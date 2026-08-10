@@ -1,6 +1,6 @@
 # 功能四：将最终修改后的项目导入主仓库
 
-人工修改完成后，Agent 应：
+Agent 应：
 
 1. 再次让参与者确认公开展示名、GitHub 用户名、`paperSlug` 和 `source`；
 2. 在作品仓库中创建 `paper/<paper-slug>-<github-user>` 分支；
