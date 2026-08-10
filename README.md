@@ -13,14 +13,13 @@
 选择一篇机器学习或人工智能论文，将 PDF、LaTeX 或论文链接连同下面这条完整指令发送给支持 Skill 的 Agent：
 
 ```text
-请获取或更新 https://github.com/ReductTech/PaperSkill，读取并严格执行 docs/AGENT_WORKFLOW.md，使用我提供的论文从环境配置开始连续完成 Paper Skill 安装、初版项目生成、依赖安装、构建和页面检查、人工修改协作、作品导入、仓库校验以及 Pull Request 准备。
-
-能够自动执行的操作不要交还给我逐条处理。只在文档规定的账号授权、论文确认、至少三项实质性修改、最终提交确认和现场展示节点让我参与。缺少参与者信息或目录标识时集中询问，不要在其他阶段中断。未完成全部验证时不要报告流程完成。
+请获取或更新 https://github.com/ReductTech/PaperSkill，首先读取并严格执行 docs/AGENT_WORKFLOW.md（菜单模式），不必读取项目中的其他源码。
+按文档要求先向我展示功能菜单，由我选择要执行的功能。
 ```
 
 整体过程为：`Agent 自动配置与生成 → 选手确认并完成实质性修改 → Agent 自动检查与准备提交 → 选手最终确认并展示`。
 
-选手只需阅读本页和 [评分标准](docs/RUBRIC.md)。其余流程文件由 Agent 自动读取并执行；当前有效文件及用途见 [文档索引](docs/README.md)。外部材料的具体提交入口以考核通知为准。
+选手只需阅读本页和 [评分标准](docs/RUBRIC.md)。Agent 会先读取 [docs/AGENT_WORKFLOW.md](docs/AGENT_WORKFLOW.md) 展示菜单并逐步执行；当前有效文件及用途见 [文档索引](docs/README.md)。外部材料的具体提交入口以考核通知为准。
 
 ## 仓库结构
 

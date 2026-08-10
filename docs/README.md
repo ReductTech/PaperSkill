@@ -9,4 +9,6 @@
 | [PARTICIPATING.md](PARTICIPATING.md) | Agent、参与者 | 分支、完整项目导入、本地校验、Pull Request 和失败处理 |
 | [SUBMISSION.md](SUBMISSION.md) | 参与者、教师 | GitHub 作品与考核外部材料的提交边界 |
 
-参与者通常只需先看仓库根目录的 `README.md` 和 `RUBRIC.md`。其余文件由 Agent 按执行阶段读取；遇到 GitHub 提交或自动检查问题时，再查看 `PARTICIPATING.md`。
+Agent 执行采用菜单模式：`docs/AGENT_WORKFLOW.md` 为入口，Agent 收到参与者从根 `README.md` 复制的指令后，先展示功能菜单由参与者选择，再读取 `docs/agent-workflow/` 下对应的说明文件执行（功能1-5各占一个文件）。
+
+参与者通常只需先看仓库根目录的 `README.md` 和 `RUBRIC.md`。其余文件由 Agent 按功能选择读取；遇到 GitHub 提交或自动检查问题时，再查看 `PARTICIPATING.md`。
