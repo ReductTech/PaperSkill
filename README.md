@@ -13,8 +13,7 @@
 选择一篇机器学习或人工智能论文，将 PDF、LaTeX 或论文链接连同下面这条完整指令发送给支持 Skill 的 Agent：
 
 ```text
-请获取或更新 https://github.com/ReductTech/PaperSkill，首先读取并严格执行 docs/AGENT_WORKFLOW.md（菜单模式），不必读取项目中的其他源码。
-按文档要求先向我展示功能菜单，由我选择要执行的功能。
+请先确认我已登录自己的 GitHub 账号；如果我还没有账号，暂停并引导我完成注册、邮箱验证和登录，确认登录成功后再继续。然后获取或更新 https://github.com/ReductTech/PaperSkill，首先读取并严格执行 docs/AGENT_WORKFLOW.md（菜单模式），不必读取项目中的其他源码。按文档要求先向我展示功能菜单，由我选择要执行的功能。
 ```
 
 整体过程为：`Agent 自动配置与生成 → 选手确认并完成实质性修改 → Agent 自动检查与准备提交 → 选手最终确认并展示`。
