@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { AnaChap1 } from './ana-chap-1';
+import { AnaChap10 } from './ana-chap-10';
+import { AnaChap2 } from './ana-chap-2';
+import { AnaChap3 } from './ana-chap-3';
+import { AnaChap4 } from './ana-chap-4';
+import { AnaChap5 } from './ana-chap-5';
+import { AnaChap6 } from './ana-chap-6';
+import { AnaChap7 } from './ana-chap-7';
+import { AnaChap8 } from './ana-chap-8';
+import { AnaChap9 } from './ana-chap-9';
+import { Chap1Mod1 } from './chap-1-1';
+import { Chap1Mod2 } from './chap-1-2';
+import { Chap10Mod1 } from './chap-10-1';
+import { Chap2Mod1 } from './chap-2-1';
+import { Chap3Mod1 } from './chap-3-1';
+import { Chap4Mod1 } from './chap-4-1';
+import { Chap4Mod2 } from './chap-4-2';
+import { Chap5Mod1 } from './chap-5-1';
+import { Chap6Mod1 } from './chap-6-1';
+import { Chap7Mod1 } from './chap-7-1';
+import { Chap8Mod1 } from './chap-8-1';
+import { Chap9Mod1 } from './chap-9-1';
+import { HeroBabelRs } from './hero-babel-rs';
+import { HeroLateAlign } from './hero-late-align';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ana-chap-1'] = AnaChap1;
+widgetRegistry['ana-chap-10'] = AnaChap10;
+widgetRegistry['ana-chap-2'] = AnaChap2;
+widgetRegistry['ana-chap-3'] = AnaChap3;
+widgetRegistry['ana-chap-4'] = AnaChap4;
+widgetRegistry['ana-chap-5'] = AnaChap5;
+widgetRegistry['ana-chap-6'] = AnaChap6;
+widgetRegistry['ana-chap-7'] = AnaChap7;
+widgetRegistry['ana-chap-8'] = AnaChap8;
+widgetRegistry['ana-chap-9'] = AnaChap9;
+widgetRegistry['chap-1-1'] = Chap1Mod1;
+widgetRegistry['chap-1-2'] = Chap1Mod2;
+widgetRegistry['chap-10-1'] = Chap10Mod1;
+widgetRegistry['chap-2-1'] = Chap2Mod1;
+widgetRegistry['chap-3-1'] = Chap3Mod1;
+widgetRegistry['chap-4-1'] = Chap4Mod1;
+widgetRegistry['chap-4-2'] = Chap4Mod2;
+widgetRegistry['chap-5-1'] = Chap5Mod1;
+widgetRegistry['chap-6-1'] = Chap6Mod1;
+widgetRegistry['chap-7-1'] = Chap7Mod1;
+widgetRegistry['chap-8-1'] = Chap8Mod1;
+widgetRegistry['chap-9-1'] = Chap9Mod1;
+widgetRegistry['hero-babel-rs'] = HeroBabelRs;
+widgetRegistry['hero-late-align'] = HeroLateAlign;
