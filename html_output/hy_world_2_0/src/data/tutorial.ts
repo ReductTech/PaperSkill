@@ -99,8 +99,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "2.1",
-          "title": "全景初始化三步观察",
-          "desc": "点击显式投影、隐式映射和接缝修复，查看各自解决的问题与边界。",
+          "title": "全景故障取证台",
+          "desc": "检查相机元数据、潜空间边界和解码后像素三类故障，为每个症状匹配正确机制，并用论文表 4 核查完整系统结果。",
           componentId: "hy-panorama"
         }
       ],

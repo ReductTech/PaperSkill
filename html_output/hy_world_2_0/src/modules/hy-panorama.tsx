@@ -109,10 +109,221 @@ export const HyBoundaryCompare: React.FC<WidgetProps> = () => {
   return <div><CanvasView animate={run>0} draw={(ctx,time)=>{clearStudio(ctx,560,240);const p=run?clamp((time-start.current)/1800,0,1):0;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(280,20);ctx.lineTo(280,210);ctx.stroke();label(ctx,'传统割裂',140,28,C.red,15,'center');label(ctx,'条件化统一',420,28,C.green,15,'center');route(ctx,[[45,175],[135,95],[235,142]],C.red,3,[7,5]);route(ctx,[[325,175],[405,105],[505,62]],C.blue,5);camera(ctx,55+p*170,170-p*58,C.red,.7);camera(ctx,335+p*160,170-p*105,C.blue,.7);target(ctx,235,142,false);target(ctx,505,62,true);label(ctx,p>.9?'各擅一端':'同起点',140,214,p>.9?C.red:C.muted,12,'center');label(ctx,p>.9?'共享组件，保留条件':'同起点',420,214,p>.9?C.green:C.muted,12,'center');}}/><div className="step-ctrl"><button className="tiny" onClick={replay}>开始比较</button></div><div className={`feedback ${run?'good':''}`}>{run?'HY-World 2.0 用共享组件连接两类任务，但仍保留不同输入条件。':'传统方案各擅长一端，难以同时覆盖生成与重建。'}</div></div>;
 };
 
+type PanoramaCaseId = 'metadata' | 'latent-seam' | 'pixel-seam';
+type PanoramaFixId = 'implicit' | 'circular' | 'blend';
+
+const panoramaCases: Array<{
+  id: PanoramaCaseId;
+  index: string;
+  title: string;
+  symptom: string;
+  question: string;
+  correct: PanoramaFixId;
+  clue: string;
+}> = [
+  {
+    id: 'metadata',
+    index: 'A',
+    title: '相机档案缺页',
+    symptom: '焦距与视场角缺失或不准，显式几何投影出现拉伸与错位。',
+    question: '哪种机制能绕开精确相机内参依赖？',
+    correct: 'implicit',
+    clue: '检查“条件图像 token”和“全景噪声 token”在哪里建立对应。',
+  },
+  {
+    id: 'latent-seam',
+    index: 'B',
+    title: '潜空间两端失联',
+    symptom: 'ERP 是环形世界，但去噪特征的左端与右端彼此看不见。',
+    question: '哪种机制在去噪阶段施加周期边界？',
+    correct: 'circular',
+    clue: '问题发生在解码之前，应该先修潜变量的边界条件。',
+  },
+  {
+    id: 'pixel-seam',
+    index: 'C',
+    title: '解码边缘仍跳色',
+    symptom: '潜空间已经闭环，但最终像素的左右边缘仍有亮度或纹理突变。',
+    question: '哪种机制直接平滑最终 ERP 边缘？',
+    correct: 'blend',
+    clue: '问题已经出现在可见像素中，需要在解码后处理。',
+  },
+];
+
+const panoramaFixes: Array<{
+  id: PanoramaFixId;
+  title: string;
+  layer: string;
+  summary: string;
+}> = [
+  { id: 'implicit', title: '隐式自适应映射', layer: '统一潜空间 · MMDiT', summary: '让自注意力学习透视图到 ERP 的特征对应。' },
+  { id: 'circular', title: '循环填充', layer: '潜空间 · 去噪阶段', summary: '把左右端作为周期邻居，约束环形边界。' },
+  { id: 'blend', title: '线性像素融合', layer: '像素空间 · 解码之后', summary: '沿 ERP 两侧边缘平滑可见过渡。' },
+];
+
 export const HyPanorama: React.FC<WidgetProps> = () => {
-  const modes=['显式投影','隐式映射','接缝修复']; const [mode,setMode]=useState(modes[0]);
-  const feedback:{[k:string]:string}={'显式投影':'显式投影依赖焦距与视场角，元数据不准会放大变形。','隐式映射':'MMDiT 在统一潜空间学习对应关系，但生成区域仍来自数据先验。','接缝修复':'循环填充与像素融合专门处理 ERP 左右接缝。'};
-  return <div><CanvasView height={250} draw={(ctx)=>{clearStudio(ctx,560,250);photo(ctx,72,105,C.orange);label(ctx,'透视条件',72,55,C.ink,13,'center');ctx.fillStyle=C.white;ctx.strokeStyle=mode==='显式投影'?C.red:C.blue;ctx.lineWidth=3;ctx.fillRect(180,65,270,82);ctx.strokeRect(180,65,270,82);for(let i=0;i<9;i++){ctx.fillStyle=i%3===0?C.floor:'#b8c9a7';ctx.fillRect(186+i*29,72,25,68);}if(mode==='显式投影'){ctx.strokeStyle=C.red;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(315,65);ctx.lineTo(337,147);ctx.stroke();}if(mode==='隐式映射'){route(ctx,[[105,105],[170,105],[315,105]],C.blue,4);label(ctx,'MMDiT token',315,180,C.blue,13,'center');}if(mode==='接缝修复'){ctx.strokeStyle=C.green;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(183,65);ctx.lineTo(183,147);ctx.moveTo(447,65);ctx.lineTo(447,147);ctx.stroke();label(ctx,'左右边界闭合',315,180,C.green,13,'center');}metricBars(ctx,['CLIP-I','Q-Align'],mode==='显式投影'?[.831,3.317]:[.844,4.026],[C.blue,C.green],40,218,95);}}/><div className="chip-row">{modes.map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='显式投影'?'bad':mode==='接缝修复'?'good':''}`}>{feedback[mode]}</div><PaperTable tableId="table-4" /></div>;
+  const [activeId, setActiveId] = useState<PanoramaCaseId>('metadata');
+  const [selectedFix, setSelectedFix] = useState<PanoramaFixId | null>(null);
+  const [solved, setSolved] = useState<PanoramaCaseId[]>([]);
+  const activeCase = panoramaCases.find(item => item.id === activeId) ?? panoramaCases[0];
+  const activeFix = panoramaFixes.find(item => item.id === selectedFix);
+  const correct = selectedFix === activeCase.correct;
+  const attempted = selectedFix !== null;
+
+  const selectCase = (id: PanoramaCaseId) => {
+    setActiveId(id);
+    setSelectedFix(null);
+  };
+
+  const applyFix = (id: PanoramaFixId) => {
+    setSelectedFix(id);
+    if (id === activeCase.correct) {
+      setSolved(items => items.includes(activeCase.id) ? items : [...items, activeCase.id]);
+    }
+  };
+
+  return <div className="panorama-lab">
+    <div className="panorama-case-head">
+      <div>
+        <span>故障样本</span>
+        <strong>从症状判断故障发生在哪一层</strong>
+      </div>
+      <small>{solved.length}/3 已归档</small>
+    </div>
+
+    <div className="panorama-case-grid">
+      {panoramaCases.map(item => {
+        const isSolved = solved.includes(item.id);
+        return <button
+          key={item.id}
+          type="button"
+          className={`${activeId === item.id ? 'selected' : ''} ${isSolved ? 'solved' : ''}`}
+          onClick={() => selectCase(item.id)}
+          aria-pressed={activeId === item.id}
+        >
+          <i>{isSolved ? '已解' : item.index}</i>
+          <span>
+            <strong>{item.title}</strong>
+            <small>{item.symptom}</small>
+          </span>
+        </button>;
+      })}
+    </div>
+
+    <div className="panorama-workbench">
+      <div className="panorama-canvas-shell">
+        <CanvasView height={286} draw={(ctx) => {
+          clearStudio(ctx, 560, 286);
+          const fixed = correct;
+          label(ctx, `案件 ${activeCase.index}`, 28, 30, C.orange, 13);
+          label(ctx, activeCase.title, 92, 30, C.ink, 15);
+
+          const nodes = [
+            { x: 82, title: '透视输入', layer: '条件' },
+            { x: 280, title: '统一潜空间', layer: '去噪' },
+            { x: 478, title: 'ERP 输出', layer: '像素' },
+          ];
+          nodes.forEach((node, index) => {
+            const activeNode = activeId === 'metadata' ? index <= 1 : activeId === 'latent-seam' ? index === 1 : index === 2;
+            ctx.fillStyle = C.white;
+            ctx.strokeStyle = activeNode ? (fixed ? C.green : C.red) : C.line;
+            ctx.lineWidth = activeNode ? 3 : 1;
+            ctx.beginPath(); ctx.roundRect(node.x - 60, 62, 120, 94, 6); ctx.fill(); ctx.stroke();
+            label(ctx, node.title, node.x, 87, activeNode ? C.ink : C.muted, 13, 'center');
+            label(ctx, node.layer, node.x, 142, activeNode ? C.blue : C.muted, 11, 'center');
+          });
+          route(ctx, [[142,109],[220,109]], fixed ? C.green : C.blue, 4, attempted && !fixed ? [6,5] : []);
+          route(ctx, [[340,109],[418,109]], fixed ? C.green : C.blue, 4, attempted && !fixed ? [6,5] : []);
+
+          photo(ctx, 82, 112, activeId === 'metadata' && !fixed ? C.red : C.orange, .82);
+          if (activeId === 'metadata') {
+            label(ctx, fixed ? '无需精确 K / FoV' : 'K ?   FoV ?', 82, 184, fixed ? C.green : C.red, 12, 'center');
+            if (fixed) {
+              label(ctx, '图像 token + 全景噪声 token', 280, 111, C.blue, 11, 'center');
+              label(ctx, 'Self-Attention', 280, 132, C.green, 11, 'center');
+            } else {
+              ctx.strokeStyle = C.red; ctx.lineWidth = 5;
+              ctx.beginPath(); ctx.moveTo(247, 98); ctx.lineTo(315, 125); ctx.stroke();
+              label(ctx, '显式投影错位', 280, 184, C.red, 12, 'center');
+            }
+          }
+
+          const stripX = activeId === 'latent-seam' ? 235 : 433;
+          const stripY = 99;
+          ctx.save();
+          ctx.beginPath(); ctx.roundRect(stripX, stripY, 90, 27, 3); ctx.clip();
+          for (let i = 0; i < 9; i += 1) {
+            const palette = fixed ? ['#93c5fd','#86efac','#fcd34d'] : ['#fb7185','#93c5fd','#86efac'];
+            ctx.fillStyle = palette[i % palette.length];
+            ctx.fillRect(stripX + i * 10, stripY, 10, 27);
+          }
+          ctx.restore();
+          ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 3; ctx.strokeRect(stripX, stripY, 90, 27);
+
+          if (activeId === 'latent-seam') {
+            ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(280, 91, 42, Math.PI, Math.PI * 2); ctx.stroke();
+            label(ctx, fixed ? '周期邻接成立' : '左右特征断开', 280, 184, fixed ? C.green : C.red, 12, 'center');
+          }
+          if (activeId === 'pixel-seam') {
+            ctx.fillStyle = fixed ? 'rgba(34,141,92,.28)' : 'rgba(196,63,82,.28)';
+            ctx.fillRect(433, 94, 13, 37); ctx.fillRect(510, 94, 13, 37);
+            label(ctx, fixed ? '像素边缘已融合' : '解码后仍跳变', 478, 184, fixed ? C.green : C.red, 12, 'center');
+          }
+
+          const stateColor = !attempted ? C.muted : correct ? C.green : C.red;
+          ctx.fillStyle = C.white; ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.roundRect(28, 214, 504, 46, 5); ctx.fill(); ctx.stroke();
+          label(ctx, !attempted ? '等待取证' : correct ? '故障层与修复机制匹配' : '修复层级不匹配', 44, 236, stateColor, 13);
+          label(ctx, attempted ? `${activeFix?.layer ?? ''}` : activeCase.clue, 44, 252, C.muted, 11);
+        }} />
+      </div>
+
+      <section className="panorama-dossier">
+        <span>当前卷宗</span>
+        <strong>{activeCase.question}</strong>
+        <p>{activeCase.symptom}</p>
+        <small>{activeCase.clue}</small>
+      </section>
+    </div>
+
+    <div className="panorama-fix-rack" aria-label="修复机制">
+      {panoramaFixes.map(item => <button
+        key={item.id}
+        type="button"
+        className={`${selectedFix === item.id ? 'selected' : ''} ${selectedFix === item.id && correct ? 'correct' : ''} ${selectedFix === item.id && !correct ? 'incorrect' : ''}`}
+        onClick={() => applyFix(item.id)}
+      >
+        <span>{item.layer}</span>
+        <strong>{item.title}</strong>
+        <small>{item.summary}</small>
+      </button>)}
+    </div>
+
+    <div className={`feedback ${attempted ? correct ? 'good' : 'bad' : ''}`}>
+      {!attempted && `请选择一种修复机制处理案件 ${activeCase.index}。`}
+      {attempted && correct && `${activeFix?.title} 与故障层级匹配。${solved.length === 3 ? ' 三类故障均已归档：映射、潜空间边界、像素边缘缺一不可。' : ' 可以继续切换案件完成全套取证。'}`}
+      {attempted && !correct && `${activeFix?.title} 作用在“${activeFix?.layer}”，无法直接处理当前故障。请根据卷宗线索重新判断。`}
+    </div>
+
+    <section className="panorama-evidence-boundary">
+      <header><span>论文证据</span><strong>完整系统结果，不由上方按钮计算</strong></header>
+      <div>
+        <p>论文第 3.2 节明确给出隐式映射、潜空间循环填充与像素线性融合；表 4 报告的是完整 HY-Pano 2.0 在 I2P 协议下的结果。</p>
+        <strong>CLIP-I 0.831 → 0.844</strong>
+        <small>HY-World 1.0 → HY-Pano 2.0；越高越好</small>
+      </div>
+    </section>
+
+    <div className="panorama-glossary-grid">
+      <details><summary>ERP 为什么有“接缝”？</summary><p>ERP 把球面展开为矩形。矩形最左与最右在球面上其实相邻，如果网络按普通图片处理，两端就可能产生不连续。</p></details>
+      <details><summary>MMDiT 在这里做什么？</summary><p>条件图像潜变量与全景噪声潜变量被拼成统一 token 序列，MMDiT 用自注意力在特征空间学习透视图到全景的对应。</p></details>
+      <details><summary>循环填充和融合为何都要？</summary><p>循环填充在去噪的潜空间建立周期边界；线性融合在解码后的像素空间平滑可见边缘，二者处于不同层级。</p></details>
+      <details><summary>“补全”是否等于真实观测？</summary><p>不是。隐式映射可以根据数据先验生成输入视角外的环境，但未见区域仍是生成结果，不能当作真实测量或确定几何。</p></details>
+    </div>
+
+    <PaperTable tableId="table-4" />
+  </div>;
 };
 
 const routeData:{[k:string]:{n:number;note:string;color:string}}={常规:{n:9,note:'离开固定视点，但物体背面仍可能缺失。',color:C.blue},环绕:{n:5,note:'围绕显著物体补足侧面观察。',color:C.green},重建感知:{n:10,note:'针对欠观察区域迭代补拍。',color:C.purple},漫游:{n:3,note:'走向可达区域远端，适合街道和走廊。',color:C.orange},航拍:{n:8,note:'补充俯视角，俯仰因碰撞动态减小。',color:C.brown}};
