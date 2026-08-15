@@ -63,10 +63,26 @@
 
 ## 论文中的相关比较资料
 
+### 模型能力进化图鉴的比较对象
+
+第 10 章模块 10.2 将下列资料整理为“模型 × 功能”矩阵。矩阵状态只描述当前资料明确覆盖的能力范围：“论文未报告”不等于“不支持”，“仅定性”也不等于已经完成统一协议下的定量验证。
+
+| 模型或资料 | 链接 | 在图鉴中的定位 | 可用于支持的结论 | 不能据此推出 |
+| --- | --- | --- | --- | --- |
+| HY-World 1.0 | [官方 GitHub](https://github.com/Tencent-Hunyuan/HunyuanWorld-1.0) | 系统级前代 | 从文字或图像生成可探索、交互式显式 3D 世界；论文表 4 还把它作为 I2P 基线 | 不能把 1.0 未出现的 2.0 模块直接写成“1.0 完全不支持” |
+| HY-World 1.5 / WorldPlay | [官方 GitHub](https://github.com/Tencent-Hunyuan/HY-WorldPlay) | 在线视频前代 | 以用户动作驱动实时像素视频世界，代表与 2.0 不同的在线视频路线 | 不能用在线响应速度直接证明其三维资产能力优于或弱于 2.0 |
+| WorldMirror 1.0 | [论文](https://arxiv.org/abs/2510.10726) · [官方 GitHub](https://github.com/Tencent-Hunyuan/HunyuanWorld-Mirror) | 重建分支前代 | 任意先验提示、前馈多任务三维重建；2.0 论文表 3、表 11、表 14 给出升级点与结果 | 它是重建子系统，不是完整世界生成系统，不能和 HY-World 2.0 做单一总分排名 |
+| GenEx | [论文](https://arxiv.org/abs/2412.09624) · [项目页](https://genex.world/) | 单图到全景探索参照 | 单图生成连续 360° 全景视频、智能体探索；HY-World 2.0 表 4 的 I2P 子表提供兼容数字 | 表 4 只能支持全景子任务比较，不能证明 HY-World 2.0 在 GenEx 的所有智能体任务上领先 |
+| video2world | [HY-World 2.0 对比章节](https://arxiv.org/abs/2604.14268) | 视频转点云/3DGS 工程参照 | 论文报告 feature-matched ICP 约 5 小时/场景，而相机先验线性对齐少于 2 分钟 | 该加速结论只覆盖论文报告的生成场景对齐流程，不能推广到所有真实视频与硬件 |
+| Marble 1.0 | [官方体验页](https://marble.worldlabs.ai/) | 闭源商业参照 | 论文截至 2026-03-30 的同全景/同单图定性案例，可讨论输入忠实度、纹理和几何完整性 | 没有统一协议定量表，不能生成虚构分数、胜率或红叉排名 |
+| HY-World 2.0 | [论文](https://arxiv.org/abs/2604.14268) · [官方 GitHub](https://github.com/Tencent-Hunyuan/HY-World-2.0) | 目标模型 | 文本/单图生成、多图/视频重建、3DGS/Mesh/点云输出和 WorldLens 运行时交互 | 完整世界生成仍约 712 秒；5.60 秒只属于 H20 四卡、128 视图重建步骤 |
+
+### 更广的产业背景
+
 | 资料 | 链接 | 与本教程的关系 |
 | --- | --- | --- |
-| Google DeepMind Genie 3 | [官方介绍](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/) | 用于理解交互式世界模型的产业背景；不能与 HY-World 2.0 的论文指标直接横向比较 |
-| World Labs Marble | [官方体验页](https://marble.worldlabs.ai/) | 论文只给出定性比较，因此教程明确避免把 Marble 写成统一协议下的定量基线 |
+| Google DeepMind Genie 3 | [官方介绍](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/) | 用于理解交互式视频世界模型的产业背景；不能与 HY-World 2.0 的论文指标直接横向比较 |
+| HY-World 2.0 官方 README 的“视频模型 vs 3D 模型”说明 | [英文 README](https://github.com/Tencent-Hunyuan/HY-World-2.0#why-3d-world-models) | 用于理解持久三维资产与逐帧视频生成的输出范式差别；宣传性总表仍需回到论文实验核对 |
 
 ## 中文解读与讨论
 
