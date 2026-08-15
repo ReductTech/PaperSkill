@@ -67,21 +67,6 @@ function route(ctx: CanvasRenderingContext2D, pts: Array<[number, number]>, colo
   pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.setLineDash([]);
 }
 
-function pointOnRoute(pts: Array<[number, number]>, progress: number): [number, number] {
-  if (pts.length < 2) return pts[0] ?? [0, 0];
-  const lengths = pts.slice(1).map(([x, y], i) => Math.hypot(x - pts[i][0], y - pts[i][1]));
-  const total = lengths.reduce((sum, length) => sum + length, 0);
-  let remaining = clamp(progress, 0, 1) * total;
-  for (let i = 0; i < lengths.length; i += 1) {
-    if (remaining <= lengths[i]) {
-      const t = lengths[i] === 0 ? 0 : remaining / lengths[i];
-      return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * t, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * t];
-    }
-    remaining -= lengths[i];
-  }
-  return pts[pts.length - 1];
-}
-
 function metricBars(ctx: CanvasRenderingContext2D, labels: string[], values: number[], colors: string[], x: number, y: number, maxW = 180) {
   const max = Math.max(...values);
   labels.forEach((t, i) => { label(ctx, t, x, y + i * 32, C.muted, 12); ctx.fillStyle = C.line; ctx.fillRect(x + 78, y - 12 + i * 32, maxW, 14); ctx.fillStyle = colors[i]; ctx.fillRect(x + 78, y - 12 + i * 32, maxW * values[i] / max, 14); label(ctx, String(values[i]), x + 84 + maxW, y + i * 32, C.ink, 12); });
@@ -116,10 +101,191 @@ export const HyInputMode: React.FC<WidgetProps> = () => {
   return <div><CanvasView draw={(ctx)=>{clearStudio(ctx,560,240); label(ctx,'输入',42,35); label(ctx,'目标',448,35); photo(ctx,88,102,C.orange); camera(ctx,270,112,C.blue,.85); route(ctx,[[122,102],[246,112],[406,generation?78:150]],C.blue,5); target(ctx,452,generation?78:150,true); label(ctx,generation?'世界生成':'世界重建',452,generation?84:156,C.green,14,'center'); label(ctx,generation?'补出未见区域':'恢复点图/深度/法线',390,210,C.ink,13);} }/><div className="chip-row">{['文本','单图','多视图','视频'].map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className="feedback good">{generation?'当前输入适合世界生成：模型需要利用生成先验补出未见区域。':'当前输入适合世界重建：多视图约束用于恢复几何。'}</div></div>;
 };
 
+type ContractAnswer = boolean | null;
+
+const systemClaims = [
+  {
+    id: 'sparse-generation',
+    number: '01',
+    claim: '文本或单图输入需要生成未见区域',
+    correct: true,
+    evidence: '论文把稀疏输入路由到四阶段世界生成：全景、规划、扩展、合成。',
+    boundary: '生成区域利用数据先验，不是对真实未见空间的测量。',
+    locator: 'Abstract；Introduction；Figure 2',
+  },
+  {
+    id: 'rich-reconstruction',
+    number: '02',
+    claim: '多视图或视频输入进入世界重建',
+    correct: true,
+    evidence: '较丰富的视觉观测由 WorldMirror 2.0 恢复几何一致的三维结构。',
+    boundary: '这条路径仍受输入覆盖、先验质量和评测协议约束。',
+    locator: 'Abstract；Introduction；Section 6',
+  },
+  {
+    id: 'reconstruction-foundation',
+    number: '03',
+    claim: '重建能力也支撑生成管线的最终合成',
+    correct: true,
+    evidence: '论文明确写道，重建不是孤立模块，而是世界生成的基础组件；生成视图会送入 WorldMirror 2.0。',
+    boundary: '“支撑生成”不表示生成与重建共享所有权重或完全相同的数据流。',
+    locator: 'Introduction；Figure 2；Section 2',
+  },
+  {
+    id: 'monolith',
+    number: '04',
+    claim: '所谓统一，表示所有任务由一个单体网络完成',
+    correct: false,
+    evidence: 'Figure 2 展示的是 HY-Pano、WorldNav、WorldStereo、WorldMirror 与 3DGS 组成的多阶段系统。',
+    boundary: '论文的“统一”是任务和组件被组织进同一系统，不是单模型端到端包办一切。',
+    locator: 'Figure 2；Section 2',
+  },
+  {
+    id: 'realtime-generation',
+    number: '05',
+    claim: 'WorldLens 可实时漫游，所以完整世界生成也是实时的',
+    correct: false,
+    evidence: 'WorldLens 是生成后资产的运行时渲染与交互平台；论文完整生成管线仍是离线流程。',
+    boundary: '运行时交互速度不能替代端到端世界生成耗时。',
+    locator: 'Abstract；Introduction；Table 2',
+  },
+] as const;
+
+type SystemClaimId = typeof systemClaims[number]['id'];
+
 export const HyBoundaryCompare: React.FC<WidgetProps> = () => {
-  const [run,setRun]=useState(0); const start=useRef(0);
-  const replay=()=>{start.current=performance.now();setRun(v=>v+1);};
-  return <div><CanvasView animate={run>0} draw={(ctx,time)=>{clearStudio(ctx,560,240);const p=run?clamp((time-start.current)/1800,0,1):0;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(280,20);ctx.lineTo(280,210);ctx.stroke();label(ctx,'传统割裂',140,28,C.red,15,'center');label(ctx,'条件化统一',420,28,C.green,15,'center');const oldPath:Array<[number,number]>=[[45,175],[135,95],[235,142]];const newPath:Array<[number,number]>=[[325,175],[405,105],[505,62]];route(ctx,oldPath,C.red,3,[7,5]);route(ctx,newPath,C.blue,5);const [oldX,oldY]=pointOnRoute(oldPath,p);const [newX,newY]=pointOnRoute(newPath,p);camera(ctx,oldX,oldY,C.red,.7);camera(ctx,newX,newY,C.blue,.7);target(ctx,235,142,false);target(ctx,505,62,true);label(ctx,p>.9?'各擅一端':'同起点',140,214,p>.9?C.red:C.muted,12,'center');label(ctx,p>.9?'共享组件，保留条件':'同起点',420,214,p>.9?C.green:C.muted,12,'center');}}/><div className="step-ctrl"><button className="tiny" onClick={replay}>开始比较</button></div><div className={`feedback ${run?'good':''}`}>{run?'HY-World 2.0 用共享组件连接两类任务，但仍保留不同输入条件。':'传统方案各擅长一端，难以同时覆盖生成与重建。'}</div></div>;
+  const [answers, setAnswers] = useState<Record<SystemClaimId, ContractAnswer>>({
+    'sparse-generation': null,
+    'rich-reconstruction': null,
+    'reconstruction-foundation': null,
+    monolith: null,
+    'realtime-generation': null,
+  });
+  const [activeClaimId, setActiveClaimId] = useState<SystemClaimId>('sparse-generation');
+  const activeClaim = systemClaims.find(item => item.id === activeClaimId) ?? systemClaims[0];
+  const answeredCount = systemClaims.filter(item => answers[item.id] !== null).length;
+  const correctCount = systemClaims.filter(item => answers[item.id] === item.correct).length;
+  const complete = correctCount === systemClaims.length;
+
+  const answerClaim = (id: SystemClaimId, value: boolean) => {
+    setActiveClaimId(id);
+    setAnswers(current => ({ ...current, [id]: value }));
+  };
+
+  const reset = () => {
+    setAnswers({
+      'sparse-generation': null,
+      'rich-reconstruction': null,
+      'reconstruction-foundation': null,
+      monolith: null,
+      'realtime-generation': null,
+    });
+    setActiveClaimId('sparse-generation');
+  };
+
+  return <div className="contract-lab">
+    <div className="contract-head">
+      <div><span>系统契约</span><strong>判断“统一生成与重建”究竟承诺了什么</strong></div>
+      <div><b>{correctCount}/5</b><small>判断正确</small></div>
+      <button type="button" onClick={reset}>重置契约</button>
+    </div>
+
+    <div className="contract-workbench">
+      <CanvasView height={310} draw={(ctx) => {
+        clearStudio(ctx, 560, 310);
+        const sparseOk = answers['sparse-generation'] === true;
+        const richOk = answers['rich-reconstruction'] === true;
+        const foundationOk = answers['reconstruction-foundation'] === true;
+        const monolithError = answers.monolith === true;
+        const realtimeError = answers['realtime-generation'] === true;
+
+        label(ctx, '稀疏条件', 36, 32, C.orange, 12);
+        label(ctx, '丰富观测', 36, 250, C.blue, 12);
+        photo(ctx, 75, 77, sparseOk ? C.orange : C.muted, .9);
+        photo(ctx, 75, 225, richOk ? C.blue : C.muted, .9);
+        label(ctx, '文本 / 单图', 75, 111, sparseOk ? C.orange : C.muted, 11, 'center');
+        label(ctx, '多视图 / 视频', 75, 261, richOk ? C.blue : C.muted, 11, 'center');
+
+        const stageXs = [175, 265, 355];
+        const stageNames = ['全景 + 规划', '世界扩展', 'WorldMirror'];
+        stageXs.forEach((x, index) => {
+          const active = index < 2 ? sparseOk : foundationOk || richOk;
+          ctx.fillStyle = C.white; ctx.strokeStyle = active ? (index === 2 && foundationOk ? C.green : C.blue) : C.line; ctx.lineWidth = active ? 3 : 1;
+          ctx.beginPath(); ctx.roundRect(x - 38, index === 2 ? 126 : 60, 76, 58, 5); ctx.fill(); ctx.stroke();
+          label(ctx, stageNames[index], x, index === 2 ? 157 : 91, active ? C.ink : C.muted, 11, 'center');
+        });
+        if (sparseOk) {
+          route(ctx, [[106,77],[137,77]], C.orange, 4);
+          route(ctx, [[213,77],[227,77]], C.blue, 4);
+          route(ctx, [[303,77],[355,126]], foundationOk ? C.green : C.blue, 4, foundationOk ? [] : [6,5]);
+        }
+        if (richOk) route(ctx, [[106,225],[317,175]], foundationOk ? C.green : C.blue, 4);
+
+        ctx.fillStyle = C.white; ctx.strokeStyle = foundationOk ? C.green : C.line; ctx.lineWidth = foundationOk ? 3 : 1;
+        ctx.beginPath(); ctx.roundRect(434, 126, 92, 58, 5); ctx.fill(); ctx.stroke();
+        label(ctx, '3DGS / 几何', 480, 157, foundationOk ? C.green : C.muted, 11, 'center');
+        if (foundationOk) route(ctx, [[393,155],[434,155]], C.green, 4);
+
+        if (monolithError) {
+          ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.setLineDash([7,5]);
+          ctx.strokeRect(130, 44, 276, 156); ctx.setLineDash([]);
+          label(ctx, '误读：一个万能网络', 268, 218, C.red, 12, 'center');
+        } else if (answers.monolith === false) {
+          label(ctx, '多组件系统', 268, 218, C.green, 12, 'center');
+        }
+
+        if (realtimeError) {
+          label(ctx, '⚡ 实时生成？', 480, 80, C.red, 13, 'center');
+          ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(458,91); ctx.lineTo(502,109); ctx.stroke();
+        } else if (answers['realtime-generation'] === false) {
+          label(ctx, '离线生成 → 实时漫游', 480, 80, C.green, 11, 'center');
+        }
+
+        ctx.fillStyle = C.white; ctx.strokeStyle = complete ? C.green : C.line; ctx.lineWidth = complete ? 3 : 1;
+        ctx.beginPath(); ctx.roundRect(136, 269, 290, 27, 4); ctx.fill(); ctx.stroke();
+        label(ctx, complete ? '契约成立：条件分流 + 重建回流 + 显式资产' : `已判断 ${answeredCount}/5，继续校验系统边界`, 281, 287, complete ? C.green : C.muted, 11, 'center');
+      }} />
+
+      <section className={`contract-evidence ${answers[activeClaim.id] === null ? '' : answers[activeClaim.id] === activeClaim.correct ? 'correct' : 'incorrect'}`}>
+        <span>当前条款 {activeClaim.number}</span>
+        <strong>{activeClaim.claim}</strong>
+        <p>{activeClaim.evidence}</p>
+        <small>{activeClaim.boundary}</small>
+        <em>{activeClaim.locator}</em>
+      </section>
+    </div>
+
+    <div className="contract-claims">
+      {systemClaims.map(item => {
+        const answer = answers[item.id];
+        const status = answer === null ? 'undecided' : answer === item.correct ? 'correct' : 'incorrect';
+        return <article key={item.id} className={`${status} ${activeClaimId === item.id ? 'active' : ''}`} onClick={() => setActiveClaimId(item.id)}>
+          <div className="contract-claim-copy">
+            <i>{item.number}</i>
+            <strong>{item.claim}</strong>
+            <small>{answer === null ? '尚未判断' : answer === item.correct ? '判断正确' : '与论文边界冲突'}</small>
+          </div>
+          <div className="contract-answer-pair" aria-label={`${item.claim}是否成立`}>
+            <button type="button" className={answer === true ? 'selected' : ''} onClick={(event) => { event.stopPropagation(); answerClaim(item.id, true); }}>成立</button>
+            <button type="button" className={answer === false ? 'selected' : ''} onClick={(event) => { event.stopPropagation(); answerClaim(item.id, false); }}>不成立</button>
+          </div>
+        </article>;
+      })}
+    </div>
+
+    <div className={`feedback ${complete ? 'good' : answeredCount === 5 ? 'bad' : ''}`}>
+      {complete && '系统契约全部成立：稀疏输入走生成、丰富观测走重建，WorldMirror 2.0 又回到生成管线完成三维合成；统一的是系统，不是一个万能网络。'}
+      {!complete && answeredCount < 5 && `已完成 ${answeredCount}/5 条判断。点击条款可查看论文证据与不可外推边界。`}
+      {!complete && answeredCount === 5 && `目前有 ${5 - correctCount} 条判断与论文冲突。优先检查“统一是否等于单体网络”以及“实时漫游是否等于实时生成”。`}
+    </div>
+
+    <div className="contract-glossary-grid">
+      <details><summary>统一系统 ≠ 单一网络</summary><p>HY-World 2.0 由 HY-Pano 2.0、WorldNav、WorldStereo 2.0、WorldMirror 2.0、3DGS 优化和 WorldLens 等组件构成。统一发生在任务分流、数据衔接和输出资产层面。</p></details>
+      <details><summary>重建为何是生成的基础组件？</summary><p>生成管线先补出多视图观察，再由 WorldMirror 2.0 恢复三维结构，随后优化为 3DGS。没有这一步，生成结果仍只是图像序列而非持久三维资产。</p></details>
+      <details><summary>离线生成与实时漫游如何共存？</summary><p>世界资产可以在 WorldLens 中实时渲染、碰撞和角色漫游，但资产生成本身仍是离线、多阶段过程。两者位于生命周期的不同阶段。</p></details>
+      <details><summary>“第一”结论的范围是什么？</summary><p>论文自称首个开源、系统化统一生成与重建的多模态世界模型。教程保留“开源、系统化、离线三维范式”这些限定，不扩写成所有世界模型中的绝对首创。</p></details>
+    </div>
+  </div>;
 };
 
 export const HyPanorama: React.FC<WidgetProps> = () => {

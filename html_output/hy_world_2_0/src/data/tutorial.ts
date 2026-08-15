@@ -58,8 +58,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "1.2",
-          "title": "传统割裂与统一框架",
-          "desc": "让两侧从同一时刻出发，比较“各擅一端”和“条件化统一”的差别。",
+          "title": "统一框架契约校验台",
+          "desc": "判断五条系统声明是否成立，拼出生成、重建与显式资产之间的真实关系，并纠正“单体网络”和“实时生成”两类误读。",
           componentId: "hy-boundary-compare",
           "figure": "/images/figure-2-architecture.png"
         }
