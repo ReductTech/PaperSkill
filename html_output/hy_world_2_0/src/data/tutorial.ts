@@ -31,16 +31,23 @@ export const tutorial: TutorialData = {
     {
       kind: "chapter",
       "id": "chap-1",
-      "title": "一套模型，两种世界任务",
+      "title": "先理解世界模型：一套系统，两种任务",
       "badge": "inf",
       "badgeLabel": "推理必读",
-      "bridge": "先确定任务边界：HY-World 2.0 的“统一”并不意味着所有输入执行同一种计算，而是根据观察丰富度选择生成或重建。",
+      "bridge": "先建立概念坐标：世界模型不等于普通视频生成器。它要表示环境状态，并支持预测、生成、重建或模拟；HY-World 2.0 选择的是离线显式三维路线。",
       "analogy": {
         "title": "同一台相机，不同的拍摄任务",
         "text": "线索稀少时，需要<b>补出未见区域</b>；观察充分时，重点变成<b>恢复真实空间关系</b>。",
         componentId: "hy-analogy"
       },
       "modules": [
+        {
+          kind: "module",
+          "id": "1.0",
+          "title": "世界模型概念实验室",
+          "desc": "切换视频生成、动作条件视频世界、显式三维重建和 HY-World 2.0，比较它们的输入、内部状态、输出、动作闭环与能力边界。",
+          componentId: "hy-world-model-basics"
+        },
         {
           kind: "module",
           "id": "1.1",
@@ -57,17 +64,17 @@ export const tutorial: TutorialData = {
           "figure": "/images/figure-2-architecture.png"
         }
       ],
-      "insight": "统一的关键不是强迫所有输入走同一路径，而是让系统根据观察丰富度切换目标。",
+      "insight": "世界模型是一个任务家族而不是单一输出格式；HY-World 2.0 的核心选择是把生成与重建接到可持久保存、可运行的显式三维资产上。",
       "takeaways": [
         {
           "icon": "🎯",
-          "title": "先看输入",
-          "desc": "文本或单图用于生成，多视图或视频用于重建。"
+          "title": "先辨范式",
+          "desc": "像素视频、动作条件世界与显式三维资产回答的问题不同。"
         },
         {
           "icon": "🔧",
-          "title": "统一但不混同",
-          "desc": "共享组件连接两类任务，适用条件仍然不同。"
+          "title": "再看输入",
+          "desc": "文本或单图用于生成，多视图或视频用于重建。"
         },
         {
           "icon": "⚠️",
