@@ -17,7 +17,8 @@ type ModelProfile = {
   name: string;
   shortName: string;
   kind: string;
-  year: string;
+  published: string;
+  publishedIso?: string;
   relation: string;
   comparison: string;
   boundary: string;
@@ -45,7 +46,7 @@ const statusMeta: Record<Status, { label: string; hint: string }> = {
   complete: { label: '完整支持', hint: '有明确系统、论文或官方说明支撑' },
   partial: { label: '局部支持', hint: '覆盖部分输入、输出或采用不同范式' },
   qualitative: { label: '仅定性', hint: '只有案例或视觉比较，不能当作统一协议分数' },
-  unreported: { label: '未报告', hint: '当前引用资料没有给出，不能写成“不支持”' },
+  unreported: { label: '未报告', hint: '当前引用资料没有给出；该单元格不可展开，也不能写成“不支持”' },
   closed: { label: '闭源参照', hint: '论文将其作为闭源商业系统讨论' },
 };
 
@@ -131,7 +132,8 @@ const models: ModelProfile[] = [
     name: 'HY-World 1.0',
     shortName: 'HY 1.0',
     kind: '系统级前代',
-    year: '2025',
+    published: '发表 2025-07-29',
+    publishedIso: '2025-07-29',
     relation: '离线显式 3D 世界生成路线，是 2.0 最直接的系统前代。',
     comparison: '2.0 保留“生成可探索三维世界”的目标，同时加入视频扩散先验扩大探索空间、提高视觉质量，并把多视图/视频重建纳入同一框架。',
     boundary: '论文把 1.0 作为前代与 I2P 基线；不同子系统的改进不能被压缩成一个总分。',
@@ -151,7 +153,8 @@ const models: ModelProfile[] = [
     name: 'HY-World 1.5',
     shortName: 'HY 1.5',
     kind: '在线视频前代',
-    year: '2025-2026',
+    published: '发表 2025-12-16',
+    publishedIso: '2025-12-16',
     relation: '以 WorldPlay + WorldCompass 为代表的在线、动作驱动视频世界路线。',
     comparison: '2.0 不是简单替代 1.5：1.5 强调动作驱动的在线视频生成，2.0 强调一次构建后可持久保存、编辑和实时渲染的显式三维资产。',
     boundary: '两代系统的输出范式和时延目标不同，不能用“离线生成更慢”或“在线视频更快”直接判定整体优劣。',
@@ -171,7 +174,8 @@ const models: ModelProfile[] = [
     name: 'WorldMirror 1.0',
     shortName: 'WM 1.0',
     kind: '重建分支前代',
-    year: '2025',
+    published: '发表 2025-10-12',
+    publishedIso: '2025-10-12',
     relation: '统一前馈三维重建器，是 2.0 重建分支的直接前代，而不是完整世界生成系统。',
     comparison: '2.0 用归一化 RoPE、深度-法线耦合、深度掩码头、token-budget 动态采样与并行策略，重点修复训练外分辨率和大视图数问题。',
     boundary: '7-Scenes 高分辨率 Acc. 0.079→0.037 是越低越好的点图误差；H20 四卡 5.60 秒仅是 128 视图重建步骤。',
@@ -191,7 +195,8 @@ const models: ModelProfile[] = [
     name: 'GenEx',
     shortName: 'GenEx',
     kind: '全景探索参照',
-    year: '2024',
+    published: '发表 2024-12-12',
+    publishedIso: '2024-12-12',
     relation: '从单张 RGB 图像生成可探索想象世界，并用全景视频支持智能体探索。',
     comparison: 'HY-Pano 2.0 在论文表 4 的 I2P 协议中改善全景相似度与感知质量；HY-World 2.0 还进一步输出持久三维资产，但这部分没有与 GenEx 做统一端到端评测。',
     boundary: '可直接比较的数字只属于 I2P 子任务：CLIP-I 0.831→0.844，Q-Align Quality Persp 2.917→4.026；不能外推成全系统胜负。',
@@ -211,7 +216,7 @@ const models: ModelProfile[] = [
     name: 'video2world',
     shortName: 'video2world',
     kind: '视频转三维参照',
-    year: '论文同期基线',
+    published: '论文未单列日期',
     relation: '把生成视频经特征匹配 ICP 对齐为点云，再构建三维表示。',
     comparison: '在论文报告的生成场景对齐流程中，HY-World 2.0 用相机姿态先验的轻量线性对齐把约 5 小时缩短到 2 分钟以内，并得到更好的最终 3DGS 几何与纹理。',
     boundary: '这是特定生成场景管线的比较，不代表所有真实视频、硬件与输入规模都能获得同样加速比。',
@@ -231,7 +236,8 @@ const models: ModelProfile[] = [
     name: 'Marble 1.0',
     shortName: 'Marble 1.0',
     kind: '闭源商业参照',
-    year: '截至 2026-03-30',
+    published: '比较版本 2026-03-30',
+    publishedIso: '2026-03-30',
     relation: 'World Labs 的闭源世界生成产品，论文用相同全景或单图输入做视觉案例比较。',
     comparison: '论文声称 HY-World 2.0 更忠于输入、纹理更清晰、跨视角几何一致性与 3DGS 完整性更好，但没有统一协议下的定量表格。',
     boundary: '所有能力判断只按论文展示的 Marble 1.0 案例和版本日期陈述，不生成分数、不画红叉、不推广到后续产品版本。',
@@ -251,7 +257,8 @@ const models: ModelProfile[] = [
     name: 'HY-World 2.0',
     shortName: 'HY 2.0',
     kind: '目标模型',
-    year: '2026',
+    published: '发表 2026-04-15',
+    publishedIso: '2026-04-15',
     relation: '统一世界生成、世界重建与运行时模拟的离线显式 3D 世界模型。',
     comparison: '2.0 的核心不是在每条轴上都宣称绝对领先，而是把稀疏输入生成、密集输入重建、持久三维资产和运行时交互接入同一系统。',
     boundary: '完整世界生成仍约 712 秒；5.60 秒只对应 H20 四卡、128 视图的 WorldMirror 2.0 重建步骤。',
@@ -267,6 +274,9 @@ const models: ModelProfile[] = [
     },
   },
 ];
+
+const modelOrder: ModelId[] = ['hy2', 'hy1', 'hy15', 'wm1', 'genex', 'video2world', 'marble'];
+const orderedModels = modelOrder.map((modelId) => models.find((model) => model.id === modelId) as ModelProfile);
 
 export const HyModelEvolution: React.FC<WidgetProps> = () => {
   const [selectedModelId, setSelectedModelId] = useState<ModelId>('hy2');
@@ -292,7 +302,9 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
         </div>
         <div className="evolution-legend" aria-label="能力状态图例">
           {(Object.keys(statusMeta) as Status[]).map((status) => (
-            <span key={status} className={`evolution-status ${status}`}>{statusMeta[status].label}</span>
+            <span key={status} className={`evolution-status ${status}`}>
+              {statusMeta[status].label}{status === 'unreported' ? '（不可展开）' : ''}
+            </span>
           ))}
         </div>
       </div>
@@ -300,10 +312,11 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
       <div className="evolution-matrix-scroll" tabIndex={0} aria-label="模型能力矩阵，可横向滚动">
         <div className="evolution-matrix" role="grid" aria-label="HY-World 2.0 历代与外部模型能力比较">
           <div className="evolution-corner" role="columnheader">功能 \ 模型</div>
-          {models.map((model) => (
+          {orderedModels.map((model) => (
             <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''}`} role="columnheader">
               <strong>{model.shortName}</strong>
               <span>{model.kind}</span>
+              <time dateTime={model.publishedIso}>{model.published}</time>
             </div>
           ))}
 
@@ -313,20 +326,23 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
                 <strong>{capability.shortName}</strong>
                 <span>{capability.name}</span>
               </div>
-              {models.map((model) => {
+              {orderedModels.map((model) => {
                 const state = model.capabilities[capability.id];
                 const isSelected = model.id === selectedModel.id && capability.id === selectedCapability.id;
+                const isDisabled = state.status === 'unreported';
                 return (
                   <button
                     key={`${model.id}-${capability.id}`}
                     type="button"
                     className={`evolution-cell ${state.status} ${isSelected ? 'selected' : ''}`}
+                    disabled={isDisabled}
                     onClick={() => {
                       setSelectedModelId(model.id);
                       setSelectedCapabilityId(capability.id);
                     }}
                     aria-pressed={isSelected}
-                    aria-label={`${model.name}，${capability.name}：${statusMeta[state.status].label}`}
+                    aria-label={`${model.name}，${capability.name}：${statusMeta[state.status].label}${isDisabled ? '，不可展开' : ''}`}
+                    title={isDisabled ? '论文未报告该能力，本单元格不可展开' : `展开 ${model.name} 的${capability.name}说明`}
                     role="gridcell"
                   >
                     <span aria-hidden="true" />
@@ -338,12 +354,12 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
           ))}
         </div>
       </div>
-      <p className="evolution-scroll-hint">灰色提示：窄屏时请在矩阵内部左右滑动；“未报告”不等于“不支持”。</p>
+      <p className="evolution-scroll-hint">灰色提示：窄屏时请在矩阵内部左右滑动；“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
 
       <section className={`evolution-detail ${selectedState.status}`} aria-live="polite">
         <header className="evolution-detail-head">
           <div>
-            <span>{selectedModel.kind} · {selectedModel.year}</span>
+            <span>{selectedModel.kind} · {selectedModel.published}</span>
             <h5>{selectedModel.name} × {selectedCapability.name}</h5>
           </div>
           <span className={`evolution-status ${selectedState.status}`}>{selectedStatus.label}</span>
