@@ -14,11 +14,11 @@ export const tutorial: TutorialData = {
   },
   hero: {
     oldMethod: {
-      desc: '传统研究管线已经能生成短片，但音频表征、视频级奖励、多人物音频归因和多步扩散各自留下了产品化缺口。',
+      desc: '这不是论文定义的一条统一“传统架构”，而是把 <b>v1.0 的音频编码、原视频级 GRPO、多步扩散和原双人 MultiTalk</b> 的限制放在同一张概念图中对照。',
       componentId: 'hero-demo',
     },
     newMethod: {
-      desc: 'LongCat 1.5 把 Whisper、逐帧 GRPO、DMD2、Silent Condition 与数据工程接入同一套开源 DiT 系统。',
+      desc: '清洗后的数据进入统一 DiT 主干，<b>Base → Per-frame GRPO → DMD2</b> 构成渐进训练路径；Whisper-large 与 Silent Condition 分别提供细粒度声学表示和多人背景条件。',
       componentId: 'hero-production',
     },
   },
