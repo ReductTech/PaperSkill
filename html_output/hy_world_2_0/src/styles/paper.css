@@ -619,6 +619,108 @@
   font-weight: 800;
 }
 
+.resolution-lab {
+  display: grid;
+  gap: 14px;
+}
+
+.resolution-levels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.resolution-levels button,
+.resolution-probes button {
+  color: var(--ink-2);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.resolution-levels button {
+  display: grid;
+  gap: 2px;
+  min-height: 54px;
+  align-content: center;
+  padding: 8px 10px;
+}
+
+.resolution-levels button strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.resolution-levels button span {
+  color: var(--muted);
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+}
+
+.resolution-levels button:hover,
+.resolution-probes button:hover {
+  border-color: var(--blue);
+}
+
+.resolution-levels button.selected,
+.resolution-probes button.selected {
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+
+.resolution-probes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.resolution-probes > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.resolution-probes button {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.resolution-readout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.resolution-readout > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 11px 12px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.resolution-readout span,
+.resolution-readout small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.resolution-readout strong {
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+  font-size: 17px;
+}
+
 .model-evolution {
   display: grid;
   gap: 14px;
@@ -1006,6 +1108,24 @@
 }
 
 @media (max-width: 520px) {
+  .resolution-levels,
+  .resolution-readout {
+    grid-template-columns: 1fr;
+  }
+
+  .resolution-levels button {
+    min-height: 48px;
+  }
+
+  .resolution-probes {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .resolution-probes button {
+    width: 100%;
+  }
+
   .evolution-matrix {
     min-width: 1016px;
     grid-template-columns: 148px repeat(7, minmax(124px, 1fr));

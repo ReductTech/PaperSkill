@@ -351,7 +351,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "7.1",
           "title": "分辨率外推变插值",
-          "desc": "拖动分辨率档位，对比标准 RoPE 与归一化 RoPE 的坐标范围和相机姿态 AUC。",
+          "desc": "点选 L/M/H 分辨率，再移动相对位置探针，观察原始索引为何外推、归一化坐标为何仍保持在固定区间。",
           componentId: "hy-resolution"
         }
       ],
@@ -361,16 +361,28 @@ export const tutorial: TutorialData = {
         "unicode": "x̂_i=(2i+1)/H_p-1,  ŷ_j=(2j+1)/W_p-1",
         "symbols": [
           {
-            "sym": "i, j",
-            "desc": "patch 在高度和宽度方向的索引。"
+            "sym": "x̂_i",
+            "desc": "高度方向第 i 个 patch 中心的归一化坐标。"
           },
           {
-            "sym": "H_p, W_p",
-            "desc": "输入图像对应的 patch 网格尺寸。"
+            "sym": "ŷ_j",
+            "desc": "宽度方向第 j 个 patch 中心的归一化坐标。"
           },
           {
-            "sym": "x̂_i, ŷ_j",
-            "desc": "归一化后的二维位置坐标。"
+            "sym": "H_p",
+            "desc": "输入图像在高度方向对应的 patch 网格尺寸。"
+          },
+          {
+            "sym": "W_p",
+            "desc": "输入图像在宽度方向对应的 patch 网格尺寸。"
+          },
+          {
+            "sym": "i",
+            "desc": "patch 在高度方向的整数索引。"
+          },
+          {
+            "sym": "j",
+            "desc": "patch 在宽度方向的整数索引。"
           }
         ]
       },

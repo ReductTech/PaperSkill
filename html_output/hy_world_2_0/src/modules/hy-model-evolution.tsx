@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import type { WidgetProps } from './registry';
-import { OfficialGif } from './hy-paper-evidence';
 
 type Status = 'complete' | 'partial' | 'qualitative' | 'unreported' | 'closed';
 type CapabilityId = 'generation' | 'reconstruction' | 'panorama' | 'expansion' | 'assets' | 'interaction' | 'open';
@@ -32,12 +31,6 @@ type CapabilityProfile = {
   shortName: string;
   purpose: string;
   hyAdvance: string;
-  gif?: {
-    src: string;
-    title: string;
-    caption: string;
-    alt: string;
-  };
 };
 
 const PAPER_URL = 'https://arxiv.org/abs/2604.14268';
@@ -57,12 +50,6 @@ const capabilities: CapabilityProfile[] = [
     shortName: '稀疏输入生成',
     purpose: '把文本或一张参考图扩展成可探索世界，适合创作、预演与快速搭建场景原型。',
     hyAdvance: 'HY-World 2.0 把文本与单图统一接入 HY-Pano 2.0、WorldNav、WorldStereo 2.0 和 WorldMirror 2.0，最终得到持久三维资产，而不是只生成一段观看后即结束的视频。',
-    gif: {
-      src: '/images/official-mesh.gif',
-      title: '从稀疏条件到可漫游三维资产',
-      caption: '官方 GIF 展示生成后 Mesh 的实时漫游形态；它说明输出形态，不替代生成质量的定量实验。',
-      alt: 'HY-World 2.0 官方 Mesh 漫游演示',
-    },
   },
   {
     id: 'reconstruction',
@@ -70,12 +57,6 @@ const capabilities: CapabilityProfile[] = [
     shortName: '密集输入重建',
     purpose: '把真实拍摄的多张照片或视频恢复为数字孪生，用于采集归档、仿真和内容再编辑。',
     hyAdvance: 'HY-World 2.0 将 WorldMirror 2.0 纳入统一系统，可在一次前馈中联合预测相机、点图、深度、法线与 3DGS，并支持 50K-500K 像素的灵活分辨率。',
-    gif: {
-      src: '/images/official-reconstruction.gif',
-      title: '多图与视频重建流程',
-      caption: '官方 GIF 展示照片或视频进入 WorldMirror 2.0 后的多种三维结果；实际质量仍取决于视角覆盖、图像质量与推理配置。',
-      alt: 'HY-World 2.0 官方多视图与视频重建演示',
-    },
   },
   {
     id: 'panorama',
@@ -97,12 +78,6 @@ const capabilities: CapabilityProfile[] = [
     shortName: '持久三维资产',
     purpose: '把生成结果保存为可渲染、可编辑、可导入引擎的资产，使一次生成可以被长期复用。',
     hyAdvance: 'HY-World 2.0 同时面向 3DGS、Mesh、点云及相关几何输出，并用深度线性对齐、非天空增密和 MaskGaussian 改善完整度、漂浮物与资产规模的平衡。',
-    gif: {
-      src: '/images/official-mesh.gif',
-      title: '持久 Mesh 资产与实时渲染',
-      caption: '官方 GIF 展示可长期保存和漫游的资产形态；不能据此推断所有场景都具有相同网格质量。',
-      alt: 'HY-World 2.0 官方 Mesh 资产演示',
-    },
   },
   {
     id: 'interaction',
@@ -110,12 +85,6 @@ const capabilities: CapabilityProfile[] = [
     shortName: '漫游与物理',
     purpose: '让用户或智能体进入场景，进行第一/第三人称移动、碰撞与持续探索，而不只是观看离线渲染。',
     hyAdvance: 'WorldLens 把生成阶段与运行时渲染解耦，加入引擎无关架构、IBL 光照、碰撞检测和角色支持；生成仍是分钟级，但资产渲染与交互可实时进行。',
-    gif: {
-      src: '/images/official-interactive.gif',
-      title: '角色移动与碰撞反馈',
-      caption: '官方 GIF 展示角色在生成世界中的移动和空间交互；它是产品能力演示，不是物理真实性基准。',
-      alt: 'HY-World 2.0 官方角色交互演示',
-    },
   },
   {
     id: 'open',
@@ -275,7 +244,7 @@ const models: ModelProfile[] = [
   },
 ];
 
-const modelOrder: ModelId[] = ['hy2', 'hy1', 'hy15', 'wm1', 'genex', 'video2world', 'marble'];
+const modelOrder: ModelId[] = ['hy2', 'hy15', 'hy1', 'wm1', 'genex', 'video2world', 'marble'];
 const orderedModels = modelOrder.map((modelId) => models.find((model) => model.id === modelId) as ModelProfile);
 
 export const HyModelEvolution: React.FC<WidgetProps> = () => {
@@ -396,14 +365,6 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
           )}
         </div>
 
-        {selectedCapability.gif && (
-          <OfficialGif
-            src={selectedCapability.gif.src}
-            title={selectedCapability.gif.title}
-            caption={`${selectedCapability.gif.caption} 当前选择的是 ${selectedModel.name}，GIF 仅展示 HY-World 2.0 对应能力，不代表两者完成了同协议动态对照。`}
-            alt={selectedCapability.gif.alt}
-          />
-        )}
       </section>
     </div>
   );

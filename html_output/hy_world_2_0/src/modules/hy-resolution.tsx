@@ -14,8 +14,91 @@ function bars(ctx:CanvasRenderingContext2D,items:Array<{name:string;value:number
 const stages=[{t:'领域适配',sub:'关键帧潜空间 + 相机适配器',color:C.blue,fb:'领域适配：关键帧潜空间与相机适配器建立精确控制。'},{t:'中段训练',sub:'GGM + SSM++',color:C.purple,fb:'中段训练：GGM 与 SSM++ 让多轨迹保持一致。'},{t:'后蒸馏',sub:'DMD 四步 DiT',color:C.green,fb:'后蒸馏：DMD 将生成器压缩为四步 DiT。'}];
 export const HyTrainingStages:React.FC<WidgetProps>=()=>{const[stage,setStage]=useState(0);return <div><CanvasView draw={(ctx)=>{clear(ctx,560,250);stages.forEach((s,i)=>{const x=65+i*180;ctx.fillStyle=i===stage?s.color:C.white;ctx.strokeStyle=i===stage?s.color:C.line;ctx.lineWidth=i===stage?4:2;ctx.beginPath();ctx.roundRect(x,70,130,70,8);ctx.fill();ctx.stroke();label(ctx,s.t,x+65,95,i===stage?C.white:C.ink,14,'center');label(ctx,s.sub,x+65,119,i===stage?C.white:C.muted,11,'center');if(i<2)route(ctx,[[x+130,105],[x+180,105]],i<stage?C.green:C.line,4)});camera(ctx,80+stage*180,185,stages[stage].color,.72);label(ctx,stage===2?'4 steps':'能力逐段加入',280,225,stage===2?C.green:C.blue,13,'center')}}/><div className="step-ctrl"><button className="tiny ghost" onClick={()=>setStage(Math.max(0,stage-1))} disabled={stage===0}>上一步</button><span className="step-label"><b>{stage+1}</b> / 3</span><button className="tiny" onClick={()=>setStage(Math.min(2,stage+1))} disabled={stage===2}>下一步</button><button className="tiny ghost" onClick={()=>setStage(0)}>重置</button></div><div className={`feedback ${stage===2?'good':''}`}>{stages[stage].fb}</div></div>};
 
-const res=[{name:'低 L',px:'189×259',old:80.55,now:83.43},{name:'中 M',px:'378×518',old:86.13,now:86.48},{name:'高 H',px:'756×1036',old:66.29,now:86.89}];
-export const HyResolution:React.FC<WidgetProps>=()=>{const[idx,setIdx]=useState(1);const d=res[idx];return <div><CanvasView draw={(ctx)=>{clear(ctx,560,250);label(ctx,`推理分辨率 ${d.px}`,40,32,C.orange,14);ctx.strokeStyle=C.line;ctx.strokeRect(40,58,215,120);ctx.strokeRect(305,58,215,120);label(ctx,'标准 RoPE 整数索引',148,52,C.red,13,'center');label(ctx,'归一化 RoPE [-1,1]',412,52,C.green,13,'center');const n=[5,8,12][idx];for(let i=0;i<n;i++){const x=55+i*180/(n-1);ctx.strokeStyle=i>7?C.red:C.blue;ctx.beginPath();ctx.moveTo(x,72);ctx.lineTo(x,164);ctx.stroke();const x2=320+i*185/(n-1);ctx.strokeStyle=C.green;ctx.beginPath();ctx.moveTo(x2,72);ctx.lineTo(x2,164);ctx.stroke()}bars(ctx,[{name:'WM 1.0 AUC',value:d.old,display:d.old.toFixed(2),color:idx===2?C.red:C.blue},{name:'WM 2.0 AUC',value:d.now,display:d.now.toFixed(2),color:C.green}],75,213,230)}}/><div className="ctrl"><label>分辨率档位 <span className="val">{d.name}</span></label><input type="range" min={0} max={2} step={1} value={idx} onChange={e=>setIdx(Number(e.target.value))}/></div><div className={`feedback ${idx===2?'good':''}`}>{idx===2?'高分辨率下，WorldMirror 1.0 的 AUC@30 从中档 86.13 降到 66.29；2.0 保持 86.89。':'归一化坐标让不同分辨率在同一范围内重新采样。'} 结论仅覆盖论文测试的 L/M/H 分辨率。</div><PaperTable tableId="table-11" /></div>};
+const res=[
+  {name:'低 L',px:'189×259',old:80.55,now:83.43,density:6,summary:'训练分辨率附近，两代模型都能维持较稳定的相机估计。'},
+  {name:'中 M',px:'378×518',old:86.13,now:86.48,density:9,summary:'中档是旧模型表现最好的对照点，两代结果接近。'},
+  {name:'高 H',px:'756×1036',old:66.29,now:86.89,density:13,summary:'进入训练外高分辨率后，旧模型明显退化，归一化位置编码仍保持稳定。'},
+];
+const probes=[
+  {name:'靠近起点',ratio:.08},
+  {name:'网格中心',ratio:.5},
+  {name:'靠近终点',ratio:.92},
+];
+
+export const HyResolution:React.FC<WidgetProps>=()=>{
+  const[idx,setIdx]=useState(1);
+  const[probeIdx,setProbeIdx]=useState(1);
+  const d=res[idx];
+  const probe=probes[probeIdx];
+  const sampleIndex=Math.round(probe.ratio*(d.density-1));
+  const normalized=(2*sampleIndex+1)/d.density-1;
+  const gain=d.now-d.old;
+
+  return <div className="resolution-lab">
+    <div className="resolution-levels" role="group" aria-label="选择论文评测分辨率档位">
+      {res.map((item,i)=><button key={item.name} type="button" className={idx===i?'selected':''} aria-pressed={idx===i} onClick={()=>setIdx(i)}><strong>{item.name}</strong><span>{item.px}</span></button>)}
+    </div>
+    <CanvasView width={600} height={286} draw={(ctx)=>{
+      clear(ctx,600,286);
+      label(ctx,`当前档位：${d.name} · ${d.px}`,300,28,C.ink,15,'center');
+      const panels=[{x:34,title:'标准 RoPE：索引范围随网格扩张',color:C.red},{x:326,title:'归一化 RoPE：始终落在 [-1, 1]',color:C.green}];
+      panels.forEach((panel,panelIdx)=>{
+        ctx.fillStyle=C.white;
+        ctx.strokeStyle=panel.color;
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.roundRect(panel.x,54,240,142,7);
+        ctx.fill();
+        ctx.stroke();
+        label(ctx,panel.title,panel.x+120,45,panel.color,12,'center');
+        const innerX=panel.x+20;
+        const innerW=200;
+        for(let i=0;i<d.density;i++){
+          const x=innerX+i*innerW/(d.density-1);
+          const active=i===sampleIndex;
+          ctx.strokeStyle=active?C.orange:C.line;
+          ctx.lineWidth=active?4:1;
+          ctx.beginPath();
+          ctx.moveTo(x,73);
+          ctx.lineTo(x,166);
+          ctx.stroke();
+          if(active){
+            ctx.fillStyle=C.orange;
+            ctx.beginPath();
+            ctx.arc(x,119,7,0,Math.PI*2);
+            ctx.fill();
+          }
+        }
+        if(panelIdx===0){
+          label(ctx,`示意索引 i = ${sampleIndex}`,panel.x+120,185,C.red,12,'center');
+        }else{
+          label(ctx,`x̂ᵢ ≈ ${normalized.toFixed(2)}`,panel.x+120,185,C.green,12,'center');
+        }
+      });
+      label(ctx,'橙色探针跟随同一相对位置；线数仅示意采样变密，不代表真实 patch 数量。',300,220,C.muted,11,'center');
+      ctx.fillStyle=C.line;
+      ctx.fillRect(92,247,170,12);
+      ctx.fillRect(338,247,170,12);
+      ctx.fillStyle=idx===2?C.red:C.blue;
+      ctx.fillRect(92,247,170*d.old/90,12);
+      ctx.fillStyle=C.green;
+      ctx.fillRect(338,247,170*d.now/90,12);
+      label(ctx,`WM 1.0 AUC@30 ${d.old.toFixed(2)}`,92,278,idx===2?C.red:C.blue,12);
+      label(ctx,`WM 2.0 AUC@30 ${d.now.toFixed(2)}`,338,278,C.green,12);
+    }}/>
+    <div className="resolution-probes" role="group" aria-label="选择网格观察位置">
+      <span>把探针放到：</span>
+      {probes.map((item,i)=><button key={item.name} type="button" className={probeIdx===i?'selected':''} aria-pressed={probeIdx===i} onClick={()=>setProbeIdx(i)}>{item.name}</button>)}
+    </div>
+    <div className="resolution-readout" aria-live="polite">
+      <div><span>标准索引</span><strong>0 … Hₚ-1</strong><small>网格变大时出现训练外位置</small></div>
+      <div><span>归一化坐标</span><strong>{normalized.toFixed(2)}</strong><small>同一相对位置仍在 [-1,1] 内</small></div>
+      <div><span>AUC@30 差值</span><strong>{gain>=0?'+':''}{gain.toFixed(2)}</strong><small>WorldMirror 2.0 - 1.0</small></div>
+    </div>
+    <div className={`feedback ${idx===2?'good':''}`}>{d.summary} 当前探针位于“{probe.name}”，它展示的是公式如何把网格相对位置映射到固定区间。结论仅覆盖论文表 11 的 L/M/H 与对应先验条件。</div>
+    <PaperTable tableId="table-11" />
+  </div>;
+};
 
 const nodes=[{n:'图像',d:'多视图 RGB 是基础输入。'},{n:'可选先验',d:'相机姿态、内参和深度可独立提供；训练时每种先验以 0.5 概率丢弃。'},{n:'Token 合并',d:'图像 token 与几何先验 token 被合并到统一序列。'},{n:'Transformer',d:'共享骨干使用全局-局部注意力聚合跨视图信息。'},{n:'任务头',d:'点图、相机、深度、法线和 3DGS 使用各自 DPT 解码头。'},{n:'输出',d:'一次前馈同时给出多类三维几何与渲染属性。'}];
 export const HyArchitecture:React.FC<WidgetProps>=()=>{const[active,setActive]=useState(0);return <div><CanvasView width={600} height={270} draw={(ctx)=>{clear(ctx,600,270);nodes.forEach((node,i)=>{const x=25+i*94;const on=i<=active;ctx.fillStyle=i===active?C.orange:on?'#e8f0fa':C.white;ctx.strokeStyle=i===active?C.orange:on?C.blue:C.line;ctx.lineWidth=i===active?4:2;ctx.beginPath();ctx.roundRect(x,80,76,66,7);ctx.fill();ctx.stroke();label(ctx,node.n,x+38,118,i===active?C.white:on?C.blue:C.muted,12,'center');if(i<5)route(ctx,[[x+76,113],[x+94,113]],i<active?C.green:C.line,4)});const outs=['点图','深度','法线','相机','3DGS'];outs.forEach((o,i)=>{ctx.fillStyle=active===5?C.green:C.line;ctx.fillRect(350+i*43,185,34,28);label(ctx,o,367+i*43,229,active===5?C.green:C.muted,10,'center')});label(ctx,'Any-Modal Tokenization → 共享骨干 → 专用输出头',300,34,C.blue,15,'center')}}/><div className="chip-row">{nodes.map((x,i)=><button key={x.n} className={`chip ${active===i?'selected':''}`} onClick={()=>setActive(i)}>{x.n}</button>)}</div><div className={`feedback ${active===5?'good':''}`}>{nodes[active].d}</div></div>};
