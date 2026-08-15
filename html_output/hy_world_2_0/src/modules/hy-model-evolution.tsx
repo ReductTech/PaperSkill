@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { WidgetProps } from './registry';
 
 type Status = 'complete' | 'partial' | 'qualitative' | 'unreported' | 'closed';
+type MatrixScope = 'lineage' | 'all';
 type CapabilityId = 'generation' | 'reconstruction' | 'panorama' | 'expansion' | 'assets' | 'interaction' | 'open';
 type ModelId = 'hy1' | 'hy15' | 'wm1' | 'genex' | 'video2world' | 'marble' | 'hy2';
 
@@ -254,10 +255,12 @@ const models: ModelProfile[] = [
 
 const modelOrder: ModelId[] = ['hy2', 'hy15', 'hy1', 'wm1', 'genex', 'video2world', 'marble'];
 const orderedModels = modelOrder.map((modelId) => models.find((model) => model.id === modelId) as ModelProfile);
+const lineageIds = new Set<ModelId>(['hy2', 'hy15', 'hy1', 'wm1']);
 
 export const HyModelEvolution: React.FC<WidgetProps> = () => {
   const [selectedModelId, setSelectedModelId] = useState<ModelId>('hy2');
   const [selectedCapabilityId, setSelectedCapabilityId] = useState<CapabilityId>('generation');
+  const [matrixScope, setMatrixScope] = useState<MatrixScope>('lineage');
 
   const selectedModel = useMemo(
     () => models.find((model) => model.id === selectedModelId) ?? models[models.length - 1],
@@ -269,13 +272,19 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
   );
   const selectedState = selectedModel.capabilities[selectedCapability.id];
   const selectedStatus = statusMeta[selectedState.status];
+  const visibleModels = matrixScope === 'lineage' ? orderedModels.filter((model) => lineageIds.has(model.id)) : orderedModels;
+
+  const changeScope = (nextScope: MatrixScope) => {
+    setMatrixScope(nextScope);
+    if (nextScope === 'lineage' && !lineageIds.has(selectedModelId)) setSelectedModelId('hy2');
+  };
 
   return (
     <div className="model-evolution">
       <div className="evolution-toolbar">
         <div>
           <strong>模型 × 功能能力矩阵</strong>
-          <span>点击任意单元格，展开该模型在该功能上的实现与 2.0 改进。</span>
+          <span>点击有证据的单元格展开说明；灰色“未报告”保持不可点击。</span>
         </div>
         <div className="evolution-legend" aria-label="能力状态图例">
           {(Object.keys(statusMeta) as Status[]).map((status) => (
@@ -286,10 +295,15 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
         </div>
       </div>
 
+      <div className="evolution-scope-switch" role="group" aria-label="选择模型比较范围">
+        <button type="button" className={matrixScope === 'lineage' ? 'selected' : ''} aria-pressed={matrixScope === 'lineage'} onClick={() => changeScope('lineage')}><strong>只看 HY 谱系</strong><small>2.0 → 1.5 → 1.0 → WorldMirror 1.0</small></button>
+        <button type="button" className={matrixScope === 'all' ? 'selected' : ''} aria-pressed={matrixScope === 'all'} onClick={() => changeScope('all')}><strong>查看全部参照</strong><small>追加 GenEx、video2world 与 Marble 1.0</small></button>
+      </div>
+
       <div className="evolution-matrix-scroll" tabIndex={0} aria-label="模型能力矩阵，可横向滚动">
-        <div className="evolution-matrix" role="grid" aria-label="HY-World 2.0 历代与外部模型能力比较">
+        <div className={`evolution-matrix ${matrixScope}`} role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 历代与外部模型能力比较'}>
           <div className="evolution-corner" role="columnheader">功能 \ 模型</div>
-          {orderedModels.map((model) => (
+          {visibleModels.map((model) => (
             <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''}`} role="columnheader">
               <strong>{model.shortName}</strong>
               <span>{model.kind}</span>
@@ -303,7 +317,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
                 <strong>{capability.shortName}</strong>
                 <span>{capability.name}</span>
               </div>
-              {orderedModels.map((model) => {
+              {visibleModels.map((model) => {
                 const state = model.capabilities[capability.id];
                 const isSelected = model.id === selectedModel.id && capability.id === selectedCapability.id;
                 const isDisabled = state.status === 'unreported';
@@ -331,7 +345,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
           ))}
         </div>
       </div>
-      <p className="evolution-scroll-hint">灰色提示：窄屏时请在矩阵内部左右滑动；“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
+      <p className="evolution-scroll-hint">灰色提示：窄屏时请在矩阵内部左右滑动；范围切换只改变可见列，不改变能力判断。“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
 
       <section className={`evolution-detail ${selectedState.status}`} aria-live="polite">
         <header className="evolution-detail-head">
