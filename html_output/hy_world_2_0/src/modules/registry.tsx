@@ -11,6 +11,7 @@ import { HyMemory } from './hy-memory';
 import { HyPanorama } from './hy-panorama';
 import { HyResolution } from './hy-resolution';
 import { HyResults } from './hy-results';
+import { HyResources } from './hy-resources';
 import { HyTrainingStages } from './hy-training-stages';
 import { HyTrajectory } from './hy-trajectory';
 
@@ -32,5 +33,6 @@ widgetRegistry['hy-memory'] = HyMemory;
 widgetRegistry['hy-panorama'] = HyPanorama;
 widgetRegistry['hy-resolution'] = HyResolution;
 widgetRegistry['hy-results'] = HyResults;
+widgetRegistry['hy-resources'] = HyResources;
 widgetRegistry['hy-training-stages'] = HyTrainingStages;
 widgetRegistry['hy-trajectory'] = HyTrajectory;
