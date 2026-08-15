@@ -113,6 +113,7 @@ export const PaperTable: React.FC<{ tableId: PaperTableId; defaultOpen?: boolean
         <span>论文表 {table.number}</span>
         <strong>{table.title}</strong>
         <small>{table.scope}</small>
+        <em className="paper-table-hint">点击此处展开/收起论文原表；表格过宽时可左右滑动查看完整数据</em>
       </summary>
       <div className="paper-table-body">
         <div className="paper-table-scroll" tabIndex={0} aria-label={`论文表 ${table.number}：${table.title}`}>
