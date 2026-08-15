@@ -53,10 +53,15 @@ const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) 
       ctx.strokeStyle = c.border; ctx.lineWidth = 2; ctx.strokeRect(28, 30, 504, 150);
 
       if (variant === 'demo' || variant === 'production') {
-        const good = variant === 'production'; const beat = 90 + p * 350; const drift = good ? Math.sin(t * 5) * 3 : p * 42;
-        ctx.setLineDash([6, 6]); ctx.strokeStyle = c.blue; ctx.beginPath(); ctx.moveTo(beat, 52); ctx.lineTo(beat, 162); ctx.stroke(); ctx.setLineDash([]);
-        drawSinger(ctx, beat - 24 + drift, 92, good ? c.green : c.red, p);
-        drawMic(ctx, beat + 20, 94); label(ctx, good ? '8 NFE · 稳定对齐' : '误差随时间累积', 42, 48, good ? c.green : c.red, true);
+        const good = variant === 'production';
+        label(ctx,good?'五项改进接入同一套 DiT':'单点能力已经成立，系统环节仍有缺口',42,50,good?c.green:c.red,true);
+        const nodes=good
+          ?[['图像 + 语音',42,96,c.blue],['Whisper-large',169,104,c.green],['Shared DiT',305,104,c.blue],['8 NFE',441,72,c.green]] as const
+          :[['图像 + 语音',42,96,c.blue],['Wav2Vec2',169,96,c.red],['视频级奖励',296,104,c.red],['DiT · 150',433,82,c.orange]] as const;
+        nodes.forEach((n,i)=>{ctx.fillStyle=n[3];roundRect(ctx,n[1],72,n[2],36,8);label(ctx,n[0],n[1]+10,95,'#fff',true);if(i<nodes.length-1){ctx.strokeStyle=good?c.green:c.border;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(n[1]+n[2],90);ctx.lineTo(nodes[i+1][1]-8,90);ctx.stroke();}});
+        const pulseX=42+(t%3)/3*461;ctx.fillStyle=good?c.green:c.red;ctx.beginPath();ctx.arc(pulseX,64,6,0,Math.PI*2);ctx.fill();
+        if(good){[['Per-frame GRPO',115,c.orange],['Silent Condition',270,c.purple],['Clean Data',414,c.green]].forEach(x=>{ctx.fillStyle=x[2] as string;roundRect(ctx,x[1] as number,126,118,28,7);label(ctx,x[0] as string,(x[1] as number)+10,145,'#fff',true);});}
+        else{[['识别偏差',58],['局部崩坏',220],['多人串音',382]].forEach(x=>{ctx.fillStyle=c.red;roundRect(ctx,x[1] as number,126,120,28,7);label(ctx,x[0] as string,(x[1] as number)+27,145,'#fff',true);});}
       } else if (variant === 'audition') {
         const items = [['嘴型', c.blue], ['肢体', c.red], ['成本', c.orange], ['多人', c.purple], ['长时', c.green]] as const;
         items.forEach(([name, color], i) => {
@@ -90,7 +95,14 @@ const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) 
         ctx.fillStyle = c.green; ctx.globalAlpha = .18; roundRect(ctx, 54, 60, Math.max(15, x - 54), 90, 8); ctx.globalAlpha = 1;
         ctx.strokeStyle = c.orange; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, 53); ctx.lineTo(x, 157); ctx.stroke(); label(ctx, '窗口级质检', x - 38, 177, c.orange, true);
       } else {
-        const values = [78, 92, 88, 96]; const names = ['合理', '协调', '稳定', '一致']; values.forEach((v, i) => { const x = 76 + i * 118; ctx.fillStyle = c.border; roundRect(ctx, x, 54, 52, 102, 8); ctx.fillStyle = i === 1 ? c.orange : c.green; roundRect(ctx, x, 156 - v, 52, v, 8); label(ctx, names[i], x + 8, 176, c.text, true); });
+        ctx.fillStyle='#f7f9fc';roundRect(ctx,48,49,216,112,12);ctx.fillStyle=c.blue;roundRect(ctx,48,49,216,8,8);
+        label(ctx,'BASE',68,80,c.blue,true);label(ctx,'150 NFE',174,80,c.orange,true);
+        label(ctx,'动作与镜头更丰富',68,111,c.text,true);label(ctx,'细腻表情 · 口型细节',68,137,c.muted);
+        ctx.fillStyle='#f4fbf7';roundRect(ctx,296,49,216,112,12);ctx.fillStyle=c.green;roundRect(ctx,296,49,216,8,8);
+        label(ctx,'FAST',316,80,c.green,true);label(ctx,'8 NFE',430,80,c.green,true);
+        label(ctx,'稳定性与合理性更强',316,111,c.text,true);label(ctx,'低畸变 · 适合部署',316,137,c.muted);
+        ctx.strokeStyle=c.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(264,105);ctx.lineTo(296,105);ctx.stroke();
+        label(ctx,'表现力与部署效率的权衡',177,184,c.orange,true);
       }
       if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
       if (running) raf = requestAnimationFrame(draw);
