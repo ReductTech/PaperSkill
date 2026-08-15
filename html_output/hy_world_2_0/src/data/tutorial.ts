@@ -483,8 +483,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "9.1",
-          "title": "高斯数量与画质取舍",
-          "desc": "切换表 9 的五种配置，比较高斯数量、PSNR、LPIPS 与漂浮物风险。",
+          "title": "高斯预算帕累托实验",
+          "desc": "调节最大高斯数量与最低 PSNR，在表 9 的五个真实配置中寻找可行点、最低数量推荐与被支配方案，再展开原表核对完整指标。",
           componentId: "hy-composition"
         }
       ],
