@@ -306,8 +306,8 @@ export const tutorial: TutorialData = {
       ],
       "insight": "四步 DiT 只加速 WorldStereo 2.0 的生成器，不能把整个 712 秒世界生成管线称为实时。",
       "formula": {
-        "lead": "DMD 用真实分数与伪分数的差异更新少步生成器。",
-        "unicode": "∇L_DMD = -E_t[(s_real(x_t,t)-s_fake(x_t,t)) · dx_t/dθ]",
+        "lead": "DMD 用真实分数与伪分数的差异更新少步生成器；J_θ 缩写样本对学生参数的导数项。",
+        "unicode": "∇L_DMD = -E_t[(s_real(x_t,t)-s_fake(x_t,t)) · J_θ]",
         "symbols": [
           {
             "sym": "s_real",
@@ -326,8 +326,8 @@ export const tutorial: TutorialData = {
             "desc": "在扩散时间 t 的带噪样本。"
           },
           {
-            "sym": "θ",
-            "desc": "被更新的学生生成器参数。"
+            "sym": "J_θ",
+            "desc": "样本对学生参数 θ 的雅可比项，即 dx_t/dθ。"
           }
         ]
       },

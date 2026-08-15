@@ -95,7 +95,8 @@ export const HyResolution:React.FC<WidgetProps>=()=>{
       <div><span>归一化坐标</span><strong>{normalized.toFixed(2)}</strong><small>同一相对位置仍在 [-1,1] 内</small></div>
       <div><span>AUC@30 差值</span><strong>{gain>=0?'+':''}{gain.toFixed(2)}</strong><small>WorldMirror 2.0 - 1.0</small></div>
     </div>
-    <div className={`feedback ${idx===2?'good':''}`}>{d.summary} 当前探针位于“{probe.name}”，它展示的是公式如何把网格相对位置映射到固定区间。结论仅覆盖论文表 11 的 L/M/H 与对应先验条件。</div>
+    <div className="resolution-protocol-note"><strong>两个低档尺寸不要混用：</strong><span>上方相机姿态 AUC 对应论文正文与表 12 的 L=189×259；下方可展开的表 11 点图重建单独注明 L=182×252。M=378×518、H=756×1036 在两处一致。</span></div>
+    <div className={`feedback ${idx===2?'good':''}`}>{d.summary} 当前探针位于“{probe.name}”，它展示的是公式如何把网格相对位置映射到固定区间。AUC 来自论文表 12；下方表 11 只负责点图误差与几何先验条件。</div>
     <PaperTable tableId="table-11" />
   </div>;
 };

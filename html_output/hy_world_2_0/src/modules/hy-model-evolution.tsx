@@ -31,6 +31,7 @@ type CapabilityProfile = {
   shortName: string;
   purpose: string;
   hyAdvance: string;
+  readerImpact: string;
 };
 
 const PAPER_URL = 'https://arxiv.org/abs/2604.14268';
@@ -50,6 +51,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '稀疏输入生成',
     purpose: '把文本或一张参考图扩展成可探索世界，适合创作、预演与快速搭建场景原型。',
     hyAdvance: 'HY-World 2.0 把文本与单图统一接入 HY-Pano 2.0、WorldNav、WorldStereo 2.0 和 WorldMirror 2.0，最终得到持久三维资产，而不是只生成一段观看后即结束的视频。',
+    readerImpact: '结果不只是一段镜头运动视频，还能保存为 3DGS/Mesh 并从新视角继续浏览；代价是完整生成仍需分钟级。',
   },
   {
     id: 'reconstruction',
@@ -57,6 +59,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '密集输入重建',
     purpose: '把真实拍摄的多张照片或视频恢复为数字孪生，用于采集归档、仿真和内容再编辑。',
     hyAdvance: 'HY-World 2.0 将 WorldMirror 2.0 纳入统一系统，可在一次前馈中联合预测相机、点图、深度、法线与 3DGS，并支持 50K-500K 像素的灵活分辨率。',
+    readerImpact: '同一批真实观察可以直接得到相机、几何和可渲染资产，减少为不同三维任务分别运行模型的割裂感。',
   },
   {
     id: 'panorama',
@@ -64,6 +67,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '全景初始化',
     purpose: '先建立环绕视野，为后续相机规划和世界扩展提供全局上下文，并减少只看单一视角造成的盲区。',
     hyAdvance: 'HY-Pano 2.0 用隐式映射降低对相机元数据的依赖，并针对 ERP 环形边界进行接缝修复；在论文表 4 的 I2P 协议中，CLIP-I 从 GenEx 的 0.831 提升到 0.844。',
+    readerImpact: '初始场景不再只是一张正面图，而是一个左右边界能接上的 360° 起点，后续轨迹可以围绕它继续扩展。',
   },
   {
     id: 'expansion',
@@ -71,6 +75,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '规划与扩展',
     purpose: '决定相机应去哪里补看盲区，并生成跨轨迹一致的新视角，使世界不只停留在初始观察点附近。',
     hyAdvance: 'WorldNav 使用点云、语义掩码、NavMesh 与碰撞约束规划五类互补轨迹；WorldStereo 2.0 再通过关键帧潜空间、全局几何记忆和局部选择记忆扩展世界。',
+    readerImpact: '探索路线会主动绕到物体背面、走廊远端和俯视区域，多条路线生成的空间与纹理也更不容易互相漂移。',
   },
   {
     id: 'assets',
@@ -78,6 +83,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '持久三维资产',
     purpose: '把生成结果保存为可渲染、可编辑、可导入引擎的资产，使一次生成可以被长期复用。',
     hyAdvance: 'HY-World 2.0 同时面向 3DGS、Mesh、点云及相关几何输出，并用深度线性对齐、非天空增密和 MaskGaussian 改善完整度、漂浮物与资产规模的平衡。',
+    readerImpact: '用户可以重新加载、编辑或导入世界，而不必每次从像素视频重新推断空间；紧凑表示仍会带来轻微画质取舍。',
   },
   {
     id: 'interaction',
@@ -85,6 +91,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '漫游与物理',
     purpose: '让用户或智能体进入场景，进行第一/第三人称移动、碰撞与持续探索，而不只是观看离线渲染。',
     hyAdvance: 'WorldLens 把生成阶段与运行时渲染解耦，加入引擎无关架构、IBL 光照、碰撞检测和角色支持；生成仍是分钟级，但资产渲染与交互可实时进行。',
+    readerImpact: '等待离线构建完成后，用户可以像进入关卡一样移动与碰撞；这不代表模型本身会随动作实时重新生成整个世界。',
   },
   {
     id: 'open',
@@ -92,6 +99,7 @@ const capabilities: CapabilityProfile[] = [
     shortName: '开放与复现',
     purpose: '让研究者检查实现、下载权重、复现实验并在合法授权范围内继续开发。',
     hyAdvance: 'HY-World 2.0 已分批开放 WorldMirror 2.0、HY-Pano 2.0、WorldStereo 2.0 与世界生成推理代码；可复现不等于低门槛，仍需检查显存、CUDA、权重体积和社区许可证。',
+    readerImpact: '研究者能从论文结论进入真实代码、权重与运行入口，但是否能本地跑通取决于硬件、版本和许可证条件。',
   },
 ];
 
@@ -339,18 +347,37 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
           <span>{selectedStatus.hint}</span>
         </div>
 
+        <div className="evolution-effect-compare">
+          <div className="current">
+            <span>当前模型在该能力</span>
+            <strong>{selectedModel.name}</strong>
+            <p>{selectedState.note}</p>
+          </div>
+          <i aria-hidden="true">→</i>
+          <div className="target">
+            <span>HY-World 2.0 对应效果</span>
+            <strong>{selectedModel.id === 'hy2' ? '本代完整形态' : '从参照走向 2.0'}</strong>
+            <p>{selectedCapability.hyAdvance}</p>
+          </div>
+        </div>
+
+        <div className="evolution-user-impact">
+          <span>读者真正能感知的变化</span>
+          <p>{selectedCapability.readerImpact}</p>
+        </div>
+
         <div className="evolution-detail-grid">
           <div>
             <span>这个功能有什么用</span>
             <p>{selectedCapability.purpose}</p>
           </div>
           <div>
-            <span>{selectedModel.name} 如何实现</span>
-            <p>{selectedState.note}</p>
+            <span>代际 / 外部比较</span>
+            <p>{selectedModel.comparison}</p>
           </div>
           <div>
-            <span>HY-World 2.0 的改进点</span>
-            <p>{selectedModel.comparison} {selectedCapability.hyAdvance}</p>
+            <span>当前证据强度</span>
+            <p>{selectedStatus.label}：{selectedStatus.hint}</p>
           </div>
           <div>
             <span>证据与适用边界</span>
