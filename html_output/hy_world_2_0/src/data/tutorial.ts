@@ -422,10 +422,10 @@ export const tutorial: TutorialData = {
     {
       kind: "chapter",
       "id": "chap-8",
-      "title": "可点击的重建架构",
+      "title": "从重建架构到论文创新证据",
       "badge": "trn",
       "badgeLabel": "训练细节",
-      "bridge": "理解关键改进后，再看完整网络：多种输入先验如何进入共享骨干，又如何分流到不同三维预测任务。",
+      "bridge": "理解关键改进后，先看多种输入如何进入共享重建骨干，再把整篇论文的贡献拆成方法、训练效率、系统集成和运行时四类证据。",
       "analogy": {
         "title": "一台机身，多个可选测量附件",
         "text": "图像和几何先验先被统一成 token，再由共享骨干提取特征，最后交给不同输出头。",
@@ -439,24 +439,31 @@ export const tutorial: TutorialData = {
           "desc": "点击图像、先验、Token 合并、Transformer、任务头和输出，追踪当前激活路径。",
           componentId: "hy-architecture",
           "figure": "/images/figure-12-worldmirror.png"
+        },
+        {
+          kind: "module",
+          "id": "8.2",
+          "title": "创新证据星图",
+          "desc": "按核心方法、训练效率、系统集成或运行时筛选贡献，再追踪每项创新的旧问题、新机制、论文证据和不能外推的边界。",
+          componentId: "hy-innovation-map"
         }
       ],
-      "insight": "Any-Modal Tokenization 允许先验独立缺失，共享骨干负责融合，任务头保持输出专门化。",
+      "insight": "HY-World 2.0 的贡献不是单个模块包打天下：生成、规划、记忆、重建、资产压缩与运行时分别解决不同瓶颈，证据类型也不同。",
       "takeaways": [
         {
           "icon": "🧩",
-          "title": "任意模态 token",
-          "desc": "图像、姿态、内参和深度进入统一序列。"
+          "title": "方法要落到问题",
+          "desc": "每项机制都应回答它修复了哪一个旧瓶颈。"
         },
         {
           "icon": "🏗️",
-          "title": "共享骨干",
-          "desc": "Transformer 聚合跨视图与跨模态特征。"
+          "title": "证据要分类型",
+          "desc": "表格、消融、系统架构和官方演示承担不同证明责任。"
         },
         {
           "icon": "🎛️",
-          "title": "专用输出头",
-          "desc": "点图、相机、深度、法线与 3DGS 分别解码。"
+          "title": "边界同样重要",
+          "desc": "四步、5.60 秒和官方 GIF 都不能代表整套系统无条件实时。"
         }
       ]
     },
