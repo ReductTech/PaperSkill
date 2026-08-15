@@ -309,6 +309,13 @@ export const tutorial: TutorialData = {
           "title": "训练诊断台：给故障开对处方",
           "desc": "诊断相机控制失灵、跨轨迹漂移和扩散推理过慢三个症状，为它们匹配领域适配、记忆训练或后蒸馏。",
           componentId: "hy-training-stages"
+        },
+        {
+          kind: "module",
+          "id": "6.2",
+          "title": "DMD 分布校准仪",
+          "desc": "切换噪声层级并反复执行教学更新，观察真实 score 与伪 score 的差异如何推动学生分布靠近教师，再核对四步 DiT 与完整 712 秒生成管线的边界。",
+          componentId: "hy-dmd-lab"
         }
       ],
       "insight": "四步 DiT 只加速 WorldStereo 2.0 的生成器，不能把整个 712 秒世界生成管线称为实时。",
