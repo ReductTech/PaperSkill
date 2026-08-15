@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { PaperTable } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -147,7 +148,7 @@ const systemClaims = [
     correct: false,
     evidence: 'WorldLens 是生成后资产的运行时渲染与交互平台；论文完整生成管线仍是离线流程。',
     boundary: '运行时交互速度不能替代端到端世界生成耗时。',
-    locator: 'Abstract；Introduction；Table 2',
+    locator: 'Abstract；Introduction；Table 10；Figure 22',
   },
 ] as const;
 
@@ -278,6 +279,8 @@ export const HyBoundaryCompare: React.FC<WidgetProps> = () => {
       {!complete && answeredCount < 5 && `已完成 ${answeredCount}/5 条判断。点击条款可查看论文证据与不可外推边界。`}
       {!complete && answeredCount === 5 && `目前有 ${5 - correctCount} 条判断与论文冲突。优先检查“统一是否等于单体网络”以及“实时漫游是否等于实时生成”。`}
     </div>
+
+    {activeClaim.id === 'realtime-generation' ? <PaperTable tableId="table-10" /> : null}
 
     <div className="contract-glossary-grid">
       <details><summary>统一系统 ≠ 单一网络</summary><p>HY-World 2.0 由 HY-Pano 2.0、WorldNav、WorldStereo 2.0、WorldMirror 2.0、3DGS 优化和 WorldLens 等组件构成。统一发生在任务分流、数据衔接和输出资产层面。</p></details>

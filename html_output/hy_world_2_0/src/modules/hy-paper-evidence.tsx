@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type PaperTableId = 'table-1' | 'table-4' | 'table-8' | 'table-9' | 'table-11' | 'table-12' | 'table-14';
+export type PaperTableId = 'table-1' | 'table-4' | 'table-8' | 'table-9' | 'table-10' | 'table-11' | 'table-12' | 'table-14';
 
 type PaperTableSpec = {
   number: number;
@@ -80,6 +80,18 @@ const tables: Record<PaperTableId, PaperTableSpec> = {
     note: '评估使用 10 个场景、每场景 20 个验证视角。完整配置相对 6.000M 基线减少约 77% 高斯，但 PSNR 与 LPIPS 并非完全不变。',
     page: 29,
     emphasisRows: [4],
+  },
+  'table-10': {
+    number: 10,
+    title: '单个世界生成的分阶段耗时',
+    scope: '完整表格，NVIDIA H20',
+    headers: ['阶段', '全景生成', '轨迹规划', '世界扩展', '重建与对齐', '3DGS', '总计'],
+    rows: [
+      ['耗时（秒）', '15', '182', '286', '102', '127', '712'],
+    ],
+    note: '论文将这组 NVIDIA H20 评测描述为单个世界生成的端到端运行时间。712 秒约为 11.9 分钟；它与 WorldLens 生成后资产的实时渲染、碰撞和角色交互属于不同阶段。',
+    page: 31,
+    emphasisColumns: [6],
   },
   'table-11': {
     number: 11,
