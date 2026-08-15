@@ -241,8 +241,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "5.1",
-          "title": "组合记忆消融",
-          "desc": "在同一评测协议下切换无记忆、组合记忆、完整空间拼接和时间拼接替代方案。",
+          "title": "记忆调度局：为目标视角配对",
+          "desc": "加载 GGM 全局骨架，从三个历史视角中选择最相关关键帧，并比较空间拼接与时间拼接如何改变局部对应；最后展开论文表 8 核对真实消融。",
           componentId: "hy-memory"
         }
       ],

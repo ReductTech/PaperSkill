@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { PaperTable } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -119,7 +120,159 @@ export const HyTrajectory: React.FC<WidgetProps> = () => { const [mode,setMode]=
 
 export const HyKeyframes: React.FC<WidgetProps> = () => { const [run,setRun]=useState(0);const start=useRef(0);const go=()=>{start.current=performance.now();setRun(v=>v+1)};return <div><CanvasView height={250} animate={run>0} draw={(ctx,time)=>{clearStudio(ctx,560,250);const p=run?clamp((time-start.current)/2000,0,1):0;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(280,25);ctx.lineTo(280,205);ctx.stroke();label(ctx,'Video-VAE',140,30,C.red,14,'center');label(ctx,'Keyframe-VAE',420,30,C.green,14,'center');route(ctx,[[35,180],[235,85]],C.red,3,[6,5]);route(ctx,[[315,180],[515,85]],C.blue,5);camera(ctx,55+p*160,170-p*70,C.red,.68);camera(ctx,335+p*160,170-p*70,C.blue,.68);for(let i=0;i<6;i++)photo(ctx,60+i*30,210-i*13,C.red,.28+i*.08);for(let i=0;i<3;i++)photo(ctx,345+i*70,205-i*38,C.green,1);metricBars(ctx,['RotErr','ATE'],[.762,.492],[C.red,C.green],150,228,70);}}/><div className="step-ctrl"><button className="tiny" onClick={go}>开始同轨比较</button></div><div className={`feedback ${run?'good':''}`}>{run?'选择性冻结 Cross-Attn 与 FFN 后，RotErr 0.762→0.492，ATE 2.141→1.768。全量训练的部分视觉指标更高，但控制精度和泛化更差。':'两侧使用相同起点和时间基准。'}</div></div>; };
 
-const memoryData:{[k:string]:[number,number,number,string]}={'仅相机控制':[16.13,.474,28.81,'没有跨轨迹记忆，质量和一致性最低。'],'GGM+SSM++':[20.94,.640,30.27,'全局骨架和局部检索带来显著提升。'],'空间拼接完整配置':[21.63,.669,30.76,'空间拼接、增强与更大批次形成最终记忆配置。'],'时间拼接替代':[19.83,.581,29.77,'把空间拼接换成时间拼接会在全部指标上退化。']};
-export const HyMemory: React.FC<WidgetProps> = () => {const [mode,setMode]=useState('仅相机控制');const d=memoryData[mode];return <div><CanvasView height={260} draw={(ctx)=>{clearStudio(ctx,560,260);camera(ctx,105,138,C.blue,.8);target(ctx,460,105,true);route(ctx,[[135,138],[420,105]],mode==='仅相机控制'?C.red:C.blue,4,mode==='仅相机控制'?[8,6]:[]);ctx.strokeStyle=C.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(285,105,62,0,Math.PI*2);ctx.stroke();label(ctx,'GGM',285,102,C.purple,13,'center');if(mode!=='仅相机控制'){photo(ctx,285,58,C.purple);route(ctx,[[285,76],[370,102]],mode==='时间拼接替代'?C.red:C.green,3,mode==='时间拼接替代'?[5,4]:[]);}metricBars(ctx,['PSNR','SSIM×30','PSNRm'],[d[0],d[1]*30,d[2]],[C.blue,C.orange,C.green],50,220,92);}}/><div className="chip-row">{Object.keys(memoryData).map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='仅相机控制'||mode==='时间拼接替代'?'bad':mode==='空间拼接完整配置'?'good':''}`}>{d[3]} PSNR={d[0]}，SSIM={d[1].toFixed(3)}，PSNRm={d[2]}。</div></div>;};
+type MemoryCandidate = {
+  id: 'entry' | 'corner' | 'reverse';
+  name: string;
+  angle: number;
+  overlap: number;
+  cue: string;
+};
+
+const memoryCandidates: MemoryCandidate[] = [
+  { id: 'entry', name: 'R1 入口远景', angle: -32, overlap: 43, cue: '看得到入口，但与目标转角只共享少量区域。' },
+  { id: 'corner', name: 'R2 同向侧拍', angle: 14, overlap: 78, cue: '门框、转角与目标视野重合最多。' },
+  { id: 'reverse', name: 'R3 反向回望', angle: 132, overlap: 12, cue: '朝向相反，几乎没有可直接对应的局部细节。' },
+];
+
+type StitchMode = 'spatial' | 'temporal';
+
+export const HyMemory: React.FC<WidgetProps> = () => {
+  const [ggmEnabled, setGgmEnabled] = useState(false);
+  const [candidateId, setCandidateId] = useState<MemoryCandidate['id']>('entry');
+  const [stitchMode, setStitchMode] = useState<StitchMode>('temporal');
+  const candidate = memoryCandidates.find((item) => item.id === candidateId) ?? memoryCandidates[0];
+  const retrievalReady = candidate.id === 'corner';
+  const pairingReady = stitchMode === 'spatial';
+  const success = ggmEnabled && retrievalReady && pairingReady;
+  const reportedRow = ggmEnabled && retrievalReady
+    ? stitchMode === 'spatial' ? '配置 A：GGM + SSM++' : '配置 A*：时间拼接替代'
+    : null;
+
+  const feedback = !ggmEnabled
+    ? '局部照片能补纹理，却没有 360° 全景点云约束跨轨迹的粗结构。先打开 GGM。'
+    : !retrievalReady
+      ? `${candidate.name} 与目标视野对应不足。SSM++ 会选择最相关关键帧，而不是把所有历史帧都塞进主干。`
+      : !pairingReady
+        ? '检索帧选对了，但时间拼接把它当成另一个时刻；论文表 8 的 A* 在所有指标上都明显退化。'
+        : '调度成立：GGM 守住全局骨架，R2 提供局部对应，空间拼接让检索帧与目标帧共享同一时间索引。';
+
+  return (
+    <div className="memory-lab">
+      <CanvasView height={310} draw={(ctx) => {
+        clearStudio(ctx,560,310);
+        label(ctx,'全局几何',44,30,C.ink,13);
+        label(ctx,'局部检索与配对',318,30,C.ink,13);
+
+        ctx.strokeStyle = ggmEnabled ? C.purple : C.line;
+        ctx.lineWidth = ggmEnabled ? 4 : 2;
+        ctx.beginPath(); ctx.arc(145,130,76,0,Math.PI*2); ctx.stroke();
+        for (let index=0; index<18; index++) {
+          const angle = index/18*Math.PI*2;
+          const radius = index%3===0 ? 62 : 72;
+          ctx.fillStyle = ggmEnabled ? C.purple : '#b8c1cf';
+          ctx.globalAlpha = ggmEnabled ? .82 : .35;
+          ctx.beginPath(); ctx.arc(145+Math.cos(angle)*radius,130+Math.sin(angle)*radius*.56,3,0,Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        camera(ctx,145,138,ggmEnabled?C.purple:C.muted,.62);
+        label(ctx,ggmEnabled?'Ppan 已加载':'Ppan 未加载',145,232,ggmEnabled?C.purple:C.muted,12,'center');
+
+        const candidateY = 90;
+        photo(ctx,342,candidateY,retrievalReady?C.green:C.orange,1);
+        label(ctx,candidate.name,342,128,retrievalReady?C.green:C.orange,11,'center');
+        photo(ctx,466,candidateY,C.blue,1);
+        label(ctx,'目标帧 T',466,128,C.blue,11,'center');
+
+        if (stitchMode === 'spatial') {
+          ctx.strokeStyle = pairingReady ? C.green : C.line;
+          ctx.lineWidth = 3;
+          ctx.strokeRect(310,154,190,60);
+          ctx.beginPath(); ctx.moveTo(405,154); ctx.lineTo(405,214); ctx.stroke();
+          label(ctx,'R',358,188,retrievalReady?C.green:C.orange,16,'center');
+          label(ctx,'T',452,188,C.blue,16,'center');
+          label(ctx,'宽度 2W · 同一时间索引 tk',405,237,C.green,11,'center');
+        } else {
+          ctx.strokeStyle = C.red;
+          ctx.lineWidth = 3;
+          ctx.setLineDash([7,5]);
+          ctx.strokeRect(334,153,142,32);
+          ctx.strokeRect(334,198,142,32);
+          ctx.setLineDash([]);
+          label(ctx,'R · tk',405,175,C.orange,12,'center');
+          label(ctx,'T · tk+1',405,220,C.blue,12,'center');
+          label(ctx,'时间身份被错开',405,253,C.red,11,'center');
+        }
+
+        route(ctx,[[225,130],[286,130],[306,162]],ggmEnabled?C.purple:C.line,3,ggmEnabled?[]:[6,5]);
+        label(ctx,success?'全局 + 局部对齐完成':'仍有记忆条件未满足',530,286,success?C.green:C.orange,12,'right');
+      }} />
+
+      <div className="memory-control-grid">
+        <section className="memory-global-control">
+          <header><span>1 / 全局骨架</span><strong>加载全景点云记忆</strong></header>
+          <label className="memory-switch">
+            <input type="checkbox" checked={ggmEnabled} onChange={(event) => setGgmEnabled(event.target.checked)} />
+            <span aria-hidden="true"><i /></span>
+            <b>{ggmEnabled?'GGM 已接入':'仅依赖局部照片'}</b>
+          </label>
+          <p>推理时论文使用来自 HY-Pano 2.0 的 360° 全景点云 Ppan 作为全局几何引导。</p>
+        </section>
+
+        <section className="memory-stitch-control">
+          <header><span>3 / 配对方式</span><strong>给检索帧安排位置</strong></header>
+          <div className="memory-segmented" role="group" aria-label="选择检索帧拼接方式">
+            <button type="button" className={stitchMode==='spatial'?'selected':''} aria-pressed={stitchMode==='spatial'} onClick={() => setStitchMode('spatial')}>空间拼接</button>
+            <button type="button" className={stitchMode==='temporal'?'selected':''} aria-pressed={stitchMode==='temporal'} onClick={() => setStitchMode('temporal')}>时间拼接</button>
+          </div>
+          <p>SSM++ 横向拼成 2W，并让检索帧继承其目标帧的时间索引。</p>
+        </section>
+      </div>
+
+      <section className="memory-retrieval-control">
+        <header><span>2 / 局部检索</span><strong>为目标视角选择最相关历史帧</strong><small>重合率仅是教程线索，不是论文阈值或模型输出</small></header>
+        <div className="memory-candidates" role="group" aria-label="选择历史检索帧">
+          {memoryCandidates.map((item) => {
+            const selected = item.id === candidateId;
+            return (
+              <button key={item.id} type="button" className={`${selected?'selected':''} ${item.id==='corner'?'best-match':''}`} aria-pressed={selected} onClick={() => setCandidateId(item.id)}>
+                <span className="memory-view" style={{'--memory-angle': `${item.angle}deg`,'--memory-shift': `${8+item.overlap*.22}px`} as React.CSSProperties}><i /></span>
+                <strong>{item.name}</strong>
+                <b>视野重合线索 {item.overlap}%</b>
+                <small>{item.cue}</small>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="memory-diagnostics">
+        <div className={ggmEnabled?'ready':'waiting'}><span>全局骨架</span><strong>{ggmEnabled?'已约束':'缺失'}</strong></div>
+        <div className={retrievalReady?'ready':'waiting'}><span>局部对应</span><strong>{retrievalReady?'R2 命中':'继续检索'}</strong></div>
+        <div className={pairingReady?'ready':'waiting'}><span>时间身份</span><strong>{pairingReady?'tk 对齐':'被错开'}</strong></div>
+      </div>
+
+      <div className={`feedback ${success?'good':ggmEnabled&&retrievalReady?'bad':''}`}>{feedback}</div>
+
+      <section className="memory-paper-spotlight">
+        <header><span>论文证据区</span><strong>{reportedRow ?? '当前是教程自定义状态，论文表 8 没有对应行'}</strong></header>
+        <div className="memory-evidence-cards">
+          <div><span>相机控制基线</span><strong>PSNR 16.13</strong><small>SSIM 0.474 · PSNRm 28.81</small></div>
+          <div className={reportedRow?.includes('配置 A：')?'active':''}><span>配置 A · GGM + SSM++</span><strong>PSNR 20.94</strong><small>SSIM 0.640 · PSNRm 30.27</small></div>
+          <div className={reportedRow?.includes('A*')?'active bad':''}><span>配置 A* · 时间拼接</span><strong>PSNR 19.83</strong><small>SSIM 0.581 · PSNRm 29.77</small></div>
+          <div><span>配置 F · 完整中训</span><strong>PSNR 21.63</strong><small>SSIM 0.669 · PSNRm 30.76</small></div>
+        </div>
+        <p>上方实验不计算指标。配置 F 还包含可训练 FFN、两类增强、相机嵌入和 batch size 64，不能只归因于“选对一张照片”。</p>
+      </section>
+
+      <div className="memory-glossary-grid">
+        <details><summary>GGM 到底记住什么？</summary><p>它把参考点云与额外视角点云合并为扩展全局点云。推理时以全景点云覆盖 360° 环境，主要负责跨轨迹的粗结构一致性。</p></details>
+        <details><summary>SSM++ 比 SSM 多了什么？</summary><p>检索关键帧直接进入主 DiT；只选最相关帧；主干使用更开放的自注意力；显式点图引导被隐式相机嵌入替代。</p></details>
+        <details><summary>为何空间拼接更合适？</summary><p>检索帧和目标帧横向组成宽度 2W 的配对，并共享同一时间索引。这样模型把它们理解为同一时刻的两种空间观察，而不是前后两个视频时刻。</p></details>
+      </div>
+
+      <PaperTable tableId="table-8" />
+    </div>
+  );
+};
 
 export default HyAnalogy;
