@@ -292,8 +292,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "6.1",
-          "title": "三阶段能力阶梯",
-          "desc": "逐步切换领域适配、中段记忆训练和后蒸馏，观察每一段新增的能力。",
+          "title": "训练诊断台：给故障开对处方",
+          "desc": "诊断相机控制失灵、跨轨迹漂移和扩散推理过慢三个症状，为它们匹配领域适配、记忆训练或后蒸馏。",
           componentId: "hy-training-stages"
         }
       ],
@@ -311,8 +311,16 @@ export const tutorial: TutorialData = {
             "desc": "随训练更新的伪分数函数。"
           },
           {
-            "sym": "G_θ",
-            "desc": "被蒸馏为四步推理的学生生成器。"
+            "sym": "L_DMD",
+            "desc": "分布匹配蒸馏目标，用于训练少步学生生成器。"
+          },
+          {
+            "sym": "x_t",
+            "desc": "在扩散时间 t 的带噪样本。"
+          },
+          {
+            "sym": "θ",
+            "desc": "被更新的学生生成器参数。"
           }
         ]
       },

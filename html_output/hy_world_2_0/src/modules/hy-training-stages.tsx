@@ -10,8 +10,91 @@ function camera(ctx:CanvasRenderingContext2D,x:number,y:number,color=C.blue,s=.8
 function route(ctx:CanvasRenderingContext2D,pts:Array<[number,number]>,color=C.blue,width=4,dash:number[]=[]){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.setLineDash([])}
 function bars(ctx:CanvasRenderingContext2D,items:Array<{name:string;value:number;display:string;color:string}>,x:number,y:number,maxW=190){const max=Math.max(...items.map(v=>v.value));items.forEach((it,i)=>{label(ctx,it.name,x,y+i*31,C.muted,12);ctx.fillStyle=C.line;ctx.fillRect(x+88,y-12+i*31,maxW,14);ctx.fillStyle=it.color;ctx.fillRect(x+88,y-12+i*31,maxW*it.value/max,14);label(ctx,it.display,x+94+maxW,y+i*31,C.ink,12)})}
 
-const stages=[{t:'领域适配',sub:'关键帧潜空间 + 相机适配器',color:C.blue,fb:'领域适配：关键帧潜空间与相机适配器建立精确控制。'},{t:'中段训练',sub:'GGM + SSM++',color:C.purple,fb:'中段训练：GGM 与 SSM++ 让多轨迹保持一致。'},{t:'后蒸馏',sub:'DMD 四步 DiT',color:C.green,fb:'后蒸馏：DMD 将生成器压缩为四步 DiT。'}];
-export const HyTrainingStages:React.FC<WidgetProps>=()=>{const[stage,setStage]=useState(0);return <div><CanvasView draw={(ctx)=>{clear(ctx,560,250);stages.forEach((s,i)=>{const x=65+i*180;ctx.fillStyle=i===stage?s.color:C.white;ctx.strokeStyle=i===stage?s.color:C.line;ctx.lineWidth=i===stage?4:2;ctx.beginPath();ctx.roundRect(x,70,130,70,8);ctx.fill();ctx.stroke();label(ctx,s.t,x+65,95,i===stage?C.white:C.ink,14,'center');label(ctx,s.sub,x+65,119,i===stage?C.white:C.muted,11,'center');if(i<2)route(ctx,[[x+130,105],[x+180,105]],i<stage?C.green:C.line,4)});camera(ctx,80+stage*180,185,stages[stage].color,.72);label(ctx,stage===2?'4 steps':'能力逐段加入',280,225,stage===2?C.green:C.blue,13,'center')}}/><div className="step-ctrl"><button className="tiny ghost" onClick={()=>setStage(Math.max(0,stage-1))} disabled={stage===0}>上一步</button><span className="step-label"><b>{stage+1}</b> / 3</span><button className="tiny" onClick={()=>setStage(Math.min(2,stage+1))} disabled={stage===2}>下一步</button><button className="tiny ghost" onClick={()=>setStage(0)}>重置</button></div><div className={`feedback ${stage===2?'good':''}`}>{stages[stage].fb}</div></div>};
+const stages=[
+  {t:'领域适配',sub:'关键帧潜空间 + 相机适配器',color:C.blue,ability:'相机控制',why:'先让模型适应关键帧潜空间，并建立精确的相机条件控制。'},
+  {t:'中段记忆训练',sub:'GGM + SSM++',color:C.purple,ability:'跨轨迹一致性',why:'在已有相机控制上加入全局几何记忆和局部选择记忆。'},
+  {t:'后蒸馏',sub:'DMD 四步 DiT',color:C.green,ability:'少步推理',why:'最后压缩已经学好的生成器；蒸馏不是用来重新学习相机或记忆。'},
+];
+const cases=[
+  {title:'镜头不听指令',scene:'关键帧外观清晰，但相机偏离给定轨迹。',expected:0,result:'先完成领域适配，模型才能把关键帧潜空间与相机条件对齐。'},
+  {title:'同一房间越走越变',scene:'单条轨迹可用，跨轨迹生成时结构与纹理逐渐漂移。',expected:1,result:'GGM 守住全局几何，SSM++ 检索局部参考，共同处理跨轨迹一致性。'},
+  {title:'质量够了但推理太慢',scene:'控制和记忆已经学好，但扩散采样步数仍影响生成速度。',expected:2,result:'DMD 在训练完成后把 WorldStereo 2.0 生成器蒸馏为四步 DiT。'},
+];
+
+export const HyTrainingStages:React.FC<WidgetProps>=()=>{
+  const[caseIdx,setCaseIdx]=useState(0);
+  const[choice,setChoice]=useState<number|null>(null);
+  const[solved,setSolved]=useState([false,false,false]);
+  const current=cases[caseIdx];
+  const correct=choice===current.expected;
+  const solvedCount=solved.filter(Boolean).length;
+
+  const prescribe=(stageIdx:number)=>{
+    setChoice(stageIdx);
+    if(stageIdx===current.expected){
+      setSolved((previous)=>previous.map((done,i)=>i===caseIdx?true:done));
+    }
+  };
+  const selectCase=(next:number)=>{
+    setCaseIdx(next);
+    setChoice(null);
+  };
+  const reset=()=>{
+    setCaseIdx(0);
+    setChoice(null);
+    setSolved([false,false,false]);
+  };
+
+  return <div className="training-clinic">
+    <div className="training-cases" role="tablist" aria-label="选择训练故障案例">
+      {cases.map((item,i)=><button key={item.title} type="button" role="tab" aria-selected={caseIdx===i} className={`${caseIdx===i?'selected':''} ${solved[i]?'solved':''}`} onClick={()=>selectCase(i)}><span>案 {i+1}</span><strong>{item.title}</strong><small>{solved[i]?'已诊断':'待诊断'}</small></button>)}
+    </div>
+    <CanvasView width={600} height={278} draw={(ctx)=>{
+      clear(ctx,600,278);
+      label(ctx,`症状：${current.title}`,34,30,C.ink,15);
+      label(ctx,current.scene,34,53,C.muted,12);
+      stages.forEach((stage,i)=>{
+        const x=35+i*188;
+        const chosen=choice===i;
+        const done=solved[i];
+        ctx.fillStyle=chosen?(correct?stage.color:'#fff1f2'):done?'#edf8f1':C.white;
+        ctx.strokeStyle=chosen?(correct?stage.color:C.red):done?C.green:C.line;
+        ctx.lineWidth=chosen?4:2;
+        ctx.beginPath();
+        ctx.roundRect(x,82,154,106,7);
+        ctx.fill();
+        ctx.stroke();
+        label(ctx,`第 ${i+1} 段`,x+77,105,chosen&&correct?C.white:stage.color,11,'center');
+        label(ctx,stage.t,x+77,131,chosen&&correct?C.white:C.ink,13,'center');
+        label(ctx,stage.ability,x+77,157,chosen&&correct?C.white:C.muted,11,'center');
+        if(chosen){
+          label(ctx,correct?'处方命中':'顺序不匹配',x+77,177,correct?C.white:C.red,11,'center');
+        }else if(done){
+          label(ctx,'已掌握',x+77,177,C.green,11,'center');
+        }
+        if(i<2)route(ctx,[[x+154,135],[x+188,135]],solved[i]?C.green:C.line,4,solved[i]?[]:[5,5]);
+      });
+      const abilities=[{name:'相机控制',on:solved[0]},{name:'跨轨迹一致',on:solved[1]},{name:'四步生成器',on:solved[2]}];
+      abilities.forEach((ability,i)=>{
+        const x=65+i*176;
+        ctx.fillStyle=ability.on?C.green:C.line;
+        ctx.fillRect(x,229,120,10);
+        label(ctx,ability.name,x+60,261,ability.on?C.green:C.muted,11,'center');
+      });
+      label(ctx,`${solvedCount}/3 个训练故障已定位`,560,212,solvedCount===3?C.green:C.blue,12,'right');
+    }}/>
+    <div className="training-prescriptions" role="group" aria-label="选择训练处方">
+      <span>为当前症状选择处方：</span>
+      {stages.map((stage,i)=><button key={stage.t} type="button" className={`${choice===i?'selected':''} ${choice===i?(correct?'correct':'wrong'):''}`} aria-pressed={choice===i} onClick={()=>prescribe(i)}><strong>{stage.t}</strong><small>{stage.sub}</small></button>)}
+    </div>
+    <div className={`feedback ${choice===null?'':correct?'good':'bad'}`} aria-live="polite">{choice===null?'先读症状，再判断应该在哪个训练阶段处理。':correct?current.result:`“${stages[choice].t}”主要解决${stages[choice].ability}。${stages[current.expected].why}`}</div>
+    <div className="training-progress">
+      <strong>{solvedCount===3?'完整课程已拼好':'课程依赖'}</strong>
+      <span>{solvedCount===3?'先建立控制，再训练记忆，最后蒸馏少步生成器；四步只属于 WorldStereo 2.0 生成器。':'领域适配 → 记忆训练 → 后蒸馏。后续阶段建立在前一阶段已经获得的能力之上。'}</span>
+      <button type="button" onClick={reset}>重新诊断</button>
+    </div>
+  </div>;
+};
 
 const res=[{name:'低 L',px:'189×259',old:80.55,now:83.43},{name:'中 M',px:'378×518',old:86.13,now:86.48},{name:'高 H',px:'756×1036',old:66.29,now:86.89}];
 export const HyResolution:React.FC<WidgetProps>=()=>{const[idx,setIdx]=useState(1);const d=res[idx];return <div><CanvasView draw={(ctx)=>{clear(ctx,560,250);label(ctx,`推理分辨率 ${d.px}`,40,32,C.orange,14);ctx.strokeStyle=C.line;ctx.strokeRect(40,58,215,120);ctx.strokeRect(305,58,215,120);label(ctx,'标准 RoPE 整数索引',148,52,C.red,13,'center');label(ctx,'归一化 RoPE [-1,1]',412,52,C.green,13,'center');const n=[5,8,12][idx];for(let i=0;i<n;i++){const x=55+i*180/(n-1);ctx.strokeStyle=i>7?C.red:C.blue;ctx.beginPath();ctx.moveTo(x,72);ctx.lineTo(x,164);ctx.stroke();const x2=320+i*185/(n-1);ctx.strokeStyle=C.green;ctx.beginPath();ctx.moveTo(x2,72);ctx.lineTo(x2,164);ctx.stroke()}bars(ctx,[{name:'WM 1.0 AUC',value:d.old,display:d.old.toFixed(2),color:idx===2?C.red:C.blue},{name:'WM 2.0 AUC',value:d.now,display:d.now.toFixed(2),color:C.green}],75,213,230)}}/><div className="ctrl"><label>分辨率档位 <span className="val">{d.name}</span></label><input type="range" min={0} max={2} step={1} value={idx} onChange={e=>setIdx(Number(e.target.value))}/></div><div className={`feedback ${idx===2?'good':''}`}>{idx===2?'高分辨率下，WorldMirror 1.0 的 AUC@30 从中档 86.13 降到 66.29；2.0 保持 86.89。':'归一化坐标让不同分辨率在同一范围内重新采样。'} 结论仅覆盖论文测试的 L/M/H 分辨率。</div></div>};
