@@ -97,21 +97,21 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
 
       drawCurve(teacherCenter, C.green);
       drawCurve(studentCenter, C.purple, true);
-      label(ctx, '教师真实分布', xFor(teacherCenter), 34, C.green, 11, 'center');
-      label(ctx, '学生伪分布', xFor(studentCenter), 34, C.purple, 11, 'center');
+      label(ctx, '教师真实分布 · 实线', left, 34, C.green, 11);
+      label(ctx, '学生伪分布 · 虚线', right, 34, C.purple, 11, 'right');
 
       const probe = Math.min(.96, studentCenter + noise.sigma * .65);
       const probeX = xFor(probe);
       ctx.strokeStyle = C.orange; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(probeX, 48); ctx.lineTo(probeX, base); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(probeX, base, 7, 0, Math.PI * 2); ctx.fill();
-      label(ctx, '同一个带噪样本 xₜ', probeX, base + 39, C.orange, 10, 'center');
+      label(ctx, '带噪样本 xₜ', probeX, 258, C.orange, 10, 'center');
 
       const realTarget = xFor(teacherCenter + noise.sigma * .2);
       const fakeTarget = xFor(studentCenter + noise.sigma * .2);
-      arrow(ctx, probeX, realTarget, 278, C.green, 's_real');
-      arrow(ctx, probeX, fakeTarget, 306, C.purple, 's_fake');
-      label(ctx, converged ? '两条分数方向已经接近' : '两条分数的差异推动学生向教师靠近', 600, 320, converged ? C.green : C.blue, 10, 'right');
+      arrow(ctx, probeX, realTarget, 288, C.green, 's_real');
+      arrow(ctx, probeX, fakeTarget, 316, C.purple, 's_fake');
+      label(ctx, converged ? '分数方向已接近' : '分数差推动学生靠近教师', 600, 324, converged ? C.green : C.blue, 9, 'right');
     }} />
 
     <div className="dmd-noise-tabs" role="tablist" aria-label="选择扩散噪声层级">
