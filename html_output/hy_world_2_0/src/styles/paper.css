@@ -931,6 +931,285 @@
   line-height: 1.4;
 }
 
+.world-model-stress {
+  display: grid;
+  gap: 11px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.world-model-stress > header {
+  display: flex;
+  gap: 14px;
+  align-items: end;
+  justify-content: space-between;
+}
+
+.world-model-stress > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.world-model-stress > header span {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.world-model-stress > header strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.world-model-stress > header small {
+  max-width: 240px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.world-model-stress-tests {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.world-model-stress-tests button {
+  min-height: 42px;
+  padding: 8px 10px;
+  color: var(--ink-2);
+  background: #fff;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.world-model-stress-tests button:hover,
+.world-model-stress-tests button.selected {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.world-model-stress-tests button.selected {
+  box-shadow: inset 0 3px 0 var(--blue);
+}
+
+.world-model-stress-body {
+  display: grid;
+  grid-template-columns: minmax(240px, .9fr) minmax(0, 1.1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.world-model-stress-scene {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background: var(--paper-scene-bg);
+  border: 1px solid var(--line);
+}
+
+.stress-room-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.stress-wall {
+  position: absolute;
+  top: 45px;
+  right: 21%;
+  bottom: 28px;
+  width: 7px;
+  background: #aab4c4;
+}
+
+.stress-cabinet,
+.stress-chair,
+.stress-camera,
+.stress-zone {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 900;
+  transition: left .25s ease, right .25s ease, transform .25s ease, background .25s ease;
+}
+
+.stress-cabinet {
+  top: 69px;
+  right: 10%;
+  width: 54px;
+  height: 75px;
+  background: #d8b48a;
+  border: 2px solid #8b5e34;
+}
+
+.stress-chair {
+  bottom: 38px;
+  left: 46%;
+  width: 40px;
+  height: 38px;
+  background: #f7c873;
+  border: 2px solid #a96613;
+}
+
+.stress-camera {
+  bottom: 36px;
+  left: 12%;
+  width: 50px;
+  height: 32px;
+  color: #fff;
+  background: var(--blue);
+  border: 2px solid var(--ink);
+}
+
+.stress-camera::after {
+  content: '';
+  position: absolute;
+  right: -15px;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 14px solid var(--orange);
+}
+
+.stress-trace {
+  position: absolute;
+  right: 24%;
+  bottom: 51px;
+  left: 20%;
+  border-top: 3px dashed #95a1b4;
+}
+
+.stress-zone {
+  top: 48px;
+  right: 1%;
+  bottom: 22px;
+  width: 19%;
+  color: var(--muted);
+  background: #eef1f5;
+  border: 2px dashed #aab4c4;
+  writing-mode: vertical-rl;
+}
+
+.world-model-stress-scene.occlusion .stress-camera {
+  bottom: 66px;
+  left: 67%;
+  transform: rotate(180deg);
+}
+
+.world-model-stress-scene.revisit .stress-camera {
+  left: 24%;
+}
+
+.world-model-stress-scene.action-video.action .stress-chair,
+.world-model-stress-scene.hy-world.action .stress-chair {
+  left: 62%;
+  transform: rotate(8deg);
+}
+
+.world-model-stress-scene.video .stress-zone {
+  color: var(--purple);
+  background: #f2edfb;
+  border-color: #a78bca;
+}
+
+.world-model-stress-scene.action-video .stress-zone {
+  color: var(--blue);
+  background: #eaf1fa;
+  border-color: #7f9dc2;
+}
+
+.world-model-stress-scene.reconstruction .stress-zone {
+  color: var(--muted);
+  background: #fff;
+}
+
+.world-model-stress-scene.hy-world .stress-zone {
+  color: var(--green);
+  background: #e7f5ec;
+  border-color: var(--green);
+}
+
+.world-model-stress-readout {
+  display: grid;
+  gap: 7px;
+  align-content: center;
+  padding: 18px;
+  background: #fff;
+  border-left: 4px solid var(--line);
+}
+
+.world-model-stress-readout > span {
+  width: fit-content;
+  padding: 4px 7px;
+  color: var(--muted);
+  background: #eef1f5;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.world-model-stress-readout > strong {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.world-model-stress-readout > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.world-model-stress-readout.strong { border-left-color: var(--green); }
+.world-model-stress-readout.conditional { border-left-color: var(--orange); }
+.world-model-stress-readout.weak { border-left-color: var(--red); }
+.world-model-stress-readout.strong > span { color: var(--green); background: #e7f5ec; }
+.world-model-stress-readout.conditional > span { color: #9a5a08; background: #fff3d9; }
+.world-model-stress-readout.weak > span { color: var(--red); background: #fdecef; }
+
+.world-model-state-ledger {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.world-model-state-ledger > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px 10px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.world-model-state-ledger span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.world-model-state-ledger strong {
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 .world-model-cutaway {
   display: grid;
   gap: 12px;
@@ -1831,6 +2110,10 @@
     grid-template-columns: 1fr;
   }
 
+  .world-model-stress-body {
+    grid-template-columns: 1fr;
+  }
+
   .world-model-flow > i {
     justify-self: center;
     transform: rotate(90deg);
@@ -1917,6 +2200,21 @@
   }
 
   .world-model-feedback-loop {
+    grid-template-columns: 1fr;
+  }
+
+  .world-model-stress > header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .world-model-stress > header small {
+    max-width: none;
+    text-align: left;
+  }
+
+  .world-model-stress-tests,
+  .world-model-state-ledger {
     grid-template-columns: 1fr;
   }
 

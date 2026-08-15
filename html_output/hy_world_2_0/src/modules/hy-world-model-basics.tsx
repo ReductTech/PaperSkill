@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
 
 type ModelLensId = 'video' | 'action-video' | 'reconstruction' | 'hy-world';
+type StressTestId = 'occlusion' | 'revisit' | 'action';
+type StressStatus = 'strong' | 'conditional' | 'weak';
 
 type ModelLens = {
   id: ModelLensId;
@@ -110,9 +112,97 @@ const history = [
 
 const traitLabel = { yes: '明确具备', partial: '部分覆盖', no: '不是主要目标' } as const;
 
+const stressTests: Array<{ id: StressTestId; title: string; question: string }> = [
+  { id: 'occlusion', title: '绕到遮挡背面', question: '相机看到输入里没有出现过的柜子背面，会发生什么？' },
+  { id: 'revisit', title: '离开后再回访', question: '走出房间再回来，桌椅位置是否还能保持？' },
+  { id: 'action', title: '推动场景物体', question: '用户推动椅子后，世界状态能否继续响应？' },
+];
+
+const stressMatrix: Record<ModelLensId, Record<StressTestId, {
+  status: StressStatus;
+  label: string;
+  verdict: string;
+  explanation: string;
+  hidden: string;
+  revisit: string;
+  action: string;
+}>> = {
+  video: {
+    occlusion: {
+      status: 'conditional', label: '能补画，不能当测量', verdict: '背面可以被生成，但不是被相机恢复出来的真实几何。',
+      explanation: '视频生成器擅长合成视觉上合理的新画面；它没有义务输出可测量、可编辑的柜子三维结构。',
+      hidden: '生成先验补画', revisit: '没有显式资产保证', action: '通常不接动作',
+    },
+    revisit: {
+      status: 'weak', label: '画面连续不等于持久', verdict: '回到原处可能看起来相似，但缺少可重新加载的空间状态。',
+      explanation: '像素序列可以保持短时连贯，却不能因此推断桌椅已经作为三维对象被保存。',
+      hidden: '可生成', revisit: '依赖视频时序', action: '通常不接动作',
+    },
+    action: {
+      status: 'weak', label: '没有动作闭环', verdict: '普通离线视频不会因为用户推椅子而持续更新世界。',
+      explanation: '动作不是普通视频生成器的持续输入条件；一次生成完成后，用户通常只能播放结果。',
+      hidden: '可生成', revisit: '无显式持久状态', action: '不是主要目标',
+    },
+  },
+  'action-video': {
+    occlusion: {
+      status: 'conditional', label: '随动作继续生成', verdict: '相机转向背面时会生成下一段观察，但状态仍主要存在于像素 rollout 中。',
+      explanation: '动作条件视频世界能响应镜头运动；是否长期守住几何，要看模型的时空一致性，而不是只看单帧质量。',
+      hidden: '在线生成新观察', revisit: '短时状态延续', action: '直接条件输入',
+    },
+    revisit: {
+      status: 'conditional', label: '可回访，长期一致性有条件', verdict: '连续 rollout 可以带回旧区域，但不等于拥有可编辑三维资产。',
+      explanation: '在线像素世界强调低延迟动作反馈；长时间离开后能否完全复原旧场景仍是独立难题。',
+      hidden: '在线生成', revisit: '依赖长时记忆', action: '实时响应',
+    },
+    action: {
+      status: 'strong', label: '动作直接驱动观察', verdict: '推动椅子的动作会成为下一段画面的条件。',
+      explanation: '这是动作视频世界最核心的优势：环境观察会随用户或智能体动作继续 rollout。',
+      hidden: '随轨迹生成', revisit: '像素状态延续', action: '明确具备',
+    },
+  },
+  reconstruction: {
+    occlusion: {
+      status: 'weak', label: '没有观察就缺少证据', verdict: '柜子背面若从未被拍到，重建器不能把想象当作测量。',
+      explanation: '显式重建优先忠实利用多视角对应；有限补全可以存在，但不是任意生成完整世界。',
+      hidden: '保持未知或有限补全', revisit: '已观测几何稳定', action: '不负责运行时动作',
+    },
+    revisit: {
+      status: 'strong', label: '已观察区域被几何锚定', verdict: '相机与显式几何会把回访视角重新定位到同一空间。',
+      explanation: '多视图或视频提供对应关系，已观察的桌椅可以进入点云、3DGS 等持久表示。',
+      hidden: '证据优先', revisit: '显式几何锚定', action: '不负责运行时动作',
+    },
+    action: {
+      status: 'weak', label: '重建不是物理模拟', verdict: '得到三维资产后，是否能推椅子取决于后续引擎与物理设置。',
+      explanation: '恢复相机、深度和 3DGS 不会自动赋予物体可交互语义、刚体属性或控制逻辑。',
+      hidden: '证据优先', revisit: '显式资产可重载', action: '需要外部运行时',
+    },
+  },
+  'hy-world': {
+    occlusion: {
+      status: 'conditional', label: '生成背面，再落成资产', verdict: '稀疏输入路径会补出背面，并由重建阶段合成为显式三维世界。',
+      explanation: '这是 HY-World 2.0 连接生成与重建的关键；补出的背面来自生成先验，不能称为真实场景测量。',
+      hidden: '生成先验补全', revisit: '写入 3DGS / Mesh', action: '生成后进入运行时',
+    },
+    revisit: {
+      status: 'strong', label: '世界生成后可以回访', verdict: '生成或重建结束后，资产可以保存、重新加载并从新视角渲染。',
+      explanation: '持久显式三维状态是 2.0 相对逐帧视频路线最重要的输出范式差别之一。',
+      hidden: '生成或观测恢复', revisit: '显式资产保持', action: 'WorldLens 漫游',
+    },
+    action: {
+      status: 'conditional', label: '可漫游交互，不是在线再生成', verdict: 'WorldLens 可处理角色、碰撞与实时渲染，但完整世界生成仍在运行前完成。',
+      explanation: '推动椅子一类行为需要资产、碰撞代理和运行时规则；这不代表生成模型会随每个动作实时重建世界。',
+      hidden: '离线生成/重建', revisit: '资产可重载', action: '运行时部分覆盖',
+    },
+  },
+};
+
 export const HyWorldModelBasics: React.FC<WidgetProps> = () => {
   const [lensId, setLensId] = useState<ModelLensId>('hy-world');
+  const [stressTestId, setStressTestId] = useState<StressTestId>('revisit');
   const lens = lenses.find((item) => item.id === lensId) ?? lenses[3];
+  const stressTest = stressTests.find((item) => item.id === stressTestId) ?? stressTests[1];
+  const stress = stressMatrix[lens.id][stressTest.id];
 
   return (
     <div className="world-model-lab">
@@ -124,6 +214,44 @@ export const HyWorldModelBasics: React.FC<WidgetProps> = () => {
           </button>
         ))}
       </div>
+
+      <section className="world-model-stress" aria-live="polite">
+        <header>
+          <div>
+            <span>状态持久性压力测试</span>
+            <strong>{stressTest.question}</strong>
+          </div>
+          <small>这是范式教学实验，不是统一数据集上的模型排行榜。</small>
+        </header>
+        <div className="world-model-stress-tests" role="group" aria-label="选择世界状态压力测试">
+          {stressTests.map((test) => (
+            <button key={test.id} type="button" className={stressTestId === test.id ? 'selected' : ''} aria-pressed={stressTestId === test.id} onClick={() => setStressTestId(test.id)}>
+              {test.title}
+            </button>
+          ))}
+        </div>
+        <div className="world-model-stress-body">
+          <div className={`world-model-stress-scene ${stressTest.id} ${lens.id}`} aria-label={`${lens.short} 的${stressTest.title}示意`}>
+            <div className="stress-room-label">观察房间</div>
+            <div className="stress-wall" />
+            <div className="stress-cabinet"><span>柜</span></div>
+            <div className="stress-chair"><span>椅</span></div>
+            <div className="stress-camera"><span>CAM</span></div>
+            <div className="stress-trace" />
+            <div className="stress-zone">遮挡区</div>
+          </div>
+          <div className={`world-model-stress-readout ${stress.status}`}>
+            <span>{stress.label}</span>
+            <strong>{stress.verdict}</strong>
+            <p>{stress.explanation}</p>
+          </div>
+        </div>
+        <div className="world-model-state-ledger">
+          <div><span>未见区域</span><strong>{stress.hidden}</strong></div>
+          <div><span>离开再回访</span><strong>{stress.revisit}</strong></div>
+          <div><span>动作响应</span><strong>{stress.action}</strong></div>
+        </div>
+      </section>
 
       <section className={`world-model-cutaway ${lens.id}`} aria-live="polite">
         <header>

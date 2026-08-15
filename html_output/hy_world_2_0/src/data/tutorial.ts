@@ -45,7 +45,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "1.0",
           "title": "世界模型概念实验室",
-          "desc": "切换视频生成、动作条件视频世界、显式三维重建和 HY-World 2.0，比较它们的输入、内部状态、输出、动作闭环与能力边界。",
+          "desc": "切换四种世界建模范式，再用遮挡、回访和动作三项压力测试，比较它们如何处理未见区域、状态持久性、显式资产与反馈闭环。",
           componentId: "hy-world-model-basics"
         },
         {
