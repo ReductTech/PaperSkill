@@ -102,6 +102,13 @@ export const tutorial: TutorialData = {
           "title": "全景故障取证台",
           "desc": "检查相机元数据、潜空间边界和解码后像素三类故障，为每个症状匹配正确机制，并用论文表 4 核查完整系统结果。",
           componentId: "hy-panorama"
+        },
+        {
+          kind: "module",
+          "id": "2.2",
+          "title": "全景数据策展暗房",
+          "desc": "检查六张真实拍摄或 UE 合成教学样本，保留能扩展训练分布的高质量数据，并剔除明显接缝与拍摄设备污染。",
+          componentId: "hy-panorama-curation"
         }
       ],
       "insight": "HY-Pano 2.0 用数据驱动的隐式映射降低相机元数据依赖，再专门处理 ERP 环形边界。",
