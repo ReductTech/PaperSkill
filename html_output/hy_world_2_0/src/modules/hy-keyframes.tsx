@@ -117,7 +117,100 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
 const routeData:{[k:string]:{n:number;note:string;color:string}}={常规:{n:9,note:'离开固定视点，但物体背面仍可能缺失。',color:C.blue},环绕:{n:5,note:'围绕显著物体补足侧面观察。',color:C.green},重建感知:{n:10,note:'针对欠观察区域迭代补拍。',color:C.purple},漫游:{n:3,note:'走向可达区域远端，适合街道和走廊。',color:C.orange},航拍:{n:8,note:'补充俯视角，俯仰因碰撞动态减小。',color:C.brown}};
 export const HyTrajectory: React.FC<WidgetProps> = () => { const [mode,setMode]=useState('常规'); const d=routeData[mode]; return <div><CanvasView height={260} draw={(ctx)=>{clearStudio(ctx,560,260);ctx.fillStyle='#cbd5c0';ctx.fillRect(210,65,80,58);ctx.fillRect(380,125,70,55);label(ctx,'障碍',250,96,C.muted,12,'center');const paths:{[k:string]:Array<[number,number]>}={常规:[[55,205],[160,150],[330,190],[500,80]],环绕:[[55,205],[160,150],[195,65],[315,50],[345,145],[500,80]],重建感知:[[55,205],[150,175],[320,205],[345,145],[500,80]],漫游:[[55,205],[100,70],[180,45],[330,55],[500,80]],航拍:[[55,205],[145,150],[280,95],[410,55],[500,80]]};route(ctx,paths[mode],d.color,5);camera(ctx,85,185,d.color,.75);target(ctx,500,80,true);label(ctx,`最大数量 ${d.n}`,410,225,d.color,14);label(ctx,mode,55,35,d.color,15);}}/><div className="chip-row">{Object.keys(routeData).map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='环绕'||mode==='重建感知'?'good':''}`}>{d.note} 这些数量是表 1 的启发式上限，并依赖检测到的对象。</div></div>; };
 
-export const HyKeyframes: React.FC<WidgetProps> = () => { const [run,setRun]=useState(0);const start=useRef(0);const go=()=>{start.current=performance.now();setRun(v=>v+1)};return <div><CanvasView height={250} animate={run>0} draw={(ctx,time)=>{clearStudio(ctx,560,250);const p=run?clamp((time-start.current)/2000,0,1):0;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(280,25);ctx.lineTo(280,205);ctx.stroke();label(ctx,'Video-VAE',140,30,C.red,14,'center');label(ctx,'Keyframe-VAE',420,30,C.green,14,'center');route(ctx,[[35,180],[235,85]],C.red,3,[6,5]);route(ctx,[[315,180],[515,85]],C.blue,5);camera(ctx,55+p*160,170-p*70,C.red,.68);camera(ctx,335+p*160,170-p*70,C.blue,.68);for(let i=0;i<6;i++)photo(ctx,60+i*30,210-i*13,C.red,.28+i*.08);for(let i=0;i<3;i++)photo(ctx,345+i*70,205-i*38,C.green,1);metricBars(ctx,['RotErr','ATE'],[.762,.492],[C.red,C.green],150,228,70);}}/><div className="step-ctrl"><button className="tiny" onClick={go}>开始同轨比较</button></div><div className={`feedback ${run?'good':''}`}>{run?'选择性冻结 Cross-Attn 与 FFN 后，RotErr 0.762→0.492，ATE 2.141→1.768。全量训练的部分视觉指标更高，但控制精度和泛化更差。':'两侧使用相同起点和时间基准。'}</div></div>; };
+const keyframePoints: Array<[number, number]> = [[48,210],[112,188],[175,151],[235,108],[300,78],[370,68],[444,92],[515,137]];
+const keyframeAngles = [-34,-25,-14,-2,12,25,39,55];
+
+export const HyKeyframes: React.FC<WidgetProps> = () => {
+  const [selectedFrames, setSelectedFrames] = useState<number[]>([0,1,2]);
+  const ordered = [...selectedFrames].sort((a,b) => a-b);
+  const gaps = ordered.slice(1).map((value,index) => value-ordered[index]);
+  const minGap = gaps.length ? Math.min(...gaps) : 0;
+  const span = ordered.length > 1 ? ordered[ordered.length-1]-ordered[0] : 0;
+  const complete = ordered.length === 3;
+  const sparse = complete && minGap >= 2;
+  const wide = complete && span >= 6;
+  const success = sparse && wide;
+
+  const toggleFrame = (index: number) => {
+    setSelectedFrames((current) => {
+      if (current.includes(index)) return current.filter((item) => item !== index);
+      if (current.length >= 3) return current;
+      return [...current,index];
+    });
+  };
+
+  const feedback = !complete
+    ? `还需选择 ${3-ordered.length} 帧。关键帧不是越少越好，而是要覆盖足够大的视角变化。`
+    : !sparse
+      ? '三帧中仍有相邻候选，重复观察过多；先撤下一帧，再把它放到更远的视角。'
+      : !wide
+        ? '帧间已经稀疏，但首尾视角跨度仍不够，快速转弯区域可能没有被覆盖。'
+        : '关键帧组合成立：三帧彼此分散，并覆盖了整段快速转弯。下面的论文指标只证明选择性冻结配置的相机控制改进。';
+
+  return (
+    <div className="keyframe-lab">
+      <CanvasView height={280} draw={(ctx) => {
+        clearStudio(ctx,560,280);
+        label(ctx,'同一条快速转弯轨迹',30,32,C.ink,14);
+        route(ctx,keyframePoints,C.line,4);
+        keyframePoints.forEach(([x,y],index) => {
+          const selected = selectedFrames.includes(index);
+          ctx.fillStyle = selected ? C.blue : C.white;
+          ctx.strokeStyle = selected ? C.blue : '#aab4c4';
+          ctx.lineWidth = selected ? 4 : 2;
+          ctx.beginPath(); ctx.arc(x,y,selected?9:6,0,Math.PI*2); ctx.fill(); ctx.stroke();
+          label(ctx,`F${index+1}`,x,y+25,selected?C.blue:C.muted,10,'center');
+          if (selected) {
+            const angle = keyframeAngles[index]*Math.PI/180;
+            route(ctx,[[x,y],[x+Math.cos(angle)*42,y-Math.sin(angle)*42]],C.orange,3);
+            camera(ctx,x,y,C.blue,.44);
+          }
+        });
+        label(ctx,success?'稀疏且跨视角':'检查帧间重复与首尾跨度',530,32,success?C.green:C.orange,12,'right');
+      }} />
+
+      <div className="keyframe-picker-head">
+        <div><span>从 8 个候选视角中选择 3 帧</span><strong>{ordered.length} / 3 已选</strong></div>
+        <button type="button" aria-label="重置为连续三帧" title="重置为连续三帧" onClick={() => setSelectedFrames([0,1,2])}>↺</button>
+      </div>
+
+      <div className="keyframe-picker" role="group" aria-label="选择三张关键帧">
+        {keyframePoints.map((_,index) => {
+          const selected = selectedFrames.includes(index);
+          const disabled = !selected && selectedFrames.length >= 3;
+          return (
+            <button key={index} type="button" className={selected?'selected':''} aria-pressed={selected} disabled={disabled} onClick={() => toggleFrame(index)}>
+              <span className="keyframe-thumb" style={{'--object-shift': `${8+index*5}%`,'--camera-shift': `${8+index*3}%`} as React.CSSProperties}><i /></span>
+              <strong>F{index+1}</strong>
+              <small>{keyframeAngles[index] > 0 ? '+' : ''}{keyframeAngles[index]}°</small>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="keyframe-diagnostics">
+        <div className={complete?'ready':'waiting'}><span>帧数约束</span><strong>{complete?'3 帧已满':'尚未选满'}</strong></div>
+        <div className={sparse?'ready':'waiting'}><span>最小间隔</span><strong>{complete?`${minGap} 个候选位`:'等待选满'}</strong></div>
+        <div className={wide?'ready':'waiting'}><span>首尾跨度</span><strong>{complete?`${span} 个候选位`:'等待选满'}</strong></div>
+      </div>
+
+      <div className="keyframe-encoding-compare">
+        <div className="video-vae"><span>Video-VAE 观察方式</span><strong>连续帧一起做时空压缩</strong><p>相邻画面很多，但快速视角变化中的高频外观和几何容易在时间压缩中受损。</p></div>
+        <i aria-hidden="true">→</i>
+        <div className="keyframe-vae"><span>Keyframe-VAE 观察方式</span><strong>{success?'稀疏关键帧覆盖整段转弯':'等待更分散的三帧'}</strong><p>去除时间压缩，优先保留跨视角关键帧的外观与相机条件。</p></div>
+      </div>
+
+      <div className={`feedback ${success?'good':complete?'bad':''}`}>{feedback}</div>
+
+      <section className="keyframe-paper-evidence">
+        <header><span>论文证据，不由上方选择器计算</span><strong>选择性冻结 Cross-Attn 与 FFN 后，相机误差下降</strong></header>
+        <div className="keyframe-metric-row"><span>RotErr ↓</span><div><i className="baseline" style={{width:'95%'}} /><i className="result" style={{width:'61%'}} /></div><strong>0.762 → 0.492</strong></div>
+        <div className="keyframe-metric-row"><span>ATE ↓</span><div><i className="baseline" style={{width:'97%'}} /><i className="result" style={{width:'80%'}} /></div><strong>2.141 → 1.768</strong></div>
+        <p>两项指标均为越低越好；全量训练的部分视觉指标更高，但相机控制精度和泛化更差。</p>
+      </section>
+    </div>
+  );
+};
 
 const memoryData:{[k:string]:[number,number,number,string]}={'仅相机控制':[16.13,.474,28.81,'没有跨轨迹记忆，质量和一致性最低。'],'GGM+SSM++':[20.94,.640,30.27,'全局骨架和局部检索带来显著提升。'],'空间拼接完整配置':[21.63,.669,30.76,'空间拼接、增强与更大批次形成最终记忆配置。'],'时间拼接替代':[19.83,.581,29.77,'把空间拼接换成时间拼接会在全部指标上退化。']};
 export const HyMemory: React.FC<WidgetProps> = () => {const [mode,setMode]=useState('仅相机控制');const d=memoryData[mode];return <div><CanvasView height={260} draw={(ctx)=>{clearStudio(ctx,560,260);camera(ctx,105,138,C.blue,.8);target(ctx,460,105,true);route(ctx,[[135,138],[420,105]],mode==='仅相机控制'?C.red:C.blue,4,mode==='仅相机控制'?[8,6]:[]);ctx.strokeStyle=C.purple;ctx.lineWidth=3;ctx.beginPath();ctx.arc(285,105,62,0,Math.PI*2);ctx.stroke();label(ctx,'GGM',285,102,C.purple,13,'center');if(mode!=='仅相机控制'){photo(ctx,285,58,C.purple);route(ctx,[[285,76],[370,102]],mode==='时间拼接替代'?C.red:C.green,3,mode==='时间拼接替代'?[5,4]:[]);}metricBars(ctx,['PSNR','SSIM×30','PSNRm'],[d[0],d[1]*30,d[2]],[C.blue,C.orange,C.green],50,220,92);}}/><div className="chip-row">{Object.keys(memoryData).map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='仅相机控制'||mode==='时间拼接替代'?'bad':mode==='空间拼接完整配置'?'good':''}`}>{d[3]} PSNR={d[0]}，SSIM={d[1].toFixed(3)}，PSNRm={d[2]}。</div></div>;};
