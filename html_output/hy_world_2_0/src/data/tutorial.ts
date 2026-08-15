@@ -139,8 +139,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "3.1",
-          "title": "五类轨迹覆盖实验",
-          "desc": "选择常规、环绕、重建感知、漫游或航拍路线，观察覆盖范围和路线条件。",
+          "title": "盲区勘景任务台",
+          "desc": "先指定物体背面、走廊远端或俯视盲区，再从五类 WorldNav 路线中组合最多两类策略，比较覆盖目标、执行条件与互补性。",
           componentId: "hy-trajectory"
         }
       ],

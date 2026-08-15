@@ -114,8 +114,128 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
   return <div><CanvasView height={250} draw={(ctx)=>{clearStudio(ctx,560,250);photo(ctx,72,105,C.orange);label(ctx,'透视条件',72,55,C.ink,13,'center');ctx.fillStyle=C.white;ctx.strokeStyle=mode==='显式投影'?C.red:C.blue;ctx.lineWidth=3;ctx.fillRect(180,65,270,82);ctx.strokeRect(180,65,270,82);for(let i=0;i<9;i++){ctx.fillStyle=i%3===0?C.floor:'#b8c9a7';ctx.fillRect(186+i*29,72,25,68);}if(mode==='显式投影'){ctx.strokeStyle=C.red;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(315,65);ctx.lineTo(337,147);ctx.stroke();}if(mode==='隐式映射'){route(ctx,[[105,105],[170,105],[315,105]],C.blue,4);label(ctx,'MMDiT token',315,180,C.blue,13,'center');}if(mode==='接缝修复'){ctx.strokeStyle=C.green;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(183,65);ctx.lineTo(183,147);ctx.moveTo(447,65);ctx.lineTo(447,147);ctx.stroke();label(ctx,'左右边界闭合',315,180,C.green,13,'center');}metricBars(ctx,['CLIP-I','Q-Align'],mode==='显式投影'?[.831,3.317]:[.844,4.026],[C.blue,C.green],40,218,95);}}/><div className="chip-row">{modes.map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='显式投影'?'bad':mode==='接缝修复'?'good':''}`}>{feedback[mode]}</div></div>;
 };
 
-const routeData:{[k:string]:{n:number;note:string;color:string}}={常规:{n:9,note:'离开固定视点，但物体背面仍可能缺失。',color:C.blue},环绕:{n:5,note:'围绕显著物体补足侧面观察。',color:C.green},重建感知:{n:10,note:'针对欠观察区域迭代补拍。',color:C.purple},漫游:{n:3,note:'走向可达区域远端，适合街道和走廊。',color:C.orange},航拍:{n:8,note:'补充俯视角，俯仰因碰撞动态减小。',color:C.brown}};
-export const HyTrajectory: React.FC<WidgetProps> = () => { const [mode,setMode]=useState('常规'); const d=routeData[mode]; return <div><CanvasView height={260} draw={(ctx)=>{clearStudio(ctx,560,260);ctx.fillStyle='#cbd5c0';ctx.fillRect(210,65,80,58);ctx.fillRect(380,125,70,55);label(ctx,'障碍',250,96,C.muted,12,'center');const paths:{[k:string]:Array<[number,number]>}={常规:[[55,205],[160,150],[330,190],[500,80]],环绕:[[55,205],[160,150],[195,65],[315,50],[345,145],[500,80]],重建感知:[[55,205],[150,175],[320,205],[345,145],[500,80]],漫游:[[55,205],[100,70],[180,45],[330,55],[500,80]],航拍:[[55,205],[145,150],[280,95],[410,55],[500,80]]};route(ctx,paths[mode],d.color,5);camera(ctx,85,185,d.color,.75);target(ctx,500,80,true);label(ctx,`最大数量 ${d.n}`,410,225,d.color,14);label(ctx,mode,55,35,d.color,15);}}/><div className="chip-row">{Object.keys(routeData).map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className={`feedback ${mode==='环绕'||mode==='重建感知'?'good':''}`}>{d.note} 这些数量是表 1 的启发式上限，并依赖检测到的对象。</div><PaperTable tableId="table-1" /></div>; };
+type TrajectoryName = '常规' | '环绕' | '重建感知' | '漫游' | '航拍';
+type BlindSpotId = 'object-back' | 'corridor' | 'overhead';
+
+const routeData: Record<TrajectoryName, {
+  n: number;
+  note: string;
+  condition: string;
+  color: string;
+  covers: BlindSpotId[];
+  path: Array<[number, number]>;
+}> = {
+  常规: { n: 9, note: '离开固定视点，补充普通新视角。', condition: '不绑定对象，可直接执行。', color: C.blue, covers: ['corridor'], path: [[55,215],[155,165],[330,198],[500,92]] },
+  环绕: { n: 5, note: '围绕显著物体补足侧面和背面。', condition: '需要检测到可绑定对象。', color: C.green, covers: ['object-back'], path: [[55,215],[150,165],[190,78],[305,58],[350,145]] },
+  重建感知: { n: 10, note: '针对当前重建中欠观察的区域迭代补拍。', condition: '依赖重建反馈，并迭代执行。', color: C.purple, covers: ['object-back','overhead'], path: [[55,215],[145,185],[315,210],[350,145],[435,72]] },
+  漫游: { n: 3, note: '沿可导航区域走向街道或走廊远端。', condition: '不绑定对象，依赖 NavMesh。', color: C.orange, covers: ['corridor'], path: [[55,215],[105,82],[190,48],[345,58],[500,92]] },
+  航拍: { n: 8, note: '抬高相机补充俯视观察。', condition: '碰撞风险升高时会动态减小俯仰。', color: C.brown, covers: ['overhead'], path: [[55,215],[145,160],[275,105],[420,58]] },
+};
+
+const blindSpots: Array<{
+  id: BlindSpotId;
+  title: string;
+  prompt: string;
+  recommended: TrajectoryName[];
+  point: [number, number];
+}> = [
+  { id: 'object-back', title: '物体背面', prompt: '中心全景看到了物体正面，但背后仍缺少观察。', recommended: ['环绕','重建感知'], point: [350,145] },
+  { id: 'corridor', title: '走廊远端', prompt: '固定视点无法确认远端拐角后的空间。', recommended: ['漫游','常规'], point: [500,92] },
+  { id: 'overhead', title: '俯视盲区', prompt: '地面视角缺少屋顶、平台或高处结构。', recommended: ['航拍','重建感知'], point: [420,58] },
+];
+
+export const HyTrajectory: React.FC<WidgetProps> = () => {
+  const [blindSpotId, setBlindSpotId] = useState<BlindSpotId>('object-back');
+  const [selectedRoutes, setSelectedRoutes] = useState<TrajectoryName[]>(['环绕']);
+  const blindSpot = blindSpots.find((item) => item.id === blindSpotId) ?? blindSpots[0];
+  const covered = selectedRoutes.some((name) => routeData[name].covers.includes(blindSpot.id));
+  const complete = blindSpot.recommended.every((name) => selectedRoutes.includes(name));
+
+  const toggleRoute = (name: TrajectoryName) => {
+    setSelectedRoutes((current) => {
+      if (current.includes(name)) return current.filter((item) => item !== name);
+      if (current.length >= 2) return current;
+      return [...current, name];
+    });
+  };
+
+  const selectBlindSpot = (id: BlindSpotId) => {
+    setBlindSpotId(id);
+    const next = blindSpots.find((item) => item.id === id) ?? blindSpots[0];
+    setSelectedRoutes([next.recommended[0]]);
+  };
+
+  return (
+    <div className="trajectory-lab">
+      <div className="trajectory-targets" role="tablist" aria-label="选择需要补看的盲区">
+        {blindSpots.map((item) => (
+          <button key={item.id} type="button" role="tab" aria-selected={blindSpot.id === item.id} className={blindSpot.id === item.id ? 'selected' : ''} onClick={() => selectBlindSpot(item.id)}>
+            <strong>{item.title}</strong>
+            <span>{item.prompt}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="trajectory-workbench">
+        <CanvasView height={280} draw={(ctx) => {
+          clearStudio(ctx,560,280);
+          ctx.fillStyle='#cbd5c0'; ctx.fillRect(205,72,88,64); ctx.fillRect(374,132,78,58);
+          label(ctx,'障碍',249,108,C.muted,12,'center');
+          label(ctx,'起点',55,246,C.muted,11,'center');
+          (Object.keys(routeData) as TrajectoryName[]).forEach((name) => {
+            const item = routeData[name];
+            route(ctx,item.path,selectedRoutes.includes(name) ? item.color : '#d5dbe4',selectedRoutes.includes(name) ? 5 : 2,selectedRoutes.includes(name) ? [] : [5,6]);
+          });
+          selectedRoutes.forEach((name, index) => {
+            const item = routeData[name];
+            const end = item.path[item.path.length - 1];
+            camera(ctx,end[0],end[1],item.color,.52 + index * .05);
+          });
+          target(ctx,blindSpot.point[0],blindSpot.point[1],covered);
+          label(ctx,blindSpot.title,blindSpot.point[0],blindSpot.point[1]-32,covered?C.green:C.red,13,'center');
+          label(ctx,selectedRoutes.length ? `已组合 ${selectedRoutes.length} / 2 类策略` : '尚未选择策略',35,35,selectedRoutes.length?C.blue:C.red,13);
+        }} />
+
+        <section className={`trajectory-mission ${complete ? 'complete' : covered ? 'covered' : 'missing'}`} aria-live="polite">
+          <span>当前勘景任务</span>
+          <h5>补看：{blindSpot.title}</h5>
+          <p>{blindSpot.prompt}</p>
+          <div>
+            <small>教学推荐组合</small>
+            <strong>{blindSpot.recommended.join(' + ')}</strong>
+          </div>
+          <p className="trajectory-mission-result">
+            {complete
+              ? '两类策略形成互补：一类直接触达盲区，另一类根据对象、重建反馈或普通新视角补充证据。'
+              : covered
+                ? '当前路线能够触达目标，但还缺少推荐的互补策略；这不代表路线无效，只表示观察类型仍单一。'
+                : '当前组合没有针对这个盲区。请撤下一条路线，再选择能够覆盖目标的策略。'}
+          </p>
+        </section>
+      </div>
+
+      <div className="trajectory-strategies" role="group" aria-label="组合最多两类 WorldNav 路线">
+        {(Object.keys(routeData) as TrajectoryName[]).map((name) => {
+          const item = routeData[name];
+          const selected = selectedRoutes.includes(name);
+          const disabled = !selected && selectedRoutes.length >= 2;
+          return (
+            <button key={name} type="button" className={selected ? 'selected' : ''} aria-pressed={selected} disabled={disabled} onClick={() => toggleRoute(name)}>
+              <span><strong>{name}</strong><b>最大数量 {item.n}</b></span>
+              <small>{item.note}</small>
+              <em>{item.condition}</em>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className={`feedback ${complete ? 'good' : covered ? '' : 'bad'}`}>
+        最多组合两类路线用于教学比较；“最大数量”来自论文表 1 的启发式上限，不是本实验的预算成本，也不代表路线质量分数。
+      </div>
+      <PaperTable tableId="table-1" />
+    </div>
+  );
+};
 
 export const HyKeyframes: React.FC<WidgetProps> = () => { const [run,setRun]=useState(0);const start=useRef(0);const go=()=>{start.current=performance.now();setRun(v=>v+1)};return <div><CanvasView height={250} animate={run>0} draw={(ctx,time)=>{clearStudio(ctx,560,250);const p=run?clamp((time-start.current)/2000,0,1):0;ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(280,25);ctx.lineTo(280,205);ctx.stroke();label(ctx,'Video-VAE',140,30,C.red,14,'center');label(ctx,'Keyframe-VAE',420,30,C.green,14,'center');route(ctx,[[35,180],[235,85]],C.red,3,[6,5]);route(ctx,[[315,180],[515,85]],C.blue,5);camera(ctx,55+p*160,170-p*70,C.red,.68);camera(ctx,335+p*160,170-p*70,C.blue,.68);for(let i=0;i<6;i++)photo(ctx,60+i*30,210-i*13,C.red,.28+i*.08);for(let i=0;i<3;i++)photo(ctx,345+i*70,205-i*38,C.green,1);metricBars(ctx,['RotErr','ATE'],[.762,.492],[C.red,C.green],150,228,70);}}/><div className="step-ctrl"><button className="tiny" onClick={go}>开始同轨比较</button></div><div className={`feedback ${run?'good':''}`}>{run?'选择性冻结 Cross-Attn 与 FFN 后，RotErr 0.762→0.492，ATE 2.141→1.768。全量训练的部分视觉指标更高，但控制精度和泛化更差。':'两侧使用相同起点和时间基准。'}</div></div>; };
 
