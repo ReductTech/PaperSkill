@@ -18,8 +18,11 @@ npm run preview   # 预览构建结果
 - 论文：[HY-World 2.0: A Multi-Modal World Model for Reconstructing, Generating, and Simulating 3D Worlds](https://arxiv.org/abs/2604.14268)
 - `public/images/figure-2-architecture.png`：摘自论文 Figure 2，用于讲解整体系统架构。
 - `public/images/figure-12-worldmirror.png`：摘自论文 Figure 12，用于讲解 WorldMirror 2.0 的多模态重建流程。
+- `public/images/official-reconstruction.gif`：来自腾讯混元官方 GitHub 的 `assets/recon_en.gif`，用于展示多图/视频重建流程。
+- `public/images/official-mesh.gif`：来自腾讯混元官方 GitHub 的 `assets/mesh_en.gif`，用于展示可漫游 Mesh 资产。
+- `public/images/official-interactive.gif`：来自腾讯混元官方 GitHub 的 `assets/interactive.gif`，用于展示角色交互与物理反馈。
 
-上述论文图片仅用于本教程的论文解读和教学展示，版权归原论文作者及其所属机构所有。
+三个 GIF 均做了降分辨率、降帧率和调色板压缩，未改变演示内容。论文图片与官方 GIF 仅用于本教程的论文解读和教学展示，版权归原作者及腾讯混元团队所有；官方演示素材不替代论文定量证据。公开复用前请同时核对官方仓库当前的 [Community License](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/License.txt)。
 
 ## 审查资料
 

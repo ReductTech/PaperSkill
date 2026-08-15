@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { PaperTable } from './hy-paper-evidence';
+import type { PaperTableId } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type Verdict = '成立' | '有条件' | '不成立';
@@ -20,6 +22,7 @@ type CaseFile = {
   explanation: string;
   checks: string[];
   metric?: Metric;
+  tableId?: PaperTableId;
 };
 
 const cases: CaseFile[] = [
@@ -32,6 +35,7 @@ const cases: CaseFile[] = [
     explanation: '这是同一表格、同一指标下的兼容比较，可以陈述为该协议内提升。',
     checks: ['指标方向：越高越好', '比较范围：I2P 图像到全景', '不能外推为所有全景任务都更优'],
     metric: { beforeLabel: 'HY-World 1.0', before: '0.831', afterLabel: 'HY-Pano 2.0', after: '0.844', note: 'CLIP-I' },
+    tableId: 'table-4',
   },
   {
     category: '高分辨率重建',
@@ -42,6 +46,7 @@ const cases: CaseFile[] = [
     explanation: '表 11 的 Acc. 是误差指标，数值越低越好；2.0 从 0.079 降到 0.037。',
     checks: ['指标方向：越低越好', '分辨率：论文高分辨率设置', '不能把误差下降写成准确率下降'],
     metric: { beforeLabel: 'WorldMirror 1.0', before: '0.079', afterLabel: 'WorldMirror 2.0', after: '0.037', note: 'Acc. ↓' },
+    tableId: 'table-11',
   },
   {
     category: '3DGS 取舍',
@@ -52,6 +57,7 @@ const cases: CaseFile[] = [
     explanation: '高斯数量约减少 77%，但 PSNR 从 25.176 变为 25.023，不能说“完全没有变化”。',
     checks: ['数量显著下降成立', '画质接近但并非数值相同', '困难轨迹仍可能产生对齐误差'],
     metric: { beforeLabel: '基线', before: '6.000M / 25.176', afterLabel: '完整配置', after: '1.381M / 25.023', note: '高斯数 / PSNR' },
+    tableId: 'table-9',
   },
   {
     category: '效率边界',
@@ -62,6 +68,7 @@ const cases: CaseFile[] = [
     explanation: '5.60 秒是特定 H20 四卡配置下的 128 视图重建步骤；论文给出的完整世界生成总耗时是 712 秒。',
     checks: ['局部步骤不能代表完整管线', '硬件条件：NVIDIA H20', '完整生成仍是分钟级离线流程'],
     metric: { beforeLabel: '128 视图重建', before: '5.60 s', afterLabel: '完整世界生成', after: '712 s', note: '不同任务，不可直接替换' },
+    tableId: 'table-14',
   },
   {
     category: '外部比较',
@@ -206,6 +213,7 @@ export const HyEvidenceCourt: React.FC<WidgetProps> = () => {
             {current.checks.map((check) => <li key={check}>{check}</li>)}
           </ul>
           <a href={current.sourceUrl} target="_blank" rel="noreferrer">查看证据：{current.source} ↗</a>
+          {current.tableId ? <PaperTable tableId={current.tableId} /> : null}
         </div>
       ) : (
         <div className="feedback">先作出判决，证据才会解锁。</div>

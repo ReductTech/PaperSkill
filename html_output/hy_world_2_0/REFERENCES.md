@@ -26,6 +26,18 @@
 
 仓库文档还说明：`WorldMirrorPipeline` 提供类似 Diffusers 的 Python 调用方式；首次运行会从 Hugging Face 下载权重；多 GPU 模式下输入图像数量不得少于 GPU 数量；Gradio 页面可查看 3DGS、点云、深度、法线和相机参数。
 
+## 官方动态素材
+
+以下 GIF 来自官方 GitHub 的 `assets/` 目录。本教程将它们下载到本地并压缩，避免运行时依赖外部图片链接；素材只用于解释“官方当前展示了什么”，不承担论文实验数字的证据角色。
+
+| 教程文件 | 官方原文件 | 教程用途 | 证据边界 |
+| --- | --- | --- | --- |
+| `official-reconstruction.gif` | [`assets/recon_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/recon_en.gif) | 第 8 章展示多视图/视频到三维资产的重建流程 | 产品/仓库演示，不代表所有输入都能达到相同效果 |
+| `official-mesh.gif` | [`assets/mesh_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/mesh_en.gif) | 第 9 章展示可漫游的轻量 Mesh | 说明资产形态与漫游体验，不是网格质量的统一指标 |
+| `official-interactive.gif` | [`assets/interactive.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/interactive.gif) | 第 9 章展示角色移动、碰撞与空间交互 | 说明官方演示能力，不等同于论文中的定量性能结论 |
+
+所有动态素材的公开使用仍受官方仓库当前许可证与 Notice 要求约束。本教程 README 已逐项标注来源，压缩版本未加入新的视觉内容或结论。
+
 ## 模型权重平台
 
 | 平台 | 链接 | 适合查看 | 使用前检查 |
