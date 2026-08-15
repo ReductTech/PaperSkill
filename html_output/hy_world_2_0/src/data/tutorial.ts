@@ -111,12 +111,12 @@ export const tutorial: TutorialData = {
           componentId: "hy-panorama-curation"
         }
       ],
-      "insight": "HY-Pano 2.0 用数据驱动的隐式映射降低相机元数据依赖，再专门处理 ERP 环形边界。",
+      "insight": "HY-Pano 2.0 同时升级数据与模型：用真实 / 合成双源数据扩展分布并过滤明显污染，再以隐式映射降低相机元数据依赖、以双层修复处理 ERP 环形边界。",
       "takeaways": [
         {
           "icon": "🌀",
-          "title": "全局初始化",
-          "desc": "360 度上下文是后续路线规划和扩展的起点。"
+          "title": "双源策展",
+          "desc": "真实质感与合成标签互补，明显接缝和设备入镜需要过滤。"
         },
         {
           "icon": "🧠",
