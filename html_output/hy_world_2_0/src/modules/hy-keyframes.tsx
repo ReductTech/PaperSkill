@@ -208,6 +208,17 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
         <div className="keyframe-metric-row"><span>ATE ↓</span><div><i className="baseline" style={{width:'97%'}} /><i className="result" style={{width:'80%'}} /></div><strong>2.141 → 1.768</strong></div>
         <p>两项指标均为越低越好；全量训练的部分视觉指标更高，但相机控制精度和泛化更差。</p>
       </section>
+
+      <div className="keyframe-glossary-head">
+        <strong>镜头术语暗格</strong>
+        <span>灰色提示：点击术语展开；以下内容用于补充机制直觉，不改变上方论文指标。</span>
+      </div>
+      <div className="keyframe-glossary-grid">
+        <details><summary>Keyframe-VAE 与 Video-VAE 差在哪？</summary><p>Video-VAE 会同时压缩时间和空间，适合连续视频；WorldStereo 2.0 面对跨视角稀疏关键帧时去掉时间压缩，优先保留单帧外观、几何和相机条件。它不是“只允许三帧”，三帧只是上方谜题规则。</p></details>
+        <details><summary>Plücker 射线在告诉模型什么？</summary><p>它把相机中心与像素射线方向编码为逐像素几何条件，帮助模型理解“这条光线从哪里出发、朝哪里看”。它提供相机几何，不等于已经知道场景真实深度。</p></details>
+        <details><summary>点图条件为什么能补充射线？</summary><p>点图为像素提供三维位置线索，使模型除了知道观察方向，还能获得显式空间位置参考。论文将射线与点图作为互补相机条件；教程不把二者合成一个虚构控制分数。</p></details>
+        <details><summary>为什么选择性冻结会有取舍？</summary><p>冻结 Cross-Attn 与 FFN 的部分参数，可以保留预训练生成先验并减少相机控制训练对它们的扰动。论文消融显示相机误差与泛化更好，但部分视觉指标并非最高，因此不能简单理解为“冻结越多越好”。</p></details>
+      </div>
     </div>
   );
 };
