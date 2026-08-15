@@ -435,8 +435,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "8.1",
-          "title": "WorldMirror 2.0 路径地图",
-          "desc": "点击图像、先验、Token 合并、Transformer、任务头和输出，追踪当前激活路径。",
+          "title": "Any-Modal 架构配线盘",
+          "desc": "以多视图图像为必需输入，独立接入位姿、内参和深度先验，再检查五个同时在线的 DPT 输出头及无先验 / 全先验的论文端点。",
           componentId: "hy-architecture",
           "figure": "/images/figure-12-worldmirror.png"
         },

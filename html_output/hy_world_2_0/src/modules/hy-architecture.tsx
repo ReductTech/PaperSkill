@@ -17,8 +17,130 @@ export const HyTrainingStages:React.FC<WidgetProps>=()=>{const[stage,setStage]=u
 const res=[{name:'低 L',px:'189×259',old:80.55,now:83.43},{name:'中 M',px:'378×518',old:86.13,now:86.48},{name:'高 H',px:'756×1036',old:66.29,now:86.89}];
 export const HyResolution:React.FC<WidgetProps>=()=>{const[idx,setIdx]=useState(1);const d=res[idx];return <div><CanvasView draw={(ctx)=>{clear(ctx,560,250);label(ctx,`推理分辨率 ${d.px}`,40,32,C.orange,14);ctx.strokeStyle=C.line;ctx.strokeRect(40,58,215,120);ctx.strokeRect(305,58,215,120);label(ctx,'标准 RoPE 整数索引',148,52,C.red,13,'center');label(ctx,'归一化 RoPE [-1,1]',412,52,C.green,13,'center');const n=[5,8,12][idx];for(let i=0;i<n;i++){const x=55+i*180/(n-1);ctx.strokeStyle=i>7?C.red:C.blue;ctx.beginPath();ctx.moveTo(x,72);ctx.lineTo(x,164);ctx.stroke();const x2=320+i*185/(n-1);ctx.strokeStyle=C.green;ctx.beginPath();ctx.moveTo(x2,72);ctx.lineTo(x2,164);ctx.stroke()}bars(ctx,[{name:'WM 1.0 AUC',value:d.old,display:d.old.toFixed(2),color:idx===2?C.red:C.blue},{name:'WM 2.0 AUC',value:d.now,display:d.now.toFixed(2),color:C.green}],75,213,230)}}/><div className="ctrl"><label>分辨率档位 <span className="val">{d.name}</span></label><input type="range" min={0} max={2} step={1} value={idx} onChange={e=>setIdx(Number(e.target.value))}/></div><div className={`feedback ${idx===2?'good':''}`}>{idx===2?'高分辨率下，WorldMirror 1.0 的 AUC@30 从中档 86.13 降到 66.29；2.0 保持 86.89。':'归一化坐标让不同分辨率在同一范围内重新采样。'} 结论仅覆盖论文测试的 L/M/H 分辨率。</div></div>};
 
-const nodes=[{n:'图像',d:'多视图 RGB 是基础输入。'},{n:'可选先验',d:'相机姿态、内参和深度可独立提供；训练时每种先验以 0.5 概率丢弃。'},{n:'Token 合并',d:'图像 token 与几何先验 token 被合并到统一序列。'},{n:'Transformer',d:'共享骨干使用全局-局部注意力聚合跨视图信息。'},{n:'任务头',d:'点图、相机、深度、法线和 3DGS 使用各自 DPT 解码头。'},{n:'输出',d:'一次前馈同时给出多类三维几何与渲染属性。'}];
-export const HyArchitecture:React.FC<WidgetProps>=()=>{const[active,setActive]=useState(0);return <div><CanvasView width={600} height={270} draw={(ctx)=>{clear(ctx,600,270);nodes.forEach((node,i)=>{const x=25+i*94;const on=i<=active;ctx.fillStyle=i===active?C.orange:on?'#e8f0fa':C.white;ctx.strokeStyle=i===active?C.orange:on?C.blue:C.line;ctx.lineWidth=i===active?4:2;ctx.beginPath();ctx.roundRect(x,80,76,66,7);ctx.fill();ctx.stroke();label(ctx,node.n,x+38,118,i===active?C.white:on?C.blue:C.muted,12,'center');if(i<5)route(ctx,[[x+76,113],[x+94,113]],i<active?C.green:C.line,4)});const outs=['点图','深度','法线','相机','3DGS'];outs.forEach((o,i)=>{ctx.fillStyle=active===5?C.green:C.line;ctx.fillRect(350+i*43,185,34,28);label(ctx,o,367+i*43,229,active===5?C.green:C.muted,10,'center')});label(ctx,'Any-Modal Tokenization → 共享骨干 → 专用输出头',300,34,C.blue,15,'center')}}/><div className="chip-row">{nodes.map((x,i)=><button key={x.n} className={`chip ${active===i?'selected':''}`} onClick={()=>setActive(i)}>{x.n}</button>)}</div><div className={`feedback ${active===5?'good':''}`}>{nodes[active].d}</div><OfficialGif src="/images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方仓库展示 WorldMirror 2.0 从多视图或视频输入恢复可浏览三维资产。该 GIF 用于理解产品流程，不替代论文表格中的定量评测。" alt="HY-World 2.0 官方多视图与视频重建演示" /></div>};
+type PriorId = 'pose' | 'intrinsics' | 'depth';
+type OutputId = 'pointmap' | 'camera' | 'depth' | 'normal' | 'gaussian';
+
+const priorSpecs: Array<{id:PriorId;name:string;short:string;role:string;color:string}> = [
+  {id:'pose',name:'相机位姿',short:'Pose',role:'提供跨视图的全局空间布局线索。',color:C.purple},
+  {id:'intrinsics',name:'相机内参',short:'K',role:'帮助解析焦距、主点与尺度歧义。',color:C.orange},
+  {id:'depth',name:'多视图深度',short:'D',role:'提供逐像素几何约束，但仍需处理无效区域。',color:C.green},
+];
+
+const outputSpecs: Array<{id:OutputId;name:string;short:string;role:string;upgrade:string}> = [
+  {id:'pointmap',name:'点图 / 稠密点云',short:'Pts3D',role:'为每个像素预测三维位置，承担后续点云融合与世界合成的几何骨架。',upgrade:'2.0 在高分辨率下使用归一化位置编码，避免位置外推导致结构崩塌。'},
+  {id:'camera',name:'相机参数',short:'Camera',role:'从共享特征回归相机参数；输入位姿是可选条件，不是启用该输出头的开关。',upgrade:'Any-Modal 允许有位姿先验时利用它、没有时仍执行相机估计。'},
+  {id:'depth',name:'深度 + 有效掩码',short:'Depth',role:'预测多视图深度，并用独立有效掩码头过滤天空、极端深度与断裂区域。',upgrade:'2.0 新增 depth-to-normal 监督与深度有效掩码头。'},
+  {id:'normal',name:'表面法线',short:'Normal',role:'预测局部表面朝向，并通过 depth-to-normal 损失反向约束深度几何。',upgrade:'2.0 使用 normal-only 伪标签增强真实数据监督，避免逐视图伪深度的层叠误差。'},
+  {id:'gaussian',name:'像素级 3DGS 属性',short:'3DGS',role:'从共享几何特征解码可渲染的高斯属性，连接重建与最终世界表示。',upgrade:'两阶段课程先联合训练几何头，再冻结几何参数、单独训练 3DGS 头。'},
+];
+
+export const HyArchitecture:React.FC<WidgetProps>=()=>{
+  const[activePriors,setActivePriors]=useState<PriorId[]>([]);
+  const[focusedOutput,setFocusedOutput]=useState<OutputId>('pointmap');
+  const focused = outputSpecs.find((item)=>item.id===focusedOutput) ?? outputSpecs[0];
+  const allPriors = activePriors.length===priorSpecs.length;
+  const noPriors = activePriors.length===0;
+  const togglePrior=(id:PriorId)=>setActivePriors((current)=>current.includes(id)?current.filter((item)=>item!==id):[...current,id]);
+  const priorSummary=noPriors?'仅图像':allPriors?'图像 + 全部先验':`图像 + ${activePriors.map((id)=>priorSpecs.find((item)=>item.id===id)?.name).filter(Boolean).join(' + ')}`;
+
+  return <div className="architecture-lab">
+    <CanvasView width={620} height={340} draw={(ctx)=>{
+      clear(ctx,620,340);
+      label(ctx,'Any-Modal Tokenization',28,30,C.blue,14);
+      label(ctx,'一次前馈，五个输出头同时工作',592,30,C.green,12,'right');
+
+      for(let i=0;i<3;i++){
+        const y=68+i*38;
+        ctx.fillStyle='#e8f0fa';ctx.strokeStyle=C.blue;ctx.lineWidth=2;ctx.fillRect(32,y,70,27);ctx.strokeRect(32,y,70,27);
+        label(ctx,`图像 V${i+1}`,67,y+18,C.blue,10,'center');
+        route(ctx,[[102,y+13],[196,126]],C.blue,2);
+      }
+
+      priorSpecs.forEach((prior,index)=>{
+        const y=205+index*34;
+        const on=activePriors.includes(prior.id);
+        ctx.fillStyle=on?prior.color:C.white;ctx.strokeStyle=on?prior.color:C.line;ctx.lineWidth=on?3:2;
+        ctx.fillRect(32,y,70,25);ctx.strokeRect(32,y,70,25);
+        label(ctx,prior.short,67,y+17,on?C.white:C.muted,10,'center');
+        route(ctx,[[102,y+12],[196,154]],on?prior.color:C.line,on?3:2,on?[]:[5,4]);
+      });
+
+      ctx.fillStyle='#fff';ctx.strokeStyle=C.orange;ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(196,98,92,84,6);ctx.fill();ctx.stroke();
+      label(ctx,'Token',242,130,C.orange,13,'center');label(ctx,'合并',242,151,C.orange,13,'center');
+      route(ctx,[[288,140],[326,140]],C.green,4);
+
+      ctx.fillStyle='#e8f0fa';ctx.strokeStyle=C.blue;ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(326,88,118,104,6);ctx.fill();ctx.stroke();
+      label(ctx,'共享 Transformer',385,132,C.blue,13,'center');label(ctx,'global-local attention',385,154,C.muted,9,'center');
+
+      outputSpecs.forEach((output,index)=>{
+        const y=52+index*52;
+        const focusedNow=output.id===focusedOutput;
+        route(ctx,[[444,140],[472,y+16]],focusedNow?C.orange:C.green,focusedNow?4:2);
+        ctx.fillStyle=focusedNow?C.orange:'#ecf8f1';ctx.strokeStyle=focusedNow?C.orange:C.green;ctx.lineWidth=focusedNow?4:2;
+        ctx.fillRect(472,y,116,32);ctx.strokeRect(472,y,116,32);
+        label(ctx,output.short,530,y+21,focusedNow?C.white:C.green,10,'center');
+      });
+      label(ctx,`${activePriors.length} / 3 可选先验已接入`,190,317,allPriors?C.green:C.orange,11,'center');
+      label(ctx,`正在检查：${focused.short}`,590,317,C.orange,11,'right');
+    }}/>
+
+    <div className="architecture-input-grid">
+      <section className="architecture-required-input">
+        <header><span>必需输入</span><strong>多视图 RGB 图像</strong></header>
+        <div className="architecture-view-stack"><i>V1</i><i>V2</i><i>V3+</i></div>
+        <p>WorldMirror 2.0 是多视图 / 视频重建模型；位姿、内参和深度只是可选先验，不能替代图像输入。</p>
+      </section>
+      <section className="architecture-prior-control">
+        <header><span>可选输入</span><strong>接入几何先验</strong><small>{activePriors.length} / 3 已选择</small></header>
+        <div className="architecture-prior-list">
+          {priorSpecs.map((prior)=><label key={prior.id} className={activePriors.includes(prior.id)?'selected':''}>
+            <input type="checkbox" checked={activePriors.includes(prior.id)} onChange={()=>togglePrior(prior.id)}/>
+            <span style={{'--prior-color':prior.color} as React.CSSProperties}>{prior.short}</span>
+            <b>{prior.name}</b>
+            <small>{prior.role}</small>
+          </label>)}
+        </div>
+      </section>
+    </div>
+
+    <section className="architecture-output-inspector">
+      <header><span>输出头检查器</span><strong>五类结果会在一次前馈中同时预测</strong><small>点击只切换讲解焦点，不会关闭其它输出头</small></header>
+      <div className="architecture-output-tabs" role="tablist" aria-label="检查 WorldMirror 输出头">
+        {outputSpecs.map((output)=><button key={output.id} type="button" role="tab" aria-selected={focusedOutput===output.id} className={focusedOutput===output.id?'selected':''} onClick={()=>setFocusedOutput(output.id)}><i aria-hidden="true"/><span>{output.short}</span><small>{output.name}</small></button>)}
+      </div>
+      <div className="architecture-output-detail">
+        <div><span>当前职责</span><strong>{focused.name}</strong><p>{focused.role}</p></div>
+        <div><span>2.0 相关改进</span><strong>{focused.upgrade}</strong><p>这些改进的有效范围分别由第 6 章方法说明和第 8.2 节任务评测限定。</p></div>
+      </div>
+    </section>
+
+    <div className="architecture-diagnostics">
+      <div className="ready"><span>基础输入</span><strong>多视图图像已接入</strong></div>
+      <div className={allPriors?'ready':activePriors.length?'partial':'waiting'}><span>先验状态</span><strong>{priorSummary}</strong></div>
+      <div className="ready"><span>共享预测</span><strong>5 个 DPT 头在线</strong></div>
+    </div>
+
+    <div className={`feedback ${allPriors?'good':''}`}>{allPriors?'全部先验已接入。它们通过统一 token 序列协同提供全局布局、相机标定与像素几何约束，但不是每个任务都必须具备全部先验。':noPriors?'无几何先验仍是合法输入：训练时每种先验以 0.5 概率独立丢弃，使模型能在推理时灵活接受不同组合。':'当前部分先验组合合法；Any-Modal 的重点是按现有观测条件接入信息，而不是强制凑齐全部附件。'}</div>
+
+    <section className="architecture-evidence-strip">
+      <header><span>论文表 11 · 7-Scenes 高分辨率端点</span><strong>Acc. / Comp. 均值均为越低越好</strong></header>
+      <div className="architecture-evidence-pair">
+        <div className={noPriors?'active':''}><span>仅图像</span><strong>Acc. 均值 0.037 · Comp. 均值 0.040</strong><small>WorldMirror 2.0，H 分辨率</small></div>
+        <i aria-hidden="true">→</i>
+        <div className={allPriors?'active':''}><span>图像 + 全部先验</span><strong>Acc. 均值 0.012 · Comp. 均值 0.016</strong><small>位姿 + 内参 + 深度</small></div>
+      </div>
+      <p>{activePriors.length>0&&!allPriors?'当前部分先验组合在表 11 没有单独一行；Figure 27 另行比较各先验条件，不能把端点数字插值成中间结果。':'上方数字是论文表 11 的两个真实端点，不由配线盘计算。'}</p>
+    </section>
+
+    <div className="architecture-glossary-grid">
+      <details><summary>Any-Modal 为什么不是“任意输入”？</summary><p>它指论文规定的四类模态被编码到统一 token 序列：图像必需，位姿、内参、深度可选。它不表示模型能接收未定义的传感器或任意数据格式。</p></details>
+      <details><summary>DPT 输出头是什么？</summary><p>共享 Transformer 先提取跨视图特征，再由任务专用 DPT 解码头恢复像素级空间输出。共享骨干负责融合，专用头负责各自的预测格式。</p></details>
+      <details><summary>为什么 3DGS 单独第二阶段训练？</summary><p>论文先联合训练点图、深度、相机和法线等几何头，再冻结几何参数，只训练 3DGS 头，以解耦几何学习与外观建模。</p></details>
+    </div>
+
+    <OfficialGif src="/images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方仓库展示 WorldMirror 2.0 从多视图或视频输入恢复可浏览三维资产。该 GIF 用于理解产品流程，不替代论文表格中的定量评测。" alt="HY-World 2.0 官方多视图与视频重建演示" />
+  </div>;
+};
 
 const gs=[{n:'基线',count:6,psnr:25.176,lpips:.209,color:C.blue,fb:'6.000M 高斯画质最高，但渲染负担大。'},{n:'仅体素降采样',count:1,psnr:24.504,lpips:.276,color:C.red,fb:'均匀降采样把数量降到 1.000M，却明显损伤高频细节。'},{n:'+ 自适应增密',count:5.254,psnr:25.158,lpips:.210,color:C.orange,fb:'增密恢复画质，但数量回升到 5.254M。'},{n:'+ MaskGaussian',count:1.383,psnr:25.017,lpips:.216,color:C.purple,fb:'概率掩码删除低频冗余，高斯数量显著下降。'},{n:'完整配置',count:1.381,psnr:25.023,lpips:.215,color:C.green,fb:'非天空增密 + MaskGaussian 在该消融中减少约 77% 高斯数量。'}];
 export const HyComposition:React.FC<WidgetProps>=()=>{const[idx,setIdx]=useState(0);const d=gs[idx];return <div><CanvasView height={270} draw={(ctx)=>{clear(ctx,560,270);ctx.strokeStyle=C.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(45,88);ctx.lineTo(240,70);ctx.stroke();ctx.strokeStyle=C.green;ctx.beginPath();ctx.moveTo(45,135);ctx.lineTo(240,135);ctx.stroke();label(ctx,'深度对齐',142,165,C.green,13,'center');const dots=Math.round(20+d.count*5);for(let i=0;i<dots;i++){const x=310+(i*37)%210;const y=48+((i*53)%116);ctx.fillStyle=i%7===0&&idx<4?C.red:d.color;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;bars(ctx,[{name:'高斯数(M)',value:d.count,display:d.count.toFixed(3),color:d.color},{name:'PSNR',value:d.psnr/5,display:d.psnr.toFixed(3),color:C.green},{name:'LPIPS×20',value:d.lpips*20,display:d.lpips.toFixed(3),color:C.orange}],60,214,165)}}/><div className="chip-row">{gs.map((x,i)=><button key={x.n} className={`chip ${idx===i?'selected':''}`} onClick={()=>setIdx(i)}>{x.n}</button>)}</div><div className={`feedback ${idx===1?'bad':idx===4?'good':''}`}>{d.fb} 稀疏引导或困难轨迹仍可能产生错误对齐系数。</div></div>};
