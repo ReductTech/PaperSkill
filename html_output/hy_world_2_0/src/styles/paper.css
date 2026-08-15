@@ -12,86 +12,73 @@
   --paper-photo: #ffffff;
 }
 
-.resource-navigator {
+.mission-planner,
+.evidence-court {
   display: grid;
   gap: 14px;
 }
 
-.resource-track {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+.mission-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  overflow-x: auto;
-  padding: 4px 0 8px;
-  scrollbar-width: thin;
 }
 
-.resource-stop {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 7px;
-  min-height: 40px;
-  padding: 7px 12px;
+.mission-input {
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+  gap: 2px;
+  padding: 7px 10px;
   color: var(--slate-2);
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 6px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.resource-stop:hover,
-.resource-stop.selected {
+.mission-input small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mission-input:hover,
+.mission-input.selected {
   color: #fff;
   background: var(--blue);
   border-color: var(--blue);
 }
 
-.resource-index {
-  display: inline-grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  color: var(--blue);
-  background: #fff;
-  border-radius: 50%;
-  font-size: 12px;
+.mission-input.selected small {
+  color: #fff;
 }
 
-.resource-detail {
-  min-height: 278px;
-  padding: 18px 20px;
-  background: var(--blue-soft);
+.mission-board {
+  display: grid;
+  grid-template-columns: minmax(190px, .8fr) minmax(360px, 1.5fr);
+  border: 1px solid var(--line);
   border-left: 4px solid var(--blue);
 }
 
-.resource-detail.resource-tier-official {
-  background: #f1f7f4;
+.mission-board.reconstruction {
   border-left-color: var(--green);
 }
 
-.resource-detail.resource-tier-warning {
-  background: #fff8ed;
-  border-left-color: var(--orange);
+.mission-brief {
+  padding: 18px;
+  background: var(--blue-soft);
+  border-right: 1px solid var(--line);
 }
 
-.resource-detail.resource-tier-thirdparty {
-  background: #f7f4fa;
-  border-left-color: var(--purple);
+.mission-board.reconstruction .mission-brief {
+  background: #f1f7f4;
 }
 
-.resource-detail-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-}
-
-.resource-tier-label {
+.mission-lane {
   display: inline-flex;
+  min-height: 25px;
   align-items: center;
-  min-height: 24px;
   padding: 3px 8px;
   color: #fff;
   background: var(--blue);
@@ -100,117 +87,397 @@
   font-weight: 800;
 }
 
-.resource-tier-official .resource-tier-label {
+.mission-board.reconstruction .mission-lane {
   background: var(--green);
 }
 
-.resource-tier-warning .resource-tier-label {
-  background: var(--orange);
-}
-
-.resource-tier-thirdparty .resource-tier-label {
-  background: var(--purple);
-}
-
-.resource-source {
-  color: var(--slate-2);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.resource-detail h5 {
-  margin: 5px 0 8px;
+.mission-brief h5 {
+  margin: 8px 0 7px;
   color: var(--ink);
-  font-size: 19px;
+  font-size: 20px;
 }
 
-.resource-detail p {
+.mission-brief p {
   margin: 0;
   color: var(--ink-2);
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
-.resource-facts {
-  display: grid;
-  gap: 6px;
-  margin: 12px 0 0;
-  padding-left: 20px;
-  color: var(--ink-2);
+.mission-condition {
+  margin-top: 12px;
+  padding-top: 10px;
+  color: var(--slate-2);
+  border-top: 1px solid var(--line);
+  font-size: 13px;
   line-height: 1.55;
 }
 
-.resource-facts li::marker {
-  color: var(--blue);
-}
-
-.resource-links {
+.mission-route {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px 14px 88px;
+  background: var(--paper-scene-bg);
 }
 
-.resource-links a {
-  display: inline-flex;
-  align-items: center;
+.mission-stage {
+  display: grid;
+  width: min(130px, 22%);
+  min-width: 92px;
+  align-content: start;
   gap: 5px;
-  min-height: 36px;
-  padding: 6px 10px;
+  padding: 10px;
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-top: 4px solid var(--blue);
+}
+
+.mission-board.reconstruction .mission-stage {
+  border-top-color: var(--green);
+}
+
+.mission-stage b {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: #fff;
+  background: var(--blue);
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.mission-board.reconstruction .mission-stage b {
+  background: var(--green);
+}
+
+.mission-stage span {
+  color: var(--ink);
+  font-size: 13px;
   font-weight: 800;
 }
 
-.resource-links a:hover {
-  border-color: var(--blue);
+.mission-stage small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
-.resource-release-timeline {
-  display: grid;
-  grid-template-columns: auto repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  align-items: stretch;
+.mission-connector {
+  align-self: center;
+  color: var(--orange);
+  font-weight: 900;
 }
 
-.resource-release-timeline > strong,
-.resource-release-timeline > span {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
+.mission-outputs {
+  grid-column: 2;
+  margin-top: -72px;
+  padding: 0 18px 16px;
 }
 
-.resource-release-timeline > strong {
-  color: #fff;
-  background: var(--slate-2);
-}
-
-.resource-release-timeline > span {
-  flex-wrap: wrap;
-  gap: 5px;
-  color: var(--ink-2);
-  background: var(--paper);
+.mission-outputs strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--slate-2);
   font-size: 13px;
 }
 
-.resource-release-timeline b {
-  color: var(--orange);
+.mission-outputs > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-@media (max-width: 720px) {
-  .resource-detail {
-    min-height: 332px;
-    padding: 16px;
+.mission-outputs span {
+  padding: 4px 8px;
+  color: var(--green);
+  background: #fff;
+  border: 1px solid var(--green);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.court-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--slate-2);
+  font-size: 13px;
+}
+
+.court-status strong {
+  color: var(--green);
+}
+
+.court-case {
+  min-height: 150px;
+  padding: 18px 20px;
+  background: var(--paper-scene-bg);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--purple);
+}
+
+.court-category {
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.court-case h5 {
+  margin: 7px 0 8px;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.court-case p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.court-verdicts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.court-verdicts button {
+  min-height: 46px;
+  color: var(--slate-2);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.court-verdicts button:hover:not(:disabled) {
+  border-color: var(--blue);
+}
+
+.court-verdicts button.selected {
+  color: #fff;
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.court-verdicts button.answer {
+  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  opacity: 1;
+}
+
+.court-verdicts button:disabled {
+  cursor: default;
+  opacity: .62;
+}
+
+.court-evidence {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+}
+
+.court-evidence.incorrect {
+  border-left-color: var(--red);
+}
+
+.court-ruling {
+  display: grid;
+  gap: 4px;
+}
+
+.court-ruling strong {
+  color: var(--green);
+  font-size: 16px;
+}
+
+.court-evidence.incorrect .court-ruling strong {
+  color: var(--red);
+}
+
+.court-ruling span {
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.court-metric {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background: var(--blue-soft);
+}
+
+.court-metric > div {
+  display: grid;
+  gap: 3px;
+}
+
+.court-metric > div:last-of-type {
+  text-align: right;
+}
+
+.court-metric small {
+  color: var(--muted);
+}
+
+.court-metric b {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.court-metric > span {
+  color: var(--orange);
+  font-weight: 900;
+}
+
+.court-metric em {
+  grid-column: 1 / -1;
+  color: var(--slate-2);
+  font-size: 12px;
+  font-style: normal;
+  text-align: center;
+}
+
+.court-evidence ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.court-evidence li::marker {
+  color: var(--blue);
+}
+
+.court-evidence a {
+  width: fit-content;
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.court-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.court-summary {
+  display: grid;
+  min-height: 310px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: var(--paper-scene-bg);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--green);
+}
+
+.court-summary > span {
+  color: var(--slate-2);
+  font-weight: 800;
+}
+
+.court-summary > strong {
+  color: var(--green);
+  font-size: 42px;
+}
+
+.court-summary h5 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.court-summary p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+.court-summary-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.court-summary-links a {
+  padding: 6px 9px;
+  color: var(--blue);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .mission-inputs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .resource-release-timeline {
+  .mission-board {
     grid-template-columns: 1fr;
   }
 
-  .resource-release-timeline > strong,
-  .resource-release-timeline > span {
+  .mission-brief {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mission-route {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 88px;
+  }
+
+  .mission-stage {
+    flex: 0 0 116px;
+    width: 116px;
+  }
+
+  .mission-outputs {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .court-case {
+    min-height: 182px;
+    padding: 16px;
+  }
+
+  .court-case h5 {
+    font-size: 18px;
+  }
+
+  .court-verdicts {
+    grid-template-columns: 1fr;
+  }
+
+  .court-verdicts button {
     min-height: 42px;
+  }
+
+  .court-status {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
 }

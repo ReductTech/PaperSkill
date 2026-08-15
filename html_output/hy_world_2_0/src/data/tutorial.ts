@@ -44,9 +44,9 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "1.1",
-          "title": "输入决定任务",
-          "desc": "切换文本、单图、多视图和视频，观察系统为什么进入不同分支。",
-          componentId: "hy-input-mode"
+          "title": "世界任务调度台",
+          "desc": "选择文本、单图、多视图或视频，把输入条件映射到生成或重建路径，并检查各阶段与可观察输出。",
+          componentId: "hy-mission-planner"
         },
         {
           kind: "module",
@@ -507,16 +507,9 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "10.1",
-          "title": "兼容协议结果赛",
-          "desc": "先选择同一协议内的指标，再启动比较；画面会按高优或低优方向统一显示。",
-          componentId: "hy-results"
-        },
-        {
-          kind: "module",
-          "id": "10.2",
-          "title": "资料可信度与使用前检查",
-          "desc": "切换论文、官网、代码文档、模型权重、在线体验、许可证和中文解读，判断每类资料能证明什么，以及复现或部署前还要检查什么。",
-          componentId: "hy-resources"
+          "title": "结论审判庭：八案证据挑战",
+          "desc": "对论文数字、效率边界、Marble 比较、官方开源状态、在线体验与许可证说法作出判决，答题后解锁对应证据。",
+          componentId: "hy-evidence-court"
         }
       ],
       "insight": "论文展示了多项开源基线优势，官方仓库也已分批开放模型与推理代码；但 Marble 仅有定性比较，完整生成仍需 712 秒并依赖 H20 优化配置，实际使用还受当前代码版本、硬件与社区许可证约束。",
@@ -533,8 +526,8 @@ export const tutorial: TutorialData = {
         },
         {
           "icon": "🔗",
-          "title": "资料分层复核",
-          "desc": "数字看论文，开放状态看 GitHub，产品能力看官网，使用边界看许可证。"
+          "title": "先判决，再找证据",
+          "desc": "同一句宣传语可能成立、有条件或不成立，结论必须连同协议和来源一起阅读。"
         }
       ]
     }
