@@ -373,7 +373,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "7.1",
           "title": "分辨率外推变插值",
-          "desc": "点选 L/M/H 分辨率，再移动相对位置探针，观察原始索引为何外推、归一化坐标为何仍保持在固定区间。",
+          "desc": "点选 L/M/H 分辨率，再移动相对位置探针，观察原始索引为何外推、归一化坐标为何仍保持在固定区间，并展开表 12 / 表 11 核对不同评测协议。",
           componentId: "hy-resolution"
         }
       ],

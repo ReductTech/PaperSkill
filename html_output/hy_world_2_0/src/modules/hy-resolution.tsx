@@ -95,8 +95,11 @@ export const HyResolution:React.FC<WidgetProps>=()=>{
       <div><span>归一化坐标</span><strong>{normalized.toFixed(2)}</strong><small>同一相对位置仍在 [-1,1] 内</small></div>
       <div><span>AUC@30 差值</span><strong>{gain>=0?'+':''}{gain.toFixed(2)}</strong><small>WorldMirror 2.0 - 1.0</small></div>
     </div>
-    <div className="resolution-protocol-note"><strong>两个低档尺寸不要混用：</strong><span>上方相机姿态 AUC 对应论文正文与表 12 的 L=189×259；下方可展开的表 11 点图重建单独注明 L=182×252。M=378×518、H=756×1036 在两处一致。</span></div>
-    <div className={`feedback ${idx===2?'good':''}`}>{d.summary} 当前探针位于“{probe.name}”，它展示的是公式如何把网格相对位置映射到固定区间。AUC 来自论文表 12；下方表 11 只负责点图误差与几何先验条件。</div>
+    <div className="resolution-protocol-note"><strong>两个低档尺寸不要混用：</strong><span>上方相机姿态 AUC 对应论文正文与表 12 的 L=189×259；表 11 点图重建单独注明 L=182×252。M=378×518、H=756×1036 在两处一致。</span></div>
+    <div className={`feedback ${idx===2?'good':''}`}>{d.summary} 当前探针位于“{probe.name}”，它展示的是公式如何把网格相对位置映射到固定区间。下方表 12 核查相机 / 深度 / NVS，表 11 核查点图误差与几何先验条件。</div>
+    <div className="resolution-table-guide"><strong>先看表 12：位置编码与跨分辨率结果</strong><span>灰色提示：点击展开完整相机姿态、深度与新视角合成结果；“-”只表示对应子表未报告。</span></div>
+    <PaperTable tableId="table-12" />
+    <div className="resolution-table-guide"><strong>再看表 11：点图重建与先验端点</strong><span>灰色提示：点击展开 7-Scenes 点图子表；注意它的低分辨率尺寸与表 12 不同。</span></div>
     <PaperTable tableId="table-11" />
   </div>;
 };
