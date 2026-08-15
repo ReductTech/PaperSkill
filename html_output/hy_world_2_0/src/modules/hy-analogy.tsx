@@ -104,10 +104,75 @@ const analogyNames = ['定任务','转全景','选路线','拍关键帧','查记
 export const HyAnalogy: React.FC<WidgetProps> = ({ chapterId }) => {
   const index = clamp(Number(chapterId.split('-')[1] || 1) - 1, 0, 9);
   return <CanvasView width={244} height={130} animate draw={(ctx, time) => {
-    clearStudio(ctx, 244, 130); const p = easeInOutQuad((time % 3000) / 3000); const y = 82;
-    if (index === 1) { const a = p * Math.PI * 2; ctx.strokeStyle = C.green; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(122,73,42,0,a); ctx.stroke(); camera(ctx,122+Math.cos(a)*42,73+Math.sin(a)*22,C.blue,.55); }
-    else { const path: Array<[number, number]> = [[34,y+12],[92,y-5],[154,y+7],[210,y-18]]; route(ctx, path, index===8 ? C.orange : C.blue, 3); const [camX, camY] = pointOnRoute(path, p); camera(ctx,camX,camY,C.blue,.58); target(ctx,210,y-18,true); }
-    label(ctx, analogyNames[index], 12, 20, C.ink, 13); if (index===4) photo(ctx,164,43,C.purple,.9); if(index===6){ctx.strokeStyle=C.orange;ctx.strokeRect(172,38,42,42);} if(index===9) label(ctx,'完成',214,23,C.green,12,'right');
+    clearStudio(ctx, 244, 130);
+    const raw = (time % 3200) / 3200;
+    const p = easeInOutQuad(raw);
+    label(ctx, analogyNames[index], 12, 20, C.ink, 13);
+
+    if (index === 0) {
+      const generation = raw < .5;
+      const local = easeInOutQuad((raw % .5) * 2);
+      const start: [number, number] = [42, 82];
+      const branch: Array<[number, number]> = generation ? [start,[108,82],[156,52],[207,46]] : [start,[108,82],[156,103],[207,100]];
+      route(ctx,[[108,82],[156,52],[207,46]],generation?C.green:C.line,3);
+      route(ctx,[[108,82],[156,103],[207,100]],generation?C.line:C.blue,3);
+      const [x,y] = pointOnRoute(branch,local);
+      camera(ctx,x,y,generation?C.green:C.blue,.52);
+      label(ctx,generation?'稀疏线索':'丰富观察',42,112,generation?C.green:C.blue,9,'center');
+      label(ctx,'生成',207,34,C.green,9,'center'); label(ctx,'重建',207,121,C.blue,9,'center');
+    } else if (index === 1) {
+      const a = p * Math.PI * 2;
+      ctx.strokeStyle = C.green; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(122,73,42,0,a); ctx.stroke();
+      ctx.fillStyle='#cbd5c0';ctx.fillRect(105,57,34,32);
+      camera(ctx,122+Math.cos(a)*42,73+Math.sin(a)*22,C.blue,.55);
+      label(ctx,'360°',122,78,C.green,10,'center');
+    } else if (index === 2) {
+      ctx.fillStyle='#cbd5c0';ctx.fillRect(96,43,54,49);label(ctx,'墙',123,71,C.muted,9,'center');
+      const path: Array<[number,number]>=[[35,104],[75,84],[83,38],[168,34],[207,72]];
+      route(ctx,path,C.blue,3);
+      const [x,y]=pointOnRoute(path,p);camera(ctx,x,y,C.blue,.52);
+      target(ctx,210,72,true);label(ctx,'绕开障碍',118,118,C.blue,9,'center');
+    } else if (index === 3) {
+      const stops: Array<[number,number]>=[[50,96],[121,68],[197,43]];
+      stops.forEach(([x,y],i)=>{ctx.fillStyle=i<=Math.floor(raw*3)?'#dcfce7':C.white;ctx.strokeStyle=i<=Math.floor(raw*3)?C.green:C.line;ctx.lineWidth=2;ctx.fillRect(x-18,y-13,36,26);ctx.strokeRect(x-18,y-13,36,26);label(ctx,`K${i+1}`,x,y+4,i<=Math.floor(raw*3)?C.green:C.muted,8,'center');});
+      const segment=Math.min(2,Math.floor(raw*3));const [x,y]=stops[segment];camera(ctx,x,y-23,C.blue,.46);
+      ctx.strokeStyle=C.orange;ctx.globalAlpha=.25+.55*Math.abs(Math.sin(time/130));ctx.beginPath();ctx.arc(x,y-23,25,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+      label(ctx,'少拍 · 跨视角',122,121,C.green,9,'center');
+    } else if (index === 4) {
+      [[42,58],[42,86],[42,114]].forEach(([x,y],i)=>photo(ctx,x,y,i===1?C.purple:C.line,.9));
+      ctx.strokeStyle=C.line;ctx.strokeRect(168,53,56,45);label(ctx,'目标槽',196,79,C.muted,8,'center');
+      const from:[number,number]=[42,86],to:[number,number]=[196,75];
+      const x=from[0]+(to[0]-from[0])*p,y=from[1]+(to[1]-from[1])*p;
+      photo(ctx,x,y,C.purple,1);label(ctx,'检索最相关照片',129,120,C.purple,9,'center');
+    } else if (index === 5) {
+      for(let i=0;i<8;i++){ctx.fillStyle=i%2===0?C.line:'#eef1f4';ctx.beginPath();ctx.arc(31+i*27,73,5,0,Math.PI*2);ctx.fill();}
+      const stops=[31,85,139,193];const step=Math.min(3,Math.floor(raw*4));
+      stops.forEach((x,i)=>{ctx.strokeStyle=i<=step?C.green:C.line;ctx.lineWidth=3;ctx.strokeRect(x-9,94,18,13);label(ctx,String(i+1),x,121,i<=step?C.green:C.muted,8,'center');});
+      camera(ctx,stops[step],62,C.blue,.43);label(ctx,'多步教师 → 四拍学生',122,35,C.blue,9,'center');
+    } else if (index === 6) {
+      const w=72+p*86,h=42+p*38,x=122-w/2,y=72-h/2;
+      ctx.strokeStyle=C.orange;ctx.lineWidth=3;ctx.strokeRect(x,y,w,h);
+      for(let i=1;i<4;i++){ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(x+w*i/4,y);ctx.lineTo(x+w*i/4,y+h);ctx.stroke();}
+      ctx.fillStyle=C.green;ctx.beginPath();ctx.arc(x+w*.68,y+h*.35,6,0,Math.PI*2);ctx.fill();
+      label(ctx,'-1',x,119,C.muted,8,'center');label(ctx,'+1',x+w,119,C.muted,8,'center');label(ctx,'相对位置不漂移',122,28,C.green,9,'center');
+    } else if (index === 7) {
+      const cx=122,cy=75,a=-Math.PI*.75+p*Math.PI*1.5;
+      ['点图','深度','法线','3DGS'].forEach((name,i)=>{const angle=-Math.PI*.75+i*Math.PI*.5;label(ctx,name,cx+Math.cos(angle)*72,cy+Math.sin(angle)*51,C.muted,8,'center');});
+      ctx.fillStyle=C.white;ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fill();ctx.stroke();
+      route(ctx,[[cx,cy],[cx+Math.cos(a)*23,cy+Math.sin(a)*23]],C.orange,5);ctx.fillStyle=C.orange;ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fill();
+      label(ctx,'一机多头',122,121,C.blue,9,'center');
+    } else if (index === 8) {
+      photo(ctx,82,72,C.green,1);
+      const x=168-(1-p)*45,y=55+(1-p)*28;
+      ctx.save();ctx.translate(x,y);ctx.rotate((1-p)*.2);photo(ctx,0,0,C.orange,.88);ctx.restore();
+      route(ctx,[[82,103],[168,103]],C.line,2,[4,4]);
+      label(ctx,p>.9?'尺度与偏移已对齐':'移动第二张深度图',122,121,p>.9?C.green:C.orange,9,'center');
+    } else {
+      ctx.fillStyle='#cbd5c0';ctx.fillRect(70,43,103,53);ctx.strokeStyle=C.green;ctx.lineWidth=3;ctx.strokeRect(70,43,103,53);label(ctx,'已保存世界',121,72,C.green,9,'center');
+      const a=p*Math.PI*2,x=122+Math.cos(a)*72,y=75+Math.sin(a)*34;
+      ctx.fillStyle=C.orange;ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle=C.blue;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y+7);ctx.lineTo(x,y+20);ctx.stroke();
+      label(ctx,'生成后可回访',122,121,C.blue,9,'center');
+    }
   }} />;
 };
 
