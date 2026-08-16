@@ -1,0 +1,54 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-light: #b8c9a7;
+  --paper-scene-dark: #76906a;
+  --paper-route: #92400e;
+  --paper-current: #27446e;
+  --paper-success: #228d5c;
+  --paper-failure: #c43f52;
+  --paper-emphasis: #d97706;
+  --paper-aux: #7c3aed;
+}
+
+.darts-canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.darts-canvas--module { aspect-ratio: 12 / 5; }
+.darts-canvas--hero { aspect-ratio: 56 / 25; }
+.darts-canvas--mini { width: 244px !important; aspect-ratio: 244 / 130; }
+
+.darts-chip-row {
+  justify-content: center;
+}
+
+.darts-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.darts-result-grid span {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper-2);
+  color: var(--slate);
+  font-family: var(--ui-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .darts-result-grid { grid-template-columns: 1fr; }
+  .darts-canvas--mini { max-width: 244px !important; }
+}
