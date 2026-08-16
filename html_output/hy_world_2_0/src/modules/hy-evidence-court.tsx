@@ -3,226 +3,121 @@ import { PaperTable } from './hy-paper-evidence';
 import type { PaperTableId } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
-type Verdict = '成立' | '有条件' | '不成立';
+type EvidenceLevel = 'paper' | 'official' | 'thirdparty' | 'unreported';
 
-type Metric = {
-  beforeLabel: string;
-  before: string;
-  afterLabel: string;
-  after: string;
-  note: string;
-};
-
-type CaseFile = {
-  category: string;
+type BoundaryCard = {
+  id: string;
+  title: string;
   claim: string;
-  correct: Verdict;
+  verdict: string;
+  level: EvidenceLevel;
   source: string;
-  sourceUrl: string;
   explanation: string;
-  checks: string[];
-  metric?: Metric;
+  conditions: string[];
   tableId?: PaperTableId;
 };
 
-const cases: CaseFile[] = [
+const levelMeta: Record<EvidenceLevel, { label: string; desc: string }> = {
+  paper: { label: '论文报告', desc: '公式、表格、消融或正文直接支持' },
+  official: { label: '官方展示', desc: '项目页、GitHub、产品页或官方 GIF' },
+  thirdparty: { label: '第三方解读', desc: '帮助建立直觉，但不是论文证据' },
+  unreported: { label: '未报告', desc: '现有资料不能支持该结论' },
+};
+
+const cards: BoundaryCard[] = [
   {
-    category: '论文结果',
-    claim: '在论文表 4 的 I2P 协议下，HY-Pano 2.0 的 CLIP-I 高于 HY-World 1.0。',
-    correct: '成立',
-    source: '论文表 4',
-    sourceUrl: 'https://arxiv.org/abs/2604.14268',
-    explanation: '这是同一表格、同一指标下的兼容比较，可以陈述为该协议内提升。',
-    checks: ['指标方向：越高越好', '比较范围：I2P 图像到全景', '不能外推为所有全景任务都更优'],
-    metric: { beforeLabel: 'HY-World 1.0', before: '0.831', afterLabel: 'HY-Pano 2.0', after: '0.844', note: 'CLIP-I' },
+    id: 'metric', title: '协议内性能', level: 'paper',
+    claim: 'HY-Pano 2.0 在表 4 的 I2P CLIP-I 上高于 CubeDiff 与 GenEx。',
+    verdict: '可陈述，但只能限定在表 4 的 I2P 子协议。',
+    source: '论文 Table 4',
+    explanation: '0.844 高于 0.828 与 0.831；它衡量图像到全景的兼容指标，不是完整世界系统总排名。',
+    conditions: ['同一 I2P 子协议', 'CLIP-I 越高越好', '不能外推到三维几何与运行时'],
     tableId: 'table-4',
   },
   {
-    category: '高分辨率重建',
-    claim: '在 7-Scenes 高分辨率设置中，WorldMirror 2.0 的点图误差低于 1.0。',
-    correct: '成立',
-    source: '论文表 11',
-    sourceUrl: 'https://arxiv.org/abs/2604.14268',
-    explanation: '表 11 的 Acc. 是误差指标，数值越低越好；2.0 从 0.079 降到 0.037。',
-    checks: ['指标方向：越低越好', '分辨率：论文高分辨率设置', '不能把误差下降写成准确率下降'],
-    metric: { beforeLabel: 'WorldMirror 1.0', before: '0.079', afterLabel: 'WorldMirror 2.0', after: '0.037', note: 'Acc. ↓' },
-    tableId: 'table-11',
-  },
-  {
-    category: '3DGS 取舍',
-    claim: '完整配置把高斯数从 6.000M 降到 1.381M，而且画质完全没有变化。',
-    correct: '有条件',
-    source: '论文表 9',
-    sourceUrl: 'https://arxiv.org/abs/2604.14268',
-    explanation: '高斯数量约减少 77%，但 PSNR 从 25.176 变为 25.023，不能说“完全没有变化”。',
-    checks: ['数量显著下降成立', '画质接近但并非数值相同', '困难轨迹仍可能产生对齐误差'],
-    metric: { beforeLabel: '基线', before: '6.000M / 25.176', afterLabel: '完整配置', after: '1.381M / 25.023', note: '高斯数 / PSNR' },
-    tableId: 'table-9',
-  },
-  {
-    category: '效率边界',
-    claim: '128 视图重建只需 5.60 秒，所以完整世界生成已经可以实时完成。',
-    correct: '不成立',
-    source: '论文表 14 与效率汇总',
-    sourceUrl: 'https://arxiv.org/abs/2604.14268',
-    explanation: '5.60 秒是特定 H20 四卡配置下的 128 视图重建步骤；论文给出的完整世界生成总耗时是 712 秒。',
-    checks: ['局部步骤不能代表完整管线', '硬件条件：NVIDIA H20', '完整生成仍是分钟级离线流程'],
-    metric: { beforeLabel: '128 视图重建', before: '5.60 s', afterLabel: '完整世界生成', after: '712 s', note: '不同任务，不可直接替换' },
+    id: 'runtime', title: '局部效率', level: 'paper',
+    claim: 'WorldMirror 2.0 在 H20 四卡、128 视图设置下报告 5.60 秒。',
+    verdict: '可陈述，但不能改写为完整世界实时生成。',
+    source: '论文 Table 14 与系统耗时汇总',
+    explanation: '5.60 秒对应重建子步骤；论文完整生成链路仍约 712 秒，二者任务范围不同。',
+    conditions: ['H20 四卡', 'SP + BF16 + FSDP', '128 视图、518x378'],
     tableId: 'table-14',
   },
   {
-    category: '外部比较',
-    claim: '论文已经在统一评测协议下定量证明 HY-World 2.0 超过 Marble。',
-    correct: '不成立',
-    source: '论文比较边界',
-    sourceUrl: 'https://arxiv.org/abs/2604.14268',
-    explanation: '论文对 Marble 提供的是定性比较，没有兼容协议下的定量表格。',
-    checks: ['可以讨论案例观感', '不能伪造统一指标排名', '第三方体验只能作为个人判断'],
+    id: 'marble', title: 'Marble 比较', level: 'unreported',
+    claim: 'HY-World 2.0 已在统一定量协议下超过 Marble。',
+    verdict: '不能陈述。',
+    source: '论文只提供定性案例比较',
+    explanation: '可以讨论同输入案例的纹理、忠实度与几何观感，但没有可合并的统一定量表格。',
+    conditions: ['不虚构分数', '不生成胜率', '第三方体验只标个人判断'],
   },
   {
-    category: '官方开源状态',
-    claim: '当前官方仓库提供 WorldMirrorPipeline、单卡/多卡命令和 Gradio 入口。',
-    correct: '成立',
-    source: '官方 GitHub 与中文文档',
-    sourceUrl: 'https://github.com/Tencent-Hunyuan/HY-World-2.0',
-    explanation: '仓库文档已经给出类似 Diffusers 的 Pipeline、命令行推理和 Gradio 使用方式。',
-    checks: ['首次运行会下载权重', '多 GPU 输入图像数需不少于 GPU 数', '代码和权重版本需要匹配'],
+    id: 'interaction', title: '运行时交互', level: 'official',
+    claim: '生成后的资产可接入 IBL、碰撞代理和角色漫游。',
+    verdict: '官方资料支持能力存在，但没有统一帧率或物理准确率基准。',
+    source: '官方项目页、GitHub 与演示 GIF',
+    explanation: 'WorldLens 处理生成完成后的资产运行时；这不代表世界生成本身实时，也不证明碰撞完全物理正确。',
+    conditions: ['资产已生成完成', 'GIF 是演示而非指标', '运行时和生成阶段分开'],
   },
   {
-    category: '产品体验',
-    claim: '腾讯官方 Scene to 3D 页面无需登录即可直接创建世界。',
-    correct: '不成立',
-    source: '腾讯混元 3D 当前页面',
-    sourceUrl: 'https://3d.hunyuan.tencent.com/sceneTo3D',
-    explanation: '当前未登录访问会进入登录页，需要登录后才能创建。',
-    checks: ['账号权限可能变化', '排队与参数属于产品状态', '产品体验不等于论文实验'],
+    id: 'zhihu', title: '工程直觉', level: 'thirdparty',
+    claim: '视频扩散负责补未观测区域，前馈 3DGS 负责把多视图拉回显式几何。',
+    verdict: '可作为教学概括，关键机制仍需回到论文核对。',
+    source: '知乎文章《生成辅助重建的完整开源》',
+    explanation: '该表述很好地解释两类技术为何互补，但作者的 Marble 观感和工程评价不能升级为论文结论。',
+    conditions: ['术语回到论文', '体验判断明确署名', '数字不用第三方文章替代'],
   },
   {
-    category: '使用许可',
-    claim: 'HY-World 2.0 的 Community License 可以直接按 MIT 许可证理解。',
-    correct: '不成立',
-    source: 'Tencent HY-WORLD 2.0 Community License',
-    sourceUrl: 'https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/License.txt',
-    explanation: '这是自定义社区许可证，包含地域、百万月活、分发通知和模型用途等限制。',
-    checks: ['适用地域排除欧盟、英国和韩国', '特定百万月活主体需另行申请许可', '输出权利不等于模型可自由再分发'],
+    id: 'license', title: '开源与许可', level: 'official',
+    claim: '仓库公开不等于可以按 MIT 许可证任意部署和再分发。',
+    verdict: '应阅读 Tencent HY-WORLD 2.0 Community License。',
+    source: '官方 GitHub 与 License.txt',
+    explanation: '当前许可证包含地域、百万月活、分发通知与用途限制；教程只作风险提示，不构成法律意见。',
+    conditions: ['核对当前版本', '部署前阅读全文', '输出权利不等于模型再分发权'],
   },
 ];
 
-const verdicts: Verdict[] = ['成立', '有条件', '不成立'];
-
 export const HyEvidenceCourt: React.FC<WidgetProps> = () => {
-  const [caseIndex, setCaseIndex] = useState(0);
-  const [selected, setSelected] = useState<Verdict | null>(null);
-  const [score, setScore] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  const current = cases[caseIndex];
-  const answered = selected !== null;
-  const correct = selected === current.correct;
+  const [level, setLevel] = useState<EvidenceLevel>('paper');
+  const visible = cards.filter((card) => card.level === level);
+  const [selectedId, setSelectedId] = useState(cards[0].id);
+  const selected = cards.find((card) => card.id === selectedId && card.level === level) ?? visible[0];
 
-  const judge = (verdict: Verdict) => {
-    if (answered) return;
-    setSelected(verdict);
-    if (verdict === current.correct) setScore((value) => value + 1);
+  const chooseLevel = (next: EvidenceLevel) => {
+    setLevel(next);
+    const first = cards.find((card) => card.level === next);
+    if (first) setSelectedId(first.id);
   };
-
-  const nextCase = () => {
-    if (caseIndex === cases.length - 1) {
-      setCompleted(true);
-      return;
-    }
-    setCaseIndex((value) => value + 1);
-    setSelected(null);
-  };
-
-  const restart = () => {
-    setCaseIndex(0);
-    setSelected(null);
-    setScore(0);
-    setCompleted(false);
-  };
-
-  if (completed) {
-    const rank = score === cases.length ? '首席证据审判官' : score >= 6 ? '协议边界猎手' : score >= 4 ? '事实侦察员' : '需要回炉的宣传语克星';
-    return (
-      <div className="evidence-court">
-        <div className="court-summary">
-          <span>八案审理完成</span>
-          <strong>{score} / {cases.length}</strong>
-          <h5>{rank}</h5>
-          <p>复盘规则：数字必须带协议，效率必须带任务范围，开放状态必须看当前仓库，使用资格必须读许可证。</p>
-          <div className="court-summary-links">
-            <a href="https://arxiv.org/abs/2604.14268" target="_blank" rel="noreferrer">论文证据 ↗</a>
-            <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0" target="_blank" rel="noreferrer">开源状态 ↗</a>
-            <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/License.txt" target="_blank" rel="noreferrer">许可证 ↗</a>
-          </div>
-        </div>
-        <div className="court-actions">
-          <button className="tiny" onClick={restart}>重新挑战</button>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="evidence-court">
-      <div className="court-status">
-        <span>案卷 {caseIndex + 1} / {cases.length}</span>
-        <strong>已判对 {score} 案</strong>
-      </div>
-
-      <article className="court-case" aria-live="polite">
-        <div className="court-category">{current.category}</div>
-        <h5>{current.claim}</h5>
-        <p>请选择最准确的判决。注意：“有条件”表示核心趋势成立，但原说法省略了不可缺少的限制。</p>
-      </article>
-
-      <div className="court-verdicts" role="group" aria-label="选择判决">
-        {verdicts.map((verdict) => {
-          const isSelected = selected === verdict;
-          const isAnswer = answered && current.correct === verdict;
-          return (
-            <button
-              key={verdict}
-              className={`${isSelected ? 'selected' : ''} ${isAnswer ? 'answer' : ''}`}
-              onClick={() => judge(verdict)}
-              disabled={answered}
-            >
-              {verdict}
-            </button>
-          );
+    <div className="evidence-dashboard">
+      <div className="evidence-level-tabs" role="tablist" aria-label="选择证据层级">
+        {(Object.keys(levelMeta) as EvidenceLevel[]).map((key) => {
+          const count = cards.filter((card) => card.level === key).length;
+          return <button key={key} type="button" role="tab" aria-selected={level === key} className={level === key ? 'selected' : ''} onClick={() => chooseLevel(key)}>
+            <strong>{levelMeta[key].label}</strong><span>{levelMeta[key].desc}</span><b>{count}</b>
+          </button>;
         })}
       </div>
 
-      {answered ? (
-        <div className={`court-evidence ${correct ? 'correct' : 'incorrect'}`}>
-          <div className="court-ruling">
-            <strong>{correct ? '判决命中' : `应判为“${current.correct}”`}</strong>
-            <span>{current.explanation}</span>
-          </div>
+      <div className="evidence-dashboard-body">
+        <nav aria-label="当前证据层级的结论切片">
+          {visible.map((card) => <button key={card.id} type="button" className={selected.id === card.id ? 'selected' : ''} onClick={() => setSelectedId(card.id)}>
+            <span>{card.title}</span><strong>{card.claim}</strong>
+          </button>)}
+        </nav>
 
-          {current.metric ? (
-            <div className="court-metric">
-              <div><small>{current.metric.beforeLabel}</small><b>{current.metric.before}</b></div>
-              <span aria-hidden="true">→</span>
-              <div><small>{current.metric.afterLabel}</small><b>{current.metric.after}</b></div>
-              <em>{current.metric.note}</em>
-            </div>
-          ) : null}
-
-          <ul>
-            {current.checks.map((check) => <li key={check}>{check}</li>)}
-          </ul>
-          <a href={current.sourceUrl} target="_blank" rel="noreferrer">查看证据：{current.source} ↗</a>
-          {current.tableId ? <PaperTable tableId={current.tableId} /> : null}
-        </div>
-      ) : (
-        <div className="feedback">先作出判决，证据才会解锁。</div>
-      )}
-
-      <div className="court-actions">
-        <button className="tiny" onClick={nextCase} disabled={!answered}>{caseIndex === cases.length - 1 ? '完成挑战' : '下一案'}</button>
-        <button className="tiny ghost" onClick={restart}>重新审理</button>
+        <section aria-live="polite">
+          <header><span>{levelMeta[selected.level].label}</span><h5>{selected.title}</h5><b>{selected.source}</b></header>
+          <blockquote>{selected.claim}</blockquote>
+          <div className="evidence-verdict"><strong>边界结论</strong><p>{selected.verdict}</p></div>
+          <p>{selected.explanation}</p>
+          <div className="evidence-condition-list">{selected.conditions.map((item) => <span key={item}>{item}</span>)}</div>
+        </section>
       </div>
+
+      {selected.tableId ? <PaperTable tableId={selected.tableId} /> : null}
+      <p className="evidence-dashboard-hint">灰色提示：这里不再连续答题。先选择证据层级，再检查一条结论能说到哪里、必须携带哪些条件。</p>
     </div>
   );
 };
