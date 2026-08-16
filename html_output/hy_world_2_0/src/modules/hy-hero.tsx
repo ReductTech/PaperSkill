@@ -7,6 +7,83 @@ const C = {
   blue: '#27446e', green: '#228d5c', red: '#c43f52', orange: '#d97706', purple: '#7c3aed', brown: '#92400e', white: '#ffffff',
 };
 
+const quickReadStops = [
+  { id: 'quick-overview', chapter: '全文总览', title: '为什么做、怎么做、做到什么', cue: '视频生成能补盲区却不守持久几何，重建能守几何却不能补未见区域；论文把两者接成显式三维世界生产链。', components: 'HY-Pano 2.0 → WorldNav → WorldStereo 2.0 → WorldMirror 2.0 → WorldLens' },
+  { id: 'quick-planning', chapter: '生成起点', title: '全景种子与主动规划', cue: '先用全景补齐方向上下文，再让规划器把有限视角预算投向背面、远端、空洞和顶部盲区。', components: 'HY-Pano 2.0 · WorldNav' },
+  { id: 'quick-memory', chapter: '一致扩展', title: '关键帧与双记忆', cue: 'Keyframe-VAE 保留跨视角细节，GGM 固定全局骨架，SSM++ 检索局部参考，三者共同降低跨路线漂移。', components: 'Keyframe-VAE · GGM · SSM++' },
+  { id: 'quick-training', chapter: '训练压缩', title: '先控制记忆，再四步蒸馏', cue: '作者先训练相机控制，再接入跨轨迹记忆，最后用 DMD 把成熟教师压缩为四步 WorldStereo 学生。', components: 'Camera control · GGM/SSM++ · DMD' },
+  { id: 'quick-reconstruction', chapter: '前馈重建', title: '一次前向恢复五类产物', cue: 'WorldMirror 2.0 用 Any-Modal 共享骨干同时恢复相机、点图、深度、法线与 3DGS 属性。', components: 'Normalized RoPE · Any-Modal · WorldMirror 2.0' },
+  { id: 'quick-runtime', chapter: '资产运行', title: '压缩后进入 WorldLens', cue: '深度对齐和 MaskGaussian 把结果整理为紧凑显式资产，WorldLens 再提供光照、碰撞和角色漫游。', components: 'Depth alignment · MaskGaussian · WorldLens' },
+  { id: 'quick-results', chapter: '实验证据', title: '按协议验证四类贡献', cue: '全景、记忆、重建和资产压缩分别由不同表格与协议验证，不能把跨任务数字揉成一个总分。', components: 'Table 4 · 8 · 9 · 11/12/14' },
+  { id: 'quick-conclusion', chapter: '结论边界', title: '可运行世界，但仍是离线生产', cue: '最终产物可保存、渲染和交互；WorldMirror 子步骤可到 5.60 秒，但完整世界生成仍约 712 秒。', components: '128 views: 5.60 s · End-to-end: 712 s · NVIDIA H20' },
+] as const;
+
+const waitForQuickReadFrame = (delay: number) => new Promise<void>((resolve) => window.setTimeout(resolve, delay));
+
+async function revealQuickReadTarget(targetId: string) {
+  document.documentElement.classList.add('quickread-unlocking');
+  for (let attempt = 0; attempt < 36; attempt += 1) {
+    const target = document.getElementById(targetId);
+    if (target) {
+      await waitForQuickReadFrame(260);
+      document.documentElement.classList.remove('quickread-unlocking');
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      return;
+    }
+    const next = Array.from(document.querySelectorAll<HTMLButtonElement>('.chap-loader-btn')).find((button) => button.offsetParent !== null && !button.disabled);
+    if (next) next.click();
+    await waitForQuickReadFrame(90);
+  }
+  document.documentElement.classList.remove('quickread-unlocking');
+}
+
+function QuickReadNavigator() {
+  const [quickMode] = useState(() => new URLSearchParams(window.location.search).get('quickread') === '1');
+  const [activeId, setActiveId] = useState(() => window.location.hash.replace('#', '') || quickReadStops[0].id);
+  const [collapsed, setCollapsed] = useState(() => window.matchMedia('(max-width: 620px)').matches);
+  const active = quickReadStops.find((item) => item.id === activeId) ?? quickReadStops[0];
+
+  useEffect(() => {
+    if (!quickMode) return undefined;
+    document.documentElement.classList.add('quickread-mode');
+    void revealQuickReadTarget(active.id);
+    return () => document.documentElement.classList.remove('quickread-mode', 'quickread-unlocking');
+  }, [active.id, quickMode]);
+
+  useEffect(() => {
+    if (!quickMode) return undefined;
+    const syncFromLocation = () => {
+      const targetId = window.location.hash.replace('#', '');
+      if (quickReadStops.some((item) => item.id === targetId)) setActiveId(targetId);
+    };
+    window.addEventListener('hashchange', syncFromLocation);
+    window.addEventListener('popstate', syncFromLocation);
+    return () => {
+      window.removeEventListener('hashchange', syncFromLocation);
+      window.removeEventListener('popstate', syncFromLocation);
+    };
+  }, [quickMode]);
+
+  if (!quickMode) return null;
+
+  const goTo = (targetId: string) => {
+    setActiveId(targetId);
+    if (window.location.hash !== `#${targetId}`) window.history.pushState(null, '', `?quickread=1#${targetId}`);
+    if (window.matchMedia('(max-width: 620px)').matches) setCollapsed(true);
+  };
+
+  return <aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="Quick Read 导航">
+      <header>
+        <div><span>QUICK READ</span><strong>专家展示导航</strong><small>完整论文八个讲解落点</small><a href="./">返回完整教程</a></div>
+        <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? '展开 Quick Read 导航' : '收起 Quick Read 导航'} title={collapsed ? '展开导航' : '收起导航'}>{collapsed ? '＋' : '−'}</button>
+      </header>
+      {collapsed ? null : <>
+        <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
+        <section aria-live="polite"><span>当前讲解提示</span><strong>{active.title}</strong><p>{active.cue}</p><small title={active.components}>{active.components}</small></section>
+      </>}
+    </aside>;
+}
+
 function CanvasView({ width = 560, height = 240, animate = false, draw }: { width?: number; height?: number; animate?: boolean; draw: (ctx: CanvasRenderingContext2D, time: number) => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const drawRef = useRef(draw);
@@ -39,7 +116,7 @@ function clearStudio(ctx: CanvasRenderingContext2D, w: number, h: number) {
 }
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 14, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function camera(ctx: CanvasRenderingContext2D, x: number, y: number, color = C.blue, scale = 1) {
@@ -116,7 +193,8 @@ function wireRoom(ctx: CanvasRenderingContext2D, x: number, y: number, color: st
 }
 
 export const HyHero: React.FC<WidgetProps> = ({ moduleId }) => (
-  <CanvasView width={520} height={180} animate draw={(ctx, time) => {
+  <div className="hy-hero-visual">
+    <CanvasView width={520} height={180} animate draw={(ctx, time) => {
     clearStudio(ctx, 520, 180); const cycle = (time % 4200) / 4200; const p = easeInOutQuad(cycle < .72 ? cycle / .72 : 1);
     if (moduleId === 'old') {
       label(ctx, '逐帧想象', 34, 25, C.red, 13); label(ctx, '只恢复已观察区域', 310, 25, C.red, 13);
@@ -139,7 +217,9 @@ export const HyHero: React.FC<WidgetProps> = ({ moduleId }) => (
       wireRoom(ctx, 342, 39, C.green, p, false);
       label(ctx, p > .92 ? '可保存 · 可渲染 · 可交互' : '多视图正在对齐', 406, 160, p > .92 ? C.green : C.blue, 10, 'center');
     }
-  }} />
+    }} />
+    {moduleId === 'new' ? <QuickReadNavigator /> : null}
+  </div>
 );
 
 const analogyNames = ['定任务','转全景','选路线','拍关键帧','查记忆','压步数','换尺度','拨输出','对齐','交付'];

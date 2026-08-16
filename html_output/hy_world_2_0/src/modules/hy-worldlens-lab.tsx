@@ -46,7 +46,7 @@ const modes: Array<{
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
   ctx.fillStyle = color;
-  ctx.font = `700 ${size}px Segoe UI, sans-serif`;
+  ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`;
   ctx.textAlign = align;
   ctx.fillText(text, x, y);
   ctx.textAlign = 'left';
@@ -273,7 +273,7 @@ export const HyWorldLensLab: React.FC<WidgetProps> = () => {
   };
 
   return (
-    <div className={`worldlens-lab ${running ? 'is-running' : ''}`}>
+    <div id="quick-runtime" className={`worldlens-lab ${running ? 'is-running' : ''}`}>
       <div className="worldlens-modes" role="tablist" aria-label="选择 WorldLens 运行时能力">
         {modes.map((item) => (
           <button key={item.id} type="button" role="tab" aria-selected={item.id === mode} className={item.id === mode ? 'selected' : ''} onClick={() => selectMode(item.id)}>
@@ -290,7 +290,7 @@ export const HyWorldLensLab: React.FC<WidgetProps> = () => {
         <div><p><b>运行时做什么</b>{active.action}</p><p><b>画面如何读</b>{active.effect}</p><p><b>证据边界</b>{active.boundary}</p></div>
       </section>
       <div className="feedback good">WorldLens 位于生成或重建完成之后：它让已有资产可实时渲染、打光和碰撞，不负责把 712 秒的完整世界生成过程变成实时。</div>
-      <EvidenceMediaDrawer mediaType="官方 GIF" src="/images/official-interactive.gif" title="角色漫游与碰撞演示" caption="腾讯混元官方演示用于说明生成后资产能够支持角色移动与空间交互；它不是碰撞准确率、帧率或物理真实性的统一基准。" alt="HY-World 2.0 官方角色漫游与碰撞演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
+      <EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-interactive.gif" title="角色漫游与碰撞演示" caption="腾讯混元官方演示用于说明生成后资产能够支持角色移动与空间交互；它不是碰撞准确率、帧率或物理真实性的统一基准。" alt="HY-World 2.0 官方角色漫游与碰撞演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
     </div>
   );
 };

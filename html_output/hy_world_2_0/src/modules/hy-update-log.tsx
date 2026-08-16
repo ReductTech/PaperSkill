@@ -4,40 +4,40 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
-    id: 'v049',
-    version: 'V0.49',
-    alias: '镜界巡检·星图映写姬',
-    focus: '结构图、资产放大镜与演示收束',
-    modules: ['1.2/1.3 标签与任务卡', '2.1/2.2/2.3 空间表达', '5.2 多头巡检结构图', '6.1 3DGS 双放大镜', '7.2/7.3 比较视图', '8.2 更新日志'],
-    note: '把难以读懂的交互改成能沿着一条视觉路径讲完的演示版本。',
+    id: 'v059',
+    version: 'V0.59',
+    alias: '首席星柱·无碰撞观测姬',
+    focus: '7.3 标签避让与本文优先排序',
+    modules: ['7.3 显存/时间数值换行', '7.3 柱宽与模型簇扩容', '四类协议本文模型置顶', 'Table 14 本文配置置顶', '模型选择器同步排序'],
+    note: '修复投影字号放大后显存与时间标签跨柱重叠的问题；所有 7.3 对比统一把本文模型或本文目标配置排在第一位，模型选择器和图表顺序保持一致。',
   },
   {
-    id: 'v048',
-    version: 'V0.48',
-    alias: '万象归航·星图验收姬',
-    focus: '统一初始状态、二维数据地图与证据资料库',
-    modules: ['2.2 数据分布地图', '2.3 WorldNav 规划', '5.2 分阶段重建', '7.3 工程记录', '8.1 结论资料库'],
-    note: '建立统一的审查边界，并把全文从十章收束为八章。',
+    id: 'v058',
+    version: 'V0.58',
+    alias: '启程星册·首章导览姬',
+    focus: '速览从封面归位第一章',
+    modules: ['1.0 全文速览', '首章专家导航入口', 'Hero 封面减负', 'quick-overview 锚点迁移', '组件职责拆分'],
+    note: '把全文概述和快速展示入口从 Hero 移到第一章最前端，封面恢复为纯粹的论文定位与新旧方法对照；Quick Read 固定导航仍保留完整八站论证链。',
   },
   {
-    id: 'v047',
-    version: 'V0.47',
-    alias: '星轨校准·镜界巡游使',
-    focus: '曲线相机、全景故障与跨论文效率调研',
-    modules: ['1.2 曲线关键帧', '2.1 全景故障擦除', '2.3 候选淘汰', '3.2 SSM++', '7.3 效率资料'],
-    note: '把轨迹、故障症状和工程记录重新绑定到可核查的视觉证据。',
+    id: 'v057',
+    version: 'V0.57',
+    alias: '一屏星图·极速讲解姬',
+    focus: '全文总览与完整专家论证链',
+    modules: ['Hero 全文最快概述', '五组件系统链', 'Quick Read 总览首站', '八个论证落点', '组件与证据提示'],
+    note: '新增一屏论文总览，用问题、路线、产物和五组件链直接解释整篇工作；重排专家导航为“总览、生成、一致性、训练、重建、资产、证据、边界”，每个落点同时显示对应组件或表格。',
   },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v049');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v059');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
     <div className="learning-contract">
-      <div><span>为什么展示</span><p>现场演示不只需要最终页面，也需要说明每轮修改具体解决了什么问题。</p></div>
-      <div><span>本次操作</span><p>切换最近三个版本，查看别名、重点模块和审查目标；需要追溯时再展开完整日志。</p></div>
-      <div><span>应得判断</span><p>版本号对应可复查的模块变化，萌系别名只帮助记忆，不替代事实、验证结果和边界记录。</p></div>
+      <div><span>为什么展示</span><p>说明每轮修改解决了什么问题。</p></div>
+      <div><span>本次操作</span><p>切换最近版本；需要时展开完整日志。</p></div>
+      <div><span>应得判断</span><p>版本号对应可复查的模块变化。</p></div>
     </div>
 
     <section className="update-log-stage">
