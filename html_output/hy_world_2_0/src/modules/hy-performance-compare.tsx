@@ -137,6 +137,7 @@ function formatValue(value: number, metric: MetricDef) {
 export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
   const [groupId, setGroupId] = useState<GroupId>('panorama');
   const [viewIndex, setViewIndex] = useState(2);
+  const [efficiencyView, setEfficiencyView] = useState<'paper' | 'cross'>('paper');
   const group = groupId === 'efficiency' ? efficiencyGroup(viewIndex) : staticGroups[groupId];
   const [selectedModels, setSelectedModels] = useState<string[]>(staticGroups.panorama.models.map((model) => model.id));
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(staticGroups.panorama.metrics.map((metric) => metric.id));
@@ -145,6 +146,7 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
     const nextViewIndex = next === 'efficiency' ? 0 : viewIndex;
     const nextGroup = next === 'efficiency' ? efficiencyGroup(nextViewIndex) : staticGroups[next];
     if (next === 'efficiency') setViewIndex(nextViewIndex);
+    if (next === 'efficiency') setEfficiencyView('paper');
     setGroupId(next);
     setSelectedModels(nextGroup.models.map((model) => model.id));
     setSelectedMetrics(nextGroup.metrics.map((metric) => metric.id));
@@ -172,6 +174,7 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
   };
 
   const tableId = groupId === 'panorama' ? 'table-4' : groupId === 'efficiency' ? 'table-14' : 'table-12';
+  const showingCrossEfficiency = groupId === 'efficiency' && efficiencyView === 'cross';
 
   return (
     <div className="cluster-compare">
@@ -185,8 +188,10 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
         ] as Array<[GroupId, string, string]>).map(([id, label, source]) => <button key={id} type="button" role="tab" aria-selected={groupId === id} className={groupId === id ? 'selected' : ''} onClick={() => changeGroup(id)}><strong>{label}</strong><span>{source}</span></button>)}
       </div>
 
-      {groupId === 'efficiency' ? <label className="cluster-view-count"><span>输入视图数</span><select value={viewIndex} onChange={(event) => setViewIndex(Number(event.target.value))}>{viewCounts.map((count, index) => <option key={count} value={index}>{count} 视图</option>)}</select></label> : null}
+      {groupId === 'efficiency' ? <div className="efficiency-view-switch" role="group" aria-label="选择效率证据范围"><button type="button" className={efficiencyView === 'paper' ? 'selected' : ''} aria-pressed={efficiencyView === 'paper'} onClick={() => setEfficiencyView('paper')}><strong>本文 Table 14</strong><small>同硬件、同输入协议内比较配置</small></button><button type="button" className={efficiencyView === 'cross' ? 'selected' : ''} aria-pressed={efficiencyView === 'cross'} onClick={() => setEfficiencyView('cross')}><strong>其它模型公开记录</strong><small>显存、秒数与 FPS 分组阅读</small></button></div> : null}
 
+      {!showingCrossEfficiency ? <>
+      {groupId === 'efficiency' ? <label className="cluster-view-count"><span>输入视图数</span><select value={viewIndex} onChange={(event) => setViewIndex(Number(event.target.value))}>{viewCounts.map((count, index) => <option key={count} value={index}>{count} 视图</option>)}</select></label> : null}
       <div className="cluster-picker">
         <fieldset><legend>选择模型</legend><div>{group.models.map((model) => <button key={model.id} type="button" aria-pressed={selectedModels.includes(model.id)} className={selectedModels.includes(model.id) ? 'selected' : ''} onClick={() => toggle(model.id, selectedModels, setSelectedModels)}>{model.label}</button>)}</div></fieldset>
         <fieldset><legend>选择指标</legend><div>{group.metrics.map((metric) => <button key={metric.id} type="button" aria-pressed={selectedMetrics.includes(metric.id)} className={selectedMetrics.includes(metric.id) ? 'selected' : ''} onClick={() => toggle(metric.id, selectedMetrics, setSelectedMetrics)}><i style={{ background: metric.color }} />{metric.label}<small>{metric.direction === 'higher' ? '↑' : '↓'}</small></button>)}</div></fieldset>
@@ -213,7 +218,8 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
       </section>
 
       <div className="performance-boundary"><strong>严格零基线比例</strong><span>柱高 = 原始数值 / 当前指标最大已报告值。AUC、PSNR、SSIM 等越高越好；AbsRel、LPIPS、显存、时间越低越好，因此后者的短柱才更优。不同指标不能相加、平均或构造综合分数。</span></div>
-      {groupId === 'efficiency' ? <section className="cross-paper-efficiency">
+      <PaperTable tableId={tableId} />
+      </> : <section className="cross-paper-efficiency">
         <header><div><span>跨论文调研</span><strong>三组工程记录条形图</strong></div><p>每组柱长严格与该组公开数值成比例，但硬件、输入和测量范围不同；它们回答“各论文报告了什么”，不构成无条件资源排行榜。</p></header>
         <div className="cross-paper-bar-groups">
           <section>
@@ -242,8 +248,7 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
           </section>
         </div>
         <footer><strong>阅读规则</strong><span>GB 与 GiB 保留原论文单位；FPS 不倒数成“单场景秒数”；骨干成本不冒充完整多头模型；未报告显存保持未报告。</span></footer>
-      </section> : null}
-      <PaperTable tableId={tableId} />
+      </section>}
     </div>
   );
 };

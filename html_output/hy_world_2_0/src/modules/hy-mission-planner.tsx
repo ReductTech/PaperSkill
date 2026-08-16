@@ -67,6 +67,7 @@ const missions: Record<InputMode, Mission> = {
 };
 
 const modes: InputMode[] = ['文本', '单图', '多视图', '视频'];
+const modeIcons: Record<InputMode, string> = { 文本: 'T', 单图: '▣', 多视图: '▦', 视频: '▶' };
 
 const generationStages = [
   { id: 'pano', name: 'HY-Pano 2.0' },
@@ -113,7 +114,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
                     onClick={() => setMode(item)}
                     aria-pressed={selected}
                   >
-                    <span>{item}</span>
+                    <div className="mission-input-title"><i aria-hidden="true">{modeIcons[item]}</i><span>{item}</span></div>
                     <strong>{itemMission.lane}</strong>
                     <small>{itemMission.inputNote}</small>
                   </button>

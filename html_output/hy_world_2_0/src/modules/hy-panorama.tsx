@@ -46,12 +46,20 @@ function drawPanoramaBase(ctx: CanvasRenderingContext2D) {
 function drawFailureOverlay(ctx: CanvasRenderingContext2D, mode: CaseId) {
   const x = 30, y = 48, w = 560, h = 216;
   if (mode === 'projection') {
-    ctx.fillStyle = '#d9e8f2'; ctx.fillRect(x, y, 126, h); ctx.fillRect(x + w - 126, y, 126, h);
-    ctx.fillStyle = '#839d78'; ctx.beginPath(); ctx.moveTo(x, y + 176); ctx.quadraticCurveTo(x + 72, y + 42, x + 126, y + 154); ctx.lineTo(x + 126, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(x + w - 126, y + 160); ctx.quadraticCurveTo(x + w - 58, y + 22, x + w, y + 182); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - 126, y + h); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = C.red; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x + 18, y + 108, 112, -.72, .72); ctx.stroke(); ctx.beginPath(); ctx.arc(x + w - 18, y + 108, 112, Math.PI - .72, Math.PI + .72); ctx.stroke();
-    label(ctx, '焦距误差放大', x + 76, y + 29, C.red, 10, 'center'); label(ctx, '边缘拉伸', x + w - 70, y + 29, C.red, 10, 'center');
-    ctx.strokeStyle = C.red; ctx.lineWidth = 2; [[x+84,y+98,x+38,y+78],[x+w-84,y+98,x+w-38,y+72]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+    ctx.fillStyle = 'rgba(255,245,246,.72)'; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = C.muted; ctx.lineWidth = 2; ctx.setLineDash([7,5]);
+    ctx.strokeRect(x + 242, y + 82, 76, 134); ctx.setLineDash([]);
+    label(ctx, '正确落点', x + 280, y + 76, C.muted, 9, 'center');
+
+    ctx.fillStyle = 'rgba(196,63,82,.18)';
+    ctx.beginPath(); ctx.moveTo(x + 188, y + 70); ctx.lineTo(x + 350, y + 88); ctx.lineTo(x + 370, y + h); ctx.lineTo(x + 168, y + h); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = C.red; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(x + 188, y + 70); ctx.lineTo(x + 350, y + 88); ctx.lineTo(x + 370, y + h); ctx.lineTo(x + 168, y + h); ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = '#d9bd8a'; ctx.beginPath(); ctx.moveTo(x + 214, y + 93); ctx.lineTo(x + 334, y + 104); ctx.lineTo(x + 348, y + h); ctx.lineTo(x + 198, y + h); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = C.red; ctx.lineWidth = 2;
+    [[x+242,y+96,x+205,y+89],[x+318,y+96,x+350,y+99],[x+242,y+178,x+190,y+182],[x+318,y+178,x+358,y+183]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+    label(ctx, '错误 FoV 把同一建筑投得过宽', x + w / 2, y + 29, C.red, 10, 'center');
+    label(ctx, '轮廓与 ERP 地标错位', x + w / 2, y + 202, C.red, 10, 'center');
   }
   if (mode === 'latent') {
     ctx.fillStyle = 'rgba(41,85,143,.42)'; ctx.fillRect(x, y, 46, h); ctx.fillStyle = 'rgba(217,119,6,.46)'; ctx.fillRect(x + w - 46, y, 46, h);

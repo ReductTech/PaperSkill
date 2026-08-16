@@ -103,7 +103,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '固定同一相对位置并切换 L/M/H，直接比较整数索引进入训练外范围与归一化坐标保持可比的因果差异。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '为固定三图委托选择 Pose、K、Depth，播放“逐项接入→共享骨干→五头分流→质量验收”动画；坏候选丢弃仅是教学验收示意，不冒充论文新增网络。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '在一张从左到右、再进入下一行的大结构图中，为固定三图委托接入 Pose、K、Depth，观察共享骨干如何分流五个输出头；只有带问题的教学候选会被退回，正常候选直接通过。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {
@@ -126,7 +126,7 @@ export const tutorial: TutorialData = {
       bridge: 'WorldMirror 输出的逐帧深度仍有尺度与偏移差异。系统先把它们对齐到全景坐标，再用 3DGS 优化得到紧凑资产，最后交给 WorldLens 运行时。',
       analogy: { title: '先把照片标尺对齐，再删掉重复测量点', text: '几何先统一坐标，之后才有资格在画质、数量和漂浮物之间做资产压缩。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '6.1', title: '3DGS 配方逐步重建实验', desc: '按表 9 的五个真实配置逐步切换，直接观察体素降采样造成的细节损失、增密引入的天空漂浮物、MaskGaussian 剪枝与最终非天空增密。', componentId: 'hy-composition' },
+        { kind: 'module', id: '6.1', title: '3DGS 配方逐步重建实验', desc: '按表 9 的五个真实配置推进配方，并同时查看主场景、墙面细节放大镜与天空区域放大镜，区分删点损失、错误增密、掩码剪枝和非天空增密各自解决的问题。', componentId: 'hy-composition' },
         { kind: 'module', id: '6.2', title: 'WorldLens 运行时实验', desc: '切换 IBL 光照、碰撞代理和角色漫游，区分“资产已经生成后的实时交互”与“完整世界实时生成”。', componentId: 'hy-worldlens-lab' },
       ],
       insight: 'MaskGaussian 以可学习存在概率抑制冗余与漂浮物；WorldLens 负责资产进入运行时后的光照、碰撞和角色，不负责重新生成世界。',
@@ -151,8 +151,8 @@ export const tutorial: TutorialData = {
       analogy: { title: '比较相机前，先统一拍摄条件', text: '模型、指标、数据集和硬件必须一起选择；不同任务不能揉成一个总分。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择一个旧问题并切换连接机制，观察规划、记忆、重建与运行时为何不能互相替代；匹配后展开论文证据与外推边界。', componentId: 'hy-innovation-map' },
-        { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；只对资料已报告的能力开放详情，并标注发表时间。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '论文内指标继续严格按零基线比例绘制；跨论文效率拆成显存、秒级墙钟和 FPS 三组条形图，并保留硬件、输入规模、测量范围与未报告项。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；外部谱系压缩为一屏展示，不再横向滑动，只对资料已报告的能力开放详情并标注发表时间。', componentId: 'hy-model-evolution' },
+        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '在“本文 Table 14 / 其它模型公开记录”之间切换：论文内配置按同协议零基线比例绘制，跨论文显存、秒数和 FPS 分组显示并保留全部硬件与测量边界。', componentId: 'hy-performance-compare' },
       ],
       insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；表 4、表 12、表 14 可以在各自协议内画比例图，跨论文资源记录只能带完整条件并列阅读。',
       takeaways: [
@@ -167,6 +167,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '交付世界时附上测量条件、来源标签与继续阅读地图', text: '数字看论文，产品能力看官方资料，体验看署名观点，未报告就保持未知。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '8.1', title: '结论地图与继续阅读资料库', desc: '先汇总论文、官方资料和第三方文章能共同支持的四个判断，再浏览证据边界、完成两道不计分快问，并从下拉资料库进入论文、代码、演示、权重、许可证、相关文章与相关论文。', componentId: 'hy-evidence-court' },
+        { kind: 'module', id: '8.2', title: '版本星轨与完整更新日志', desc: '切换最近三个大型版本，快速展示每轮调整的重点模块与审查目标；完整 TUTORIAL_CHANGELOG.md 默认折叠，现场需要追溯时再展开。', componentId: 'hy-update-log' },
       ],
       insight: '最稳妥的结论是：HY-World 2.0 把稀疏输入生成、丰富输入重建、显式资产和运行时接到同一工程框架；它仍是分钟级离线世界生产系统，外部闭源模型也缺少统一定量协议。',
       takeaways: [

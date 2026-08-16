@@ -12,12 +12,12 @@ const priors: Array<{ id: PriorId; label: string; short: string; effect: string 
 ];
 
 const outputs = [
-  { id: 'camera', label: 'Camera', role: '恢复相机参数，把多视图放进共同坐标。', check: '检查跨视图回投影是否一致', reject: '漂移位姿', color: '#7c3aed' },
-  { id: 'pointmap', label: 'Pointmap', role: '为每个像素预测对应的三维点。', check: '检查点是否脱离连续表面', reject: '离群点', color: '#228d5c' },
-  { id: 'depth', label: 'Depth', role: '输出相机坐标下的距离结构。', check: '检查无效深度与遮挡空洞', reject: '无效像素', color: '#27446e' },
-  { id: 'normal', label: 'Normal', role: '描述表面朝向，辅助几何与材质判断。', check: '检查相邻表面朝向是否突翻', reject: '翻转法线', color: '#5b7f68' },
-  { id: 'gaussian', label: '3DGS', role: '第二阶段把共享几何变成可渲染高斯属性。', check: '检查渲染中漂浮与重复高斯', reject: '漂浮点', color: '#d97706' },
-];
+  { id: 'camera', label: 'Camera', role: '恢复相机参数，把多视图放进共同坐标。', check: '检查跨视图回投影是否一致', issue: '候选位姿漂移', quality: 'reject', color: '#7c3aed' },
+  { id: 'pointmap', label: 'Pointmap', role: '为每个像素预测对应的三维点。', check: '检查点是否脱离连续表面', issue: '候选含离群点', quality: 'reject', color: '#228d5c' },
+  { id: 'depth', label: 'Depth', role: '输出相机坐标下的距离结构。', check: '检查无效深度与遮挡空洞', issue: '深度连续', quality: 'pass', color: '#27446e' },
+  { id: 'normal', label: 'Normal', role: '描述表面朝向，辅助几何与材质判断。', check: '检查相邻表面朝向是否突翻', issue: '候选局部翻转', quality: 'reject', color: '#5b7f68' },
+  { id: 'gaussian', label: '3DGS', role: '第二阶段把共享几何变成可渲染高斯属性。', check: '检查渲染中漂浮与重复高斯', issue: '渲染结构稳定', quality: 'pass', color: '#d97706' },
+] as const;
 
 const stepCopy: Record<string, string> = {
   rgb: '先把三张 RGB 观察编码为必需 token。',
@@ -80,7 +80,9 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       : '部分先验会约束歧义，但论文没有在 Table 11 为这个组合报告可插值数值。';
   const currentOutput = outputs.find((output) => output.id === focusOutput) ?? outputs[0];
   const stageMessage = activeInspection
-    ? `正在验收 ${currentOutput.label}：${currentOutput.check}，发现“${currentOutput.reject}”示意后将其移出交付结果。`
+    ? currentOutput.quality === 'reject'
+      ? `正在验收 ${currentOutput.label}：${currentOutput.check}；标记“${currentOutput.issue}”后退回这个教学坏候选。`
+      : `正在验收 ${currentOutput.label}：${currentOutput.check}；当前教学候选通过，不执行丢弃。`
     : stepCopy[stage] ?? '先选择手头已有的先验，再播放一次完整重建。';
 
   return <div className="architecture-rebuild">
@@ -101,44 +103,47 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       <p>{selectedPriorDetails.length === 0 ? '当前不提供额外先验。训练时每种先验以 0.5 概率独立丢弃，因此这不是非法输入。' : selectedPriorDetails.map((prior) => prior.effect).join(' ')}</p>
     </section>
 
-    <section className="reconstruction-ingest" aria-live="polite">
-      <header><span>输入接入序列</span><strong>{stageMessage}</strong></header>
+    <section className={`reconstruction-flowboard ${reached('heads') ? 'heads-ready' : ''}`} aria-live="polite">
+      <header><div><span>从左到右，再进入下一行</span><strong>Any-Modal 共享重建与输出巡检</strong></div><p>{stageMessage}</p></header>
       <div className="reconstruction-token-lane">
-        <article className={reached('rgb') ? 'accepted active' : ''}><b>RGB</b><small>必需观察</small><i>3 views</i></article>
-        {priors.map((prior) => {
+        <article className={reached('rgb') ? 'accepted active' : ''}><span>01</span><b>RGB</b><small>三张必需观察</small><i>{reached('rgb') ? '已编码' : '等待接入'}</i></article>
+        {priors.map((prior, index) => {
           const selected = activePriors.includes(prior.id);
-          return <article key={prior.id} className={`${selected ? 'selected' : 'skipped'} ${reached(prior.id) ? 'accepted active' : ''}`}><b>{prior.short}</b><small>{selected ? '本次接入' : '本次缺省'}</small><i>{selected && reached(prior.id) ? '✓' : selected ? '…' : '—'}</i></article>;
+          return <article key={prior.id} className={`${selected ? 'selected' : 'skipped'} ${reached(prior.id) ? 'accepted active' : ''}`}><span>0{index + 2}</span><b>{prior.short}</b><small>{selected ? prior.label : `${prior.label}缺省`}</small><i>{selected && reached(prior.id) ? '已接入' : selected ? '等待' : '跳过'}</i></article>;
         })}
         <span className={reached('shared') ? 'flow active' : 'flow'}>→</span>
-        <article className={`shared-token ${reached('shared') ? 'accepted active' : ''}`}><b>Shared</b><small>Global-local Transformer</small><i>{reached('shared') ? '共享空间特征' : '等待 token'}</i></article>
+        <article className={`shared-token ${reached('shared') ? 'accepted active' : ''}`}><span>05</span><b>Shared Transformer</b><small>Global-local 跨视图理解</small><i>{reached('shared') ? '共享空间特征建立' : '等待 token'}</i></article>
       </div>
-    </section>
-
-    <section className={`reconstruction-head-fan ${reached('heads') ? 'active' : ''}`}>
-      <div className="reconstruction-shared-core"><span>一次共享前向</span><strong>跨视图对应 + 几何上下文</strong><i /></div>
-      <div className="reconstruction-output-grid">
+      <div className={`reconstruction-row-turn ${reached('heads') ? 'active' : ''}`}><span>↓</span><strong>共享特征进入下一行，同时分流给五个专用输出头</strong></div>
+      <div className="reconstruction-head-row">
+        <div className="reconstruction-shared-core"><span>06 · 一次共享前向</span><strong>对应关系 + 几何上下文</strong><i /><small>复用同一份空间理解</small></div>
+        <span className="reconstruction-fan-arrow" aria-hidden="true">→</span>
+        <div className="reconstruction-output-grid">
         {outputs.map((output) => {
           const checking = activeInspection === output.id;
           const checked = checkedOutputs.includes(output.id) && !checking;
+          const outcome = output.quality === 'reject' ? 'reject' : 'pass';
           return <button
             key={output.id}
             type="button"
             disabled={!reached('heads')}
-            className={`${focusOutput === output.id && reached('heads') ? 'selected' : ''} ${checking ? 'checking' : ''} ${checked ? 'checked' : ''}`}
+            className={`${focusOutput === output.id && reached('heads') ? 'selected' : ''} ${outcome} ${checking ? 'checking' : ''} ${checked ? 'checked' : ''}`}
             onClick={() => setFocusOutput(output.id)}
             style={{ '--output-color': output.color } as React.CSSProperties}
           >
-            <span className="output-check-mini"><i /><b>{checking ? '丢弃' : checked ? '✓' : '待检'}</b></span>
-            <strong>{output.label}</strong><small>{output.check}</small><em>{output.reject}</em>
+            <span className={`output-preview ${output.id}`} aria-hidden="true"><i /><i /><i /><b /></span>
+            <span className="output-card-title"><strong>{output.label}</strong><b>{checking ? output.quality === 'reject' ? '标记问题' : '扫描通过' : checked ? output.quality === 'reject' ? '已退回' : '可交付' : '待检'}</b></span>
+            <small>{output.check}</small><em>{output.issue}</em>
           </button>;
         })}
+        </div>
       </div>
     </section>
 
     <div className="reconstruction-inspection-note">
       <span>教学验收示意</span>
       <strong>{currentOutput.label}：{currentOutput.role}</strong>
-      <p>上方的“坏候选 → 丢弃”用来说明每类产物应检查什么，不是声称论文在共享骨干后新增了一个统一自动验收网络。</p>
+      <p>{currentOutput.quality === 'reject' ? `当前用“${currentOutput.issue}”演示坏候选如何被标记并退回。` : `当前用“${currentOutput.issue}”演示正常候选通过检查并保留。`} 这只是解释每类产物应检查什么，不是声称论文新增了统一自动验收网络。</p>
     </div>
 
     <div className={`feedback ${stage === 'done' && activePriors.length === 3 ? 'good' : ''}`}>{!hasRun ? '先配置现有证据并执行重建。' : `${resultBoundary} 先验收已有产物，再进入后续深度对齐与 3DGS 资产优化。`}</div>

@@ -167,6 +167,23 @@ function drawRouteCamera(ctx: CanvasRenderingContext2D, x: number, y: number, an
   ctx.restore();
 }
 
+function drawIsoBlock(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, lift: number) {
+  ctx.fillStyle = '#7f8f7a'; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y-16); ctx.lineTo(x+w,y+h-lift); ctx.lineTo(x,y+h); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#aab7a3'; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+22,y-lift); ctx.lineTo(x+w+22,y-lift-16); ctx.lineTo(x+w,y-16); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#93a18d'; ctx.beginPath(); ctx.moveTo(x+w,y-16); ctx.lineTo(x+w+22,y-lift-16); ctx.lineTo(x+w+22,y+h-lift-16); ctx.lineTo(x+w,y+h-lift); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#56645a'; ctx.lineWidth = 1.5; ctx.strokeRect(x,y,w,h);
+}
+
+function drawPerspectiveScene(ctx: CanvasRenderingContext2D) {
+  ctx.clearRect(0,0,560,300); ctx.fillStyle='#eef3f7';ctx.fillRect(0,0,560,300);
+  ctx.fillStyle='#dce8d2';ctx.beginPath();ctx.moveTo(28,258);ctx.lineTo(198,52);ctx.lineTo(532,91);ctx.lineTo(488,268);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#afc0aa';ctx.lineWidth=1;
+  for(let i=0;i<7;i+=1){const t=i/6;ctx.beginPath();ctx.moveTo(28+(488-28)*t,258+(268-258)*t);ctx.lineTo(198+(532-198)*t,52+(91-52)*t);ctx.stroke();}
+  for(let i=1;i<6;i+=1){const t=i/6;ctx.beginPath();ctx.moveTo(28+(198-28)*t,258+(52-258)*t);ctx.lineTo(488+(532-488)*t,268+(91-268)*t);ctx.stroke();}
+  ctx.fillStyle='rgba(34,141,92,.12)';ctx.beginPath();ctx.moveTo(52,236);ctx.lineTo(211,73);ctx.lineTo(506,105);ctx.lineTo(458,248);ctx.closePath();ctx.fill();
+  drawIsoBlock(ctx,214,118,72,56,27); drawIsoBlock(ctx,356,163,78,48,22);
+}
+
 export const HyTrajectory: React.FC<WidgetProps> = () => {
   const [trajectory, setTrajectory] = useState<TrajectoryName>('漫游');
   const [stage, setStage] = useState<PlannerStage>(0);
@@ -207,16 +224,15 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
       <div className="trajectory-planner-stage">
         <CanvasView height={300} animate draw={(ctx, time) => {
           const p = easeInOutQuad(clamp((time - animationStart.current) / (stage === 4 ? 2600 : 950), 0, 1));
-          clearStudio(ctx, 560, 300);
-          ctx.fillStyle = '#edf2e9'; ctx.fillRect(22, 48, 516, 210);
-          ctx.strokeStyle = '#b8c9a7'; ctx.lineWidth = 1.5;
+          drawPerspectiveScene(ctx);
+          ctx.strokeStyle = '#97aa92'; ctx.lineWidth = 1.2;
           [[50,226],[126,184],[182,110],[300,74],[340,126],[470,68],[505,88]].forEach(([x,y], index, nodes) => {
             if (index < nodes.length - 1) { ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(nodes[index + 1][0],nodes[index + 1][1]); ctx.stroke(); }
-            ctx.fillStyle = index === 0 ? C.blue : '#a8b99d'; ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle = index === 0 ? C.blue : '#8fa58b'; ctx.beginPath(); ctx.ellipse(x,y,5,3,0,0,Math.PI*2); ctx.fill();
           });
-          obstacles.forEach((item) => { ctx.fillStyle = '#9ba994'; ctx.fillRect(item.x,item.y,item.w,item.h); ctx.strokeStyle = C.ink; ctx.strokeRect(item.x,item.y,item.w,item.h); });
-          label(ctx,'NavMesh 可走区域',34,34,C.green,12);
-          label(ctx,'障碍',252,128,C.white,11,'center'); label(ctx,'障碍',396,177,C.white,11,'center');
+          label(ctx,'斜俯三维 NavMesh',34,30,C.green,12);
+          label(ctx,'立体障碍',250,118,C.white,10,'center'); label(ctx,'立体障碍',394,161,C.white,10,'center');
+          ctx.strokeStyle='rgba(39,68,110,.28)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(505,88);ctx.lineTo(505,43);ctx.stroke();ctx.setLineDash([]);label(ctx,'远端目标高度',516,47,C.blue,9,'right');
           target(ctx,routeInfo.path[routeInfo.path.length - 1][0],routeInfo.path[routeInfo.path.length - 1][1],stage === 4 && p > .9);
           if (trajectory === '常规') {
             [[118,184],[170,224],[280,62],[470,205]].forEach(([x,y])=>{ctx.strokeStyle=C.blue;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(62,226);ctx.lineTo(x,y);ctx.stroke();ctx.fillStyle=C.blue;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();});
