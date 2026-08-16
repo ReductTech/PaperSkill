@@ -4,7 +4,7 @@ import type { WidgetProps } from './registry';
 
 const W=560,H=250,MW=244,MH=130;
 const C={desk:'#f5f8f0',paper:'#fff',shadow:'#b8c9a7',contour:'#76906a',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#d97706',purple:'#7c3aed',text:'#21324a',muted:'#68778f',border:'#d7deea'};
-type Phase='base'|'add'|'source'|'preserve';type Source='generation'|'2d'|'3d';
+type Phase='base'|'add'|'source'|'preserve';type Source='generation'|'2d'|'3d';type RetentionView='generation'|'editing';
 interface MixState{phase:Phase;sourceFocus:Source;hasMixed:boolean;dropletProgress:number;}
 function compactMode(id:string){return !/^\d+(\.\d+)?$/.test(id);}
 function sheet(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number){ctx.fillStyle=C.shadow;ctx.fillRect(x+3,y+4,w,h);ctx.fillStyle=C.paper;ctx.fillRect(x,y,w,h);ctx.strokeStyle=C.border;ctx.strokeRect(x,y,w,h);}
@@ -20,7 +20,7 @@ function drawMain(ctx:CanvasRenderingContext2D,state:MixState){ctx.clearRect(0,0
   outputCard(ctx,390,48,'普通生成',state.phase==='base'||state.phase==='preserve','gen');outputCard(ctx,390,100,'分割 RGB',state.phase==='add'||state.phase==='source','seg');outputCard(ctx,390,152,'深度 RGB',state.phase==='add'||state.phase==='source','depth');
   ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(160,122);ctx.lineTo(188,122);ctx.moveTo(328,122);ctx.lineTo(384,122);ctx.stroke();if(state.phase==='preserve')seal(ctx,348,190,'近似保留');}
 
-export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const compact=compactMode(moduleId);const canvasRef=useRef<HTMLCanvasElement>(null);const [state,setState]=useState<MixState>({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0});
+export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const compact=compactMode(moduleId);const canvasRef=useRef<HTMLCanvasElement>(null);const [state,setState]=useState<MixState>({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0});const [retentionView,setRetentionView]=useState<RetentionView>('generation');
   useEffect(()=>{const canvas=canvasRef.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,compact?MW:W,compact?MH:H);}catch{return;}const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;let raf:number|null=null;const frame=(now:number)=>{compact?drawMini(ctx,now,reduced):drawMain(ctx,state);canvas.classList.add('is-ready');raf=compact&&!reduced?requestAnimationFrame(frame):null;};const start=()=>{if(raf===null)raf=requestAnimationFrame(frame);};const stop=()=>{if(raf!==null)cancelAnimationFrame(raf);raf=null;};const disconnect=observeCanvas(canvas,start,stop);return()=>{stop();disconnect();};},[compact,state]);
   const feedback=useMemo(()=>{if(state.phase==='base')return'Nano Banana Pro 先通过图像生成预训练获得广泛生成先验；此时不保证稳定输出可解码的视觉任务格式。';if(state.phase==='add')return'论文把视觉任务数据以“很低比例”混入原训练混合；具体比例没有披露。';if(state.phase==='source')return state.sourceFocus==='2d'?'2D 指令数据来自网页抓取图像的内部模型标注。':state.sourceFocus==='3d'?'3D 指令数据来自渲染引擎生成的合成数据；深度训练不使用真实世界深度数据。':'对应评测基准的训练数据没有进入指令微调混合。';return'下方两项人类偏好记录接近 50% 分界，证据支持“近似持平”，不是每项都更好。';},[state]);
   if(compact)return <canvas ref={canvasRef} width={MW} height={MH} aria-label="滴管向原生成调色盘加入定性的少量任务格式数据"/>;
@@ -28,9 +28,23 @@ export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const
   return <div>
     <div className="paper-step-group" role="group" aria-label="训练混合阶段"><button type="button" aria-current={state.phase==='base'?'step':undefined} onClick={()=>setPhase('base')}>① 看原训练混合</button><button type="button" aria-current={state.phase==='add'?'step':undefined} onClick={()=>setPhase('add')}>② 加入视觉任务数据</button><button type="button" aria-current={state.phase==='source'?'step':undefined} onClick={()=>setPhase('source')}>③ 核对数据来源</button><button type="button" aria-current={state.phase==='preserve'?'step':undefined} onClick={()=>setPhase('preserve')}>④ 查看保留能力</button></div>
     <div className="paper-choice-group" role="group" aria-label="数据来源"><button type="button" aria-pressed={state.sourceFocus==='generation'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'generation'}))}>原图像生成数据</button><button type="button" aria-pressed={state.sourceFocus==='2d'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'2d'}))}>2D 网页图像标注</button><button type="button" aria-pressed={state.sourceFocus==='3d'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'3d'}))}>3D 合成渲染数据</button></div>
-    <div className="paper-action-group"><button type="button" onClick={()=>setState(s=>({...s,phase:'add',hasMixed:true,dropletProgress:s.dropletProgress===1?.65:1}))}>演示少量数据加入</button><button type="button" className="paper-reset-button" onClick={()=>setState({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0})}>重置训练示意</button></div>
+    <div className="paper-action-group"><button type="button" onClick={()=>setState(s=>({...s,phase:'add',hasMixed:true,dropletProgress:s.dropletProgress===1?.65:1}))}>演示少量数据加入</button><button type="button" className="paper-reset-button" onClick={()=>{setState({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0});setRetentionView('generation');}}>重置训练示意</button></div>
     <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} style={{maxWidth:'100%',height:'auto'}} aria-label="原图像生成数据保持在混合中，少量视觉任务数据只作定性示意"/>
     <div className={`feedback ${state.phase==='preserve'?'good':''}`} role="status" aria-live="polite">{feedback}</div>
+    {state.phase==='preserve'&&<section className="paper-retention-evidence" aria-labelledby={`retention-title-${chapterId}-${moduleId}`}>
+      <header className="paper-retention-evidence-header"><span>论文定性证据</span><h4 id={`retention-title-${chapterId}-${moduleId}`}>微调前后的生成结果仍然高度相似</h4><p>先看图像内容，再结合下方接近 50% 的成对人评；二者共同支持“生成能力大体保留”。</p></header>
+      <div className="paper-choice-group" role="tablist" aria-label="选择生成能力对比图">
+        <button type="button" role="tab" aria-selected={retentionView==='generation'} onClick={()=>setRetentionView('generation')}>文生图 · 图 11</button>
+        <button type="button" role="tab" aria-selected={retentionView==='editing'} onClick={()=>setRetentionView('editing')}>图像编辑 · 图 12</button>
+      </div>
+      {retentionView==='generation'?<figure className="paper-evidence-figure">
+        <img src="/images/paper-generation-retention.png" alt="论文图11：Vision Banana与Nano Banana Pro在四条GenAI-Bench提示上的文生图左右对比" loading="lazy"/>
+        <figcaption><strong>图 11｜文生图能力对比</strong><span>每行左侧是 Vision Banana，右侧是 Nano Banana Pro。幽灵船、森林提灯、黄色出租车和樱花园武士四组结果在语义、构图与细节质量上接近。</span></figcaption>
+      </figure>:<figure className="paper-evidence-figure">
+        <img src="/images/paper-editing-retention.png" alt="论文图12：原图、Vision Banana与Nano Banana Pro在四条ImgEdit指令上的图像编辑对比" loading="lazy"/>
+        <figcaption><strong>图 12｜图像编辑能力对比</strong><span>每行从左到右是原图、Vision Banana 和 Nano Banana Pro。两种模型都能完成场景替换、物体移除、车辆改色与办公室背景编辑。</span></figcaption>
+      </figure>}
+    </section>}
     <dl className="paper-fact-grid"><dt>GenAI-Bench 文生图</dt><dd>Vision Banana 对 Nano Banana Pro 胜率 53.5%</dd><dt>ImgEdit 图像编辑</dt><dd>Vision Banana 对 Nano Banana Pro 胜率 47.8%</dd><dt>读法</dt><dd>50% 表示双方持平；两项合看支持近似保留生成能力。</dd></dl>
   </div>;
 };

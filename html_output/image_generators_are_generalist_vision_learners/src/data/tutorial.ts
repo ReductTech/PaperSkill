@@ -231,7 +231,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           id: '5.1',
           title: '四条证据共同完成能力归因',
-          desc: '依次查看原生成预训练、低比例任务数据、数据来源与生成能力保留，理解论文如何把多条证据连成能力归因链。',
+          desc: '依次查看原生成预训练、低比例任务数据、数据来源与生成能力保留；最后切换论文图 11、图 12，对照微调前后的文生图与图像编辑结果。',
           componentId: 'instruction-mix',
         },
       ],
