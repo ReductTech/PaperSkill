@@ -1,0 +1,6 @@
+import React, { useEffect, useRef } from 'react';
+import { observeCanvas, setupCanvas } from '../lib/canvasKit';
+import type { WidgetProps } from './registry';
+
+export const Analogy6: React.FC<WidgetProps> = () => { const ref=useRef<HTMLCanvasElement>(null);useEffect(()=>{const canvas=ref.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,244,130);}catch{return;}const render=()=>{ctx.clearRect(0,0,244,130);ctx.fillStyle='#f5f8f0';ctx.fillRect(0,0,244,130);const holds=[[35,92],[82,72],[133,49],[190,30]];ctx.strokeStyle='#d7deea';ctx.lineWidth=2;ctx.beginPath();holds.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();holds.forEach(([x,y],i)=>{ctx.strokeStyle=i===2?'#228d5c':'#76906a';ctx.lineWidth=i===2?4:2;ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.stroke();});ctx.strokeStyle='#27446e';ctx.lineWidth=3;ctx.beginPath();ctx.arc(82,83,10,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(82,93);ctx.lineTo(82,112);ctx.moveTo(82,96);ctx.lineTo(108,65);ctx.stroke();ctx.fillStyle='#21324a';ctx.font='13px system-ui';ctx.fillText('前进一步',92,120);canvas.classList.add('is-ready');};const d=observeCanvas(canvas,render,()=>{});render();return d;},[]);return <canvas ref={ref} width={244} height={130} role="img" aria-label="一个攀岩者沿固定线路向绿色目标岩点前进一步"/>;};
+export default Analogy6;

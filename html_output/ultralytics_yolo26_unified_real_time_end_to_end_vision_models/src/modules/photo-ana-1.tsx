@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna1:React.FC<WidgetProps>=()=> <AnalogyScene action="watch" label="守卫上报可疑区域"/>;

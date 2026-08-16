@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna8:React.FC<WidgetProps>=()=> <AnalogyScene action="dispatch" label="指挥中心选择方案"/>;
