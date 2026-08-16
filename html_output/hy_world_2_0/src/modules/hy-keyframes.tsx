@@ -119,9 +119,14 @@ export const HyTrajectory: React.FC<WidgetProps> = () => { const [mode,setMode]=
 
 const keyframePoints: Array<[number, number]> = [[48,210],[112,188],[175,151],[235,108],[300,78],[370,68],[444,92],[515,137]];
 const keyframeAngles = [-34,-25,-14,-2,12,25,39,55];
+const keyframePresets = [
+  { id: 'continuous', title: '连续三帧', frames: [0,1,2], note: '重复观察多，首尾跨度小。' },
+  { id: 'middle', title: '中段密集', frames: [2,3,4], note: '覆盖转弯中心，但忽略首尾。' },
+  { id: 'wide', title: '跨视角', frames: [0,3,7], note: '保留起点、中段与远端视角。' },
+] as const;
 
 export const HyKeyframes: React.FC<WidgetProps> = () => {
-  const [selectedFrames, setSelectedFrames] = useState<number[]>([0,1,2]);
+  const [selectedFrames, setSelectedFrames] = useState<number[]>([0,3,7]);
   const ordered = [...selectedFrames].sort((a,b) => a-b);
   const gaps = ordered.slice(1).map((value,index) => value-ordered[index]);
   const minGap = gaps.length ? Math.min(...gaps) : 0;
@@ -130,6 +135,7 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
   const sparse = complete && minGap >= 2;
   const wide = complete && span >= 6;
   const success = sparse && wide;
+  const selectedKey = ordered.join('-');
 
   const toggleFrame = (index: number) => {
     setSelectedFrames((current) => {
@@ -140,15 +146,21 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
   };
 
   const feedback = !complete
-    ? `还需选择 ${3-ordered.length} 帧。关键帧不是越少越好，而是要覆盖足够大的视角变化。`
+    ? `当前保留 ${ordered.length} 帧，还可加入 ${3-ordered.length} 帧。观察指标会实时显示覆盖结构，但这里没有唯一答案。`
     : !sparse
-      ? '三帧中仍有相邻候选，重复观察过多；先撤下一帧，再把它放到更远的视角。'
+      ? '当前三帧彼此相邻，重复观察较多。它适合保留局部连续性，但对大视角变化的覆盖有限。'
       : !wide
-        ? '帧间已经稀疏，但首尾视角跨度仍不够，快速转弯区域可能没有被覆盖。'
-        : '关键帧组合成立：三帧彼此分散，并覆盖了整段快速转弯。下面的论文指标只证明选择性冻结配置的相机控制改进。';
+        ? '当前帧间已经分散，但首尾跨度仍集中在局部区间；转弯两端的观察可能不足。'
+        : '当前组合同时满足教学中的稀疏间隔与首尾跨度，适合观察 Keyframe-VAE 为什么强调跨视角关键帧。';
 
   return (
     <div className="keyframe-lab">
+      <section className="keyframe-task-brief">
+        <div><span>取景任务</span><strong>用固定 3 帧概括一段快速转弯</strong></div>
+        <p><b>目标：</b>减少相邻重复，同时覆盖足够大的视角变化。</p>
+        <p><b>观察：</b>帧数、最小间隔和首尾跨度只用于解释采样结构，不是论文训练超参数。</p>
+      </section>
+
       <CanvasView height={280} draw={(ctx) => {
         clearStudio(ctx,560,280);
         label(ctx,'同一条快速转弯轨迹',30,32,C.ink,14);
@@ -170,8 +182,14 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
       }} />
 
       <div className="keyframe-picker-head">
-        <div><span>从 8 个候选视角中选择 3 帧</span><strong>{ordered.length} / 3 已选</strong></div>
-        <button type="button" aria-label="重置为连续三帧" title="重置为连续三帧" onClick={() => setSelectedFrames([0,1,2])}>↺</button>
+        <div><span>从 8 个候选视角中保留 3 帧</span><strong>{ordered.length} / 3 已选</strong></div>
+      </div>
+
+      <div className="keyframe-presets" role="group" aria-label="切换关键帧取景预设">
+        {keyframePresets.map((preset) => {
+          const active = selectedKey === preset.frames.join('-');
+          return <button key={preset.id} type="button" className={active?'selected':''} aria-pressed={active} onClick={() => setSelectedFrames([...preset.frames])}><strong>{preset.title}</strong><small>{preset.note}</small></button>;
+        })}
       </div>
 
       <div className="keyframe-picker" role="group" aria-label="选择三张关键帧">
@@ -200,7 +218,7 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
         <div className="keyframe-vae"><span>Keyframe-VAE 观察方式</span><strong>{success?'稀疏关键帧覆盖整段转弯':'等待更分散的三帧'}</strong><p>去除时间压缩，优先保留跨视角关键帧的外观与相机条件。</p></div>
       </div>
 
-      <div className={`feedback ${success?'good':complete?'bad':''}`}>{feedback}</div>
+      <div className={`feedback ${success?'good':''}`}>{feedback}</div>
 
       <section className="keyframe-paper-evidence">
         <header><span>论文证据，不由上方选择器计算</span><strong>选择性冻结 Cross-Attn 与 FFN 后，相机误差下降</strong></header>
@@ -214,7 +232,7 @@ export const HyKeyframes: React.FC<WidgetProps> = () => {
         <span>灰色提示：点击术语展开；以下内容用于补充机制直觉，不改变上方论文指标。</span>
       </div>
       <div className="keyframe-glossary-grid">
-        <details><summary>Keyframe-VAE 与 Video-VAE 差在哪？</summary><p>Video-VAE 会同时压缩时间和空间，适合连续视频；WorldStereo 2.0 面对跨视角稀疏关键帧时去掉时间压缩，优先保留单帧外观、几何和相机条件。它不是“只允许三帧”，三帧只是上方谜题规则。</p></details>
+        <details><summary>Keyframe-VAE 与 Video-VAE 差在哪？</summary><p>Video-VAE 会同时压缩时间和空间，适合连续视频；WorldStereo 2.0 面对跨视角稀疏关键帧时去掉时间压缩，优先保留单帧外观、几何和相机条件。它不是“只允许三帧”，三帧只是上方教学沙盘的固定对照条件。</p></details>
         <details><summary>Plücker 射线在告诉模型什么？</summary><p>它把相机中心与像素射线方向编码为逐像素几何条件，帮助模型理解“这条光线从哪里出发、朝哪里看”。它提供相机几何，不等于已经知道场景真实深度。</p></details>
         <details><summary>点图条件为什么能补充射线？</summary><p>点图为像素提供三维位置线索，使模型除了知道观察方向，还能获得显式空间位置参考。论文将射线与点图作为互补相机条件；教程不把二者合成一个虚构控制分数。</p></details>
         <details><summary>为什么选择性冻结会有取舍？</summary><p>冻结 Cross-Attn 与 FFN 的部分参数，可以保留预训练生成先验并减少相机控制训练对它们的扰动。论文消融显示相机误差与泛化更好，但部分视觉指标并非最高，因此不能简单理解为“冻结越多越好”。</p></details>

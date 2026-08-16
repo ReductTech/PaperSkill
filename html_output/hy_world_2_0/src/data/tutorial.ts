@@ -186,8 +186,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "4.1",
-          "title": "关键帧取景谜题",
-          "desc": "从同一条快速转弯轨迹的 8 个候选视角中选择 3 帧，检查相邻重复、首尾跨度与 Keyframe-VAE 的保真逻辑，再阅读论文相机误差证据。",
+          "title": "关键帧取景沙盘",
+          "desc": "在连续三帧、中段密集、跨视角三个预设间切换，或自由改选 8 个候选视角中的 3 帧；观察重复度与首尾跨度如何改变覆盖结构，再阅读独立的论文相机误差证据。",
           componentId: "hy-keyframes"
         }
       ],
