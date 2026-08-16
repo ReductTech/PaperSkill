@@ -750,18 +750,68 @@
   gap: 14px;
 }
 
-.training-cases {
+.training-timeline-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.training-timeline-head > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.training-timeline-head > div:first-child span {
+  color: var(--purple);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.training-timeline-head > div:first-child strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.training-timeline-head > div:nth-child(2) {
+  display: grid;
+  justify-items: end;
+}
+
+.training-timeline-head b {
+  color: var(--blue);
+  font-size: 17px;
+}
+
+.training-timeline-head small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.training-timeline-head > button {
+  padding: 7px 10px;
+  color: var(--blue);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.training-stage-tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
 }
 
-.training-cases button {
+.training-stage-tabs button {
   display: grid;
   gap: 3px;
   min-width: 0;
-  min-height: 76px;
+  min-height: 82px;
   align-content: center;
   padding: 9px 11px;
   color: var(--ink-2);
@@ -773,120 +823,132 @@
   text-align: left;
 }
 
-.training-cases button:hover,
-.training-cases button.selected {
+.training-stage-tabs button:hover,
+.training-stage-tabs button.selected {
   background: var(--blue-soft);
 }
 
-.training-cases button.selected {
+.training-stage-tabs button.selected {
   box-shadow: inset 0 3px 0 var(--blue);
 }
 
-.training-cases button.solved {
-  box-shadow: inset 0 3px 0 var(--green);
-}
-
-.training-cases button span,
-.training-cases button small {
+.training-stage-tabs button span,
+.training-stage-tabs button small {
   color: var(--muted);
   font-size: 10px;
   font-weight: 800;
+  line-height: 1.45;
 }
 
-.training-cases button strong {
+.training-stage-tabs button strong {
   color: var(--ink);
   font-size: 13px;
   line-height: 1.35;
 }
 
-.training-cases button.solved small {
-  color: var(--green);
+.training-stage-tabs button.selected span,
+.training-stage-tabs button.selected small {
+  color: var(--blue);
 }
 
-.training-prescriptions {
+.training-clinic > canvas {
+  width: min(100%, 600px);
+  height: auto !important;
+  aspect-ratio: 600 / 278;
+}
+
+.training-stage-detail {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--purple);
+  border-radius: 5px;
+}
+
+.training-stage-detail header {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.training-stage-detail header span {
+  color: var(--purple);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.training-stage-detail header strong {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.training-stage-detail header small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.training-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
-.training-prescriptions > span {
-  grid-column: 1 / -1;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.training-prescriptions button {
-  display: grid;
-  gap: 3px;
-  min-height: 58px;
-  align-content: center;
-  padding: 8px 10px;
-  color: var(--ink-2);
-  background: #fff;
+.training-detail-grid > div {
+  min-width: 0;
+  padding: 10px 11px;
+  background: var(--paper-scene-bg);
   border: 1px solid var(--line);
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-.training-prescriptions button:hover,
-.training-prescriptions button.selected {
-  border-color: var(--blue);
-}
-
-.training-prescriptions button.correct {
-  color: var(--green);
-  background: #edf8f1;
-  border-color: var(--green);
-}
-
-.training-prescriptions button.wrong {
-  color: var(--red);
-  background: #fff1f2;
-  border-color: var(--red);
-}
-
-.training-prescriptions button strong {
-  color: inherit;
-  font-size: 13px;
-}
-
-.training-prescriptions button small {
-  color: var(--muted);
+.training-detail-grid span,
+.training-order-note strong,
+.training-symptom-strip strong {
+  color: var(--blue);
   font-size: 10px;
-  line-height: 1.4;
+  font-weight: 900;
 }
 
-.training-progress {
+.training-detail-grid p,
+.training-order-note p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.training-order-note {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  gap: 2px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.training-order-note strong {
+  color: var(--purple);
+}
+
+.training-symptom-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 10px;
   align-items: center;
-  padding: 11px 12px;
-  background: var(--paper-scene-bg);
-  border-left: 3px solid var(--purple);
+  padding: 10px 12px;
+  background: #fff7e8;
+  border-left: 3px solid var(--orange);
 }
 
-.training-progress strong {
-  color: var(--ink);
-  font-size: 12px;
+.training-symptom-strip strong {
+  color: var(--orange);
 }
 
-.training-progress span {
+.training-symptom-strip span {
   color: var(--muted);
   font-size: 11px;
   line-height: 1.5;
-}
-
-.training-progress button {
-  padding: 6px 9px;
-  color: var(--blue);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
 }
 
 .dmd-lab {
@@ -4333,7 +4395,7 @@
   gap: 7px;
 }
 
-.contract-claims article {
+.contract-reading-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
@@ -4345,11 +4407,13 @@
   border-left: 4px solid var(--line);
   border-radius: 4px;
   cursor: pointer;
+  text-align: left;
 }
 
-.contract-claims article.active { border-color: var(--blue); }
-.contract-claims article.correct { border-left-color: var(--green); }
-.contract-claims article.incorrect { border-left-color: var(--red); }
+.contract-reading-card:hover { background: var(--paper-scene-bg); }
+.contract-reading-card.active { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.contract-reading-card.supported { border-left-color: var(--green); }
+.contract-reading-card.misread { border-left-color: var(--red); }
 
 .contract-claim-copy {
   display: grid;
@@ -4384,33 +4448,26 @@
   font-weight: 800;
 }
 
-.contract-claims article.correct .contract-claim-copy small { color: var(--green); }
-.contract-claims article.incorrect .contract-claim-copy small { color: var(--red); }
+.contract-reading-card.supported .contract-claim-copy small { color: var(--green); }
+.contract-reading-card.misread .contract-claim-copy small { color: var(--red); }
 
-.contract-answer-pair {
-  display: grid;
-  grid-template-columns: repeat(2, 68px);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.contract-answer-pair button {
-  min-height: 34px;
-  padding: 6px;
-  color: var(--muted);
-  background: #fff;
-  border: 0;
-  font-size: 11px;
+.contract-reading-action {
+  align-self: center;
+  padding: 5px 7px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border: 1px solid #c6d7ea;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 900;
-  cursor: pointer;
+  white-space: nowrap;
 }
 
-.contract-answer-pair button + button { border-left: 1px solid var(--line); }
-.contract-answer-pair button:hover { background: #f5f7fa; }
-.contract-answer-pair button.selected { color: #fff; background: var(--blue); }
-.contract-claims article.correct .contract-answer-pair button.selected { background: var(--green); }
-.contract-claims article.incorrect .contract-answer-pair button.selected { background: var(--red); }
+.contract-reading-card.active .contract-reading-action {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
 
 .contract-glossary-grid {
   display: grid;
@@ -4804,12 +4861,8 @@
     grid-template-columns: 1fr;
   }
 
-  .contract-claims article {
+  .contract-reading-card {
     grid-template-columns: 1fr;
-  }
-
-  .contract-answer-pair {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .panorama-workbench {
@@ -5133,21 +5186,23 @@
     grid-template-columns: 1fr;
   }
 
-  .training-cases,
-  .training-prescriptions {
+  .training-stage-tabs,
+  .training-detail-grid {
     grid-template-columns: 1fr;
   }
 
-  .training-prescriptions > span {
-    grid-column: 1;
+  .training-timeline-head {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .training-progress {
-    grid-template-columns: 1fr;
-  }
-
-  .training-progress button {
+  .training-timeline-head > button {
+    grid-column: 1 / -1;
     width: 100%;
+  }
+
+  .training-stage-detail header,
+  .training-symptom-strip {
+    grid-template-columns: 1fr;
   }
 
   .dmd-noise-tabs,

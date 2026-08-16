@@ -58,8 +58,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "1.2",
-          "title": "统一框架契约校验台",
-          "desc": "判断五条系统声明是否成立，拼出生成、重建与显式资产之间的真实关系，并纠正“单体网络”和“实时生成”两类误读。",
+          "title": "统一系统边界透视台",
+          "desc": "逐条展开五个证据切片，让系统大图只高亮当前关系；直接区分三条论文支持的关系与“单体网络”“实时生成”两类常见误读，无需连续答题。",
           componentId: "hy-boundary-compare",
           "figure": "/images/figure-2-architecture.png"
         }
@@ -306,8 +306,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "6.1",
-          "title": "训练诊断台：给故障开对处方",
-          "desc": "诊断相机控制失灵、跨轨迹漂移和扩散推理过慢三个症状，为它们匹配领域适配、记忆训练或后蒸馏。",
+          "title": "三阶段训练能力时间轴",
+          "desc": "依次点选领域适配、记忆训练和后蒸馏，查看每段的前置条件、引入组件、能力增量与继承关系，并观察相机控制、跨轨迹一致性和四步采样如何逐层累积。",
           componentId: "hy-training-stages"
         },
         {

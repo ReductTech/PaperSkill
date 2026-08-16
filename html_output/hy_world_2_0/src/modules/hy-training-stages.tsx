@@ -11,87 +11,104 @@ function route(ctx:CanvasRenderingContext2D,pts:Array<[number,number]>,color=C.b
 function bars(ctx:CanvasRenderingContext2D,items:Array<{name:string;value:number;display:string;color:string}>,x:number,y:number,maxW=190){const max=Math.max(...items.map(v=>v.value));items.forEach((it,i)=>{label(ctx,it.name,x,y+i*31,C.muted,12);ctx.fillStyle=C.line;ctx.fillRect(x+88,y-12+i*31,maxW,14);ctx.fillStyle=it.color;ctx.fillRect(x+88,y-12+i*31,maxW*it.value/max,14);label(ctx,it.display,x+94+maxW,y+i*31,C.ink,12)})}
 
 const stages=[
-  {t:'领域适配',sub:'关键帧潜空间 + 相机适配器',color:C.blue,ability:'相机控制',why:'先让模型适应关键帧潜空间，并建立精确的相机条件控制。'},
-  {t:'中段记忆训练',sub:'GGM + SSM++',color:C.purple,ability:'跨轨迹一致性',why:'在已有相机控制上加入全局几何记忆和局部选择记忆。'},
-  {t:'后蒸馏',sub:'DMD 四步 DiT',color:C.green,ability:'少步推理',why:'最后压缩已经学好的生成器；蒸馏不是用来重新学习相机或记忆。'},
-];
-const cases=[
-  {title:'镜头不听指令',scene:'关键帧外观清晰，但相机偏离给定轨迹。',expected:0,result:'先完成领域适配，模型才能把关键帧潜空间与相机条件对齐。'},
-  {title:'同一房间越走越变',scene:'单条轨迹可用，跨轨迹生成时结构与纹理逐渐漂移。',expected:1,result:'GGM 守住全局几何，SSM++ 检索局部参考，共同处理跨轨迹一致性。'},
-  {title:'质量够了但推理太慢',scene:'控制和记忆已经学好，但扩散采样步数仍影响生成速度。',expected:2,result:'DMD 在训练完成后把 WorldStereo 2.0 生成器蒸馏为四步 DiT。'},
+  {
+    t:'领域适配',
+    short:'先学会听相机指令',
+    sub:'关键帧潜空间 + 相机适配器',
+    color:C.blue,
+    prerequisite:'预训练视频扩散骨干',
+    introduced:'关键帧 VAE 潜空间、相机条件适配器',
+    ability:'受控相机轨迹生成',
+    inherited:'通用视频生成先验',
+    symptom:'解决“画面能生成，但镜头偏离指定轨迹”。',
+    why:'先把表示空间和相机条件对齐，后续记忆模块才有稳定的受控轨迹可连接。',
+  },
+  {
+    t:'中段记忆训练',
+    short:'再让多条轨迹记住同一世界',
+    sub:'GGM + SSM++',
+    color:C.purple,
+    prerequisite:'已经可控的关键帧轨迹',
+    introduced:'全局几何记忆 GGM、选择性局部记忆 SSM++',
+    ability:'跨轨迹结构与纹理一致性',
+    inherited:'相机控制、关键帧生成能力',
+    symptom:'解决“单条轨迹可用，但回到同一房间时外观和结构变化”。',
+    why:'记忆训练建立在第一阶段的轨迹控制上；否则模型连参考帧与目标视角都难以稳定对应。',
+  },
+  {
+    t:'后蒸馏',
+    short:'最后把成熟生成器压到四步',
+    sub:'DMD 四步 DiT',
+    color:C.green,
+    prerequisite:'已经具备控制与跨轨迹记忆的教师生成器',
+    introduced:'冻结教师、少步学生、DMD 分布匹配目标',
+    ability:'WorldStereo 2.0 四步采样',
+    inherited:'相机控制、全局与局部记忆',
+    symptom:'解决“质量和一致性已建立，但扩散采样步数仍然较多”。',
+    why:'蒸馏负责压缩已学能力，而不是重新学习控制或记忆；过早蒸馏会把不完整教师的缺陷一起压缩。',
+  },
 ];
 
 export const HyTrainingStages:React.FC<WidgetProps>=()=>{
-  const[caseIdx,setCaseIdx]=useState(0);
-  const[choice,setChoice]=useState<number|null>(null);
-  const[solved,setSolved]=useState([false,false,false]);
-  const current=cases[caseIdx];
-  const correct=choice===current.expected;
-  const solvedCount=solved.filter(Boolean).length;
-
-  const prescribe=(stageIdx:number)=>{
-    setChoice(stageIdx);
-    if(stageIdx===current.expected){
-      setSolved((previous)=>previous.map((done,i)=>i===caseIdx?true:done));
-    }
-  };
-  const selectCase=(next:number)=>{
-    setCaseIdx(next);
-    setChoice(null);
-  };
-  const reset=()=>{
-    setCaseIdx(0);
-    setChoice(null);
-    setSolved([false,false,false]);
-  };
+  const[active,setActive]=useState(0);
+  const current=stages[active];
+  const next=()=>setActive(value=>(value+1)%stages.length);
 
   return <div className="training-clinic">
-    <div className="training-cases" role="tablist" aria-label="选择训练故障案例">
-      {cases.map((item,i)=><button key={item.title} type="button" role="tab" aria-selected={caseIdx===i} className={`${caseIdx===i?'selected':''} ${solved[i]?'solved':''}`} onClick={()=>selectCase(i)}><span>案 {i+1}</span><strong>{item.title}</strong><small>{solved[i]?'已诊断':'待诊断'}</small></button>)}
+    <div className="training-timeline-head">
+      <div><span>三阶段训练能力时间轴</span><strong>沿课程顺序检查每一段新增了什么</strong></div>
+      <div><b>0{active+1}/03</b><small>当前阶段</small></div>
+      <button type="button" onClick={next}>下一阶段</button>
+    </div>
+    <div className="training-stage-tabs" role="tablist" aria-label="选择训练阶段">
+      {stages.map((stage,i)=><button key={stage.t} type="button" role="tab" aria-selected={active===i} className={active===i?'selected':''} onClick={()=>setActive(i)}><span>阶段 0{i+1}</span><strong>{stage.t}</strong><small>{stage.short}</small></button>)}
     </div>
     <CanvasView width={600} height={278} draw={(ctx)=>{
       clear(ctx,600,278);
-      label(ctx,`症状：${current.title}`,34,30,C.ink,15);
-      label(ctx,current.scene,34,53,C.muted,12);
+      label(ctx,'能力不是同时出现，而是从左到右累积',34,30,C.ink,15);
+      label(ctx,`当前观察：${current.t}`,34,53,current.color,12);
       stages.forEach((stage,i)=>{
         const x=35+i*188;
-        const chosen=choice===i;
-        const done=solved[i];
-        ctx.fillStyle=chosen?(correct?stage.color:'#fff1f2'):done?'#edf8f1':C.white;
-        ctx.strokeStyle=chosen?(correct?stage.color:C.red):done?C.green:C.line;
-        ctx.lineWidth=chosen?4:2;
+        const selected=active===i;
+        const available=i<=active;
+        ctx.fillStyle=selected?stage.color:available?'#edf8f1':C.white;
+        ctx.strokeStyle=selected?stage.color:available?C.green:C.line;
+        ctx.lineWidth=selected?4:2;
         ctx.beginPath();
         ctx.roundRect(x,82,154,106,7);
         ctx.fill();
         ctx.stroke();
-        label(ctx,`第 ${i+1} 段`,x+77,105,chosen&&correct?C.white:stage.color,11,'center');
-        label(ctx,stage.t,x+77,131,chosen&&correct?C.white:C.ink,13,'center');
-        label(ctx,stage.ability,x+77,157,chosen&&correct?C.white:C.muted,11,'center');
-        if(chosen){
-          label(ctx,correct?'处方命中':'顺序不匹配',x+77,177,correct?C.white:C.red,11,'center');
-        }else if(done){
-          label(ctx,'已掌握',x+77,177,C.green,11,'center');
-        }
-        if(i<2)route(ctx,[[x+154,135],[x+188,135]],solved[i]?C.green:C.line,4,solved[i]?[]:[5,5]);
+        label(ctx,`第 ${i+1} 段`,x+77,105,selected?C.white:stage.color,11,'center');
+        label(ctx,stage.t,x+77,131,selected?C.white:C.ink,13,'center');
+        label(ctx,stage.ability,x+77,157,selected?C.white:available?C.green:C.muted,11,'center');
+        label(ctx,selected?'正在拆解':available?'已经继承':'等待前置',x+77,177,selected?C.white:available?C.green:C.muted,11,'center');
+        if(i<2)route(ctx,[[x+154,135],[x+188,135]],i<active?C.green:C.line,4,i<active?[]:[5,5]);
       });
-      const abilities=[{name:'相机控制',on:solved[0]},{name:'跨轨迹一致',on:solved[1]},{name:'四步生成器',on:solved[2]}];
+      const abilities=[{name:'相机控制',on:active>=0},{name:'跨轨迹一致',on:active>=1},{name:'四步生成器',on:active>=2}];
       abilities.forEach((ability,i)=>{
         const x=65+i*176;
         ctx.fillStyle=ability.on?C.green:C.line;
         ctx.fillRect(x,229,120,10);
         label(ctx,ability.name,x+60,261,ability.on?C.green:C.muted,11,'center');
       });
-      label(ctx,`${solvedCount}/3 个训练故障已定位`,560,212,solvedCount===3?C.green:C.blue,12,'right');
+      label(ctx,`已累积 ${active+1}/3 组能力`,560,212,active===2?C.green:C.blue,12,'right');
     }}/>
-    <div className="training-prescriptions" role="group" aria-label="选择训练处方">
-      <span>为当前症状选择处方：</span>
-      {stages.map((stage,i)=><button key={stage.t} type="button" className={`${choice===i?'selected':''} ${choice===i?(correct?'correct':'wrong'):''}`} aria-pressed={choice===i} onClick={()=>prescribe(i)}><strong>{stage.t}</strong><small>{stage.sub}</small></button>)}
+    <section className="training-stage-detail" aria-live="polite">
+      <header><span>{`阶段 0${active+1}`}</span><strong>{current.t}</strong><small>{current.sub}</small></header>
+      <div className="training-detail-grid">
+        <div><span>前置能力</span><p>{current.prerequisite}</p></div>
+        <div><span>本段引入</span><p>{current.introduced}</p></div>
+        <div><span>能力增量</span><p>{current.ability}</p></div>
+        <div><span>继承能力</span><p>{current.inherited}</p></div>
+      </div>
+      <div className="training-order-note"><strong>为什么放在这里？</strong><p>{current.why}</p></div>
+    </section>
+    <div className="training-symptom-strip">
+      <strong>它主要处理的症状</strong>
+      <span>{current.symptom}</span>
     </div>
-    <div className={`feedback ${choice===null?'':correct?'good':'bad'}`} aria-live="polite">{choice===null?'先读症状，再判断应该在哪个训练阶段处理。':correct?current.result:`“${stages[choice].t}”主要解决${stages[choice].ability}。${stages[current.expected].why}`}</div>
-    <div className="training-progress">
-      <strong>{solvedCount===3?'完整课程已拼好':'课程依赖'}</strong>
-      <span>{solvedCount===3?'先建立控制，再训练记忆，最后蒸馏少步生成器；四步只属于 WorldStereo 2.0 生成器。':'领域适配 → 记忆训练 → 后蒸馏。后续阶段建立在前一阶段已经获得的能力之上。'}</span>
-      <button type="button" onClick={reset}>重新诊断</button>
+    <div className="feedback good">
+      依次点击三个阶段，注意绿色能力条只会向右累积。四步采样是最后对 WorldStereo 2.0 生成器做的蒸馏结果，不代表完整世界生成管线只需四步。
     </div>
   </div>;
 };

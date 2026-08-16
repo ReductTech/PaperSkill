@@ -102,8 +102,6 @@ export const HyInputMode: React.FC<WidgetProps> = () => {
   return <div><CanvasView draw={(ctx)=>{clearStudio(ctx,560,240); label(ctx,'输入',42,35); label(ctx,'目标',448,35); photo(ctx,88,102,C.orange); camera(ctx,270,112,C.blue,.85); route(ctx,[[122,102],[246,112],[406,generation?78:150]],C.blue,5); target(ctx,452,generation?78:150,true); label(ctx,generation?'世界生成':'世界重建',452,generation?84:156,C.green,14,'center'); label(ctx,generation?'补出未见区域':'恢复点图/深度/法线',390,210,C.ink,13);} }/><div className="chip-row">{['文本','单图','多视图','视频'].map(x=><button key={x} className={`chip ${mode===x?'selected':''}`} onClick={()=>setMode(x)}>{x}</button>)}</div><div className="feedback good">{generation?'当前输入适合世界生成：模型需要利用生成先验补出未见区域。':'当前输入适合世界重建：多视图约束用于恢复几何。'}</div></div>;
 };
 
-type ContractAnswer = boolean | null;
-
 const systemClaims = [
   {
     id: 'sparse-generation',
@@ -155,100 +153,69 @@ const systemClaims = [
 type SystemClaimId = typeof systemClaims[number]['id'];
 
 export const HyBoundaryCompare: React.FC<WidgetProps> = () => {
-  const [answers, setAnswers] = useState<Record<SystemClaimId, ContractAnswer>>({
-    'sparse-generation': null,
-    'rich-reconstruction': null,
-    'reconstruction-foundation': null,
-    monolith: null,
-    'realtime-generation': null,
-  });
   const [activeClaimId, setActiveClaimId] = useState<SystemClaimId>('sparse-generation');
   const activeClaim = systemClaims.find(item => item.id === activeClaimId) ?? systemClaims[0];
-  const answeredCount = systemClaims.filter(item => answers[item.id] !== null).length;
-  const correctCount = systemClaims.filter(item => answers[item.id] === item.correct).length;
-  const complete = correctCount === systemClaims.length;
-
-  const answerClaim = (id: SystemClaimId, value: boolean) => {
-    setActiveClaimId(id);
-    setAnswers(current => ({ ...current, [id]: value }));
-  };
-
-  const reset = () => {
-    setAnswers({
-      'sparse-generation': null,
-      'rich-reconstruction': null,
-      'reconstruction-foundation': null,
-      monolith: null,
-      'realtime-generation': null,
-    });
-    setActiveClaimId('sparse-generation');
-  };
+  const activeIndex = systemClaims.findIndex(item => item.id === activeClaim.id);
+  const showSparse = activeClaim.id === 'sparse-generation' || activeClaim.id === 'reconstruction-foundation' || activeClaim.id === 'monolith';
+  const showRich = activeClaim.id === 'rich-reconstruction' || activeClaim.id === 'reconstruction-foundation' || activeClaim.id === 'monolith';
+  const showFoundation = activeClaim.id === 'reconstruction-foundation' || activeClaim.id === 'monolith' || activeClaim.id === 'realtime-generation';
+  const nextClaim = () => setActiveClaimId(systemClaims[(activeIndex + 1) % systemClaims.length].id);
 
   return <div className="contract-lab">
     <div className="contract-head">
-      <div><span>系统契约</span><strong>判断“统一生成与重建”究竟承诺了什么</strong></div>
-      <div><b>{correctCount}/5</b><small>判断正确</small></div>
-      <button type="button" onClick={reset}>重置契约</button>
+      <div><span>系统边界透视台</span><strong>逐条浏览“统一生成与重建”真正包含的范围</strong></div>
+      <div><b>{activeClaim.number}/05</b><small>当前切片</small></div>
+      <button type="button" onClick={nextClaim}>下一条边界</button>
     </div>
 
     <div className="contract-workbench">
       <CanvasView height={310} draw={(ctx) => {
         clearStudio(ctx, 560, 310);
-        const sparseOk = answers['sparse-generation'] === true;
-        const richOk = answers['rich-reconstruction'] === true;
-        const foundationOk = answers['reconstruction-foundation'] === true;
-        const monolithError = answers.monolith === true;
-        const realtimeError = answers['realtime-generation'] === true;
 
         label(ctx, '稀疏条件', 36, 32, C.orange, 12);
         label(ctx, '丰富观测', 36, 250, C.blue, 12);
-        photo(ctx, 75, 77, sparseOk ? C.orange : C.muted, .9);
-        photo(ctx, 75, 225, richOk ? C.blue : C.muted, .9);
-        label(ctx, '文本 / 单图', 75, 111, sparseOk ? C.orange : C.muted, 11, 'center');
-        label(ctx, '多视图 / 视频', 75, 261, richOk ? C.blue : C.muted, 11, 'center');
+        photo(ctx, 75, 77, showSparse ? C.orange : C.muted, showSparse ? .95 : .35);
+        photo(ctx, 75, 225, showRich ? C.blue : C.muted, showRich ? .95 : .35);
+        label(ctx, '文本 / 单图', 75, 111, showSparse ? C.orange : C.muted, 11, 'center');
+        label(ctx, '多视图 / 视频', 75, 261, showRich ? C.blue : C.muted, 11, 'center');
 
         const stageXs = [175, 265, 355];
         const stageNames = ['全景 + 规划', '世界扩展', 'WorldMirror'];
         stageXs.forEach((x, index) => {
-          const active = index < 2 ? sparseOk : foundationOk || richOk;
-          ctx.fillStyle = C.white; ctx.strokeStyle = active ? (index === 2 && foundationOk ? C.green : C.blue) : C.line; ctx.lineWidth = active ? 3 : 1;
+          const active = index < 2 ? showSparse : showFoundation || showRich;
+          ctx.fillStyle = C.white; ctx.strokeStyle = active ? (index === 2 ? C.green : C.blue) : C.line; ctx.lineWidth = active ? 3 : 1;
           ctx.beginPath(); ctx.roundRect(x - 38, index === 2 ? 126 : 60, 76, 58, 5); ctx.fill(); ctx.stroke();
           label(ctx, stageNames[index], x, index === 2 ? 157 : 91, active ? C.ink : C.muted, 11, 'center');
         });
-        if (sparseOk) {
+        if (showSparse) {
           route(ctx, [[106,77],[137,77]], C.orange, 4);
           route(ctx, [[213,77],[227,77]], C.blue, 4);
-          route(ctx, [[303,77],[355,126]], foundationOk ? C.green : C.blue, 4, foundationOk ? [] : [6,5]);
+          route(ctx, [[303,77],[355,126]], showFoundation ? C.green : C.blue, 4, showFoundation ? [] : [6,5]);
         }
-        if (richOk) route(ctx, [[106,225],[317,175]], foundationOk ? C.green : C.blue, 4);
+        if (showRich) route(ctx, [[106,225],[317,175]], showFoundation ? C.green : C.blue, 4);
 
-        ctx.fillStyle = C.white; ctx.strokeStyle = foundationOk ? C.green : C.line; ctx.lineWidth = foundationOk ? 3 : 1;
+        ctx.fillStyle = C.white; ctx.strokeStyle = showFoundation ? C.green : C.line; ctx.lineWidth = showFoundation ? 3 : 1;
         ctx.beginPath(); ctx.roundRect(434, 126, 92, 58, 5); ctx.fill(); ctx.stroke();
-        label(ctx, '3DGS / 几何', 480, 157, foundationOk ? C.green : C.muted, 11, 'center');
-        if (foundationOk) route(ctx, [[393,155],[434,155]], C.green, 4);
+        label(ctx, '3DGS / 几何', 480, 157, showFoundation ? C.green : C.muted, 11, 'center');
+        if (showFoundation) route(ctx, [[393,155],[434,155]], C.green, 4);
 
-        if (monolithError) {
-          ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.setLineDash([7,5]);
-          ctx.strokeRect(130, 44, 276, 156); ctx.setLineDash([]);
-          label(ctx, '误读：一个万能网络', 268, 218, C.red, 12, 'center');
-        } else if (answers.monolith === false) {
-          label(ctx, '多组件系统', 268, 218, C.green, 12, 'center');
+        if (activeClaim.id === 'monolith') {
+          label(ctx, '多个专用组件被组织成统一系统', 280, 218, C.green, 12, 'center');
+          label(ctx, '≠ 一个万能网络', 280, 238, C.red, 11, 'center');
         }
 
-        if (realtimeError) {
-          label(ctx, '⚡ 实时生成？', 480, 80, C.red, 13, 'center');
-          ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(458,91); ctx.lineTo(502,109); ctx.stroke();
-        } else if (answers['realtime-generation'] === false) {
-          label(ctx, '离线生成 → 实时漫游', 480, 80, C.green, 11, 'center');
+        if (activeClaim.id === 'realtime-generation') {
+          label(ctx, '712 秒离线生成', 480, 62, C.red, 11, 'center');
+          label(ctx, '离线生成 → 实时漫游', 480, 92, C.green, 11, 'center');
         }
 
-        ctx.fillStyle = C.white; ctx.strokeStyle = complete ? C.green : C.line; ctx.lineWidth = complete ? 3 : 1;
+        ctx.fillStyle = C.white; ctx.strokeStyle = activeClaim.correct ? C.green : C.red; ctx.lineWidth = 3;
         ctx.beginPath(); ctx.roundRect(136, 269, 290, 27, 4); ctx.fill(); ctx.stroke();
-        label(ctx, complete ? '契约成立：条件分流 + 重建回流 + 显式资产' : `已判断 ${answeredCount}/5，继续校验系统边界`, 281, 287, complete ? C.green : C.muted, 11, 'center');
+        label(ctx, activeClaim.correct ? '论文明确支持这一系统关系' : '这是需要纠正的常见误读', 281, 287, activeClaim.correct ? C.green : C.red, 11, 'center');
       }} />
 
-      <section className={`contract-evidence ${answers[activeClaim.id] === null ? '' : answers[activeClaim.id] === activeClaim.correct ? 'correct' : 'incorrect'}`}>
-        <span>当前条款 {activeClaim.number}</span>
+      <section className={`contract-evidence ${activeClaim.correct ? 'correct' : 'incorrect'}`}>
+        <span>{activeClaim.correct ? '论文支持' : '常见误读'} · 切片 {activeClaim.number}</span>
         <strong>{activeClaim.claim}</strong>
         <p>{activeClaim.evidence}</p>
         <small>{activeClaim.boundary}</small>
@@ -258,26 +225,19 @@ export const HyBoundaryCompare: React.FC<WidgetProps> = () => {
 
     <div className="contract-claims">
       {systemClaims.map(item => {
-        const answer = answers[item.id];
-        const status = answer === null ? 'undecided' : answer === item.correct ? 'correct' : 'incorrect';
-        return <article key={item.id} className={`${status} ${activeClaimId === item.id ? 'active' : ''}`} onClick={() => setActiveClaimId(item.id)}>
+        return <button key={item.id} type="button" className={`contract-reading-card ${item.correct ? 'supported' : 'misread'} ${activeClaimId === item.id ? 'active' : ''}`} aria-pressed={activeClaimId === item.id} onClick={() => setActiveClaimId(item.id)}>
           <div className="contract-claim-copy">
             <i>{item.number}</i>
             <strong>{item.claim}</strong>
-            <small>{answer === null ? '尚未判断' : answer === item.correct ? '判断正确' : '与论文边界冲突'}</small>
+            <small>{item.correct ? '论文明确支持' : '点击查看为何需要纠正'}</small>
           </div>
-          <div className="contract-answer-pair" aria-label={`${item.claim}是否成立`}>
-            <button type="button" className={answer === true ? 'selected' : ''} onClick={(event) => { event.stopPropagation(); answerClaim(item.id, true); }}>成立</button>
-            <button type="button" className={answer === false ? 'selected' : ''} onClick={(event) => { event.stopPropagation(); answerClaim(item.id, false); }}>不成立</button>
-          </div>
-        </article>;
+          <span className="contract-reading-action">展开证据</span>
+        </button>;
       })}
     </div>
 
-    <div className={`feedback ${complete ? 'good' : answeredCount === 5 ? 'bad' : ''}`}>
-      {complete && '系统契约全部成立：稀疏输入走生成、丰富观测走重建，WorldMirror 2.0 又回到生成管线完成三维合成；统一的是系统，不是一个万能网络。'}
-      {!complete && answeredCount < 5 && `已完成 ${answeredCount}/5 条判断。点击条款可查看论文证据与不可外推边界。`}
-      {!complete && answeredCount === 5 && `目前有 ${5 - correctCount} 条判断与论文冲突。优先检查“统一是否等于单体网络”以及“实时漫游是否等于实时生成”。`}
+    <div className="feedback good">
+      这不是答题环节。依次浏览五个切片，可以看到三条论文明确支持的系统关系，以及“单体万能网络”“完整生成实时化”两种常见误读。
     </div>
 
     {activeClaim.id === 'realtime-generation' ? <PaperTable tableId="table-10" /> : null}
