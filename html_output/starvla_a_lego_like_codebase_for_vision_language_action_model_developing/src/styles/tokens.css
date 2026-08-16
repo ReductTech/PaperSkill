@@ -1,0 +1,86 @@
+/* ============================================================
+   StarVLA 交互讲解页 · 设计系统
+   母题：乐高积木（凸点 brick）× 暖纸背景 × 大字讲解
+   零外部字体 / 零外部请求，可离线演示
+   ============================================================ */
+
+:root {
+  /* 纸与墨 */
+  --paper: #f6f2ea;
+  --paper-deep: #efe9dd;
+  --card: #fffdf8;
+  --ink: #20293a;
+  --ink-soft: #4d5a73;
+  --ink-faint: #8a94a9;
+  --line: #e3dccd;
+
+  /* 乐高五色 */
+  --red: #e05252;
+  --red-deep: #c23b3b;
+  --yellow: #f2b53a;
+  --yellow-deep: #d99a1b;
+  --blue: #3f7fbf;
+  --blue-deep: #2f639a;
+  --green: #43a06c;
+  --green-deep: #2f7d50;
+  --purple: #8265c4;
+  --purple-deep: #6649a8;
+
+  /* 语义色规约：红=问题/失败，绿=解决/收益，紫=可替换模块，蓝=中性信息，黄=类比/注意 */
+  --c-fast: var(--red);
+  --c-oft: var(--blue);
+  --c-pi: var(--purple);
+  --c-groot: var(--green);
+
+  /* 排版尺度（投影演示优先，字号偏大） */
+  --content-max: 1080px;
+  --text-max: 740px;
+  --fs-body: 18px;
+  --fs-small: 14.5px;
+  --fs-h1: clamp(46px, 6vw, 76px);
+  --fs-h2: clamp(34px, 4.4vw, 54px);
+  --fs-h3: clamp(22px, 2.2vw, 28px);
+  --lh-body: 1.8;
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 2px 6px rgba(32, 41, 58, 0.06), 0 14px 34px rgba(32, 41, 58, 0.08);
+  --shadow-pop: 0 4px 10px rgba(32, 41, 58, 0.10), 0 22px 48px rgba(32, 41, 58, 0.14);
+  --font: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", "Noto Sans CJK SC", sans-serif;
+  --mono: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* 暖纸上的淡网格，呼应"图纸/工作台" */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(32, 41, 58, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+  z-index: 0;
+}
+
+#root { position: relative; z-index: 1; }
+
+::selection { background: rgba(242, 181, 58, 0.45); }
+
+button { font-family: inherit; cursor: pointer; }
+

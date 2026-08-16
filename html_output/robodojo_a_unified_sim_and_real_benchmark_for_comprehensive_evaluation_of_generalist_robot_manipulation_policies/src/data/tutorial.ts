@@ -1,0 +1,295 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  meta: {
+    titleEn: 'RoboDojo: A Sim-and-Real Benchmark for Generalist Robot Manipulation',
+    titleZh: 'RoboDojo：面向通用机器人操作的仿真与真实评测基准',
+    venue: 'paper-frozen snapshot, 2026',
+    authors: 'RoboDojo authors',
+    affiliation: 'Multi-institution robot manipulation benchmark project',
+    domain: 'Robotics / Benchmark / Evaluation Infrastructure',
+    coreProblem:
+      'RoboDojo 的贡献不是造出一个更聪明的机器人，而是建立一套更系统的考试，让我们知道机器人究竟哪里会、哪里不会，以及到了真实世界以后是否仍然可靠。',
+    coreInsight:
+      '旧 benchmark 往往任务简单、短时或技能覆盖有限；RoboDojo 把 <b>simulation capability diagnosis</b> 与 <b>reproducible real-world validation</b> 放进同一套 sim-and-real 评测基础设施。',
+    keywords: ['42 simulation tasks', '18 real-world tasks', 'Score / Success Rate'],
+  },
+  hero: {
+    oldMethod: {
+      desc: '只看单题高分，容易把“会做这题”误读成“机器人通用”。',
+      componentId: 'hero-old',
+    },
+    newMethod: {
+      desc: 'RoboDojo 用五维仿真诊断 + 标准化真实验证，把“会、稳、泛化、通用”拆开看。',
+      componentId: 'hero-new',
+    },
+  },
+  chapters: [
+    {
+      kind: 'chapter',
+      id: 'chap-1',
+      title: '一次高分，能证明机器人“通用”吗？',
+      badge: 'inf',
+      badgeLabel: '问题入口',
+      bridge: '我们先亲自踩一下“单任务高分”的陷阱，再引出为什么 RoboDojo 要做 sim-and-real benchmark。',
+      analogy: {
+        title: '像一次测验只考一道题',
+        text: '一道题 90 分不等于整门课都掌握。机器人也一样：单个 pick-and-place 高分，只是局部证据。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '1.1',
+          title: 'Sweep-blocks：局部高分之后，我们继续追问',
+          desc: '先看机器人是否能拿起刷子；播放到 3 秒后暂停，再追问它是否真的能利用刷子完成扫块目标。',
+          componentId: 'sweep-blocks-probe',
+        },
+        {
+          kind: 'module',
+          id: '1.2',
+          title: '只测 Sim、只测 Real，还是两者都要？',
+          desc: '切换三种评测视角，比较它们各自能回答什么问题。',
+          componentId: 'eval-scope-switch',
+        },
+      ],
+      insight: 'RoboDojo 不是新的 robot policy，而是一套用于 generalist robot manipulation 的统一 sim-and-real benchmark 和 evaluation infrastructure。',
+      takeaways: [
+        { icon: '1', title: '单题不够', desc: '局部成功不能证明通用。' },
+        { icon: '2', title: '能力要拆开', desc: '泛化、记忆、长程、精细、开放目标都要看。' },
+        { icon: '3', title: 'Sim 与 Real 互补', desc: '一个诊断能力，一个检验真实可靠性。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-2',
+      title: '42 道仿真题，真正考的是五种能力',
+      badge: 'inf',
+      badgeLabel: '能力地图',
+      bridge: '现在我们把 42 个 simulation tasks 收束为五个 capability dimension，而不是把任务清单铺满页面。',
+      analogy: {
+        title: '像体能测试分项目',
+        text: '跑得快、记得住、动作稳、控制准、能应变，分项目看才知道短板在哪里。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '2.1',
+          title: '点击五维能力，看代表任务与失败模式',
+          desc: 'Simulation 共 42 tasks：Generalization 12、Memory 6、Long-Horizon 8、Precision 8、Open 8；每个 task 50 episodes，Generalization 含 25 standard 和 25 random。',
+          componentId: 'capability-selector',
+        },
+      ],
+      insight: '五维不是装饰分类，而是让“哪里会、哪里不会”可诊断。',
+      takeaways: [
+        { icon: '1', title: '42 题', desc: '覆盖五种能力，而不是一个总题库。' },
+        { icon: '2', title: '代表视频', desc: '每个维度用一个具体任务形成直觉。' },
+        { icon: '3', title: '等权 Overall', desc: '最终仿真结果按五个维度等权，而不是直接按 42 题平均。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-3',
+      title: '分数到底怎么算：完成与“做到一半”是两回事',
+      badge: 'both',
+      badgeLabel: '指标解释',
+      bridge: '现在我们把 Success Rate 和 Average Score 分开讲，避免把“过程进展”和“最终完成”混为一谈。',
+      analogy: {
+        title: '像拼完才算通关',
+        text: '中间拼对几块能说明有进展，但最后一块没到位，通关仍然不是 1。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '3.1',
+          title: '逐步推进任务：Score 会涨，SR 不一定变 1',
+          desc: 'Success Rate 表示 binary final completion；Average Score 表示 partial task progress。真实 RoboDojo 不采用一个统一子步骤权重公式。',
+          componentId: 'score-stepper',
+        },
+        {
+          kind: 'module',
+          id: '3.2',
+          title: 'Overall calculator：五维等权，而不是 42 题大平均',
+          desc: '拖动 Open 维度示例分，观察五维等权和按任务数量粗平均会给出不同倾向。',
+          componentId: 'overall-calculator',
+        },
+      ],
+      formula: {
+        lead: '教学中只需要记住聚合方向，而不是编造统一 task-specific Score 权重。',
+        unicode: 'Overall_sim = mean(Generalization, Memory, Long-Horizon, Precision, Open)',
+        symbols: [
+          { sym: 'Overall_sim', desc: '仿真总结果，先按五个能力维度汇总后等权平均。' },
+          { sym: 'SR', desc: 'Success Rate，最终完整成功的二元完成率。' },
+          { sym: 'Score', desc: 'Average Score，反映部分任务进展；不同任务的评分细节不能被统一伪造成一个公式。' },
+        ],
+      },
+      takeaways: [
+        { icon: '1', title: 'SR 很严格', desc: '没完整成功就是 0。' },
+        { icon: '2', title: 'Score 看进展', desc: '它能保留做到一半的信息。' },
+        { icon: '3', title: 'Overall 有层级', desc: '五维等权，不能直接把 42 个 task 混算。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-4',
+      title: '为什么还要真实世界？看起来一样，其实不是一回事',
+      badge: 'inf',
+      badgeLabel: 'Sim / Real',
+      bridge: '现在我们用 classify_objects 的 sim / real 视频同步对比，强调它们是互补评测设置，不是一一配对的 sim-to-real transfer benchmark。',
+      analogy: {
+        title: '像在练习场和正式场地',
+        text: '动作看起来相似，但地面、灯光、噪声和器材反馈不同；真正要问的是输入和物理从哪里来。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '4.1',
+          title: '同步观看 classify_objects：SIM / REAL 的差别在哪里？',
+          desc: '左右视频可以同步播放和暂停。即使同名 classify_objects，simulation 是三类物体、三个篮子；Piper X real-world 是两类物体、两个篮子。',
+          componentId: 'sim-real-sync',
+        },
+      ],
+      insight: '区别不是任务画面像不像，而是 observation 和 physics 从哪里来。',
+      takeaways: [
+        { icon: '1', title: 'Simulation 快', desc: '可扩展、可复现、适合能力诊断。' },
+        { icon: '2', title: 'Real 直接', desc: '能反映真实接触、传感噪声和执行误差。' },
+        { icon: '3', title: '不是配对迁移', desc: 'sim / real 是 complementary evaluation settings。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-5',
+      title: '三套系统怎样把一场“综合考试”跑起来',
+      badge: 'trn',
+      badgeLabel: '系统结构',
+      bridge: '现在我们从三套系统解释 RoboDojo 的基础设施：XPolicyLab 是统一插头，Simulation Platform 是高速诊断考场，RoboDojo-RealEval 是标准化真实考场。',
+      analogy: {
+        title: '像同一张准考证进入不同考场',
+        text: '参赛者不该因为门口接口不同被扣分；统一入口后，能力差异才更可比较。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '5.1',
+          title: '点击系统节点：Policy 如何接入两条评测路径？',
+          desc: 'Policy → XPolicyLab → Simulation Platform；Policy → XPolicyLab → RoboDojo-RealEval。',
+          componentId: 'system-architecture',
+        },
+        {
+          kind: 'module',
+          id: '5.2',
+          title: '异构并行为什么更快？',
+          desc: '逐步比较 cloned environment 与 heterogeneous parallelism，并保留论文中的 interactions/s 数字。',
+          componentId: 'parallelism-stepper',
+        },
+      ],
+      takeaways: [
+        { icon: '1', title: 'Simulation Platform', desc: 'Isaac Sim / Isaac Lab，配置化任务和异构并行。' },
+        { icon: '2', title: 'RoboDojo-RealEval', desc: '固定相机、光照、布局重放和云端评分。' },
+        { icon: '3', title: 'XPolicyLab', desc: '统一观察-动作接口、训练模板、部署流程和评测脚本。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-6',
+      title: '怎么做到快、稳、公平',
+      badge: 'trn',
+      badgeLabel: '复现机制',
+      bridge: '如果被问到真实评测怎么保证复现，我们就看这里：真实评测不是把机器人放上桌就算公平，还要尽量恢复相机、光照、机器人位置和初始布局。',
+      analogy: {
+        title: '像把考场座位线对齐',
+        text: '每次考试前都按参照线摆好桌面，才能把模型能力和 reset 偏差分开。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '6.1',
+          title: 'RoboDojo-RealEval Layout Overlay：拖拽恢复初始场景',
+          desc: '真正可拖拽的 layout replay 教学重建：根据 JSON 中 source / target normalized coordinates 映射 mug 位置，支持 mouse 与 touch pointer events。',
+          componentId: 'layout-overlay-drag',
+        },
+        {
+          kind: 'module',
+          id: '6.2',
+          title: 'Public Layout / Hidden Verification：为什么能更公平？',
+          desc: '切换公开布局和隐藏验证，理解 benchmark stability、3 seeds、mean / std 与真实评测成本。',
+          componentId: 'stability-switch',
+        },
+      ],
+      insight: 'RoboDojo-RealEval 的 layout overlay replay 标准化的是评测前真实场景 reset，不是 policy 自己完成的 manipulation task。',
+      takeaways: [
+        { icon: '1', title: '快', desc: '仿真端通过异构并行提升吞吐。' },
+        { icon: '2', title: '稳', desc: '真实端通过固定姿态、光照和 layout replay 降低 variation。' },
+        { icon: '3', title: '公平', desc: 'hidden verification 降低只针对公开布局调参。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-7',
+      title: 'RoboDojo 真正测出了什么？',
+      badge: 'both',
+      badgeLabel: '关键结果',
+      bridge: '现在我们不照搬完整 leaderboard，只保留 4 个关键 finding，再用 Leaderboard Mountain 看 Top-10 robot policies 的 capability fingerprint。',
+      analogy: {
+        title: '像成绩单不是只看总名次',
+        text: '第一名仍可能有短板；看分项能力，才知道脆弱在哪里。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '7.1',
+          title: 'Result Race：机器人和人类的差距',
+          desc: 'Best robot simulation：Hy-Embodied-0.5-VLA 13.07 Score / 8.80% SR；Human 80.42 / 76.03%。',
+          componentId: 'result-race',
+        },
+        {
+          kind: 'module',
+          id: '7.2',
+          title: 'Leaderboard Mountain：Top-10 排名与五维画像',
+          desc: '使用论文 Table 1 frozen snapshot（2026-07-03），严格显示 JSON 中 Top-10。排名依据 Average Score，不是 Success Rate，也不是实时 leaderboard。',
+          componentId: 'leaderboard-mountain',
+        },
+      ],
+      insight: 'Leaderboard 不只是排谁第一，更重要的是揭示每个模型到底在哪些能力上强、哪些能力上脆弱。',
+      takeaways: [
+        { icon: '1', title: '总体差距大', desc: '8.80% SR vs human 76.03%。' },
+        { icon: '2', title: '随机化会崩', desc: 'Hy-Embodied standard 21.98 到 random 1.57，drop 92.9%。' },
+        { icon: '3', title: 'Open / Real 仍弱', desc: 'π0.5 Open SR 1.67%；Real-world SR 12.8% vs human 100%。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-8',
+      title: '最后的判断：会 ≠ 稳 ≠ 泛化 ≠ 真正通用',
+      badge: 'both',
+      badgeLabel: '收束判断',
+      bridge: '最后把整套教程收束成一句可带走的判断：RoboDojo 的贡献是更系统的考试，而不是一个更聪明的机器人。',
+      analogy: {
+        title: '像一本能力护照',
+        text: '护照上不能只盖一个章。会做、稳定、泛化、真实可靠，每一项都要单独过关。',
+        componentId: 'analogy-scene',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '8.1',
+          title: 'Diagnostic Passport：给虚构机器人做能力判读',
+          desc: '选择一个虚构能力画像。它不绑定论文模型名，也不伪造真实实验数字，只用来训练判断。',
+          componentId: 'diagnostic-passport',
+        },
+      ],
+      insight: 'Simulation 告诉我们它会不会；Real-world 告诉我们它靠不靠谱。',
+      takeaways: [
+        { icon: '1', title: '边界 1', desc: 'real-world benchmark 是 compact suite，当前 3 个真实机器人 embodiment。' },
+        { icon: '2', title: '边界 2', desc: 'sim / real 不是一一配对，real-world 仍包含人工评分。' },
+        { icon: '3', title: '未来扩展', desc: 'dexterous、humanoid whole-body、tactile、mobile manipulation。' },
+      ],
+    },
+  ],
+};
