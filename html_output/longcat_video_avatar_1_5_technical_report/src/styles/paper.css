@@ -37,6 +37,19 @@
 
 .hero-compare .bg-side.new .bg-side-head { color: #176b50; }
 
+.hero-compare .bg-side.old .bg-side-head,
+.hero-compare .bg-side.new .bg-side-head { font-size: 0; }
+
+.hero-compare .bg-side.old .bg-side-head::after {
+  content: 'v1.0 / 研究型基线';
+  font-size: 15px;
+}
+
+.hero-compare .bg-side.new .bg-side-head::after {
+  content: 'LongCat-Video-Avatar 1.5';
+  font-size: 15px;
+}
+
 .hero-compare .bg-side-tag {
   min-height: 84px;
   padding: 14px 22px 16px;
@@ -71,6 +84,136 @@
   border: 0;
   box-shadow: none;
 }
+
+.lc-canvas-shell.compact {
+  margin-top: 8px;
+  padding: 7px;
+  background:
+    linear-gradient(rgba(39, 68, 110, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39, 68, 110, 0.035) 1px, transparent 1px),
+    #f8faf7;
+  background-size: 24px 24px;
+}
+
+.lc-subfigure-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 8px;
+  color: var(--ink);
+}
+
+.lc-subfigure-head span {
+  padding: 4px 8px;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: var(--ui-radius-pill);
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.lc-subfigure-head b { font-size: 15px; }
+
+.lc-pipeline-note {
+  margin-top: 8px;
+  padding: 10px 13px;
+  color: var(--slate);
+  background: #f5f8fb;
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.lc-pipeline-note b { color: var(--ink); }
+
+/* ELF-inspired information hierarchy, adapted to this paper's seven-part story. */
+section.chap {
+  position: relative;
+  overflow: hidden;
+}
+
+section.chap::before {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  left: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--green), transparent 88%);
+  border-radius: 0 0 4px 4px;
+  content: '';
+}
+
+.chap-title {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(39, 68, 110, 0.11);
+}
+
+.flow-mini {
+  padding: 11px 13px;
+  background: #fbfcfe;
+  border-color: rgba(39, 68, 110, 0.16);
+}
+
+.flow-step {
+  gap: 4px;
+  padding-inline: 9px;
+  font-size: 13px;
+}
+
+.flow-step::after { color: inherit; font-weight: 700; }
+.flow-step[data-step='1']::after { content: ' 现状'; }
+.flow-step[data-step='2']::after { content: ' 音频'; }
+.flow-step[data-step='3']::after { content: ' 逐帧'; }
+.flow-step[data-step='4']::after { content: ' 加速'; }
+.flow-step[data-step='5']::after { content: ' 多人'; }
+.flow-step[data-step='6']::after { content: ' 数据'; }
+.flow-step[data-step='7']::after { content: ' 结果'; }
+
+.chap-bridge {
+  background:
+    radial-gradient(circle at 96% 12%, rgba(34, 141, 92, 0.10), transparent 25%),
+    linear-gradient(135deg, #f3f7fc 0%, #eef8f3 100%);
+  border-color: rgba(39, 68, 110, 0.16);
+  box-shadow: 0 10px 26px rgba(31, 55, 86, 0.055);
+}
+
+.cb-icon {
+  color: var(--blue);
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 0;
+}
+
+.cb-icon::before { font-size: 27px; }
+#chap-1 .cb-icon::before { content: '🎯'; }
+#chap-2 .cb-icon::before { content: '🎧'; }
+#chap-3 .cb-icon::before { content: '📍'; }
+#chap-4 .cb-icon::before { content: '⚡'; }
+#chap-5 .cb-icon::before { content: '🔇'; }
+#chap-6 .cb-icon::before { content: '🔍'; }
+#chap-7 .cb-icon::before { content: '📊'; }
+
+.cb-title {
+  color: var(--blue);
+  letter-spacing: 0.06em;
+}
+
+.cb-text b,
+.analogy-text b,
+.module-desc b,
+.insight-bar b { color: var(--ink); font-weight: 800; }
+
+.module-desc em,
+.insight-bar em { color: var(--blue); font-style: normal; font-weight: 700; }
+
+.analogy-card {
+  border-color: rgba(217, 119, 6, 0.28);
+  box-shadow: 0 10px 24px rgba(134, 92, 23, 0.055);
+}
+
+.analogy-title { font-size: 17px; }
 
 .lc-chip-row {
   justify-content: center;
@@ -137,4 +280,6 @@
   .lc-evidence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lc-model-summary { grid-template-columns: 1fr; }
   .lc-chip-row .chip { flex: 1 1 42%; justify-content: center; }
+  .flow-step::after { display: none; }
+  .lc-subfigure-head { align-items: flex-start; flex-direction: column; gap: 7px; }
 }

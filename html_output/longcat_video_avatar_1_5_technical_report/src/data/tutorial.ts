@@ -14,7 +14,7 @@ export const tutorial: TutorialData = {
   },
   hero: {
     oldMethod: {
-      desc: '这不是论文定义的一条统一“传统架构”，而是把 <b>v1.0 的音频编码、原视频级 GRPO、多步扩散和原双人 MultiTalk</b> 的限制放在同一张概念图中对照。',
+      desc: '左图是一张<b>概念性基线归纳</b>：集中呈现 v1.0 的音频编码、原视频级 GRPO、多步扩散和原双人 MultiTalk 各自暴露的限制，并不代表论文定义了这样一套统一架构。',
       componentId: 'hero-demo',
     },
     newMethod: {
@@ -29,25 +29,25 @@ export const tutorial: TutorialData = {
       title: '这篇论文解决了什么问题？',
       badge: 'inf',
       badgeLabel: '问题地图',
-      bridge: '现有研究 Demo 已经能生成会说话的人物短片。进入真实产品后，复杂发音的识别与声学表征不够准确、局部画面会突然崩坏、扩散推理昂贵、多人容易串音，长视频还会漂移；高质量商业系统又多为闭源，研究社区难以复用。LongCat 1.5 正面回应了这两层落差。',
+      bridge: '这篇论文从一个更实际的问题出发：<b>研究演示为什么还不能稳定进入产品？</b> 已有方法能让人物说话；一旦换成长视频、复杂发音、局部肢体和多人画面，可靠性与成本问题会同时暴露。LongCat 1.5 希望用一套开源方案，<em>把这些分散的产品化缺口连起来</em>。',
       analogy: {
         title: '短片能用，完整产品还差五道关',
-        text: '研究条件下可以生成；商业部署还要持续保证口型、肢体、成本、多人归因和长时稳定。',
+        text: '研究条件下，<b>一次成功就能证明能力</b>；商业部署还要持续保证口型、肢体、成本、多人归因和长时稳定。',
         componentId: 'scene-audition',
       },
       modules: [
         {
           kind: 'module',
           id: '1.1',
-          title: '从研究演示切换到商业部署',
-          desc: '对照两种使用条件，查看研究 Demo 已经具备的能力，以及进入产品前仍需补齐的五项要求。',
+          title: '一张图看懂：研究演示与商业部署差在哪里',
+          desc: '两套验收条件并排展示：研究 Demo 关注<b>能否生成一次</b>，商业系统关注复杂输入下能否<em>长期、重复、低成本地生成</em>。',
           componentId: 'failure-lab',
         },
         {
           kind: 'module',
           id: '1.2',
           title: '五个产品障碍，对应五项关键改进',
-          desc: '点击每个问题，查看 LongCat 1.5 采用的解决思路。',
+          desc: '点击每个问题，查看它从旧方案的哪个限制，转变为 LongCat 1.5 的哪项改进。',
           componentId: 'solution-map',
         },
       ],
@@ -64,10 +64,10 @@ export const tutorial: TutorialData = {
       title: '能说话，但嘴型不够准：Whisper-large',
       badge: 'inf',
       badgeLabel: '音画对齐',
-      bridge: '第一道关卡是声音理解。v1.0 使用 Wav2Vec2，面对复杂发音、多语言和连续音素时，声学表示不够充分，最终会带来口型识别偏差与不连贯。v1.5 将编码器升级为 Whisper-large，以更丰富的音素和上下文信息驱动嘴部运动。',
+      bridge: '上一章把问题分成五类，本章先处理最直接的音画接口：<em>语音究竟提供了多细的时间信息</em>。v1.0 使用 Wav2Vec2；v1.5 改用 Whisper-large，并将 33 层声学表示压缩、重采样，最终 <b>严格对齐到视频潜变量的时间轴</b>。',
       analogy: {
         title: '跟歌词不够，还要跟住每个音素',
-        text: '歌手的嘴型随起音、爆破和收尾连续变化；模型需要同样细的时间刻度。',
+        text: '歌手的嘴型随起音、爆破和收尾连续变化；模型不仅要听懂内容，还要<b>跟住音素何时变化</b>。',
         componentId: 'scene-phoneme',
       },
       modules: [
@@ -75,14 +75,14 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '2.1',
           title: '同一段发音，两种音频编码器',
-          desc: '同步播放 Wav2Vec2 和 Whisper-large 的示意响应；结构、规模和嘴型轨迹会一起更新。',
+          desc: '同步播放两种编码器的示意响应，比较 Wav2Vec2 的迟滞阶梯与 Whisper-large 更连续的音素轨迹。图中轨迹用于<b>解释论文的定性观察</b>；论文没有报告对应的数值消融。',
           componentId: 'phoneme-compare',
         },
         {
           kind: 'module',
           id: '2.2',
           title: '把 33 层声学表示对齐到视频潜变量',
-          desc: '流程图先给出全貌；播放或拖动时间轴，观察 33 层特征如何合并成 5 组、从 50 Hz 对齐到 25 FPS，再匹配 VAE 潜变量并注入 DiT。',
+          desc: '先从微观流程观察 33 层特征如何变成 5 组、从 50 Hz 对齐到 25 FPS；再看下方宏观动画，理解 <b>Audio Projector 与 3D VAE 如何把两条时间轴压到同一潜变量长度</b>，并送入 DiT。',
           componentId: 'audio-alignment',
         },
       ],
@@ -108,10 +108,10 @@ export const tutorial: TutorialData = {
       title: '嘴型准了，但局部会崩：Per-frame GRPO',
       badge: 'both',
       badgeLabel: '逐帧纠错',
-      bridge: '口型对齐后，视频里仍可能突然出现一两帧异常：手指粘连、手臂融化、脸部结构变形，或者前后帧瞬间跳变。论文把这类短时、局部发生的错误作为重点优化对象。传统视频级奖励只给整段一个分数，很难指出具体哪一帧出了问题。',
+      bridge: '声音已经按时间对齐，画面仍可能在某几个局部时刻出现融手、脸部变形或跳帧。关键矛盾是：<em>整段一个分数会冲淡坏帧的位置</em>。Per-frame GRPO 把奖励保留在时间分区上，让 <b>错误发生在哪一段，优化信号就落在哪一段</b>。',
       analogy: {
         title: '整段打低分，不如圈出错拍',
-        text: '制作人会精确标记走音所在的那一拍，避免把整首歌笼统打成低分。',
+        text: '制作人会精确圈出走音所在的那一拍：<b>指出错在哪里</b>，比给整首歌一个低分更容易修正。',
         componentId: 'scene-frame-review',
       },
       modules: [
@@ -152,10 +152,10 @@ export const tutorial: TutorialData = {
       title: '效果好了，但扩散推理太贵：DMD2',
       badge: 'inf',
       badgeLabel: '部署加速',
-      bridge: '基础版有更丰富的动作与表情，但 50 步、每步约 3 次前向，总计 150 NFE，难以支撑成本敏感的服务。',
+      bridge: '质量提升后，下一道门槛是计算成本。Base 需要 50 个去噪步、约 150 NFE；论文用 DMD2 进行分布匹配蒸馏，并用 LoRA 在共享 DiT 上切换角色，目标是 <b>把多步教师压缩成 8 NFE 的 Fast 模型</b>。',
       analogy: {
         title: '从多步教师模型中学会八步生成',
-        text: 'DMD2 属于生成模型蒸馏：快速生成器学习匹配多步扩散教师的输出分布。',
+        text: 'DMD2 属于生成模型蒸馏：快速生成器学习<b>匹配多步教师的生成分布</b>，关注整体分布关系，而非照抄某一张结果。',
         componentId: 'scene-distill',
       },
       modules: [
@@ -192,10 +192,10 @@ export const tutorial: TutorialData = {
       title: '单人好了，但多人会串音：Silent Condition',
       badge: 'both',
       badgeLabel: '多人归因',
-      bridge: '单人场景只有一个声音来源；多人画面中，参考注意力可能把背景人物吸收到目标说话者区域，主讲人的声音于是会驱动背景人物张嘴。论文同时从数据和条件绑定入手：先标注说话人与干净静音片段，再为背景区域提供专用 Silent Condition。',
+      bridge: '单人同步解决的是“何时张嘴”，多人生成还要回答 <em>这段声音属于谁</em>。当背景人物没有独立音频条件时，目标说话人的声音可能错误驱动背景脸。作者为背景区域增加 <b>专用 Silent Condition</b>，从条件层面切断串音。',
       analogy: {
         title: '麦克风分给谁，谁才开口',
-        text: '目标人物各自绑定说话音轨，背景人物则明确绑定静音条件。',
+        text: '目标人物各自领取说话音轨，背景人物也得到一个明确答案：<b>你的音频条件就是静音</b>。',
         componentId: 'scene-routing',
       },
       modules: [
@@ -220,10 +220,10 @@ export const tutorial: TutorialData = {
       title: '片段都过关了，长视频仍可能漂移：数据工程',
       badge: 'trn',
       badgeLabel: '长时稳定',
-      bridge: '作者把数据质量视为模型质量的一部分：来源决定模型能学到哪些能力，标注决定样本能否被准确调用，窗口检查则阻止跳帧、闪白、字幕边框和音画错位进入训练。整套流程先理解完整素材，再验证真正送入训练的局部片段。',
+      bridge: '模型能力的上限由监督质量决定。作者先让不同来源提供互补能力，再离线标注完整视频，最后对真正抽到的训练窗口重新检查。核心原则是：<b>全片合格不等于当前片段合格</b>；进入训练的每个局部窗口都必须可用。',
       analogy: {
         title: '整段合格，截出的几秒也要重新检查',
-        text: '离线标注建立可复用信息；在线验证直接检查本次采样片段。',
+        text: '离线标注先建立整段素材的档案；在线验证再检查<b>这一次真正送进训练的几秒</b>。',
         componentId: 'scene-cleaning',
       },
       modules: [
@@ -248,10 +248,10 @@ export const tutorial: TutorialData = {
       title: '终点：Production-ready Avatar 做到了什么？',
       badge: 'both',
       badgeLabel: '结果与边界',
-      bridge: '五道障碍都被处理后，最后必须回到评测协议：Base 与 Fast 各自擅长什么，8 NFE 又换来了怎样的质量与成本权衡？',
+      bridge: '方法讲完，不能只看“更快”或“更稳”这样的口号。本章回到论文 Table 2，分别读取人类相似度与四类问题率，回答两个问题：<b>Base 保留了什么表现力，Fast 又用哪些质量取舍换来 8 NFE 部署</b>。',
       analogy: {
         title: '把主观观感和具体问题分开评估',
-        text: '人类相似度采用 1–5 分；四类质量指标统计问题发生率。页面会自动标明每项指标的判断方向。',
+        text: '人类相似度采用 1–5 分，四类质量指标统计问题发生率；读表前先看清<b>该指标是越高越好，还是越低越好</b>。',
         componentId: 'scene-finish',
       },
       modules: [

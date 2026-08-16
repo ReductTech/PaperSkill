@@ -48,6 +48,7 @@ function node(
   accent: string,
   surface = '#ffffff',
   textColor = c.text,
+  fontSize = 10.5,
 ) {
   ctx.save();
   ctx.shadowColor = 'rgba(24, 50, 82, 0.08)';
@@ -63,7 +64,7 @@ function node(
   ctx.stroke();
   ctx.fillStyle = accent;
   roundRect(ctx, x, y, 4, h, 3);
-  centeredLabel(ctx, text, x + w / 2 + 2, y + h / 2, textColor, 10.5);
+  centeredLabel(ctx, text, x + w / 2 + 2, y + h / 2, textColor, fontSize);
 }
 
 function arrow(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color = '#9babc0', dashed = false) {
@@ -111,33 +112,33 @@ function drawHeroPipeline(ctx: CanvasRenderingContext2D, variant: 'demo' | 'prod
   ctx.beginPath(); ctx.roundRect(16, 14, 528, 182, 14); ctx.stroke();
   ctx.fillStyle = accent;
   roundRect(ctx, 30, 28, 5, 23, 3);
-  label(ctx, good ? 'LongCat 1.5 · 系统路径' : '研究型基线 · 概念对照', 45, 46, ink, true);
+  label(ctx, good ? 'LongCat-Video-Avatar 1.5' : 'v1.0 / 相关研究基线', 45, 46, ink, true);
 
   if (!good) {
     microLabel(ctx, 'INFERENCE / GENERATION', 34, 69);
-    node(ctx, '参考图 + 语音', 34, 78, 91, 35, c.blue);
-    node(ctx, 'Wav2Vec2', 151, 78, 85, 35, c.red);
-    node(ctx, 'Audio-DiT', 276, 78, 82, 35, c.blue);
-    node(ctx, '多步扩散', 403, 78, 88, 35, c.orange);
-    arrow(ctx, 125, 95.5, 147, 95.5);
-    arrow(ctx, 236, 95.5, 272, 95.5);
-    arrow(ctx, 358, 95.5, 399, 95.5);
+    node(ctx, 'Reference + Audio', 34, 78, 94, 35, c.blue, '#fff', c.text, 9.5);
+    node(ctx, 'Wav2Vec2 Encoder', 151, 78, 102, 35, c.red, '#fffafb', c.red, 9.2);
+    node(ctx, 'Audio-conditioned DiT', 279, 78, 111, 35, c.blue, '#fff', c.blue, 8.7);
+    node(ctx, 'Multi-step Diffusion', 416, 78, 110, 35, c.orange, '#fffaf2', c.orange, 8.5);
+    arrow(ctx, 128, 95.5, 147, 95.5);
+    arrow(ctx, 253, 95.5, 275, 95.5);
+    arrow(ctx, 390, 95.5, 412, 95.5);
 
     const travel = (t % 4) / 4;
-    const pulseX = 125 + travel * 278;
+    const pulseX = 128 + travel * 288;
     ctx.fillStyle = accent;
     ctx.beginPath(); ctx.arc(pulseX, 95.5, 3.4, 0, Math.PI * 2); ctx.fill();
 
     microLabel(ctx, 'TRAINING FEEDBACK', 34, 139);
-    node(ctx, '整段视频 → 1 个总分', 151, 126, 154, 28, c.red, '#fffafb', c.red);
-    arrow(ctx, 305, 140, 330, 114, '#c57b88', true);
-    centeredLabel(ctx, '定位不到短时局部错误', 391, 140, c.red, 10.5);
+    node(ctx, 'Video-level reward · 1 个总分', 151, 126, 178, 28, c.red, '#fffafb', c.red, 9.5);
+    arrow(ctx, 329, 140, 341, 114, '#c57b88', true);
+    centeredLabel(ctx, '难以定位时间局部错误', 420, 140, c.red, 10);
 
     const issues = [
-      ['声学表征有限', 34, 94],
-      ['局部归因粗', 138, 82],
-      ['背景无静音条件', 230, 112],
-      ['服务成本高', 352, 86],
+      ['音频条件表达有限', 34, 111],
+      ['局部错误难定位', 153, 105],
+      ['背景缺少静音条件', 266, 117],
+      ['高 NFE 成本', 391, 91],
     ] as const;
     issues.forEach(([text, x, w]) => {
       ctx.fillStyle = '#f9ecef';
@@ -146,50 +147,46 @@ function drawHeroPipeline(ctx: CanvasRenderingContext2D, variant: 'demo' | 'prod
     });
   } else {
     microLabel(ctx, 'UNIFIED MODEL / CONDITIONS', 34, 68, '#5d796f');
-    node(ctx, '3D VAE latent', 34, 77, 86, 27, c.blue);
-    node(ctx, 'Whisper-large', 34, 110, 86, 27, c.green, '#f7fcf9', c.green);
-    node(ctx, 'Silent†', 34, 143, 86, 27, c.purple, '#faf8ff', c.purple);
+    node(ctx, '3D VAE Latent', 34, 77, 118, 27, c.blue, '#fff', c.blue, 9.5);
+    node(ctx, 'Whisper-large Feature', 34, 110, 118, 27, c.green, '#f7fcf9', c.green, 8.9);
+    node(ctx, 'Silent Condition†', 34, 143, 118, 27, c.purple, '#faf8ff', c.purple, 9.2);
 
     ctx.fillStyle = '#f7fafc';
-    roundRect(ctx, 175, 74, 171, 70, 10);
+    roundRect(ctx, 192, 74, 170, 70, 10);
     ctx.strokeStyle = '#9eb4cf'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.roundRect(175, 74, 171, 70, 10); ctx.stroke();
-    microLabel(ctx, 'SHARED BACKBONE', 190, 91, c.blue);
-    centeredLabel(ctx, 'Unified 3D DiT', 260.5, 110, c.blue, 15);
-    centeredLabel(ctx, '3D SA  ·  Text CA  ·  Audio CA  ·  FFN', 260.5, 130, c.muted, 8.5, false);
-    arrow(ctx, 120, 90.5, 171, 97, '#8aa2bd');
-    arrow(ctx, 120, 123.5, 171, 113, c.green);
-    arrow(ctx, 120, 156.5, 171, 128, c.purple, true);
+    ctx.beginPath(); ctx.roundRect(192, 74, 170, 70, 10); ctx.stroke();
+    microLabel(ctx, 'SHARED VIDEO BACKBONE', 206, 91, c.blue);
+    centeredLabel(ctx, 'Shared 3D DiT Backbone', 277, 110, c.blue, 12.5);
+    centeredLabel(ctx, '3D SA  ·  Text CA  ·  Audio CA  ·  FFN', 277, 130, c.muted, 8.2, false);
+    arrow(ctx, 152, 90.5, 188, 97, '#8aa2bd');
+    arrow(ctx, 152, 123.5, 188, 113, c.green);
+    arrow(ctx, 152, 156.5, 188, 128, c.purple, true);
 
-    node(ctx, '视频', 389, 88, 57, 39, c.green, '#f7fcf9', c.green);
-    node(ctx, '8 NFE', 466, 88, 59, 39, c.green, '#edf8f2', c.green);
-    arrow(ctx, 346, 109, 385, 109, c.green);
-    arrow(ctx, 446, 107.5, 462, 107.5, c.green);
+    node(ctx, 'Fast Avatar', 397, 78, 131, 27, c.green, '#f7fcf9', c.green, 10.2);
+    node(ctx, '8 NFE Sampling', 397, 113, 131, 27, c.green, '#edf8f2', c.green, 9.5);
+    arrow(ctx, 362, 109, 393, 91.5, c.green);
+    arrow(ctx, 462.5, 105, 462.5, 109, c.green);
 
     const path = (t % 3.6) / 3.6;
-    const pulseX = 346 + path * 120;
+    const pulseX = 362 + path * 35;
     ctx.fillStyle = c.green;
     ctx.beginPath(); ctx.arc(pulseX, 109, 3.5, 0, Math.PI * 2); ctx.fill();
 
-    microLabel(ctx, 'PROGRESSIVE TRAINING', 175, 160, '#5d796f');
-    ctx.fillStyle = '#eef6f2';
-    roundRect(ctx, 128, 169, 36, 17, 8);
-    centeredLabel(ctx, 'DATA', 146, 177.5, c.green, 8.5);
-    arrow(ctx, 167, 177.5, 172, 177.5, '#9babc0');
+    microLabel(ctx, 'PROGRESSIVE TRAINING', 34, 160, '#5d796f');
     const stages = [
-      ['BASE', 175, 54, c.blue],
-      ['PER-FRAME GRPO', 245, 108, c.orange],
-      ['DMD2', 369, 57, c.purple],
-      ['FAST', 442, 58, c.green],
+      ['DATA', 34, 42, c.green, 8.2],
+      ['BASE TRAINING', 88, 84, c.blue, 7.8],
+      ['PER-FRAME GRPO', 184, 108, c.orange, 7.8],
+      ['DMD2 DISTILLATION', 304, 112, c.purple, 7.2],
     ] as const;
-    stages.forEach(([text, x, w, color], i) => {
-      ctx.fillStyle = i === 3 ? '#e9f6ef' : '#f3f6fa';
+    stages.forEach(([text, x, w, color, size], i) => {
+      ctx.fillStyle = i === 0 ? '#eef6f2' : '#f3f6fa';
       roundRect(ctx, x, 169, w, 17, 8);
-      centeredLabel(ctx, text, x + w / 2, 177.5, color, i === 1 ? 7.8 : 8.5);
+      centeredLabel(ctx, text, x + w / 2, 177.5, color, size);
       if (i < stages.length - 1) arrow(ctx, x + w + 3, 177.5, stages[i + 1][1] - 3, 177.5, '#9babc0');
     });
-    arrow(ctx, 471, 169, 494, 131, c.green, true);
-    centeredLabel(ctx, '† 多人背景专用条件', 388, 151, c.purple, 8, false);
+    arrow(ctx, 419, 169, 462, 142, c.green, true);
+    centeredLabel(ctx, '† 仅用于多人背景区域', 284, 151, c.purple, 8, false);
   }
 }
 

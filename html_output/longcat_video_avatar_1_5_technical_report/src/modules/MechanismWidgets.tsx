@@ -7,15 +7,15 @@ const H = 330;
 const c = { bg:'#f5f8f0', panel:'#fff', light:'#b8c9a7', dark:'#76906a', blue:'#27446e', green:'#228d5c', red:'#c43f52', orange:'#d97706', purple:'#7c3aed', text:'#21324a', muted:'#68778f', border:'#d7deea' };
 type Draw = (ctx: CanvasRenderingContext2D, time: number) => void;
 
-function useCanvas(draw: Draw, deps: React.DependencyList) {
+function useCanvas(draw: Draw, deps: React.DependencyList, width = W, height = H) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
-    const ctx = setupCanvas(canvas, W, H); let raf = 0; let running = false;
-    const frame = (time:number) => { ctx.clearRect(0,0,W,H); ctx.fillStyle=c.bg; ctx.fillRect(0,0,W,H); draw(ctx,time); if(!canvas.classList.contains('is-ready'))canvas.classList.add('is-ready'); if(running)raf=requestAnimationFrame(frame); };
+    const ctx = setupCanvas(canvas, width, height); let raf = 0; let running = false;
+    const frame = (time:number) => { ctx.clearRect(0,0,width,height); ctx.fillStyle=c.bg; ctx.fillRect(0,0,width,height); draw(ctx,time); if(!canvas.classList.contains('is-ready'))canvas.classList.add('is-ready'); if(running)raf=requestAnimationFrame(frame); };
     const start=()=>{if(!running){running=true;raf=requestAnimationFrame(frame);}}; const stop=()=>{running=false;cancelAnimationFrame(raf);};
     const disconnect=observeCanvas(canvas,start,stop); return()=>{stop();disconnect();};
-  }, deps);
+  }, [...deps, width, height]);
   return ref;
 }
 function rr(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string,r=10){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
@@ -23,29 +23,32 @@ function txt(ctx:CanvasRenderingContext2D,s:string,x:number,y:number,color=c.tex
 function ctxt(ctx:CanvasRenderingContext2D,s:string,cx:number,y:number,color=c.text,size=14,bold=false){ctx.fillStyle=color;ctx.font=`${bold?700:500} ${size}px system-ui,sans-serif`;ctx.textAlign='center';ctx.fillText(s,cx,y);ctx.textAlign='start';}
 function line(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number,color:string,width=3,dash:number[]=[]){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);}
 function ChipRow({labels,value,onChange}:{labels:string[];value:number;onChange:(n:number)=>void}){return <div className="ctrl lc-chip-row" role="group">{labels.map((x,i)=><button key={x} className={`chip ${i===value?'selected':''}`} onClick={()=>onChange(i)} aria-pressed={i===value}>{x}</button>)}</div>;}
-function Canvas({canvasRef,label}:{canvasRef:React.Ref<HTMLCanvasElement>;label:string}){return <div className="lc-canvas-shell"><canvas ref={canvasRef} width={W} height={H} aria-label={label}/></div>;}
+function Canvas({canvasRef,label,width=W,height=H,compact=false}:{canvasRef:React.Ref<HTMLCanvasElement>;label:string;width?:number;height?:number;compact?:boolean}){return <div className={`lc-canvas-shell ${compact?'compact':''}`}><canvas ref={canvasRef} width={width} height={height} aria-label={label}/></div>;}
 
 export const FailureLab:React.FC<WidgetProps>=()=>{
-  const [scene,setScene]=useState(0);
   const requirements=[
-    ['短片生成','已经可用','已经可用'],
-    ['复杂发音','ASR / 音素识别不准','需要准确识别'],
-    ['手脸结构','偶发崩坏','需要可靠'],
-    ['推理成本','成本较高','需要可部署'],
-    ['多人串音','音轨归因错误','需要准确绑定'],
-    ['长时一致性','容易漂移','需要持续稳定'],
+    ['短片生成','一次成功即可展示','每次请求都要可用'],
+    ['复杂发音','识别与表征可能偏差','跨语言仍需准确'],
+    ['手脸结构','偶发局部崩坏','局部结构持续可靠'],
+    ['推理成本','可容忍高步数','延迟与成本可控制'],
+    ['多人归因','音轨可能绑定错人','人物—音轨明确对应'],
+    ['长时一致','颜色、身份可能漂移','长时身份与画面稳定'],
   ];
   const ref=useCanvas(ctx=>{
-    txt(ctx,scene===0?'研究演示：核心生成能力已经成立':'商业部署：五项额外要求必须长期满足',28,34,scene===0?c.blue:c.orange,18,true);
+    txt(ctx,'同一项能力，两套验收标准',28,30,c.text,17,true);
+    rr(ctx,154,42,270,38,'#eef3f9',10);ctxt(ctx,'研究 Demo · 证明“能生成”',289,66,c.blue,14,true);
+    rr(ctx,444,42,288,38,'#edf8f2',10);ctxt(ctx,'商业部署 · 证明“持续可靠”',588,66,c.green,14,true);
     requirements.forEach((r,i)=>{
-      const y=64+i*40; const available=scene===0?i===0:true; const text=scene===0?r[1]:r[2];
-      rr(ctx,28,y,205,30,'#fff',8); txt(ctx,r[0],44,y+21,c.text,14,true);
-      rr(ctx,250,y,472,30,available?(scene===0?c.blue:c.green):(scene===0?c.red:c.orange),8);
-      txt(ctx,text,270,y+21,'#fff',13,true);
+      const y=90+i*35;
+      rr(ctx,28,y,106,27,'#fff',7);ctxt(ctx,r[0],81,y+18,c.text,12,true);
+      rr(ctx,154,y,270,27,i===0?'#e8f0f8':'#fdf0f2',7);ctxt(ctx,r[1],289,y+18,i===0?c.blue:c.red,11.5,true);
+      rr(ctx,444,y,288,27,'#edf8f2',7);ctxt(ctx,r[2],588,y+18,c.green,11.5,true);
+      line(ctx,424,y+13.5,440,y+13.5,i===0?c.blue:c.green,2);
     });
-    txt(ctx,scene===0?'研究 Demo 证明“能生成”':'产品要求覆盖同步、结构、成本、多人和长时',28,318,scene===0?c.blue:c.green,14,true);
-  },[scene]);
-  return <div><Canvas canvasRef={ref} label="研究演示与商业部署要求对比"/><ChipRow labels={['研究演示','商业部署']} value={scene} onChange={setScene}/><div className={`feedback ${scene?'good':''}`}>{scene===0?'现有研究已经能从图片和音频生成数字人短片，复杂条件下的可靠性仍有限。':'LongCat 1.5 围绕五项产品要求组织数据、模型和后训练，并以开源方式发布。'}</div></div>;
+    rr(ctx,154,306,578,16,'#f6f8fb',8);rr(ctx,154,306,578,3,c.green,2);
+    ctxt(ctx,'研究演示关注一次结果；商业系统关注复杂输入下可重复、可预测的质量。',443,320,c.muted,10.5,true);
+  },[]);
+  return <div><Canvas canvasRef={ref} label="研究演示与商业部署的并列验收标准"/><div className="feedback good"><b>LongCat 1.5 的问题定义：</b>生成能力已经存在，论文集中补齐音频表征、局部质量、推理成本、多人归因与长时稳定性。</div></div>;
 };
 
 const fixes=[
@@ -91,8 +94,41 @@ export const AudioAlignment:React.FC<WidgetProps>=()=>{
     }else if(step===3){for(let i=0;i<8;i++){const x=64+i*72;rr(ctx,x,183,45,32,i<=Math.floor(local*7)?c.green:c.border,7);txt(ctx,`F${i+1}`,x+13,204,i<=Math.floor(local*7)?'#fff':c.muted,11,true);}for(let i=0;i<2;i++){const x=210+i*230;rr(ctx,x,246,116,31,c.blue,8);txt(ctx,`潜变量 ${i+1}`,x+27,267,'#fff',11,true);for(let j=0;j<4;j++)line(ctx,86+(i*4+j)*72,215,x+58,246,c.orange,1.5);}txt(ctx,'Audio Projector 汇总邻域，使音频长度匹配 VAE 的 4× 时间下采样',85,166,c.orange,11,true);
     }else{const nodes=[['Text Cross-Attn',70,c.blue],['Audio Cross-Attn',294,c.green],['FFN',548,c.blue]] as const;nodes.forEach((n,i)=>{rr(ctx,n[1],191,i===1?174:134,58,n[2],10);txt(ctx,n[0],n[1]+16,225,'#fff',12,true);if(i<2){line(ctx,n[1]+(i===1?174:134),220,nodes[i+1][1]-12,220,c.orange,4);}});const tokenX=70+Math.min(1,local)*478;ctx.fillStyle=c.orange;ctx.beginPath();ctx.arc(tokenX,174,8,0,Math.PI*2);ctx.fill();txt(ctx,'Audio ∈ ℝ^(T×5×1280) · 按潜变量时间步注入',197,276,c.green,13,true);}
   },[]);
+  const macroRef=useCanvas((ctx,time)=>{const p=progressRef.current;const active=Math.min(3,Math.floor(p*4));const pulse=.55+.45*Math.sin(time/260);
+    txt(ctx,'宏观视角：音频与视频沿两条支路对齐到同一潜变量时刻',26,25,c.text,15,true);
+    txt(ctx,'AUDIO',28,60,c.green,10,true);txt(ctx,'VIDEO',28,135,c.blue,10,true);
+
+    // Audio branch: waveform -> Whisper features -> projector -> latent tokens.
+    line(ctx,83,58,145,58,c.green,2);ctx.strokeStyle=c.green;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=62;i+=3){const x=83+i,y=58+Math.sin(i*.42+time/310)*7*(.4+.6*Math.sin(i*.12)**2);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+    rr(ctx,158,38,112,39,'#fff',8);ctxt(ctx,'Whisper-large',214,55,c.green,11,true);ctxt(ctx,'33 层 · 50 Hz',214,70,c.muted,9);
+    line(ctx,270,57,289,57,c.green,2);
+    for(let i=0;i<16;i++){const x=294+i*9;const group=Math.floor(i/4);rr(ctx,x,48,6,19,group===active?c.orange:'#cbd8e6',2);}
+    txt(ctx,'25 FPS audio features',294,82,c.muted,9,true);
+    line(ctx,441,57,458,57,c.green,2);
+    rr(ctx,462,38,86,39,'#fff',8);ctxt(ctx,'Audio Projector',505,55,c.green,10,true);ctxt(ctx,'时间压缩 4×',505,70,c.muted,9);
+
+    // Video branch: frames -> VAE -> latent tokens.
+    for(let i=0;i<16;i++){const x=83+i*9;const group=Math.floor(i/4);rr(ctx,x,122,6,19,group===active?c.orange:'#cbd8e6',2);}
+    txt(ctx,'25 FPS video frames',83,156,c.muted,9,true);
+    line(ctx,230,131,247,131,c.blue,2);
+    rr(ctx,251,112,92,39,'#fff',8);ctxt(ctx,'3D VAE',297,129,c.blue,11,true);ctxt(ctx,'时间压缩 4×',297,144,c.muted,9);
+    line(ctx,343,131,547,131,c.blue,2);
+
+    // Matching audio/video latent tokens. Same temporal index lights together.
+    for(let i=0;i<4;i++){
+      const x=563+i*15;const on=i===active;
+      rr(ctx,x,48,11,19,on?c.orange:'#d7e1eb',3);
+      rr(ctx,x,122,11,19,on?c.orange:'#d7e1eb',3);
+      if(on){ctx.save();ctx.globalAlpha=.18+.12*pulse;rr(ctx,x-4,43,19,103,c.orange,6);ctx.restore();line(ctx,x+5.5,67,x+5.5,122,c.orange,1.5,[3,3]);}
+    }
+    ctxt(ctx,'Aₜ',591,82,c.green,10,true);ctxt(ctx,'Vₜ',591,156,c.blue,10,true);
+    line(ctx,624,57,646,83,c.green,2);line(ctx,624,131,646,110,c.blue,2);
+    rr(ctx,650,72,84,62,c.blue,10);ctxt(ctx,'DiT Block',692,95,'#fff',11,true);ctxt(ctx,'Audio Cross-Attn',692,114,'#fff',8.5,true);ctxt(ctx,'Aₜ ↔ Vₜ',692,128,'#d9f4e6',9,true);
+
+    rr(ctx,83,181,651,24,'#fff',8);ctxt(ctx,`当前对齐：第 ${active+1} 个潜变量时间步 · 同一窗口的 Aₜ 与 Vₜ 一起进入 DiT`,408.5,197,active===3?c.green:c.orange,10.5,true);
+  },[],760,218);
   const change=(n:number)=>{const v=n/100;setPlaying(false);setProgress(v);progressRef.current=v;};const step=Math.min(4,Math.floor(progress*5));
-  return <div><Canvas canvasRef={ref} label="Whisper 33 层特征分组、时间对齐与 DiT 注入动画"/><div className="ctrl"><button className="btn" onClick={()=>setPlaying(v=>!v)}>{playing?'暂停动画':'继续播放'}</button><input aria-label="拖动查看音频对齐过程" type="range" min="0" max="99" value={Math.round(progress*100)} onChange={e=>change(Number(e.target.value))}/><span className="val">{step+1} / 5</span></div><div className={`feedback ${step===4?'good':''}`}>{alignSteps[step][1]}。拖动时间轴可停在任一阶段查看细节。</div></div>;
+  return <div><Canvas canvasRef={ref} label="Whisper 33 层特征分组、时间对齐与 DiT 注入动画"/><div className="ctrl"><button className="btn" onClick={()=>setPlaying(v=>!v)}>{playing?'暂停动画':'继续播放'}</button><input aria-label="拖动查看音频对齐过程" type="range" min="0" max="99" value={Math.round(progress*100)} onChange={e=>change(Number(e.target.value))}/><span className="val">{step+1} / 5</span></div><div className={`feedback ${step===4?'good':''}`}>{alignSteps[step][1]}。拖动时间轴可停在任一阶段查看细节。</div><div className="lc-subfigure-head"><span>PIPELINE VIEW</span><b>这些对齐操作在整套模型里做什么？</b></div><Canvas canvasRef={macroRef} label="音频特征与视频帧经过四倍时间压缩后对齐并进入 DiT" width={760} height={218} compact/><div className="lc-pipeline-note"><b>对齐发生在潜变量时间轴。</b>Audio Projector 生成的音频潜变量序列，与 3D VAE 生成的视频潜变量序列拥有相同的时间长度；相同索引的 Aₜ 随后通过 Audio Cross-Attention 控制 Vₜ。</div></div>;
 };
 
 export const FrameRewardProbe:React.FC<WidgetProps>=()=>{
