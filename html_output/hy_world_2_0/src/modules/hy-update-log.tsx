@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v057',
+    version: 'V0.57',
+    alias: '一屏星图·极速讲解姬',
+    focus: '全文总览与完整专家论证链',
+    modules: ['Hero 全文最快概述', '五组件系统链', 'Quick Read 总览首站', '八个论证落点', '组件与证据提示'],
+    note: '新增一屏论文总览，用问题、路线、产物和五组件链直接解释整篇工作；重排专家导航为“总览、生成、一致性、训练、重建、资产、证据、边界”，每个落点同时显示对应组件或表格。',
+  },
+  {
     id: 'v056',
     version: 'V0.56',
     alias: '破幻星钥·诚实接口姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['5.2 烟花生命周期', '5.2 先验扩展资料', '7.1 证据边界折叠', '模块入口短文案', '完整审查信息保留'],
     note: '修复提前重跑后烟花最后一帧残留的问题，让庆祝效果爆发后自然衰减并彻底清空；同时压缩主界面重复说明，把先验解释、教学边界和创新证据移入本节扩展资料。',
   },
-  {
-    id: 'v054',
-    version: 'V0.54',
-    alias: '归航星带·无刻领航姬',
-    focus: '无时间导航与居中展示布局',
-    modules: ['Quick Read 顶部导览条', '八章无时间索引', '正文居中恢复', '目标滚动安全区', '窄屏折叠导航'],
-    note: '删除每章时间和总时长提示，把右侧浮动面板重构为顶部横向导览条；正文恢复完整居中宽度，导航只占纵向空间，不再把章节整体向左推移。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v056');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v057');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">

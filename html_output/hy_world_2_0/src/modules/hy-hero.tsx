@@ -8,15 +8,38 @@ const C = {
 };
 
 const quickReadStops = [
-  { id: 'quick-context', chapter: '第 1 章', title: '画面为什么还不是世界', cue: '生成能补盲区，重建能守几何；专家首先需要看到这两个目标为何必须协作。' },
-  { id: 'quick-planning', chapter: '第 2 章', title: '先看全，再决定拍哪里', cue: 'HY-Pano 建立世界种子，WorldNav 把有限视角预算投向真正缺失的区域。' },
-  { id: 'quick-memory', chapter: '第 3 章', title: '双记忆守住跨路线一致性', cue: 'GGM 固定全局骨架，SSM++ 检索局部参考，解决长距离扩展时的结构与纹理漂移。' },
-  { id: 'quick-training', chapter: '第 4 章', title: '能力按依赖顺序训练', cue: '作者先建立相机控制，再加入跨轨迹记忆，最后把成熟教师蒸馏成四步学生。' },
-  { id: 'quick-reconstruction', chapter: '第 5 章', title: '一次前向恢复五类三维产物', cue: 'WorldMirror 2.0 用共享骨干同时恢复相机、点图、深度、法线与 3DGS。' },
-  { id: 'quick-runtime', chapter: '第 6 章', title: '资产生成后进入运行时', cue: '深度对齐与高斯压缩负责交付，WorldLens 再提供光照、碰撞和角色漫游。' },
-  { id: 'quick-results', chapter: '第 7 章', title: '创新必须接回旧问题与证据', cue: '规划、记忆、前馈重建和资产工程各自解决不同瓶颈，实验也必须按协议解读。' },
-  { id: 'quick-conclusion', chapter: '第 8 章', title: '一句话收束贡献与边界', cue: 'HY-World 2.0 交付的是可保存、可渲染、可运行的显式世界，但完整生成仍是离线分钟级流程。' },
+  { id: 'quick-overview', chapter: '全文总览', title: '为什么做、怎么做、做到什么', cue: '视频生成能补盲区却不守持久几何，重建能守几何却不能补未见区域；论文把两者接成显式三维世界生产链。', components: 'HY-Pano 2.0 → WorldNav → WorldStereo 2.0 → WorldMirror 2.0 → WorldLens' },
+  { id: 'quick-planning', chapter: '生成起点', title: '全景种子与主动规划', cue: '先用全景补齐方向上下文，再让规划器把有限视角预算投向背面、远端、空洞和顶部盲区。', components: 'HY-Pano 2.0 · WorldNav' },
+  { id: 'quick-memory', chapter: '一致扩展', title: '关键帧与双记忆', cue: 'Keyframe-VAE 保留跨视角细节，GGM 固定全局骨架，SSM++ 检索局部参考，三者共同降低跨路线漂移。', components: 'Keyframe-VAE · GGM · SSM++' },
+  { id: 'quick-training', chapter: '训练压缩', title: '先控制记忆，再四步蒸馏', cue: '作者先训练相机控制，再接入跨轨迹记忆，最后用 DMD 把成熟教师压缩为四步 WorldStereo 学生。', components: 'Camera control · GGM/SSM++ · DMD' },
+  { id: 'quick-reconstruction', chapter: '前馈重建', title: '一次前向恢复五类产物', cue: 'WorldMirror 2.0 用 Any-Modal 共享骨干同时恢复相机、点图、深度、法线与 3DGS 属性。', components: 'Normalized RoPE · Any-Modal · WorldMirror 2.0' },
+  { id: 'quick-runtime', chapter: '资产运行', title: '压缩后进入 WorldLens', cue: '深度对齐和 MaskGaussian 把结果整理为紧凑显式资产，WorldLens 再提供光照、碰撞和角色漫游。', components: 'Depth alignment · MaskGaussian · WorldLens' },
+  { id: 'quick-results', chapter: '实验证据', title: '按协议验证四类贡献', cue: '全景、记忆、重建和资产压缩分别由不同表格与协议验证，不能把跨任务数字揉成一个总分。', components: 'Table 4 · 8 · 9 · 11/12/14' },
+  { id: 'quick-conclusion', chapter: '结论边界', title: '可运行世界，但仍是离线生产', cue: '最终产物可保存、渲染和交互；WorldMirror 子步骤可到 5.60 秒，但完整世界生成仍约 712 秒。', components: '128 views: 5.60 s · End-to-end: 712 s · NVIDIA H20' },
 ] as const;
+
+const overviewStages = [
+  ['01', 'HY-Pano 2.0', '把文本或单图扩展为 360° 世界种子'],
+  ['02', 'WorldNav', '解析场景并规划五类补盲轨迹'],
+  ['03', 'WorldStereo 2.0', '用关键帧、双记忆和四步采样扩展观察'],
+  ['04', 'WorldMirror 2.0', '一次共享前向恢复五类三维产物'],
+  ['05', '3DGS + WorldLens', '压缩显式资产并接入光照、碰撞与漫游'],
+] as const;
+
+function PaperOverview() {
+  return <section id="quick-overview" className="hy-paper-overview" aria-label="HY-World 2.0 全文快速概述">
+    <header><span>全文最快概述</span><strong>生成补观察，重建守几何，最终交付可运行三维世界</strong></header>
+    <div className="hy-overview-theses">
+      <article><b>为什么做</b><p>视频生成擅长想象未见区域，却不稳定保存三维状态；多视图重建忠实恢复已见几何，却无法补齐盲区。</p></article>
+      <article><b>核心办法</b><p>文本与单图先走生成链，多视图与视频可直接重建；两条路线最终都由 WorldMirror 2.0 凝结为显式资产。</p></article>
+      <article><b>做成什么</b><p>输出可保存、可换视角渲染、可压缩，并能进入 WorldLens 支持重新照明、碰撞和角色漫游。</p></article>
+    </div>
+    <ol className="hy-overview-pipeline">
+      {overviewStages.map(([order, name, role]) => <li key={name}><span>{order}</span><div><strong>{name}</strong><small>{role}</small></div></li>)}
+    </ol>
+    <footer><b>结果与边界</b><span>3DGS 从 6.000M 压到 1.381M；WorldMirror 在 H20 四卡、128 视图条件下为 5.60 秒；完整世界生成约 712 秒，仍是离线流程。</span></footer>
+  </section>;
+}
 
 const waitForQuickReadFrame = (delay: number) => new Promise<void>((resolve) => window.setTimeout(resolve, delay));
 
@@ -50,25 +73,40 @@ function QuickReadNavigator() {
     return () => document.documentElement.classList.remove('quickread-mode', 'quickread-unlocking');
   }, [active.id, quickMode]);
 
+  useEffect(() => {
+    if (!quickMode) return undefined;
+    const syncFromLocation = () => {
+      const targetId = window.location.hash.replace('#', '');
+      if (quickReadStops.some((item) => item.id === targetId)) setActiveId(targetId);
+    };
+    window.addEventListener('hashchange', syncFromLocation);
+    window.addEventListener('popstate', syncFromLocation);
+    return () => {
+      window.removeEventListener('hashchange', syncFromLocation);
+      window.removeEventListener('popstate', syncFromLocation);
+    };
+  }, [quickMode]);
+
   if (!quickMode) {
-    return <a className="quick-read-entry" href="?quickread=1#quick-context"><span>4 分钟</span><strong>Quick Read 专家展示</strong><b>→</b></a>;
+    return <a className="quick-read-entry" href="?quickread=1#quick-overview"><span>快速展示</span><strong>全文总览与专家导航</strong><b>→</b></a>;
   }
 
   const goTo = (targetId: string) => {
     setActiveId(targetId);
-    window.history.replaceState(null, '', `?quickread=1#${targetId}`);
+    if (window.location.hash !== `#${targetId}`) window.history.pushState(null, '', `?quickread=1#${targetId}`);
+    if (window.matchMedia('(max-width: 620px)').matches) setCollapsed(true);
   };
 
-  return <aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="Quick Read 导航">
-    <header>
-      <div><span>QUICK READ</span><strong>专家展示导航</strong><small>八章关键落点</small><a href="./">返回完整教程</a></div>
-      <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? '展开 Quick Read 导航' : '收起 Quick Read 导航'} title={collapsed ? '展开导航' : '收起导航'}>{collapsed ? '＋' : '−'}</button>
-    </header>
-    {collapsed ? null : <>
-      <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
-      <section aria-live="polite"><span>当前讲解提示</span><strong>{active.title}</strong><p>{active.cue}</p></section>
-    </>}
-  </aside>;
+  return <><PaperOverview /><aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="Quick Read 导航">
+      <header>
+        <div><span>QUICK READ</span><strong>专家展示导航</strong><small>完整论文八个讲解落点</small><a href="./">返回完整教程</a></div>
+        <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? '展开 Quick Read 导航' : '收起 Quick Read 导航'} title={collapsed ? '展开导航' : '收起导航'}>{collapsed ? '＋' : '−'}</button>
+      </header>
+      {collapsed ? null : <>
+        <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
+        <section aria-live="polite"><span>当前讲解提示</span><strong>{active.title}</strong><p>{active.cue}</p><small title={active.components}>{active.components}</small></section>
+      </>}
+    </aside></>;
 }
 
 function CanvasView({ width = 560, height = 240, animate = false, draw }: { width?: number; height?: number; animate?: boolean; draw: (ctx: CanvasRenderingContext2D, time: number) => void }) {
