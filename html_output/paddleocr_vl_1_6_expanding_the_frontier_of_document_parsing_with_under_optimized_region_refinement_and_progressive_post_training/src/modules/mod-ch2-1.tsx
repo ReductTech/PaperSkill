@@ -90,7 +90,7 @@ export const Ch2Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     ctx.fillStyle = MUTED;
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('同样的扰动（p = ' + p.toFixed(2) + '）下，两条输出的变化对比：', 30, 40);
+    ctx.fillText('同样的扰动下，两条输出的变化对比：', 30, 40);
 
     // 稳定输出：0.06 之前保持不变，之后也只有微小漂移
     const kStable = p < 0.06 ? 0 : Math.min(2, Math.round(((p - 0.06) / 0.04) * 2));
@@ -144,9 +144,7 @@ export const Ch2Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     <div>
       <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} />
       <div className="ctrl">
-        <label>
-          扰动强度 <span className="val">{value.toFixed(2)}</span>
-        </label>
+        <label>扰动强度</label>
         <input
           type="range"
           min={0}
