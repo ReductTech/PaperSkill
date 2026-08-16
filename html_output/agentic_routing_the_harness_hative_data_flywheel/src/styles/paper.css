@@ -1,0 +1,272 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-studio-wall: #b8c9a7;
+  --paper-console: #76906a;
+  --paper-cable: #92400e;
+  --paper-meter-glow: #228d5c;
+}
+
+/* The global shell stays untouched; these small rules only help paper widgets
+   present dense protocol evidence without turning the page into a dashboard. */
+.protocol-note {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.studio-value-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.studio-value {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.studio-value b { color: var(--blue); }
+
+/* Chapter 6 keeps the long-form explanation in DOM and the mechanism in one
+   readable studio diagram. On narrow screens the diagram scrolls instead of
+   shrinking its labels into illegibility. */
+.ch6-control-label {
+  margin: 10px 0 7px;
+  color: var(--slate-2);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ch6-workbench .chip,
+.ch6-workbench button.tiny { min-height: 44px; }
+
+.ch6-canvas-scroll,
+.ch6-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border-radius: var(--ui-radius-sm);
+  scrollbar-width: thin;
+}
+
+.ch6-canvas-scroll {
+  margin: 6px 0 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+
+.ch6-canvas-scroll canvas {
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.ch6-metric-value {
+  font-size: 17px !important;
+  line-height: 1.45;
+}
+
+.ch6-subtitle {
+  margin: 22px 0 10px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.ch6-method-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.ch6-method-card {
+  --method-color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 116px;
+  padding: 12px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.ch6-method-card:hover,
+.ch6-method-card.is-active {
+  border-color: var(--method-color);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+.ch6-method-card.is-active {
+  background: color-mix(in srgb, var(--method-color) 8%, white);
+}
+
+.ch6-method-symbol {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  background: color-mix(in srgb, var(--method-color) 12%, white);
+  border: 2px solid var(--method-color);
+  border-radius: 9px;
+  color: var(--method-color);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.ch6-method-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.45;
+}
+
+.ch6-method-copy b { color: var(--ink); font-size: 15px; }
+.ch6-method-copy small { color: var(--method-color); font-size: 12px; font-weight: 700; }
+.ch6-method-copy > span { margin-top: 5px; color: var(--ink-2); font-size: 13px; }
+
+.ch6-table-caption {
+  padding: 9px 12px;
+  background: var(--paper-2);
+  color: var(--slate);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.ch6-table-scroll table.paper { min-width: 720px; }
+
+/* Chapter 9 separates reported end-to-end results from four explicit evidence gaps.
+   The rack diagram keeps its 560px logical width so the visual encoding stays
+   legible; the surrounding region owns horizontal scrolling on small screens. */
+.ch9-limitations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin: 10px 0 12px;
+}
+
+.ch9-limitation-card {
+  --limitation-color: var(--blue);
+  display: flex;
+  min-width: 0;
+  min-height: 76px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 2px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper);
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.ch9-limitation-card:hover,
+.ch9-limitation-card.is-active {
+  border-color: var(--limitation-color);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+.ch9-limitation-card.is-active {
+  outline: 2px solid color-mix(in srgb, var(--orange) 55%, transparent);
+  outline-offset: 1px;
+  background: color-mix(in srgb, var(--limitation-color) 7%, white);
+}
+
+.ch9-limitation-index {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--limitation-color) 12%, white);
+  border: 2px solid var(--limitation-color);
+  color: var(--limitation-color);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.ch9-limitation-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.35;
+}
+
+.ch9-limitation-copy b { color: var(--ink); font-size: 14px; }
+.ch9-limitation-copy small { color: var(--limitation-color); font-size: 11px; font-weight: 800; }
+
+.ch9-limitations-scroll {
+  width: 100%;
+  margin: 6px 0 10px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper-2);
+  scrollbar-width: thin;
+}
+
+.ch9-limitations-scroll canvas {
+  display: block;
+  width: 560px;
+  min-width: 560px;
+  max-width: none;
+  height: 260px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.ch9-evidence-source {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--purple);
+  background: var(--paper-2);
+  color: var(--slate);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ch9-evidence-source b { color: var(--ink); }
+
+@media (max-width: 720px) {
+  .studio-value-row { grid-template-columns: 1fr; }
+  .ch6-method-grid { grid-template-columns: 1fr 1fr; }
+  .ch6-method-card { min-height: 104px; }
+  .ch9-limitations-grid { grid-template-columns: 1fr 1fr; }
+  .ch9-limitation-card { min-height: 82px; }
+}
+
+@media (max-width: 420px) {
+  .ch6-method-grid { grid-template-columns: 1fr; }
+  .ch6-method-card { min-height: 0; }
+  .ch9-limitations-grid { grid-template-columns: 1fr; }
+  .ch9-limitation-card { min-height: 0; }
+}
