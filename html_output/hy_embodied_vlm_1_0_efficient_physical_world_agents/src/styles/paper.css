@@ -1,0 +1,245 @@
+/* Paper-specific visual polish for Hy-Embodied-VLM-1.0.
+   Semantic roles stay fixed per contract.md §5. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-track: #b8c9a7;
+  --paper-depth: #76906a;
+  --paper-route: #92400e;
+  --paper-blue: #27446e;
+  --paper-green: #228d5c;
+  --paper-red: #c43f52;
+  --paper-orange: #d97706;
+  --paper-purple: #7c3aed;
+}
+
+/* ---- Hero ---- */
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.hero-stats span {
+  padding: 8px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+  border-radius: 10px;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.hero-stats span:nth-child(2) { border-left-color: var(--blue); }
+.hero-stats span:nth-child(3) { border-left-color: var(--orange); }
+
+/* ---- Chapter progress strip ---- */
+.flow-mini .flow-step { white-space: nowrap; }
+.flow-mini .flow-title { font-size: 12px; opacity: 0.9; margin-left: 3px; }
+
+/* ---- Chapter heading hierarchy ---- */
+.chap-title {
+  letter-spacing: -0.01em;
+}
+
+.chap-title .num {
+  color: var(--blue);
+}
+
+.badge-tag {
+  letter-spacing: 0;
+}
+
+.chap-bridge {
+  border-left-width: 4px;
+}
+
+/* ---- Analogy cards ---- */
+.analogy-card {
+  border-radius: 14px;
+}
+
+.analogy-visual canvas {
+  background: var(--paper-scene-bg);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(25, 42, 70, 0.06);
+}
+
+.analogy-title {
+  letter-spacing: 0;
+}
+
+/* ---- Interactive modules ---- */
+.module {
+  border-radius: 16px;
+}
+
+.module-head {
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.module-head .num {
+  background: var(--blue);
+  color: #fff;
+}
+
+.module-body {
+  padding-top: 18px;
+}
+
+.module canvas {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  background: var(--paper-scene-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(25, 42, 70, 0.07);
+}
+
+/* ---- Controls ---- */
+.ctrl {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border-radius: 12px;
+}
+
+.chip-row {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.chip.selected {
+  box-shadow: 0 4px 10px rgba(39, 68, 110, 0.18);
+}
+
+.step-ctrl {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.step-ctrl .chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Numbers and feedback ---- */
+.ctrl .val {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  color: var(--orange);
+}
+
+.feedback {
+  font-variant-numeric: tabular-nums;
+}
+
+.feedback b {
+  font-weight: 800;
+}
+
+/* ---- Paper figures ---- */
+.paper-figure img {
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(25, 42, 70, 0.08);
+}
+
+/* ---- Chapter 2 origami modules ---- */
+.origami-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.origami-options {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.origami-steps {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.origami-steps span {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--ui-border);
+  color: var(--ui-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.origami-steps span.done { background: var(--green); color: #fff; border-color: var(--green); }
+.origami-steps span.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+/* ---- Formula cards ---- */
+.formula-explain {
+  border-radius: 18px;
+  padding: 24px 20px 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.fe-formula {
+  border: none;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--ui-border), 0 8px 20px rgba(25,42,70,0.06);
+  font-size: 28px;
+  padding: 14px 26px;
+  letter-spacing: 0.08em;
+  line-height: 1.9;
+}
+
+.fe-formula i { font-style: normal; }
+.fe-formula .fm-state { color: var(--blue); }
+.fe-formula .fm-act { color: var(--orange); }
+.fe-formula .fm-delta { color: var(--green); }
+.fe-formula .fm-hist { color: var(--purple); }
+.fe-formula .fm-arrow { color: var(--ui-text-muted); margin: 0 4px; }
+.fe-formula sub { font-size: 0.55em; color: var(--ui-text-muted); }
+
+.fe-explain {
+  border-radius: 14px;
+  margin-top: 12px;
+}
+
+@media (max-width: 720px) {
+  .origami-grid { grid-template-columns: 1fr; }
+  .fe-formula { font-size: 22px; padding: 12px 14px; letter-spacing: 0.03em; }
+}
+
+.hero-figure {
+  margin: 18px 0 0;
+}
+
+.hero-figure img {
+  width: 100%;
+  max-width: 880px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 28px rgba(25,42,70,0.10);
+}
+
+.hero-figure figcaption {
+  margin-top: 8px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
