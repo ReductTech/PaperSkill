@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
 
 type Decision = 'keep' | 'reject';
+type CurationLens = 'all' | Decision;
 
 const curationSamples = [
   {
@@ -34,55 +35,38 @@ type SampleId = typeof curationSamples[number]['id'];
 
 export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
   const [activeId, setActiveId] = useState<SampleId>('r-hotel');
-  const [decisions, setDecisions] = useState<Record<SampleId, Decision | null>>({
-    'r-hotel': null,
-    's-fantasy': null,
-    'r-street': null,
-    'r-room': null,
-    's-scifi': null,
-    's-canyon': null,
-  });
+  const [lens, setLens] = useState<CurationLens>('all');
   const active = curationSamples.find(sample => sample.id === activeId) ?? curationSamples[0];
-  const decidedCount = curationSamples.filter(sample => decisions[sample.id] !== null).length;
-  const correctCount = curationSamples.filter(sample => decisions[sample.id] === sample.correct).length;
-  const complete = correctCount === curationSamples.length;
-  const acceptedReal = curationSamples.filter(sample => sample.source === '真实拍摄' && decisions[sample.id] === 'keep');
-  const acceptedSynthetic = curationSamples.filter(sample => sample.source === 'UE 合成' && decisions[sample.id] === 'keep');
+  const visibleSamples = curationSamples.filter(sample => lens === 'all' || sample.correct === lens);
+  const acceptedReal = curationSamples.filter(sample => sample.source === '真实拍摄' && sample.correct === 'keep');
+  const acceptedSynthetic = curationSamples.filter(sample => sample.source === 'UE 合成' && sample.correct === 'keep');
 
-  const decide = (decision: Decision) => {
-    setDecisions(current => ({ ...current, [active.id]: decision }));
+  const switchLens = (next: CurationLens) => {
+    setLens(next);
+    const firstVisible = curationSamples.find(sample => next === 'all' || sample.correct === next);
+    if (firstVisible && !curationSamples.some(sample => sample.id === activeId && (next === 'all' || sample.correct === next))) {
+      setActiveId(firstVisible.id);
+    }
   };
-
-  const reset = () => {
-    setActiveId('r-hotel');
-    setDecisions({
-      'r-hotel': null,
-      's-fantasy': null,
-      'r-street': null,
-      'r-room': null,
-      's-scifi': null,
-      's-canyon': null,
-    });
-  };
-
-  const activeDecision = decisions[active.id];
-  const activeCorrect = activeDecision === active.correct;
 
   return <div className="curation-lab">
     <div className="curation-head">
       <div><span>数据暗房</span><strong>真实质感与合成多样性都要，明显污染都不要</strong></div>
-      <div><b>{correctCount}/6</b><small>裁决正确</small></div>
-      <button type="button" onClick={reset}>清空裁决</button>
+      <div><b>{visibleSamples.length}/6</b><small>当前镜头</small></div>
+    </div>
+
+    <div className="curation-lenses" role="tablist" aria-label="切换数据策展观察镜头">
+      <button type="button" role="tab" aria-selected={lens === 'all'} className={lens === 'all' ? 'selected' : ''} onClick={() => switchLens('all')}><strong>全部样本</strong><small>同时看来源与质量</small></button>
+      <button type="button" role="tab" aria-selected={lens === 'keep'} className={lens === 'keep' ? 'selected' : ''} onClick={() => switchLens('keep')}><strong>建议保留</strong><small>高质量真实 + UE 合成</small></button>
+      <button type="button" role="tab" aria-selected={lens === 'reject'} className={lens === 'reject' ? 'selected' : ''} onClick={() => switchLens('reject')}><strong>建议过滤</strong><small>接缝与设备污染</small></button>
     </div>
 
     <div className="curation-sample-grid">
-      {curationSamples.map(sample => {
-        const decision = decisions[sample.id];
-        const status = decision === null ? 'undecided' : decision === sample.correct ? 'correct' : 'incorrect';
+      {visibleSamples.map(sample => {
         return <button
           key={sample.id}
           type="button"
-          className={`${activeId === sample.id ? 'selected' : ''} ${status}`}
+          className={`${activeId === sample.id ? 'selected' : ''} ${sample.correct}`}
           onClick={() => setActiveId(sample.id)}
           aria-pressed={activeId === sample.id}
         >
@@ -92,7 +76,7 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
             <em>{sample.code}</em>
           </div>
           <span><strong>{sample.title}</strong><small>{sample.source} · {sample.issue}</small></span>
-          <i className="curation-status">{decision === null ? '待检' : decision === 'keep' ? '收入' : '剔除'}</i>
+          <i className="curation-status">{sample.correct === 'keep' ? '保留' : '过滤'}</i>
         </button>;
       })}
     </div>
@@ -102,14 +86,10 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
         <header><span>当前样本 {active.code}</span><strong>{active.title}</strong><small>{active.source}</small></header>
         <div className={`curation-preview ${active.visual}`} aria-hidden="true"><i /><b /><em>{active.issue}</em></div>
         <p>{active.reason}</p>
-        <div className="curation-actions">
-          <button type="button" className={activeDecision === 'keep' ? 'selected' : ''} onClick={() => decide('keep')}>收入训练集</button>
-          <button type="button" className={activeDecision === 'reject' ? 'selected' : ''} onClick={() => decide('reject')}>从暗房剔除</button>
-        </div>
-        <div className={`curation-verdict ${activeDecision === null ? '' : activeCorrect ? 'correct' : 'incorrect'}`}>
-          {activeDecision === null && '先观察来源与污染线索，再作出裁决。'}
-          {activeDecision !== null && activeCorrect && `裁决正确：${active.reason}`}
-          {activeDecision !== null && !activeCorrect && `裁决冲突：${active.issue === '未见明显缺陷' ? '该样本的来源可补充训练分布，当前没有论文明确要求剔除的污染。' : '论文的数据过滤会移除这类明显污染。'}`}
+        <div className={`curation-conclusion ${active.correct}`}>
+          <span>策展结论</span>
+          <strong>{active.correct === 'keep' ? '建议保留：扩展有效训练分布' : '建议过滤：避免学习错误视觉模式'}</strong>
+          <small>{active.correct === 'keep' ? '来源本身不是保留理由，关键是样本质量与它能补充的分布。' : '无论来自真实拍摄还是合成引擎，明显污染都不应进入训练集。'}</small>
         </div>
       </section>
 
@@ -123,10 +103,8 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
       </section>
     </div>
 
-    <div className={`feedback ${complete ? 'good' : decidedCount === 6 ? 'bad' : ''}`}>
-      {complete && '六张样本全部裁决正确：保留高质量真实与合成数据，同时剔除明显接缝和拍摄设备污染。'}
-      {!complete && decidedCount < 6 && `已裁决 ${decidedCount}/6。选择下一张样本，继续检查来源价值与质量污染。`}
-      {!complete && decidedCount === 6 && `仍有 ${6 - correctCount} 张样本裁决冲突。来源不是唯一标准：高质量双源都可保留，明显污染都应剔除。`}
+    <div className="feedback good">
+      这不是六道样本判断题。切换三个观察镜头，可以直接比较“为什么保留高质量双源数据”与“为什么过滤明显污染”；论文没有公开可在这里还原的固定真实 / 合成配比。
     </div>
 
     <section className="curation-paper-boundary">

@@ -117,36 +117,32 @@ const panoramaCases: Array<{
   index: string;
   title: string;
   symptom: string;
-  question: string;
-  correct: PanoramaFixId;
-  clue: string;
+  mechanism: PanoramaFixId;
+  observation: string;
 }> = [
   {
     id: 'metadata',
     index: 'A',
     title: '相机档案缺页',
     symptom: '焦距与视场角缺失或不准，显式几何投影出现拉伸与错位。',
-    question: '哪种机制能绕开精确相机内参依赖？',
-    correct: 'implicit',
-    clue: '检查“条件图像 token”和“全景噪声 token”在哪里建立对应。',
+    mechanism: 'implicit',
+    observation: '拖动扫描线，观察显式投影错位如何被统一潜空间中的隐式特征对应取代。',
   },
   {
     id: 'latent-seam',
     index: 'B',
     title: '潜空间两端失联',
     symptom: 'ERP 是环形世界，但去噪特征的左端与右端彼此看不见。',
-    question: '哪种机制在去噪阶段施加周期边界？',
-    correct: 'circular',
-    clue: '问题发生在解码之前，应该先修潜变量的边界条件。',
+    mechanism: 'circular',
+    observation: '扫描线经过统一潜空间时，左右端从断开的特征边界变成周期邻居。',
   },
   {
     id: 'pixel-seam',
     index: 'C',
     title: '解码边缘仍跳色',
     symptom: '潜空间已经闭环，但最终像素的左右边缘仍有亮度或纹理突变。',
-    question: '哪种机制直接平滑最终 ERP 边缘？',
-    correct: 'blend',
-    clue: '问题已经出现在可见像素中，需要在解码后处理。',
+    mechanism: 'blend',
+    observation: '把扫描线推向右侧，比较解码后 ERP 边缘从突变到线性过渡的变化。',
   },
 ];
 
@@ -163,45 +159,34 @@ const panoramaFixes: Array<{
 
 export const HyPanorama: React.FC<WidgetProps> = () => {
   const [activeId, setActiveId] = useState<PanoramaCaseId>('metadata');
-  const [selectedFix, setSelectedFix] = useState<PanoramaFixId | null>(null);
-  const [solved, setSolved] = useState<PanoramaCaseId[]>([]);
+  const [reveal, setReveal] = useState(52);
   const activeCase = panoramaCases.find(item => item.id === activeId) ?? panoramaCases[0];
-  const activeFix = panoramaFixes.find(item => item.id === selectedFix);
-  const correct = selectedFix === activeCase.correct;
-  const attempted = selectedFix !== null;
+  const activeFix = panoramaFixes.find(item => item.id === activeCase.mechanism) ?? panoramaFixes[0];
 
   const selectCase = (id: PanoramaCaseId) => {
     setActiveId(id);
-    setSelectedFix(null);
-  };
-
-  const applyFix = (id: PanoramaFixId) => {
-    setSelectedFix(id);
-    if (id === activeCase.correct) {
-      setSolved(items => items.includes(activeCase.id) ? items : [...items, activeCase.id]);
-    }
+    setReveal(52);
   };
 
   return <div className="panorama-lab">
     <div className="panorama-case-head">
       <div>
-        <span>故障样本</span>
-        <strong>从症状判断故障发生在哪一层</strong>
+        <span>三层修复扫描仪</span>
+        <strong>先选故障层，再拖动扫描线比较修复前后</strong>
       </div>
-      <small>{solved.length}/3 已归档</small>
+      <small>{activeCase.index}/C 当前层级</small>
     </div>
 
     <div className="panorama-case-grid">
       {panoramaCases.map(item => {
-        const isSolved = solved.includes(item.id);
         return <button
           key={item.id}
           type="button"
-          className={`${activeId === item.id ? 'selected' : ''} ${isSolved ? 'solved' : ''}`}
+          className={activeId === item.id ? 'selected' : ''}
           onClick={() => selectCase(item.id)}
           aria-pressed={activeId === item.id}
         >
-          <i>{isSolved ? '已解' : item.index}</i>
+          <i>{item.index}</i>
           <span>
             <strong>{item.title}</strong>
             <small>{item.symptom}</small>
@@ -213,98 +198,101 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
     <div className="panorama-workbench">
       <div className="panorama-canvas-shell">
         <CanvasView height={286} draw={(ctx) => {
-          clearStudio(ctx, 560, 286);
-          const fixed = correct;
-          label(ctx, `案件 ${activeCase.index}`, 28, 30, C.orange, 13);
-          label(ctx, activeCase.title, 92, 30, C.ink, 15);
+          const drawState = (fixed: boolean) => {
+            clearStudio(ctx, 560, 286);
+            label(ctx, fixed ? '修复后' : '修复前', fixed ? 28 : 532, 28, fixed ? C.green : C.red, 12, fixed ? 'left' : 'right');
+            const nodes = [
+              { x: 82, title: '透视输入', layer: '条件' },
+              { x: 280, title: '统一潜空间', layer: '去噪' },
+              { x: 478, title: 'ERP 输出', layer: '像素' },
+            ];
+            nodes.forEach((node, index) => {
+              const activeNode = activeId === 'metadata' ? index <= 1 : activeId === 'latent-seam' ? index === 1 : index === 2;
+              ctx.fillStyle = C.white;
+              ctx.strokeStyle = activeNode ? (fixed ? C.green : C.red) : C.line;
+              ctx.lineWidth = activeNode ? 3 : 1;
+              ctx.beginPath(); ctx.roundRect(node.x - 60, 62, 120, 94, 6); ctx.fill(); ctx.stroke();
+              label(ctx, node.title, node.x, 87, activeNode ? C.ink : C.muted, 13, 'center');
+              label(ctx, node.layer, node.x, 142, activeNode ? C.blue : C.muted, 11, 'center');
+            });
+            route(ctx, [[142,109],[220,109]], fixed ? C.green : C.blue, 4, fixed ? [] : [6,5]);
+            route(ctx, [[340,109],[418,109]], fixed ? C.green : C.blue, 4, fixed ? [] : [6,5]);
+            photo(ctx, 82, 112, activeId === 'metadata' && !fixed ? C.red : C.orange, .82);
 
-          const nodes = [
-            { x: 82, title: '透视输入', layer: '条件' },
-            { x: 280, title: '统一潜空间', layer: '去噪' },
-            { x: 478, title: 'ERP 输出', layer: '像素' },
-          ];
-          nodes.forEach((node, index) => {
-            const activeNode = activeId === 'metadata' ? index <= 1 : activeId === 'latent-seam' ? index === 1 : index === 2;
-            ctx.fillStyle = C.white;
-            ctx.strokeStyle = activeNode ? (fixed ? C.green : C.red) : C.line;
-            ctx.lineWidth = activeNode ? 3 : 1;
-            ctx.beginPath(); ctx.roundRect(node.x - 60, 62, 120, 94, 6); ctx.fill(); ctx.stroke();
-            label(ctx, node.title, node.x, 87, activeNode ? C.ink : C.muted, 13, 'center');
-            label(ctx, node.layer, node.x, 142, activeNode ? C.blue : C.muted, 11, 'center');
-          });
-          route(ctx, [[142,109],[220,109]], fixed ? C.green : C.blue, 4, attempted && !fixed ? [6,5] : []);
-          route(ctx, [[340,109],[418,109]], fixed ? C.green : C.blue, 4, attempted && !fixed ? [6,5] : []);
-
-          photo(ctx, 82, 112, activeId === 'metadata' && !fixed ? C.red : C.orange, .82);
-          if (activeId === 'metadata') {
-            label(ctx, fixed ? '无需精确 K / FoV' : 'K ?   FoV ?', 82, 184, fixed ? C.green : C.red, 12, 'center');
-            if (fixed) {
-              label(ctx, '图像 token + 全景噪声 token', 280, 111, C.blue, 11, 'center');
-              label(ctx, 'Self-Attention', 280, 132, C.green, 11, 'center');
-            } else {
-              ctx.strokeStyle = C.red; ctx.lineWidth = 5;
-              ctx.beginPath(); ctx.moveTo(247, 98); ctx.lineTo(315, 125); ctx.stroke();
-              label(ctx, '显式投影错位', 280, 184, C.red, 12, 'center');
+            if (activeId === 'metadata') {
+              label(ctx, fixed ? '无需精确 K / FoV' : 'K ?   FoV ?', 82, 184, fixed ? C.green : C.red, 12, 'center');
+              if (fixed) {
+                label(ctx, '条件图像 + 全景噪声', 190, 184, C.blue, 10, 'center');
+                label(ctx, '自注意力学习对应', 190, 201, C.green, 10, 'center');
+              } else {
+                ctx.strokeStyle = C.red; ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(247, 98); ctx.lineTo(315, 125); ctx.stroke();
+                label(ctx, '显式投影错位', 392, 184, C.red, 12, 'center');
+              }
             }
-          }
 
-          const stripX = activeId === 'latent-seam' ? 235 : 433;
-          const stripY = 99;
+            const stripX = activeId === 'latent-seam' ? 235 : 433;
+            const stripY = 99;
+            ctx.save();
+            ctx.beginPath(); ctx.roundRect(stripX, stripY, 90, 27, 3); ctx.clip();
+            for (let i = 0; i < 9; i += 1) {
+              const palette = fixed ? ['#93c5fd','#86efac','#fcd34d'] : ['#fb7185','#93c5fd','#86efac'];
+              ctx.fillStyle = palette[i % palette.length];
+              ctx.fillRect(stripX + i * 10, stripY, 10, 27);
+            }
+            ctx.restore();
+            ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 3; ctx.strokeRect(stripX, stripY, 90, 27);
+
+            if (activeId === 'latent-seam') {
+              ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 4;
+              ctx.beginPath(); ctx.arc(280, 91, 42, Math.PI, Math.PI * 2); ctx.stroke();
+              label(ctx, fixed ? '左右成为周期邻居' : '左右特征断开', fixed ? 160 : 405, 184, fixed ? C.green : C.red, 12, 'center');
+            }
+            if (activeId === 'pixel-seam') {
+              ctx.fillStyle = fixed ? 'rgba(34,141,92,.28)' : 'rgba(196,63,82,.28)';
+              ctx.fillRect(433, 94, 13, 37); ctx.fillRect(510, 94, 13, 37);
+              label(ctx, fixed ? '像素边缘线性融合' : '解码后仍跳变', fixed ? 365 : 482, 184, fixed ? C.green : C.red, 12, 'center');
+            }
+
+            ctx.fillStyle = C.white; ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.roundRect(28, 214, 504, 46, 5); ctx.fill(); ctx.stroke();
+            label(ctx, fixed ? activeFix.title : activeCase.title, 44, 236, fixed ? C.green : C.red, 13);
+            label(ctx, fixed ? activeFix.layer : `故障尚未修复 · ${activeFix.layer}`, 44, 252, C.muted, 10);
+          };
+
+          drawState(false);
+          const revealX = 28 + (reveal / 100) * 504;
           ctx.save();
-          ctx.beginPath(); ctx.roundRect(stripX, stripY, 90, 27, 3); ctx.clip();
-          for (let i = 0; i < 9; i += 1) {
-            const palette = fixed ? ['#93c5fd','#86efac','#fcd34d'] : ['#fb7185','#93c5fd','#86efac'];
-            ctx.fillStyle = palette[i % palette.length];
-            ctx.fillRect(stripX + i * 10, stripY, 10, 27);
-          }
+          ctx.beginPath(); ctx.rect(0, 0, revealX, 286); ctx.clip();
+          drawState(true);
           ctx.restore();
-          ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 3; ctx.strokeRect(stripX, stripY, 90, 27);
-
-          if (activeId === 'latent-seam') {
-            ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 4;
-            ctx.beginPath(); ctx.arc(280, 91, 42, Math.PI, Math.PI * 2); ctx.stroke();
-            label(ctx, fixed ? '周期邻接成立' : '左右特征断开', 280, 184, fixed ? C.green : C.red, 12, 'center');
-          }
-          if (activeId === 'pixel-seam') {
-            ctx.fillStyle = fixed ? 'rgba(34,141,92,.28)' : 'rgba(196,63,82,.28)';
-            ctx.fillRect(433, 94, 13, 37); ctx.fillRect(510, 94, 13, 37);
-            label(ctx, fixed ? '像素边缘已融合' : '解码后仍跳变', 478, 184, fixed ? C.green : C.red, 12, 'center');
-          }
-
-          const stateColor = !attempted ? C.muted : correct ? C.green : C.red;
-          ctx.fillStyle = C.white; ctx.strokeStyle = C.line; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.roundRect(28, 214, 504, 46, 5); ctx.fill(); ctx.stroke();
-          label(ctx, !attempted ? '等待取证' : correct ? '故障层与修复机制匹配' : '修复层级不匹配', 44, 236, stateColor, 13);
-          label(ctx, attempted ? `${activeFix?.layer ?? ''}` : activeCase.clue, 44, 252, C.muted, 11);
+          ctx.strokeStyle = C.orange; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(revealX, 20); ctx.lineTo(revealX, 266); ctx.stroke();
+          ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(revealX, 202, 7, 0, Math.PI * 2); ctx.fill();
         }} />
       </div>
 
       <section className="panorama-dossier">
-        <span>当前卷宗</span>
-        <strong>{activeCase.question}</strong>
+        <span>当前观察层</span>
+        <strong>{activeCase.title}</strong>
         <p>{activeCase.symptom}</p>
-        <small>{activeCase.clue}</small>
+        <small>{activeCase.observation}</small>
       </section>
     </div>
 
-    <div className="panorama-fix-rack" aria-label="修复机制">
-      {panoramaFixes.map(item => <button
-        key={item.id}
-        type="button"
-        className={`${selectedFix === item.id ? 'selected' : ''} ${selectedFix === item.id && correct ? 'correct' : ''} ${selectedFix === item.id && !correct ? 'incorrect' : ''}`}
-        onClick={() => applyFix(item.id)}
-      >
-        <span>{item.layer}</span>
-        <strong>{item.title}</strong>
-        <small>{item.summary}</small>
-      </button>)}
+    <div className="panorama-reveal-control">
+      <label htmlFor="panorama-reveal">修复前后扫描线 <span>{reveal}%</span></label>
+      <input id="panorama-reveal" type="range" min={8} max={92} value={reveal} onChange={event => setReveal(Number(event.target.value))} />
+      <small>左侧显示修复后，右侧保留修复前；扫描线只用于教学对照。</small>
     </div>
 
-    <div className={`feedback ${attempted ? correct ? 'good' : 'bad' : ''}`}>
-      {!attempted && `请选择一种修复机制处理案件 ${activeCase.index}。`}
-      {attempted && correct && `${activeFix?.title} 与故障层级匹配。${solved.length === 3 ? ' 三类故障均已归档：映射、潜空间边界、像素边缘缺一不可。' : ' 可以继续切换案件完成全套取证。'}`}
-      {attempted && !correct && `${activeFix?.title} 作用在“${activeFix?.layer}”，无法直接处理当前故障。请根据卷宗线索重新判断。`}
+    <div className="panorama-mechanism-map">
+      {panoramaFixes.map(item => <article key={item.id} className={item.id === activeCase.mechanism ? 'active' : ''}>
+        <span>{item.layer}</span><strong>{item.title}</strong><small>{item.summary}</small>
+      </article>)}
     </div>
+
+    <div className="feedback good">当前层级对应 <strong>{activeFix.title}</strong>。三种机制不是互相替代：隐式映射处理输入到潜空间的对应，循环填充修复去噪边界，线性融合处理解码后的可见接缝。</div>
 
     <section className="panorama-evidence-boundary">
       <header><span>论文证据</span><strong>完整系统结果，不由上方按钮计算</strong></header>
