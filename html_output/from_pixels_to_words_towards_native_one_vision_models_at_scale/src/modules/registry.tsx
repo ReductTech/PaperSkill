@@ -1,0 +1,51 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { NeoAna1 } from './neo-ana-1';
+import { NeoAna2 } from './neo-ana-2';
+import { NeoAna3 } from './neo-ana-3';
+import { NeoAna4 } from './neo-ana-4';
+import { NeoAna5 } from './neo-ana-5';
+import { NeoAna6 } from './neo-ana-6';
+import { NeoAna7 } from './neo-ana-7';
+import { NeoAna8 } from './neo-ana-8';
+import { NeoCh1Main } from './neo-ch1-main';
+import { NeoCh2Boundary } from './neo-ch2-boundary';
+import { NeoCh2Main } from './neo-ch2-main';
+import { NeoCh3Main, NeoCh3Tokens } from './neo-ch3-main';
+import { NeoCh4Main } from './neo-ch4-main';
+import { NeoCh5Main } from './neo-ch5-main';
+import { NeoCh6Main } from './neo-ch6-main';
+import { NeoCh7Main } from './neo-ch7-main';
+import { NeoCh8Main } from './neo-ch8-main';
+import { NeoCh9Main } from './neo-ch9-main';
+import { NeoHeroNew } from './neo-hero-new';
+import { NeoHeroOld } from './neo-hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['neo-ana-1'] = NeoAna1;
+widgetRegistry['neo-ana-2'] = NeoAna2;
+widgetRegistry['neo-ana-3'] = NeoAna3;
+widgetRegistry['neo-ana-4'] = NeoAna4;
+widgetRegistry['neo-ana-5'] = NeoAna5;
+widgetRegistry['neo-ana-6'] = NeoAna6;
+widgetRegistry['neo-ana-7'] = NeoAna7;
+widgetRegistry['neo-ana-8'] = NeoAna8;
+widgetRegistry['neo-ch1-main'] = NeoCh1Main;
+widgetRegistry['neo-ch2-boundary'] = NeoCh2Boundary;
+widgetRegistry['neo-ch2-main'] = NeoCh2Main;
+widgetRegistry['neo-ch3-main'] = NeoCh3Main;
+widgetRegistry['neo-ch3-tokens'] = NeoCh3Tokens;
+widgetRegistry['neo-ch4-main'] = NeoCh4Main;
+widgetRegistry['neo-ch5-main'] = NeoCh5Main;
+widgetRegistry['neo-ch6-main'] = NeoCh6Main;
+widgetRegistry['neo-ch7-main'] = NeoCh7Main;
+widgetRegistry['neo-ch8-main'] = NeoCh8Main;
+widgetRegistry['neo-ch9-main'] = NeoCh9Main;
+widgetRegistry['neo-hero-new'] = NeoHeroNew;
+widgetRegistry['neo-hero-old'] = NeoHeroOld;
