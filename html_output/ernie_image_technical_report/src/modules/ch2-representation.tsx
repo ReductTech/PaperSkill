@@ -56,7 +56,7 @@ export const Ch2RepresentationWidget: React.FC<WidgetProps> = () => {
       <figure className="architecture-figure">
         <img
           className="paper-original-figure"
-          src="/images/ernie-image-architecture.png"
+          src={`${import.meta.env.BASE_URL}images/ernie-image-architecture.png`}
           alt="根据论文文字重建的 ERNIE-Image 高层架构：提示增强器与文本编码器形成文字条件，VAE 潜空间与文字条件汇入 8B 单流 DiT，Aes 是独立的数据筛选与审美评估侧路。"
         />
 

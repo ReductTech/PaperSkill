@@ -85,19 +85,19 @@ const RESULT_SETS: Record<Protocol, ResultSet> = {
 const QUALITATIVE_FIGURES: Record<QualitativeFigure, { label: string; src: string; alt: string; caption: string }> = {
   photo: {
     label: '人像摄影',
-    src: '/images/result-photo.png',
+    src: `${import.meta.env.BASE_URL}images/result-photo.png`,
     alt: '论文中的人像摄影生成结果对比',
     caption: '人像摄影对比：比较面部细节、皮肤质感、姿态与整体真实感。',
   },
   instruction: {
     label: '复杂指令',
-    src: '/images/result-instruction.png',
+    src: `${import.meta.env.BASE_URL}images/result-instruction.png`,
     alt: '论文中的复杂指令遵循结果对比',
     caption: '复杂指令对比：九个角色需要同时满足动作、服装与对应文字要求。',
   },
   text: {
     label: '中文文字',
-    src: '/images/result-text.png',
+    src: `${import.meta.env.BASE_URL}images/result-text.png`,
     alt: '论文中的中文文字渲染结果对比',
     caption: '中文文字对比：观察标题、配料、步骤和页面布局是否准确、完整。',
   },
