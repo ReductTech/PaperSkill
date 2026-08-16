@@ -1,0 +1,48 @@
+/* Paper-specific overrides. Semantic roles in tokens.css stay fixed.
+   Scene canvases follow the ELF example: cool paper, one navy accent. */
+
+:root {
+  --scene-bg: #fafbfc;
+  --scene-paper: #f6f8fc;
+  --scene-paper-shadow: #d7deea;
+  --scene-dust: #94a3b8;
+}
+
+/* Keep module canvases on the same cool field as the rest of the page. */
+canvas {
+  background: #fafbfc;
+}
+
+/* Analogy slots now carry paper figures or short derivations — restyle the
+   card from the decorative yellow "tip" look to a neutral academic panel. */
+.analogy-card {
+  background: #ffffff;
+  border: 1px solid var(--line, #d7deea);
+}
+.analogy-visual {
+  background: #f6f8fc;
+}
+.analogy-title {
+  color: #27446e;
+}
+.analogy-title::before {
+  background: #27446e;
+}
+
+/* Figure-based analogy cards stack vertically so the original paper figure
+   gets full width instead of a 260px squeeze. */
+.analogy-card:has(.paper-figure) {
+  flex-direction: column;
+}
+.analogy-card:has(.paper-figure) .analogy-visual {
+  width: 100%;
+  padding: 12px 12px 0;
+}
+.analogy-visual .paper-figure {
+  width: 100%;
+  margin: 0;
+}
+.analogy-visual .paper-figure img {
+  max-height: 420px;
+  object-fit: contain;
+}
