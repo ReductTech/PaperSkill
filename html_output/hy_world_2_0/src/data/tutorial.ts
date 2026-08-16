@@ -314,7 +314,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "6.2",
           "title": "DMD 分布校准仪",
-          "desc": "切换噪声层级并反复执行教学更新，观察真实 score 与伪 score 的差异如何推动学生分布靠近教师，再核对四步 DiT 与完整 712 秒生成管线的边界。",
+          "desc": "切换噪声层级时连续观察分布宽度与 score 方向的形变；执行教学更新时，跟随学生峰值沿分数差平滑靠近教师，再核对四步 DiT 与完整 712 秒生成管线的边界。",
           componentId: "hy-dmd-lab"
         }
       ],

@@ -898,6 +898,66 @@
   width: min(100%, 620px);
   height: auto !important;
   aspect-ratio: 620 / 330;
+  border: 1px solid transparent;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.dmd-lab.is-transitioning > canvas {
+  border-color: #c9d7ea;
+  box-shadow: 0 0 0 3px rgba(39, 68, 110, .08);
+}
+
+.dmd-motion-status {
+  display: grid;
+  grid-template-columns: auto minmax(80px, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 8px 10px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.dmd-motion-status span,
+.dmd-motion-status small {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.dmd-motion-status span { color: var(--blue); }
+.dmd-motion-status.update span { color: var(--purple); }
+.dmd-motion-status.reset span { color: var(--orange); }
+
+.dmd-motion-status i {
+  position: relative;
+  height: 5px;
+  overflow: hidden;
+  background: #e7ebf0;
+  border-radius: 3px;
+}
+
+.dmd-motion-status i::after {
+  position: absolute;
+  inset: 0;
+  background: var(--blue);
+  content: '';
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.dmd-motion-status.update i::after { background: var(--purple); }
+.dmd-motion-status.reset i::after { background: var(--orange); }
+.dmd-motion-status.running.noise i::after { animation: dmd-noise-progress 560ms cubic-bezier(.22, .8, .3, 1) both; }
+.dmd-motion-status.running.update i::after { animation: dmd-update-progress 720ms cubic-bezier(.22, .8, .3, 1) both; }
+.dmd-motion-status.running.reset i::after { animation: dmd-reset-progress 480ms cubic-bezier(.22, .8, .3, 1) both; }
+
+@keyframes dmd-noise-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes dmd-update-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes dmd-reset-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dmd-motion-status i::after { animation: none !important; }
+  .dmd-lab > canvas { transition: none; }
 }
 
 .dmd-noise-tabs,
@@ -5095,6 +5155,10 @@
   .dmd-boundary-grid,
   .dmd-glossary-grid,
   .dmd-update-control {
+    grid-template-columns: 1fr;
+  }
+
+  .dmd-motion-status {
     grid-template-columns: 1fr;
   }
 

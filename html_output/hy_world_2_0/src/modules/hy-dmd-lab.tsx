@@ -14,20 +14,64 @@ const noiseLevels = [
   { id: 'high', label: '较高噪声', sigma: .38, note: '曲线更平，分数方向仍指向各自分布中心。' },
 ] as const;
 
-function CanvasView({ draw }: { draw: (ctx: CanvasRenderingContext2D) => void }) {
+function CanvasView({
+  draw,
+  animationKey,
+  duration,
+  onAnimationChange,
+}: {
+  draw: (ctx: CanvasRenderingContext2D, progress: number) => void;
+  animationKey: number;
+  duration: number;
+  onAnimationChange: (running: boolean) => void;
+}) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawRef = useRef(draw);
   drawRef.current = draw;
+
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
     let ctx: CanvasRenderingContext2D;
     try { ctx = setupCanvas(canvas, 620, 330); } catch { return; }
-    const paint = () => { drawRef.current(ctx); canvas.classList.add('is-ready'); };
+    ctxRef.current = ctx;
+    const paint = () => { drawRef.current(ctx, 1); canvas.classList.add('is-ready'); };
     const disconnect = observeCanvas(canvas, paint, () => undefined);
     paint();
-    return disconnect;
-  }, [draw]);
+    return () => { ctxRef.current = null; disconnect(); };
+  }, []);
+
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    const canvas = ref.current;
+    if (!ctx || !canvas) return;
+    if (animationKey === 0) {
+      drawRef.current(ctx, 1);
+      onAnimationChange(false);
+      return;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      drawRef.current(ctx, 1);
+      onAnimationChange(false);
+      return;
+    }
+
+    let frame = 0;
+    const startedAt = performance.now();
+    onAnimationChange(true);
+    const tick = (time: number) => {
+      const linear = Math.min(1, (time - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - linear, 3);
+      drawRef.current(ctx, eased);
+      canvas.classList.add('is-ready');
+      if (linear < 1) frame = requestAnimationFrame(tick);
+      else onAnimationChange(false);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [animationKey, duration, onAnimationChange]);
+
   return <canvas ref={ref} width={620} height={330} />;
 }
 
@@ -49,31 +93,66 @@ function arrow(ctx: CanvasRenderingContext2D, from: number, to: number, y: numbe
   label(ctx, caption, (from + to) / 2, y - 10, color, 10, 'center');
 }
 
+type VisualState = { sigma: number; gap: number };
+type TransitionKind = 'noise' | 'update' | 'reset';
+type DmdTransition = { id: number; from: VisualState; to: VisualState; kind: TransitionKind };
+
 export const HyDmdLab: React.FC<WidgetProps> = () => {
   const [noiseIndex, setNoiseIndex] = useState(1);
   const [gap, setGap] = useState(.78);
   const [updates, setUpdates] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const visualRef = useRef<VisualState>({ sigma: noiseLevels[1].sigma, gap: .78 });
+  const [transition, setTransition] = useState<DmdTransition>({
+    id: 0,
+    from: visualRef.current,
+    to: visualRef.current,
+    kind: 'noise',
+  });
   const noise = noiseLevels[noiseIndex];
   const converged = gap < .09;
   const teacherCenter = -.34;
-  const studentCenter = teacherCenter + gap;
   const scoreGap = gap / (noise.sigma * noise.sigma);
+
+  const transitionTo = (to: VisualState, kind: TransitionKind) => {
+    setTransition((current) => ({ id: current.id + 1, from: visualRef.current, to, kind }));
+  };
+
+  const selectNoise = (index: number) => {
+    const nextNoise = noiseLevels[index];
+    setNoiseIndex(index);
+    transitionTo({ sigma: nextNoise.sigma, gap }, 'noise');
+  };
 
   const updateStudent = () => {
     if (converged) return;
-    setGap((value) => Math.max(.055, value * .58));
+    const nextGap = Math.max(.055, gap * .58);
+    transitionTo({ sigma: noise.sigma, gap: nextGap }, 'update');
+    setGap(nextGap);
     setUpdates((value) => value + 1);
   };
 
-  const reset = () => { setGap(.78); setUpdates(0); };
+  const reset = () => {
+    transitionTo({ sigma: noise.sigma, gap: .78 }, 'reset');
+    setGap(.78);
+    setUpdates(0);
+  };
 
-  return <div className="dmd-lab">
-    <CanvasView draw={(ctx) => {
+  const duration = transition.kind === 'update' ? 720 : transition.kind === 'reset' ? 480 : 560;
+
+  return <div className={`dmd-lab ${animating ? 'is-transitioning' : ''}`}>
+    <CanvasView animationKey={transition.id} duration={duration} onAnimationChange={setAnimating} draw={(ctx, progress) => {
       ctx.clearRect(0, 0, 620, 330);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, 620, 330);
       const left = 60, right = 575, top = 52, base = 230;
       const xFor = (value: number) => left + (value + 1.1) / 2.2 * (right - left);
       const curve = (center: number, sigma: number, x: number) => Math.exp(-Math.pow(x - center, 2) / (2 * sigma * sigma));
+      const sigma = transition.from.sigma + (transition.to.sigma - transition.from.sigma) * progress;
+      const currentGap = transition.from.gap + (transition.to.gap - transition.from.gap) * progress;
+      const studentCenter = teacherCenter + currentGap;
+      visualRef.current = { sigma, gap: currentGap };
+      ctx.canvas.dataset.visualSigma = sigma.toFixed(4);
+      ctx.canvas.dataset.visualGap = currentGap.toFixed(4);
 
       ctx.strokeStyle = C.line; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(left, base); ctx.lineTo(right, base); ctx.stroke();
@@ -89,7 +168,7 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
         for (let i = 0; i <= 160; i += 1) {
           const value = -1.1 + i / 160 * 2.2;
           const x = xFor(value);
-          const y = base - curve(center, noise.sigma, value) * 145;
+          const y = base - curve(center, sigma, value) * 145;
           if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
         ctx.stroke(); ctx.setLineDash([]);
@@ -100,22 +179,28 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
       label(ctx, '教师真实分布 · 实线', left, 34, C.green, 11);
       label(ctx, '学生伪分布 · 虚线', right, 34, C.purple, 11, 'right');
 
-      const probe = Math.min(.96, studentCenter + noise.sigma * .65);
+      const probe = Math.min(.96, studentCenter + sigma * .65);
       const probeX = xFor(probe);
       ctx.strokeStyle = C.orange; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(probeX, 48); ctx.lineTo(probeX, base); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(probeX, base, 7, 0, Math.PI * 2); ctx.fill();
       label(ctx, '带噪样本 xₜ', probeX, 258, C.orange, 10, 'center');
 
-      const realTarget = xFor(teacherCenter + noise.sigma * .2);
-      const fakeTarget = xFor(studentCenter + noise.sigma * .2);
+      const realTarget = xFor(teacherCenter + sigma * .2);
+      const fakeTarget = xFor(studentCenter + sigma * .2);
       arrow(ctx, probeX, realTarget, 288, C.green, 's_real');
       arrow(ctx, probeX, fakeTarget, 316, C.purple, 's_fake');
       label(ctx, converged ? '分数方向已接近' : '分数差推动学生靠近教师', 600, 324, converged ? C.green : C.blue, 9, 'right');
     }} />
 
+    <div key={transition.id} className={`dmd-motion-status ${transition.kind} ${animating ? 'running' : ''}`} aria-live="polite">
+      <span>{transition.id === 0 ? '等待一次可观察的状态变化' : transition.kind === 'noise' ? '噪声层级重塑' : transition.kind === 'update' ? '学生分布沿分数差靠拢' : '恢复初始分布间距'}</span>
+      <i aria-hidden="true" />
+      <small>{transition.id === 0 ? '切换噪声或执行更新后，这里显示过渡进度' : animating ? `${duration}ms 连续过渡中` : '过渡完成'}</small>
+    </div>
+
     <div className="dmd-noise-tabs" role="tablist" aria-label="选择扩散噪声层级">
-      {noiseLevels.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={noiseIndex === index} className={noiseIndex === index ? 'selected' : ''} onClick={() => setNoiseIndex(index)}><strong>{item.label}</strong><small>{item.note}</small></button>)}
+      {noiseLevels.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={noiseIndex === index} className={noiseIndex === index ? 'selected' : ''} onClick={() => selectNoise(index)}><strong>{item.label}</strong><small>{item.note}</small></button>)}
     </div>
 
     <div className="dmd-score-ledger">
