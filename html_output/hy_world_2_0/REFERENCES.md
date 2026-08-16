@@ -38,6 +38,19 @@
 
 所有动态素材的公开使用仍受官方仓库当前许可证与 Notice 要求约束。本教程 README 已逐项标注来源，压缩版本未加入新的视觉内容或结论。
 
+## 官方四阶段说明图
+
+以下静态图来自腾讯混元 HY-World 2.0 项目主页，放入模块 1.1 各阶段的可展开证据槽。它们用于把 Canvas 教学动画映射回官方系统说明，不用于证明性能优于其它模型，也不替代论文表格中的实验协议。
+
+| 教程文件 | 项目主页原图 | 对应阶段 | 教程用途与边界 |
+| --- | --- | --- | --- |
+| `official-stage-pano.webp` | [World2_0-archi-first](https://3d-models.hunyuan.tencent.com/world/assets/png/World2_0-archi-first-CMiGkuuZ.png) | HY-Pano 2.0 | 展示真实全景案例、隐式映射、Circle Padding 与 Pixel Blending；说明动画中的“展开 + 闭环”，不代表表 4 的统一分数 |
+| `official-stage-nav.webp` | [World2_0-archi-second](https://3d-models.hunyuan.tencent.com/world/assets/png/World2_0-archi-second-BtybKoLz.png) | WorldNav | 展示五类相机轨迹在真实三维场景中的分布；说明互补规划策略，不表示端到端学习到全局最优路径 |
+| `official-stage-stereo.webp` | [World2_0-archi-third](https://3d-models.hunyuan.tencent.com/world/assets/png/World2_0-archi-third-Bc-7HubV.png) | WorldStereo 2.0 | 展示记忆库、DiT、全景深度点云、相机轨迹与 Plucker Ray Embedding；四步采样边界仍以论文 Section 4 为准 |
+| `official-stage-mirror.webp` | [World2_0-archi-forth](https://3d-models.hunyuan.tencent.com/world/assets/png/World2_0-archi-forth--JW2wNeW.png) | WorldMirror 2.0 | 展示 Any-Modal 输入、统一 token 与点图/相机/深度/法线/3DGS 输出；是架构说明，不是重建速度或质量指标 |
+
+四个远端文件虽然以 `.png` 结尾，服务器实际返回 WebP 内容，因此教程本地文件使用 `.webp` 扩展名。公开使用仍需遵守项目页与官方仓库当前的版权、许可证及 Notice 要求。
+
 ## 模型权重平台
 
 | 平台 | 链接 | 适合查看 | 使用前检查 |

@@ -21,8 +21,12 @@ npm run preview   # 预览构建结果
 - `public/images/official-reconstruction.gif`：来自腾讯混元官方 GitHub 的 `assets/recon_en.gif`，用于展示多图/视频重建流程。
 - `public/images/official-mesh.gif`：来自腾讯混元官方 GitHub 的 `assets/mesh_en.gif`，用于展示可漫游 Mesh 资产。
 - `public/images/official-interactive.gif`：来自腾讯混元官方 GitHub 的 `assets/interactive.gif`，用于展示角色交互与物理反馈。
+- `public/images/official-stage-pano.webp`：来自腾讯混元 HY-World 2.0 项目主页，用于解释 HY-Pano 2.0 的全景生成、Circle Padding 与 Pixel Blending。
+- `public/images/official-stage-nav.webp`：来自腾讯混元 HY-World 2.0 项目主页，用于解释 WorldNav 的五类互补相机轨迹。
+- `public/images/official-stage-stereo.webp`：来自腾讯混元 HY-World 2.0 项目主页，用于解释 WorldStereo 2.0 的记忆检索、关键帧扩散与相机控制。
+- `public/images/official-stage-mirror.webp`：来自腾讯混元 HY-World 2.0 项目主页，用于解释 WorldMirror 2.0 的 Any-Modal 输入、共享聚合与几何输出。
 
-三个 GIF 均做了降分辨率、降帧率和调色板压缩，未改变演示内容。论文图片与官方 GIF 仅用于本教程的论文解读和教学展示，版权归原作者及腾讯混元团队所有；官方演示素材不替代论文定量证据。公开复用前请同时核对官方仓库当前的 [Community License](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/License.txt)。
+三个 GIF 均做了降分辨率、降帧率和调色板压缩，未改变演示内容；四张阶段图按项目主页原图落库，仅将文件扩展名修正为实际 WebP 格式。论文图片与官方素材仅用于本教程的论文解读和教学展示，版权归原作者及腾讯混元团队所有；官方说明图与演示素材不替代论文定量证据。公开复用前请同时核对官方仓库当前的 [Community License](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/License.txt)。
 
 ## 审查资料
 
