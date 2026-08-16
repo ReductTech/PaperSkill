@@ -87,6 +87,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
 
   return (
     <div className="mission-planner">
+      <div className="learning-contract"><div><span>为什么学</span><p>四种输入并不走同一条前处理路线；线索多少决定系统是先生成观察，还是直接重建。</p></div><div><span>本次操作</span><p>点击任一输入任务卡，观察高亮路径如何改变，未经过的模块会同步变灰。</p></div><div><span>应得判断</span><p>文本/单图走生成主链，多视图/视频跳过前三阶段，但两条路线都在 WorldMirror 2.0 汇合。</p></div></div>
       <section className={`mission-atlas ${isGeneration ? 'generation' : 'reconstruction'}`} aria-live="polite">
         <header className="mission-atlas-head">
           <div>
@@ -95,6 +96,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
           </div>
           <b>{mission.lane}</b>
         </header>
+        <button type="button" className="mission-click-cue" onClick={() => setMode(mode === '文本' ? '单图' : mode === '单图' ? '多视图' : mode === '多视图' ? '视频' : '文本')}><span aria-hidden="true">↳</span><strong>输入任务卡可点击</strong><small>点这里也可依次预览四条路径</small></button>
 
         <div className="mission-map-scroll">
           <div className="mission-map">

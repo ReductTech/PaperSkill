@@ -1,123 +1,82 @@
 import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
 
-type Decision = 'keep' | 'reject';
-type CurationLens = 'all' | Decision;
+type RecipeId = 'real' | 'synthetic' | 'mixed-clean' | 'mixed-dirty';
 
-const curationSamples = [
-  {
-    id: 'r-hotel', code: 'R1', source: '真实拍摄', title: '玻璃庭院酒店', visual: 'hotel', issue: '未见明显缺陷', correct: 'keep' as Decision,
-    reason: '高分辨率真实光照与复杂材质可补充自然场景先验。',
+const recipes: Record<RecipeId, {
+  title: string; source: string; coverage: number; realism: number; labels: number; contamination: number;
+  lesson: string; conclusion: string;
+}> = {
+  real: {
+    title: '只用真实全景', source: '自然光照与真实纹理', coverage: 52, realism: 94, labels: 38, contamination: 14,
+    lesson: '真实数据贴近现实分布，但难以覆盖浮空遗迹、极端视角等想象场景，几何标签也不总是完整。',
+    conclusion: '真实数据负责“像现实”，却不能独自解决语义覆盖与精确标签。',
   },
-  {
-    id: 's-fantasy', code: 'S1', source: 'UE 合成', title: '浮空遗迹', visual: 'fantasy', issue: '未见明显缺陷', correct: 'keep' as Decision,
-    reason: '合成资产提供精确几何标签与现实中难以采集的想象场景。',
+  synthetic: {
+    title: '只用 UE 合成', source: '可控场景与精确几何', coverage: 82, realism: 58, labels: 96, contamination: 4,
+    lesson: '合成数据可自由设计场景并输出精确标签，但渲染规律与真实拍摄之间存在 domain gap。',
+    conclusion: '合成数据负责“可控与可标注”，却不能独自替代真实世界外观。',
   },
-  {
-    id: 'r-street', code: 'R2', source: '真实拍摄', title: '夜间商业街', visual: 'street seam', issue: '左右接缝明显', correct: 'reject' as Decision,
-    reason: '论文特别过滤带有明显 stitching artifacts 的低质量样本。',
+  'mixed-clean': {
+    title: '双源混合 + 质量过滤', source: '真实质感 + 合成多样性', coverage: 91, realism: 88, labels: 84, contamination: 5,
+    lesson: '混合两类来源扩展分布，再过滤明显接缝和拍摄设备入镜，避免模型学习错误视觉模式。',
+    conclusion: '论文的关键不是简单拼接两堆数据，而是让双源互补并对污染做质量门控。',
   },
-  {
-    id: 'r-room', code: 'R3', source: '真实拍摄', title: '室内会客厅', visual: 'room rig', issue: '全景相机设备入镜', correct: 'reject' as Decision,
-    reason: '曝光的拍摄设备会成为错误视觉模式，因此应在数据清洗中剔除。',
+  'mixed-dirty': {
+    title: '双源混合但不过滤', source: '覆盖广，但错误模式也被保留', coverage: 94, realism: 76, labels: 83, contamination: 62,
+    lesson: '接缝、支架和拍摄设备会成为高频捷径；模型可能把它们当成全景世界应有的结构。',
+    conclusion: '数据越多不等于训练信号越好，污染会把“全景边界”和“相机设备”写进生成先验。',
   },
-  {
-    id: 's-scifi', code: 'S2', source: 'UE 合成', title: '星港控制舱', visual: 'scifi', issue: '未见明显缺陷', correct: 'keep' as Decision,
-    reason: '高质量引擎资产扩展语义分布，并提供多样、可控的场景构型。',
-  },
-  {
-    id: 's-canyon', code: 'S3', source: 'UE 合成', title: '峡谷训练场', visual: 'canyon seam', issue: '边界拼接破损', correct: 'reject' as Decision,
-    reason: '无论来源为何，明显拼接破损都属于需要过滤的低质量信号。',
-  },
-] as const;
+};
 
-type SampleId = typeof curationSamples[number]['id'];
+function DistributionView({ recipe }: { recipe: RecipeId }) {
+  const d = recipes[recipe];
+  const points = [
+    { x: 14, y: 72, k: '室内' }, { x: 27, y: 40, k: '街景' }, { x: 42, y: 66, k: '自然' },
+    { x: 61, y: 34, k: '奇幻' }, { x: 76, y: 58, k: '科幻' }, { x: 88, y: 24, k: '极端视角' },
+  ];
+  const visible = recipe === 'real' ? 3 : recipe === 'synthetic' ? 5 : 6;
+  return <div className={`curation-distribution ${recipe}`}>
+    <div className="curation-axis"><span>现实常见</span><span>想象 / 稀有</span></div>
+    <div className="curation-point-field">
+      {points.map((point, index) => <i key={point.k} className={index < visible ? 'covered' : 'missing'} style={{ left: `${point.x}%`, top: `${point.y}%` }}><b>{point.k}</b></i>)}
+      {recipe === 'mixed-dirty' ? <><em className="seam-pollution">接缝捷径</em><em className="rig-pollution">设备入镜</em></> : null}
+    </div>
+    <p>{d.source}</p>
+  </div>;
+}
+
+function Meter({ label, value, bad = false }: { label: string; value: number; bad?: boolean }) {
+  return <div className="curation-meter"><span>{label}</span><i><b style={{ width: `${value}%` }} className={bad ? 'bad' : ''} /></i><strong>{value}</strong></div>;
+}
 
 export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
-  const [activeId, setActiveId] = useState<SampleId>('r-hotel');
-  const [lens, setLens] = useState<CurationLens>('all');
-  const active = curationSamples.find(sample => sample.id === activeId) ?? curationSamples[0];
-  const visibleSamples = curationSamples.filter(sample => lens === 'all' || sample.correct === lens);
-  const acceptedReal = curationSamples.filter(sample => sample.source === '真实拍摄' && sample.correct === 'keep');
-  const acceptedSynthetic = curationSamples.filter(sample => sample.source === 'UE 合成' && sample.correct === 'keep');
-
-  const switchLens = (next: CurationLens) => {
-    setLens(next);
-    const firstVisible = curationSamples.find(sample => next === 'all' || sample.correct === next);
-    if (firstVisible && !curationSamples.some(sample => sample.id === activeId && (next === 'all' || sample.correct === next))) {
-      setActiveId(firstVisible.id);
-    }
-  };
-
-  return <div className="curation-lab">
-    <div className="curation-head">
-      <div><span>数据暗房</span><strong>真实质感与合成多样性都要，明显污染都不要</strong></div>
-      <div><b>{visibleSamples.length}/6</b><small>当前镜头</small></div>
+  const [recipe, setRecipe] = useState<RecipeId>('mixed-clean');
+  const active = recipes[recipe];
+  return <div className="curation-microscope">
+    <div className="learning-contract">
+      <div><span>为什么学</span><p>HY-Pano 的世界先验来自训练分布；缺少某类场景或保留污染，都会在生成结果中反复出现。</p></div>
+      <div><span>本次操作</span><p>切换四种数据配方，观察语义覆盖、真实感、标签能力与污染风险如何共同变化。</p></div>
+      <div><span>应得判断</span><p>真实与合成不是二选一；论文采用双源互补，并明确过滤接缝与拍摄设备污染。</p></div>
     </div>
-
-    <div className="curation-lenses" role="tablist" aria-label="切换数据策展观察镜头">
-      <button type="button" role="tab" aria-selected={lens === 'all'} className={lens === 'all' ? 'selected' : ''} onClick={() => switchLens('all')}><strong>全部样本</strong><small>同时看来源与质量</small></button>
-      <button type="button" role="tab" aria-selected={lens === 'keep'} className={lens === 'keep' ? 'selected' : ''} onClick={() => switchLens('keep')}><strong>建议保留</strong><small>高质量真实 + UE 合成</small></button>
-      <button type="button" role="tab" aria-selected={lens === 'reject'} className={lens === 'reject' ? 'selected' : ''} onClick={() => switchLens('reject')}><strong>建议过滤</strong><small>接缝与设备污染</small></button>
+    <div className="curation-recipe-tabs" role="tablist" aria-label="选择全景数据配方">
+      {(Object.keys(recipes) as RecipeId[]).map((id) => <button key={id} type="button" role="tab" aria-selected={recipe === id} className={recipe === id ? 'selected' : ''} onClick={() => setRecipe(id)}><strong>{recipes[id].title}</strong><small>{id === 'mixed-clean' ? '论文思路' : id === 'mixed-dirty' ? '失败对照' : '单源对照'}</small></button>)}
     </div>
-
-    <div className="curation-sample-grid">
-      {visibleSamples.map(sample => {
-        return <button
-          key={sample.id}
-          type="button"
-          className={`${activeId === sample.id ? 'selected' : ''} ${sample.correct}`}
-          onClick={() => setActiveId(sample.id)}
-          aria-pressed={activeId === sample.id}
-        >
-          <div className={`curation-thumb ${sample.visual}`} aria-hidden="true">
-            <i />
-            <b />
-            <em>{sample.code}</em>
-          </div>
-          <span><strong>{sample.title}</strong><small>{sample.source} · {sample.issue}</small></span>
-          <i className="curation-status">{sample.correct === 'keep' ? '保留' : '过滤'}</i>
-        </button>;
-      })}
-    </div>
-
-    <div className="curation-inspector">
-      <section className="curation-active-sample">
-        <header><span>当前样本 {active.code}</span><strong>{active.title}</strong><small>{active.source}</small></header>
-        <div className={`curation-preview ${active.visual}`} aria-hidden="true"><i /><b /><em>{active.issue}</em></div>
-        <p>{active.reason}</p>
-        <div className={`curation-conclusion ${active.correct}`}>
-          <span>策展结论</span>
-          <strong>{active.correct === 'keep' ? '建议保留：扩展有效训练分布' : '建议过滤：避免学习错误视觉模式'}</strong>
-          <small>{active.correct === 'keep' ? '来源本身不是保留理由，关键是样本质量与它能补充的分布。' : '无论来自真实拍摄还是合成引擎，明显污染都不应进入训练集。'}</small>
-        </div>
-      </section>
-
-      <section className="curation-shelves">
-        <header><span>已收入样本架</span><strong>双源不是二选一</strong></header>
-        <div>
-          <article><span>真实拍摄</span><strong>{acceptedReal.length}</strong><small>自然光照、纹理与复杂真实结构</small></article>
-          <article><span>UE 合成</span><strong>{acceptedSynthetic.length}</strong><small>精确标签、想象场景与可控构型</small></article>
-        </div>
-        <p>论文说明两类来源共同扩展训练分布，但没有公开教程可还原的固定配比；这里的数量只来自六张教学样本。</p>
+    <div className="curation-microscope-body">
+      <DistributionView recipe={recipe} />
+      <section className="curation-meter-panel">
+        <header><span>同一训练目标下的教学对照</span><strong>{active.title}</strong></header>
+        <Meter label="语义覆盖" value={active.coverage} />
+        <Meter label="现实外观" value={active.realism} />
+        <Meter label="几何标签" value={active.labels} />
+        <Meter label="污染风险" value={active.contamination} bad />
+        <small>这些百分比只用于表达相对关系，不是论文公开的数据配比或测量结果。</small>
       </section>
     </div>
-
-    <div className="feedback good">
-      这不是六道样本判断题。切换三个观察镜头，可以直接比较“为什么保留高质量双源数据”与“为什么过滤明显污染”；论文没有公开可在这里还原的固定真实 / 合成配比。
-    </div>
-
-    <section className="curation-paper-boundary">
-      <span>论文事实与教程构造</span>
-      <p>论文第 3.1 节明确描述真实高分辨率全景、UE 合成资产，以及对明显接缝与拍摄设备入镜样本的过滤。R1-S3 的场景名称、画面和六题数量均为教程示意，不是论文数据样本或统计。</p>
-    </section>
-
-    <div className="curation-glossary-grid">
-      <details><summary>真实数据带来什么？</summary><p>真实全景提供自然光照、复杂纹理和真实结构先验，有助于模型学习现实世界的外观分布。</p></details>
-      <details><summary>合成数据带来什么？</summary><p>UE 等高质量引擎资产提供精确几何标签和更自由的场景设计，可覆盖现实中难以采集的构型。</p></details>
-      <details><summary>什么是 domain gap？</summary><p>真实与合成数据的纹理、光照和渲染规律存在分布差异。论文用混合数据拓宽语义分布，并减轻二者之间的域差距。</p></details>
-      <details><summary>为何过滤设备入镜？</summary><p>全景相机、支架或拍摄人员若频繁出现在训练图中，模型可能把它们学成场景的一部分，形成错误视觉先验。</p></details>
-    </div>
+    <section className="curation-cause-effect"><span>当前会发生什么</span><strong>{active.lesson}</strong><p>{active.conclusion}</p></section>
+    <div className={`feedback ${recipe === 'mixed-clean' ? 'good' : recipe === 'mixed-dirty' ? 'bad' : ''}`}>{recipe === 'mixed-clean' ? '双源互补与质量过滤同时成立：分布更广，污染捷径没有被一起收入。' : recipe === 'mixed-dirty' ? '覆盖率看似最高，但错误模式也最强；这正说明“更多样本”不能代替清洗。' : '单源能贡献一部分能力，但会留下另一侧缺口。'}</div>
+    <section className="curation-paper-boundary"><span>论文事实与教学抽象</span><p>Section 3.1 明确描述高分辨率真实全景、UE 合成资产，以及对明显 stitching artifacts 和相机设备入镜样本的过滤。上方分布点和百分比是教学抽象，不是论文样本截图或固定配比。</p></section>
+    <div className="curation-glossary-grid"><details><summary>什么是 domain gap？</summary><p>真实拍摄与引擎渲染在材质、光照、噪声和纹理统计上存在分布差异。</p></details><details><summary>为什么设备入镜危险？</summary><p>若支架或相机反复出现，模型可能把它学成全景场景的一部分，而不是采集过程的偶然污染。</p></details></div>
   </div>;
 };
 

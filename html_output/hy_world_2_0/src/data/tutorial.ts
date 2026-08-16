@@ -23,8 +23,8 @@ export const tutorial: TutorialData = {
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '1.1', title: '世界模型概念实验室', desc: '切换像素视频、动作条件世界、显式三维资产与混合系统，用遮挡、回访和动作压力测试理解不同范式。', componentId: 'hy-world-model-basics' },
-        { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '逐幕体验 HY-Pano、WorldNav、WorldStereo 与 WorldMirror 如何把世界种子变成显式三维资产，并展开官方阶段图。', componentId: 'hy-creation-pipeline' },
-        { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '选择文本、单图、多视图或视频，观察四阶段生成路线与共享 WorldMirror 重建路线如何汇合；可展开论文 Figure 2。', componentId: 'hy-mission-planner' },
+        { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '每次清空画布演示一个子系统：WorldNav 显示候选淘汰与盲区覆盖，WorldStereo 用运动主体和视差区分连续目标帧。', componentId: 'hy-creation-pipeline' },
+        { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击显式标注的输入任务卡，在紧凑路径图中切换文本、单图、多视图和视频；两条路线共享同一个 WorldMirror 2.0 落点。', componentId: 'hy-mission-planner' },
       ],
       insight: '核心不是“一个网络做完所有事”，而是让生成负责扩展观察，让重建负责恢复几何，并根据输入丰富度选择路径。',
       takeaways: [
@@ -38,9 +38,9 @@ export const tutorial: TutorialData = {
       bridge: '论文生成路线的前两段先解决“世界大致是什么样”和“还应该去哪里看”。HY-Pano 建立 360 度上下文，WorldNav 把相机预算主动投向盲区。',
       analogy: { title: '先转一圈看全，再绕开障碍补盲区', text: '全景负责建立地图感，路线负责决定下一张真正有价值的照片。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '2.1', title: '全景三层修复扫描仪', desc: '比较显式投影依赖、潜空间隐式映射和 ERP 环形接缝修复；连续拖动扫描线不会闪烁。', componentId: 'hy-panorama' },
-        { kind: 'module', id: '2.2', title: '全景数据双源策展镜头', desc: '浏览真实全景与 UE 合成样本，理解真实质感、精确标签与污染过滤为何需要一起设计。', componentId: 'hy-panorama-curation' },
-        { kind: 'module', id: '2.3', title: 'WorldNav 五层规划回放', desc: '在五类轨迹间切换，逐层查看 NavMesh、候选采样、碰撞淘汰、连接与修剪，相机最终沿折线逐段转向。', componentId: 'hy-trajectory' },
+        { kind: 'module', id: '2.1', title: '全景故障擦除实验', desc: '选择投影失真、潜空间断边或像素接缝，把扫描线完整拖到 0% / 100%，在同一 ERP 场景上比较三种机制各自修复什么。', componentId: 'hy-panorama' },
+        { kind: 'module', id: '2.2', title: '全景数据配方显微镜', desc: '切换真实单源、合成单源、清洗双源和未清洗双源，比较覆盖、真实感、标签能力与污染风险，不再用虚构图片卡冒充论文样本。', componentId: 'hy-panorama-curation' },
+        { kind: 'module', id: '2.3', title: 'WorldNav 五层规划回放', desc: '五类任务现在具有明显不同的覆盖目标：放射、对象环绕、空洞回访、远端漫游与俯视覆盖；最终相机仍按折线逐段转向。', componentId: 'hy-trajectory' },
       ],
       insight: '全景不是最终三维世界，而是后续场景解析和路线规划的世界种子；五类轨迹用不同观察方式补足背面、远端、空洞与顶部盲区。',
       takeaways: [
@@ -55,7 +55,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '少拍关键照片，并随时对照地图与相册', text: '关键帧保细节，GGM 看全局骨架，SSM++ 找局部参考。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '3.1', title: '关键帧取景沙盘', desc: '自由选择 8 个候选视角中的 3 帧，比较重复度、视角跨度和覆盖结构，理解 Keyframe-VAE 的取舍。', componentId: 'hy-keyframes' },
-        { kind: 'module', id: '3.2', title: '记忆调度局', desc: '加载 GGM 全局骨架并选择相关历史视角，比较空间拼接与时间拼接如何改变跨视角一致性；可展开表 8。', componentId: 'hy-memory' },
+        { kind: 'module', id: '3.2', title: 'GGM × SSM++ 双记忆实验', desc: '先定义 GGM 是什么，再切换无记忆、仅全局几何、仅局部检索与双记忆，观察门框位置和墙面纹理分别由谁稳定。', componentId: 'hy-memory' },
       ],
       insight: 'GGM 管“大尺度结构不能自相矛盾”，SSM++ 管“局部纹理和对应关系能对上”；两种记忆解决的尺度不同。',
       formula: {
@@ -75,11 +75,11 @@ export const tutorial: TutorialData = {
     },
     {
       kind: 'chapter', id: 'chap-4', title: '如何训练：先控制、再记忆、后蒸馏', badge: 'trn', badgeLabel: '训练课程',
-      bridge: '论文没有把相机控制、跨轨迹记忆和少步采样一次性硬塞进训练，而是先建立稳定前置能力，再压缩成熟教师。',
+      bridge: '论文没有把相机控制、跨轨迹记忆和少步采样一次性硬塞进训练。原因是 DMD 只能压缩已经成熟的教师：教师先学会精确控制与跨轨迹一致性，四步学生才有稳定分布可继承。',
       analogy: { title: '先学走路线，再记住场景，最后加快步频', text: '训练顺序一旦颠倒，后面的模块就没有可靠能力可继承。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '4.1', title: '训练课程编排器', desc: '亲自排列领域适配、记忆中训和 DMD 后蒸馏；错误顺序直接显示教师不成熟、参考关系不稳或压缩过早的失败症状。', componentId: 'hy-training-stages' },
-        { kind: 'module', id: '4.2', title: 'DMD 分布校准仪', desc: '切换噪声层级并执行教学更新，观察四步学生如何沿真实分数与伪分数之差靠近教师分布。', componentId: 'hy-dmd-lab' },
+        { kind: 'module', id: '4.2', title: '从多步教师到四步学生', desc: '先看蒸馏动机与三步过程，再切换噪声层级并执行 DMD 教学更新，理解分数差如何校准少步学生。', componentId: 'hy-dmd-lab' },
       ],
       insight: '四步只描述 WorldStereo 2.0 的扩散采样；全景、规划、重建与资产合成仍属于完整离线系统生命周期。',
       formula: {
@@ -102,8 +102,8 @@ export const tutorial: TutorialData = {
       bridge: '生成的关键帧最终必须变成稳定的相机、点图、深度、法线和 3DGS 属性。WorldMirror 2.0 用共享骨干与多任务头一次前向完成恢复。',
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '5.1', title: '跨分辨率位置探针', desc: '切换 L/M/H 分辨率并移动探针，观察整数位置外推为何退化、Normalized RoPE 如何把位置固定在区间内。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: 'Any-Modal 架构配线盘', desc: '以多视图图像为必需输入，可选接入位姿、内参和深度先验，再追踪共享骨干与五个输出头；可展开 Figure 12 和官方重建 GIF。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '固定同一相对位置并切换 L/M/H，直接比较整数索引进入训练外范围与归一化坐标保持可比的因果差异。', componentId: 'hy-resolution' },
+        { kind: 'module', id: '5.2', title: '任务驱动的 Any-Modal 重建台', desc: '从相机估计、表面恢复或 3DGS 交付任务出发，按需接入位姿、内参和深度，观察共享骨干与专用任务头为何同时需要。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {
@@ -126,7 +126,7 @@ export const tutorial: TutorialData = {
       bridge: 'WorldMirror 输出的逐帧深度仍有尺度与偏移差异。系统先把它们对齐到全景坐标，再用 3DGS 优化得到紧凑资产，最后交给 WorldLens 运行时。',
       analogy: { title: '先把照片标尺对齐，再删掉重复测量点', text: '几何先统一坐标，之后才有资格在画质、数量和漂浮物之间做资产压缩。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '6.1', title: '高斯预算帕累托实验', desc: '连续调节最大高斯数量和最低 PSNR，在表 9 的配置中寻找可行点，展开原表与官方 Mesh GIF 核对取舍。', componentId: 'hy-composition' },
+        { kind: 'module', id: '6.1', title: '3DGS 配方逐步重建实验', desc: '按表 9 的五个真实配置逐步切换，直接观察体素降采样造成的细节损失、增密引入的天空漂浮物、MaskGaussian 剪枝与最终非天空增密。', componentId: 'hy-composition' },
         { kind: 'module', id: '6.2', title: 'WorldLens 运行时实验', desc: '切换 IBL 光照、碰撞代理和角色漫游，区分“资产已经生成后的实时交互”与“完整世界实时生成”。', componentId: 'hy-worldlens-lab' },
       ],
       insight: 'MaskGaussian 以可学习存在概率抑制冗余与漂浮物；WorldLens 负责资产进入运行时后的光照、碰撞和角色，不负责重新生成世界。',
@@ -152,7 +152,7 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择一个旧问题并切换连接机制，观察规划、记忆、重建与运行时为何不能互相替代；匹配后展开论文证据与外推边界。', componentId: 'hy-innovation-map' },
         { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；只对资料已报告的能力开放详情，并标注发表时间。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '可筛选模型分簇性能图', desc: '在同一图中让每个模型形成一簇，自由选择模型与多个指标；柱顶显示论文原值，柱高只做协议内归一化。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.3', title: '严格零基线模型分簇图', desc: '自由选择模型与指标；每根柱从零开始并严格按“原值 / 当前指标最大已报告值”绘制，低优指标不再反转，OOM 不虚构数值。', componentId: 'hy-performance-compare' },
       ],
       insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；性能图只允许在表 4、表 12 或表 14 各自兼容的协议内比较。',
       takeaways: [

@@ -141,6 +141,12 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
   const duration = transition.kind === 'update' ? 720 : transition.kind === 'reset' ? 480 : 560;
 
   return <div className={`dmd-lab ${animating ? 'is-transitioning' : ''}`}>
+    <div className="learning-contract"><div><span>为什么学</span><p>成熟扩散教师需要多步去噪，沿多条轨迹生成关键帧时成本会被重复放大。</p></div><div><span>本次操作</span><p>先选噪声层级，再执行 DMD 更新，观察少步学生如何沿真实 score 与伪 score 的差靠近教师分布。</p></div><div><span>应得判断</span><p>蒸馏压缩的是 WorldStereo 关键帧生成器；四步不等于完整世界系统只需四步或实时完成。</p></div></div>
+    <section className="dmd-primer">
+      <header><span>先回答：为什么要蒸馏？</span><strong>把成熟教师的多步生成能力压缩给四步学生</strong></header>
+      <div><article><b>1</b><span><strong>教师先学会</strong><small>领域适配和记忆中训先形成可控、跨轨迹一致的目标分布。</small></span></article><i>→</i><article><b>2</b><span><strong>学生少步采样</strong><small>学生用更少扩散步生成带偏差的关键帧样本。</small></span></article><i>→</i><article><b>3</b><span><strong>分数差纠偏</strong><small>s_real - s_fake 把学生分布推向教师，而不是逐像素复制某一帧。</small></span></article></div>
+      <p>因此 DMD 必须放在训练课程最后：教师能力尚未成熟时，学生没有稳定目标可继承。</p>
+    </section>
     <CanvasView animationKey={transition.id} duration={duration} onAnimationChange={setAnimating} draw={(ctx, progress) => {
       ctx.clearRect(0, 0, 620, 330);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, 620, 330);

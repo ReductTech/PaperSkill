@@ -187,6 +187,7 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
 
   return (
     <div className="trajectory-lab trajectory-planner">
+      <div className="learning-contract"><div><span>为什么学</span><p>相机轨迹决定 WorldStereo 会生成哪些新观察；五类轨迹分别处理通用覆盖、物体背面、重建盲区、远端和俯视结构。</p></div><div><span>本次操作</span><p>先切换任务，再逐层查看候选、碰撞淘汰、连接和最终回放。</p></div><div><span>应得判断</span><p>五类任务不是同一折线换颜色，而是目标对象、覆盖形态和执行条件都不同。</p></div></div>
       <div className="trajectory-task-switch" role="tablist" aria-label="选择 WorldNav 轨迹任务">
         {(Object.keys(routeData) as TrajectoryName[]).map((name) => (
           <button key={name} type="button" role="tab" aria-selected={trajectory === name} className={trajectory === name ? 'selected' : ''} onClick={() => changeTrajectory(name)}>
@@ -217,6 +218,20 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
           label(ctx,'NavMesh 可走区域',34,34,C.green,12);
           label(ctx,'障碍',252,128,C.white,11,'center'); label(ctx,'障碍',396,177,C.white,11,'center');
           target(ctx,routeInfo.path[routeInfo.path.length - 1][0],routeInfo.path[routeInfo.path.length - 1][1],stage === 4 && p > .9);
+          if (trajectory === '常规') {
+            [[118,184],[170,224],[280,62],[470,205]].forEach(([x,y])=>{ctx.strokeStyle=C.blue;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(62,226);ctx.lineTo(x,y);ctx.stroke();ctx.fillStyle=C.blue;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();});
+            label(ctx,'从中心向多个方向铺开',286,48,C.blue,11,'center');
+          } else if (trajectory === '环绕') {
+            ctx.strokeStyle=C.green;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(252,125,94,66,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle=C.orange;ctx.fillRect(230,103,44,44);label(ctx,'绑定对象',252,129,C.white,9,'center');
+          } else if (trajectory === '重建感知') {
+            ctx.strokeStyle=C.purple;ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(470,78,42,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);label(ctx,'覆盖空洞',470,82,C.purple,10,'center');
+            for(let i=0;i<4;i+=1){ctx.strokeStyle='rgba(124,58,237,'+(.22+i*.12)+')';ctx.beginPath();ctx.moveTo(350+i*18,150-i*15);ctx.lineTo(470,78);ctx.stroke();}
+          } else if (trajectory === '漫游') {
+            ctx.fillStyle='rgba(217,119,6,.12)';ctx.fillRect(64,62,438,54);ctx.strokeStyle=C.orange;ctx.lineWidth=2;ctx.strokeRect(64,62,438,54);label(ctx,'走廊 / 街道远端',438,92,C.orange,11,'center');
+          } else {
+            ctx.strokeStyle=C.brown;ctx.lineWidth=2;for(let i=0;i<4;i+=1){ctx.strokeRect(94+i*96,78+i*18,68,48);}label(ctx,'抬高视点，补屋顶与平台',310,42,C.brown,11,'center');
+            ctx.fillStyle='rgba(146,64,14,.12)';ctx.beginPath();ctx.moveTo(488,50);ctx.lineTo(430,168);ctx.lineTo(540,168);ctx.closePath();ctx.fill();
+          }
 
           if (stage >= 1) {
             const candidates: Point[][] = [routeInfo.path, [[62,226],[178,190],[252,126],[382,80],[506,88]], [[62,226],[118,112],[248,116],[372,174],[506,88]]];

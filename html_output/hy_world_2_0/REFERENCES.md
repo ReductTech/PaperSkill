@@ -2,6 +2,24 @@
 
 本文档汇总 HY-World 2.0 教程使用的外部资料，并标明资料层级、适合解决的问题和使用边界。资料于 2026-08-16 联网核验。论文事实、公式和实验数字以论文为准；官方网页用于确认当前产品与开源状态；第三方文章只用于补充讲解视角。
 
+## V0.46 教学重构的证据映射
+
+本轮没有新增外部事实来源，而是重新绑定现有证据与交互目的：
+
+| 教程模块 | 交互用于解释 | 最终事实锚点 |
+| --- | --- | --- |
+| 1.2 四阶段管线 | WorldNav 候选淘汰、WorldStereo 目标帧视差 | 论文 Figure 2、Figure 4-8 与官方四阶段说明图 |
+| 2.1 全景故障擦除 | 隐式映射、Circle Padding、Pixel Blending 的层级分工 | Section 3.2、Table 4 |
+| 2.2 数据配方显微镜 | 真实/合成互补、domain gap、接缝与设备污染过滤 | Section 3.1；百分比均为教学抽象 |
+| 3.2 GGM × SSM++ | 全局几何锚点与局部历史视角的不同职责 | Section 4、Table 8 |
+| 4.2 DMD 蒸馏 | 多步教师、少步学生和分数差更新 | Section 4；Table 10 用于完整系统耗时边界 |
+| 5.1 Normalized RoPE | 同一相对位置跨分辨率保持可比 | 公式与 Table 11、Table 12 |
+| 5.2 Any-Modal 架构 | 共享骨干、可选先验与专用任务头 | Figure 12、Table 11 |
+| 6.1 3DGS 配方 | 降采样、增密、MaskGaussian 与非天空限制的因果链 | Table 9 |
+| 7.3 性能分簇图 | 原始数值大小与指标方向 | Table 4、Table 12、Table 14 |
+
+动画中的物体位置、污染覆盖、纹理密度和漂浮物数量只承担机制解释，不是论文新增实验。所有论文数值仍以可展开原表为准。
+
 ## 一手论文与官方入口
 
 | 资料 | 链接 | 已核验信息 | 使用边界 |
@@ -32,15 +50,15 @@
 
 | 教程文件 | 官方原文件 | 教程用途 | 证据边界 |
 | --- | --- | --- | --- |
-| `official-reconstruction.gif` | [`assets/recon_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/recon_en.gif) | 第 8 章展示多视图/视频到三维资产的重建流程 | 产品/仓库演示，不代表所有输入都能达到相同效果 |
-| `official-mesh.gif` | [`assets/mesh_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/mesh_en.gif) | 第 9 章展示可漫游的轻量 Mesh | 说明资产形态与漫游体验，不是网格质量的统一指标 |
-| `official-interactive.gif` | [`assets/interactive.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/interactive.gif) | 第 9 章展示角色移动、碰撞与空间交互 | 说明官方演示能力，不等同于论文中的定量性能结论 |
+| `official-reconstruction.gif` | [`assets/recon_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/recon_en.gif) | 第 5 章展示多视图/视频到三维资产的重建流程 | 产品/仓库演示，不代表所有输入都能达到相同效果 |
+| `official-mesh.gif` | [`assets/mesh_en.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/mesh_en.gif) | 第 6 章展示可漫游的轻量 Mesh | 说明资产形态与漫游体验，不是网格质量的统一指标 |
+| `official-interactive.gif` | [`assets/interactive.gif`](https://github.com/Tencent-Hunyuan/HY-World-2.0/blob/main/assets/interactive.gif) | 第 6 章展示角色移动、碰撞与空间交互 | 说明官方演示能力，不等同于论文中的定量性能结论 |
 
 所有动态素材的公开使用仍受官方仓库当前许可证与 Notice 要求约束。本教程 README 已逐项标注来源，压缩版本未加入新的视觉内容或结论。
 
 ## 官方四阶段说明图
 
-以下静态图来自腾讯混元 HY-World 2.0 项目主页，放入模块 1.1 各阶段的可展开证据槽。它们用于把 Canvas 教学动画映射回官方系统说明，不用于证明性能优于其它模型，也不替代论文表格中的实验协议。
+以下静态图来自腾讯混元 HY-World 2.0 项目主页，放入模块 1.2 各阶段的可展开证据槽。它们用于把 Canvas 教学动画映射回官方系统说明，不用于证明性能优于其它模型，也不替代论文表格中的实验协议。
 
 | 教程文件 | 项目主页原图 | 对应阶段 | 教程用途与边界 |
 | --- | --- | --- | --- |
