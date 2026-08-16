@@ -1,0 +1,22 @@
+import React from 'react';
+import {VideoAgentWidget} from './VideoAgentWidget';
+import {AblationLab,AgentGraphLab,AgentSelectionLab,DirectorTimelineLab,DualChallengeLab,EditingDeskScene,HeroPipeline,InputOutputLab,LimitationsLab,ResultsLab,RetrievalLab,ShotPlanningLab,TextualGradientLab,TrimmingLab} from './SpecializedWidgets';
+export interface WidgetProps{chapterId:string;moduleId:string}
+export const widgetRegistry:Record<string,React.FC<WidgetProps>>={};
+widgetRegistry['videoagent-hero']=VideoAgentWidget;
+widgetRegistry['videoagent-scene']=VideoAgentWidget;
+widgetRegistry['videoagent-module']=VideoAgentWidget;
+widgetRegistry['hero-pipeline']=HeroPipeline;
+widgetRegistry['editing-desk-scene']=EditingDeskScene;
+widgetRegistry['dual-challenge-lab']=DualChallengeLab;
+widgetRegistry['input-output-lab']=InputOutputLab;
+widgetRegistry['director-timeline-lab']=DirectorTimelineLab;
+widgetRegistry['shot-planning-lab']=ShotPlanningLab;
+widgetRegistry['retrieval-lab']=RetrievalLab;
+widgetRegistry['trimming-lab']=TrimmingLab;
+widgetRegistry['agent-selection-lab']=AgentSelectionLab;
+widgetRegistry['agent-graph-lab']=AgentGraphLab;
+widgetRegistry['textual-gradient-lab']=TextualGradientLab;
+widgetRegistry['ablation-lab']=AblationLab;
+widgetRegistry['results-lab']=ResultsLab;
+widgetRegistry['limitations-lab']=LimitationsLab;

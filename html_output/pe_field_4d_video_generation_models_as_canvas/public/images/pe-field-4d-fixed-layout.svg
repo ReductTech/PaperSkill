@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1506" height="820" viewBox="0 0 1506 820" role="img" aria-labelledby="title desc" shape-rendering="geometricPrecision">
+  <title id="title">PE-Field 4D完整数据流</title>
+  <desc id="desc">目标噪声经原始地址进入Backbone，参考帧分别经过VAE内容编码与ViPE几何建模，再以成对参考记忆进入联合注意力。</desc>
+  <defs>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#d7deea" stroke-width="1" opacity=".45"/>
+    </pattern>
+    <clipPath id="noise-clip"><rect x="42" y="108" width="212" height="120" rx="10"/></clipPath>
+    <clipPath id="reference-clip"><rect x="42" y="439" width="142" height="198" rx="10"/></clipPath>
+    <marker id="arrow-navy" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 11 5.5 0 11Z" fill="#27446e"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 11 5.5 0 11Z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 11 5.5 0 11Z" fill="#d97706"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 11 5.5 0 11Z" fill="#228d5c"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+      .title { font-size: 22px; font-weight: 750; }
+      .node-title { font-size: 21px; font-weight: 750; }
+      .node-sub { font-size: 17px; font-weight: 600; fill: #68778f; }
+      .navy-stroke { fill: none; stroke: #27446e; stroke-width: 4; stroke-linejoin: miter; }
+      .purple-stroke { fill: none; stroke: #7c3aed; stroke-width: 4; stroke-linejoin: miter; }
+      .orange-stroke { fill: none; stroke: #d97706; stroke-width: 4; stroke-linejoin: miter; }
+      .green-stroke { fill: none; stroke: #228d5c; stroke-width: 4; stroke-linejoin: miter; }
+      .block { fill: #fff; stroke-width: 3; }
+    </style>
+  </defs>
+
+  <rect width="1506" height="820" fill="#f5f8f0"/>
+  <rect width="1506" height="820" fill="url(#grid)"/>
+
+  <!-- Connections render behind nodes. All routes are orthogonal. -->
+  <path d="M254 168H336" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+  <path d="M617 167H664V151H891" class="purple-stroke" marker-end="url(#arrow-purple)"/>
+  <path d="M1309 299V361" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+
+  <path d="M184 499H206V446H261" class="green-stroke" marker-end="url(#arrow-green)"/>
+  <path d="M491 446H554" class="green-stroke" marker-end="url(#arrow-green)"/>
+  <path d="M757 446H841" class="green-stroke" marker-end="url(#arrow-green)"/>
+  <path d="M948 387V239" class="orange-stroke" marker-end="url(#arrow-orange)"/>
+
+  <path d="M184 580H204V631H270" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+  <path d="M461 631H547" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+  <path d="M773 631H834" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+  <path d="M949 570V530" class="navy-stroke" marker-end="url(#arrow-navy)"/>
+  <path d="M660 766V691" class="orange-stroke" marker-end="url(#arrow-orange)"/>
+
+  <!-- Target noise and its native address. -->
+  <text x="148" y="63" text-anchor="middle" class="title" fill="#7c3aed">目标噪声 Latent X</text>
+  <text x="148" y="94" text-anchor="middle" font-size="20" font-weight="750" fill="#21324a">形状：[B, N, D]</text>
+  <rect x="42" y="108" width="212" height="120" rx="10" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+  <image href="pe-field-target-noise.png" x="42" y="108" width="212" height="120" preserveAspectRatio="xMidYMid slice" clip-path="url(#noise-clip)" style="image-rendering:pixelated"/>
+
+  <rect x="336" y="102" width="281" height="129" rx="13" class="block" stroke="#21324a"/>
+  <text x="476.5" y="148" text-anchor="middle" class="node-title" fill="#21324a">原始地址 Pₓ</text>
+  <text x="476.5" y="211" text-anchor="middle" class="node-sub">形状：[B, N, 3]</text>
+
+  <!-- Backbone and one repeated block. -->
+  <rect x="696" y="23" width="741" height="276" rx="20" fill="#d97706" fill-opacity=".055" stroke="#d97706" stroke-width="3.5"/>
+  <text x="722" y="61" class="title" fill="#d97706">Backbone</text>
+  <rect x="716" y="74" width="711" height="197" rx="19" fill="#f8ead4" stroke="#d97706" stroke-width="3.5"/>
+  <text x="742" y="112" class="title" fill="#d97706">Block <tspan fill="#21324a">×N</tspan></text>
+
+  <!-- Keep both embedding branches visibly connected to Attention above the Block fill. -->
+  <path d="M1017 151H1118V168H1186" class="purple-stroke" marker-end="url(#arrow-purple)"/>
+  <path d="M1018 223H1186" class="orange-stroke" marker-end="url(#arrow-orange)"/>
+
+  <text x="955" y="120" text-anchor="middle" class="title" fill="#7c3aed">Embeddings X</text>
+  <rect x="890" y="136" width="22" height="31" rx="6" fill="#7c3aed" fill-opacity=".14" stroke="#7c3aed" stroke-width="2.5"/>
+  <rect x="921" y="136" width="22" height="31" rx="6" fill="#7c3aed" fill-opacity=".14" stroke="#7c3aed" stroke-width="2.5"/>
+  <text x="969" y="159" text-anchor="middle" font-size="21" font-weight="800" fill="#68778f">…</text>
+  <rect x="996" y="136" width="22" height="31" rx="6" fill="#7c3aed" fill-opacity=".14" stroke="#7c3aed" stroke-width="2.5"/>
+  <text x="1098" y="139" text-anchor="middle" font-size="17" font-weight="750" fill="#7c3aed">RoPE(Qₓ; Kₓ, Pₓ)</text>
+
+  <text x="955" y="192" text-anchor="middle" class="title" fill="#d97706">Embeddings Y</text>
+  <rect x="890" y="208" width="22" height="30" rx="6" fill="#228d5c" fill-opacity=".14" stroke="#228d5c" stroke-width="2.5"/>
+  <rect x="921" y="208" width="22" height="30" rx="6" fill="#d97706" fill-opacity=".14" stroke="#d97706" stroke-width="2.5"/>
+  <text x="969" y="231" text-anchor="middle" font-size="21" font-weight="800" fill="#68778f">…</text>
+  <rect x="996" y="208" width="22" height="30" rx="6" fill="#27446e" fill-opacity=".14" stroke="#27446e" stroke-width="2.5"/>
+  <text x="1080" y="215" text-anchor="middle" font-size="17" font-weight="750" fill="#d97706">RoPE(Kᵧ, Pᵧ)</text>
+
+  <rect x="1186" y="103" width="230" height="147" rx="16" class="block" stroke="#d97706"/>
+  <rect x="1342" y="88" width="62" height="28" rx="14" fill="#228d5c"/>
+  <text x="1373" y="107" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">LoRA</text>
+  <text x="1301" y="148" text-anchor="middle" class="node-title" fill="#d97706">Attention</text>
+  <text x="1301" y="199" text-anchor="middle" font-size="17" font-weight="750" fill="#21324a">(Qₓ, <tspan fill="#27446e">Kₓ</tspan>; <tspan fill="#d97706">Kᵧ</tspan>; <tspan fill="#27446e">Vₓ</tspan>; <tspan fill="#d97706">Vᵧ</tspan>)</text>
+
+  <rect x="1258" y="361" width="102" height="132" rx="16" class="block" stroke="#21324a"/>
+  <text x="1309" y="405" text-anchor="middle" class="node-title" fill="#21324a">x₀</text>
+  <text x="1309" y="469" text-anchor="middle" class="node-sub">输出</text>
+
+  <!-- Reference content branch. -->
+  <text x="48" y="396" class="title" fill="#d97706">同一参考帧 sᵢ</text>
+  <rect x="42" y="439" width="142" height="198" rx="10" fill="#fff" stroke="#d97706" stroke-width="2"/>
+  <image href="person-drinking-cola-turntable-v3.png" x="42" y="439" width="710" height="198" preserveAspectRatio="xMidYMid slice" clip-path="url(#reference-clip)"/>
+
+  <rect x="261" y="386" width="230" height="120" rx="15" class="block" stroke="#21324a"/>
+  <text x="376" y="431" text-anchor="middle" class="node-title" fill="#21324a">VAE</text>
+  <text x="376" y="484" text-anchor="middle" class="node-sub">逐帧复制后编码</text>
+
+  <rect x="554" y="386" width="203" height="120" rx="15" class="block" stroke="#21324a"/>
+  <text x="655.5" y="453" text-anchor="middle" class="node-title" fill="#21324a">内容Token yᵢ</text>
+
+  <rect x="841" y="387" width="214" height="143" rx="15" class="block" stroke="#21324a"/>
+  <text x="948" y="432" text-anchor="middle" class="node-title" fill="#21324a">成对参考记忆</text>
+  <text x="948" y="507" text-anchor="middle" class="node-sub">(yᵢ, Pᵧ)</text>
+
+  <!-- Geometry branch. -->
+  <rect x="270" y="570" width="191" height="121" rx="15" class="block" stroke="#21324a"/>
+  <text x="365.5" y="616" text-anchor="middle" class="node-title" fill="#21324a">ViPE建模</text>
+  <text x="365.5" y="669" text-anchor="middle" class="node-sub">深度 + 源相机</text>
+
+  <rect x="547" y="570" width="226" height="121" rx="15" class="block" stroke="#21324a"/>
+  <text x="660" y="622" text-anchor="middle" class="node-title" fill="#21324a">位置重投影</text>
+
+  <rect x="834" y="570" width="230" height="121" rx="15" class="block" stroke="#21324a"/>
+  <text x="949" y="616" text-anchor="middle" class="node-title" fill="#21324a">目标地址 Pᵧ</text>
+  <text x="949" y="669" text-anchor="middle" class="node-sub">(t+Δd,h̃,w̃)</text>
+
+  <text x="660" y="796" text-anchor="middle" class="title" fill="#d97706">相机轨迹</text>
+</svg>

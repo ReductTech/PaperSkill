@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 880" role="img" aria-labelledby="title desc">
+  <title id="title">PE-Field 4D data-centric architecture</title>
+  <desc id="desc">A scientific diagram tracing reference video, geometry, and target latent data through the VAE encoder, geometry-aware Video Diffusion Transformer backbone, VAE decoder, and output video.</desc>
+  <defs>
+    <style>
+      .title { font: 700 31px 'Times New Roman', Times, serif; fill: #111; }
+      .stage { font: 700 22px 'Times New Roman', Times, serif; fill: #111; letter-spacing: .4px; }
+      .label { font: 19px 'Times New Roman', Times, serif; fill: #111; }
+      .label-bold { font: 700 19px 'Times New Roman', Times, serif; fill: #111; }
+      .math { font: italic 19px 'Times New Roman', Times, serif; fill: #111; }
+      .small { font: 16px 'Times New Roman', Times, serif; fill: #444; }
+      .tiny { font: 14px 'Times New Roman', Times, serif; fill: #555; }
+      .blue { fill: #365f91; }
+      .blue-stroke { stroke: #365f91; }
+      .ink { stroke: #1a1a1a; }
+      .muted { stroke: #8a8a8a; }
+      .line { fill: none; stroke-width: 1.8; }
+      .thin { fill: none; stroke-width: 1.25; }
+      .dash { stroke-dasharray: 7 6; }
+      .divider { stroke: #c8c8c8; stroke-width: 1.2; stroke-dasharray: 4 7; }
+      .node { fill: #fff; stroke: #222; stroke-width: 1.4; }
+      .soft { fill: #f5f5f5; stroke: #777; stroke-width: 1.2; }
+      .pe-node { fill: #f6f8fb; stroke: #365f91; stroke-width: 1.5; }
+      .no-fill { fill: #fff; }
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#365f91"/>
+    </marker>
+    <marker id="arrow-muted" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#8a8a8a"/>
+    </marker>
+    <pattern id="noise" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="3" r="1.2" fill="#333"/>
+      <circle cx="8" cy="8" r="1" fill="#999"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="880" fill="#fff"/>
+  <text x="800" y="43" text-anchor="middle" class="title">PE-Field 4D: Data Flow Through the Core Architecture</text>
+  <line x1="45" y1="63" x2="1555" y2="63" class="thin ink"/>
+
+  <!-- Stage labels and restrained separators -->
+  <text x="145" y="101" text-anchor="middle" class="stage">INPUT</text>
+  <text x="405" y="101" text-anchor="middle" class="stage">ENCODER</text>
+  <text x="895" y="101" text-anchor="middle" class="stage">VIDEO DiT BACKBONE</text>
+  <text x="1310" y="101" text-anchor="middle" class="stage">DECODER</text>
+  <text x="1490" y="101" text-anchor="middle" class="stage">OUTPUT</text>
+  <line x1="45" y1="113" x2="245" y2="113" class="thin ink"/>
+  <line x1="315" y1="113" x2="495" y2="113" class="thin ink"/>
+  <line x1="620" y1="113" x2="1170" y2="113" class="thin ink"/>
+  <line x1="1250" y1="113" x2="1370" y2="113" class="thin ink"/>
+  <line x1="1445" y1="113" x2="1535" y2="113" class="thin ink"/>
+  <line x1="280" y1="83" x2="280" y2="802" class="divider"/>
+  <line x1="575" y1="83" x2="575" y2="802" class="divider"/>
+  <line x1="1215" y1="83" x2="1215" y2="802" class="divider"/>
+  <line x1="1415" y1="83" x2="1415" y2="802" class="divider"/>
+
+  <!-- Input: reference RGB frames -->
+  <text x="45" y="150" class="label-bold">Reference appearance</text>
+  <g transform="translate(52 174)">
+    <rect x="30" y="0" width="126" height="76" class="node"/>
+    <path d="M30 53 L58 30 L84 48 L105 22 L156 62" class="thin muted"/>
+    <circle cx="127" cy="23" r="8" fill="#d9d9d9"/>
+    <rect x="15" y="14" width="126" height="76" class="node"/>
+    <path d="M15 67 L43 44 L69 62 L90 36 L141 76" class="thin muted"/>
+    <circle cx="112" cy="37" r="8" fill="#d9d9d9"/>
+    <rect x="0" y="28" width="126" height="76" class="node"/>
+    <path d="M0 81 L28 58 L54 76 L75 50 L126 90" class="thin ink"/>
+    <circle cx="97" cy="51" r="8" fill="#bdbdbd"/>
+  </g>
+  <text x="45" y="302" class="math">I<tspan baseline-shift="sub" font-size="14">ref</tspan> ∈ R<tspan baseline-shift="super" font-size="14">B×Tₛ×3×H×W</tspan></text>
+  <text x="45" y="326" class="small">RGB reference frames</text>
+
+  <!-- Input: geometry -->
+  <text x="45" y="390" class="label-bold blue">Source-to-target geometry</text>
+  <g transform="translate(60 414)">
+    <path d="M20 60 L80 18 L140 60 Z" class="thin blue-stroke"/>
+    <circle cx="80" cy="18" r="4" fill="#365f91"/>
+    <line x1="80" y1="18" x2="80" y2="84" class="thin blue-stroke dash"/>
+    <path d="M154 72 h55 l-14 -13 m14 13 l-14 13" class="line blue-stroke"/>
+  </g>
+  <text x="45" y="526" class="math blue">G = {D<tspan baseline-shift="sub" font-size="14">ref</tspan>, C<tspan baseline-shift="sub" font-size="14">src</tspan>, C<tspan baseline-shift="sub" font-size="14">tgt</tspan>}</text>
+  <text x="45" y="550" class="small">depth and camera parameters</text>
+
+  <!-- Input: target latent -->
+  <text x="45" y="626" class="label-bold">Target generation state</text>
+  <rect x="60" y="647" width="152" height="72" fill="url(#noise)" stroke="#222" stroke-width="1.4"/>
+  <text x="136" y="745" text-anchor="middle" class="math">x<tspan baseline-shift="sub" font-size="14">τ</tspan> ∈ R<tspan baseline-shift="super" font-size="14">B×N×D</tspan></text>
+  <text x="45" y="772" class="small">inference starts from x<tspan baseline-shift="sub" font-size="12">T</tspan> ~ N(0, I)</text>
+
+  <!-- Encoder: frame identity preservation -->
+  <text x="405" y="151" text-anchor="middle" class="label-bold">Frame-identity context encoding</text>
+  <g transform="translate(298 173)">
+    <rect x="0" y="0" width="42" height="48" class="node"/>
+    <rect x="11" y="9" width="42" height="48" class="node"/>
+    <rect x="22" y="18" width="42" height="48" class="node"/>
+    <text x="32" y="90" text-anchor="middle" class="small">repeat each frame × r</text>
+    <path d="M82 34 H130" class="line ink" marker-end="url(#arrow)"/>
+    <rect x="140" y="3" width="118" height="62" rx="2" class="node"/>
+    <text x="199" y="30" text-anchor="middle" class="label-bold">Video VAE</text>
+    <text x="199" y="51" text-anchor="middle" class="small">Encoder</text>
+  </g>
+  <path d="M210 224 H298" class="line ink" marker-end="url(#arrow)"/>
+  <path d="M556 207 H564 V266 H377 V286" class="line ink" marker-end="url(#arrow)"/>
+  <g transform="translate(330 288)">
+    <rect x="0" y="0" width="26" height="84" class="soft"/>
+    <rect x="34" y="0" width="26" height="84" class="soft"/>
+    <rect x="68" y="0" width="26" height="84" class="soft"/>
+    <text x="112" y="35" class="math">y ∈ R<tspan baseline-shift="super" font-size="14">B×M×D</tspan></text>
+    <text x="112" y="59" class="small">context tokens</text>
+  </g>
+  <text x="405" y="382" text-anchor="middle" class="tiny">VAE latent → patch / linear projection → tokens</text>
+  <text x="405" y="404" text-anchor="middle" class="tiny">one context latent frame ↔ one source frame</text>
+
+  <!-- Encoder: projected position field -->
+  <text x="405" y="451" text-anchor="middle" class="label-bold blue">Projected position-field encoder</text>
+  <path d="M212 470 H324" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+  <text x="405" y="488" text-anchor="middle" class="math blue">p<tspan baseline-shift="sub" font-size="14">j</tspan> → (ħ<tspan baseline-shift="sub" font-size="14">j</tspan>, w̃<tspan baseline-shift="sub" font-size="14">j</tspan>, d<tspan baseline-shift="sub" font-size="14">j</tspan>) on C<tspan baseline-shift="sub" font-size="14">tgt</tspan></text>
+  <path d="M405 505 V535" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+  <text x="405" y="568" text-anchor="middle" class="math blue">a<tspan baseline-shift="sub" font-size="14">j</tspan> = (t<tspan baseline-shift="sub" font-size="14">j</tspan> + Δ(d<tspan baseline-shift="sub" font-size="14">j</tspan>), ħ<tspan baseline-shift="sub" font-size="14">j</tspan>, w̃<tspan baseline-shift="sub" font-size="14">j</tspan>)</text>
+  <text x="405" y="596" text-anchor="middle" class="small blue">Δ(d) ∈ [0, 0.1]; content y is unchanged</text>
+  <path d="M405 613 V622 H590 V438 H632" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+
+  <!-- Target latent enters backbone without an inference-time encoder -->
+  <path d="M212 684 H604 V267 H632" class="line ink" marker-end="url(#arrow)"/>
+  <text x="397" y="674" text-anchor="middle" class="tiny">noisy target latent x<tspan baseline-shift="sub" font-size="11">τ</tspan></text>
+  <text x="405" y="726" text-anchor="middle" class="tiny">training only: I<tspan baseline-shift="sub" font-size="11">tgt</tspan> → VAE → z<tspan baseline-shift="sub" font-size="11">0</tspan> → add noise → x<tspan baseline-shift="sub" font-size="11">τ</tspan></text>
+
+  <!-- Backbone top label -->
+  <text x="895" y="143" text-anchor="middle" class="label-bold">Wan2.1 T2V 14B + geometry-aware attention</text>
+  <text x="895" y="168" text-anchor="middle" class="small">the pretrained video prior is retained; LoRA adapts q, k, v, o and FFN</text>
+
+  <!-- Backbone: target branch -->
+  <text x="635" y="220" class="label-bold">Target branch</text>
+  <rect x="632" y="238" width="164" height="58" rx="2" class="node"/>
+  <text x="714" y="263" text-anchor="middle" class="math">x<tspan baseline-shift="sub" font-size="14">τ</tspan> → Q, K<tspan baseline-shift="sub" font-size="14">x</tspan>, V<tspan baseline-shift="sub" font-size="14">x</tspan></text>
+  <text x="714" y="284" text-anchor="middle" class="tiny">RoPE(t,h,w) on Q and K<tspan baseline-shift="sub" font-size="11">x</tspan></text>
+  <path d="M796 267 H829" class="line ink" marker-end="url(#arrow)"/>
+  <g transform="translate(840 210)">
+    <text x="0" y="20" class="math">Q<tspan baseline-shift="super" font-size="14">(g)</tspan> = W<tspan baseline-shift="sub" font-size="14">q</tspan>x<tspan baseline-shift="super" font-size="14">(g)</tspan></text>
+    <text x="0" y="57" class="math">K<tspan baseline-shift="sub" font-size="14">x</tspan>, V<tspan baseline-shift="sub" font-size="14">x</tspan> = W<tspan baseline-shift="sub" font-size="14">k,v</tspan>x<tspan baseline-shift="sub" font-size="14">τ</tspan></text>
+    <text x="0" y="83" class="small">global memory shared by all f groups</text>
+  </g>
+
+  <!-- Backbone: context branch -->
+  <text x="635" y="366" class="label-bold blue">Reference context branch</text>
+  <path d="M505 347 H614 V405 H632" class="line ink" marker-end="url(#arrow)"/>
+  <rect x="632" y="384" width="184" height="66" rx="2" class="pe-node"/>
+  <text x="724" y="410" text-anchor="middle" class="math blue">y → K<tspan baseline-shift="sub" font-size="14">y</tspan>, V<tspan baseline-shift="sub" font-size="14">y</tspan></text>
+  <text x="724" y="433" text-anchor="middle" class="tiny blue">projected RoPE(a<tspan baseline-shift="sub" font-size="11">j</tspan>) on K<tspan baseline-shift="sub" font-size="11">y</tspan></text>
+  <path d="M816 417 H848" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+  <g transform="translate(858 373)">
+    <text x="0" y="22" class="math blue">K<tspan baseline-shift="sub" font-size="14">y</tspan>, V<tspan baseline-shift="sub" font-size="14">y</tspan> = W<tspan baseline-shift="sub" font-size="14">k,v</tspan>y</text>
+    <text x="0" y="58" class="math blue">(K<tspan baseline-shift="sub" font-size="14">y</tspan>,V<tspan baseline-shift="sub" font-size="14">y</tspan>) → {(K<tspan baseline-shift="sub" font-size="14">y</tspan><tspan baseline-shift="super" font-size="14">(g)</tspan>,V<tspan baseline-shift="sub" font-size="14">y</tspan><tspan baseline-shift="super" font-size="14">(g)</tspan>)}<tspan baseline-shift="sub" font-size="14">g=1</tspan><tspan baseline-shift="super" font-size="14">f</tspan></text>
+    <text x="0" y="84" class="small blue">local memory: same latent-frame group only</text>
+  </g>
+
+  <!-- Joint SDPA -->
+  <path d="M1052 276 H1093 V501 H1002" class="line ink" marker-end="url(#arrow)"/>
+  <path d="M1052 431 H1074 V514 H1002" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+  <rect x="657" y="488" width="345" height="104" rx="3" class="node"/>
+  <text x="829" y="520" text-anchor="middle" class="label-bold">Joint scaled dot-product attention</text>
+  <text x="829" y="550" text-anchor="middle" class="math">O<tspan baseline-shift="super" font-size="14">(g)</tspan> = SDPA(Q<tspan baseline-shift="super" font-size="14">(g)</tspan>, [K<tspan baseline-shift="sub" font-size="14">x</tspan>; K<tspan baseline-shift="sub" font-size="14">y</tspan><tspan baseline-shift="super" font-size="14">(g)</tspan>], [V<tspan baseline-shift="sub" font-size="14">x</tspan>; V<tspan baseline-shift="sub" font-size="14">y</tspan><tspan baseline-shift="super" font-size="14">(g)</tspan>])</text>
+  <text x="829" y="579" text-anchor="middle" class="small">global temporal consistency + position-aligned reference retrieval</text>
+
+  <path d="M1002 540 H1042" class="line ink" marker-end="url(#arrow)"/>
+  <rect x="1052" y="503" width="126" height="74" rx="2" class="node"/>
+  <text x="1115" y="530" text-anchor="middle" class="label-bold">Merge groups</text>
+  <text x="1115" y="552" text-anchor="middle" class="small">residual + FFN</text>
+  <text x="1115" y="571" text-anchor="middle" class="tiny">predict v̂ / ε̂</text>
+
+  <!-- Iterative diffusion update -->
+  <path d="M1115 577 V644 H1052" class="line muted dash" marker-end="url(#arrow-muted)"/>
+  <text x="1036" y="671" text-anchor="middle" class="small">scheduler update: x<tspan baseline-shift="sub" font-size="12">τ</tspan> → x<tspan baseline-shift="sub" font-size="12">τ−1</tspan></text>
+  <path d="M885 651 H630 V296" class="line muted dash" marker-end="url(#arrow-muted)"/>
+  <text x="804" y="706" text-anchor="middle" class="tiny">repeat until the clean target latent x<tspan baseline-shift="sub" font-size="11">0</tspan> is obtained</text>
+
+  <!-- Backbone to decoder -->
+  <path d="M1178 540 H1248" class="line ink" marker-end="url(#arrow)"/>
+  <text x="1205" y="524" text-anchor="middle" class="math">x<tspan baseline-shift="sub" font-size="14">0</tspan></text>
+
+  <!-- Decoder -->
+  <rect x="1250" y="462" width="122" height="154" rx="2" class="node"/>
+  <text x="1311" y="520" text-anchor="middle" class="label-bold">Video VAE</text>
+  <text x="1311" y="548" text-anchor="middle" class="label-bold">Decoder</text>
+  <line x1="1272" y1="565" x2="1350" y2="565" class="thin muted"/>
+  <text x="1311" y="592" text-anchor="middle" class="small">latent → RGB</text>
+
+  <!-- Output video -->
+  <path d="M1372 539 H1441" class="line ink" marker-end="url(#arrow)"/>
+  <g transform="translate(1450 446)">
+    <rect x="0" y="0" width="112" height="174" class="node"/>
+    <rect x="10" y="13" width="92" height="42" class="soft"/>
+    <path d="M18 47 L42 28 L60 40 L76 24 L94 46" class="thin ink"/>
+    <rect x="10" y="66" width="92" height="42" class="soft"/>
+    <path d="M18 99 L45 79 L63 91 L80 74 L95 96" class="thin ink"/>
+    <rect x="10" y="119" width="92" height="42" class="soft"/>
+    <path d="M18 152 L48 132 L66 144 L84 126 L96 149" class="thin ink"/>
+  </g>
+  <text x="1506" y="651" text-anchor="middle" class="math">I<tspan baseline-shift="sub" font-size="14">out</tspan> ∈ R<tspan baseline-shift="super" font-size="14">B×T×3×H×W</tspan></text>
+  <text x="1490" y="680" text-anchor="middle" class="tiny">RGB video following C<tspan baseline-shift="sub" font-size="11">tgt</tspan></text>
+  <text x="1490" y="706" text-anchor="middle" class="tiny">re-trajectory / novel view</text>
+
+  <!-- Compact scientific legend and key statement -->
+  <line x1="52" y1="829" x2="112" y2="829" class="line ink" marker-end="url(#arrow)"/>
+  <text x="124" y="835" class="small">content / latent tensor</text>
+  <line x1="325" y1="829" x2="385" y2="829" class="line blue-stroke" marker-end="url(#arrow-blue)"/>
+  <text x="397" y="835" class="small">geometric positional address</text>
+  <line x1="675" y1="829" x2="735" y2="829" class="line muted dash" marker-end="url(#arrow-muted)"/>
+  <text x="747" y="835" class="small">diffusion iteration / training-only path</text>
+  <text x="1548" y="835" text-anchor="end" class="label-bold">Geometry rewrites the address, not the content.</text>
+</svg>

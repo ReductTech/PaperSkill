@@ -1,0 +1,612 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-paper: #fffdf7;
+  --paper-accent-2: #d97706;
+  --paper-restoration-green: #76906a;
+  --paper-restoration-light: #b8c9a7;
+  --ui-bg-page: #edf2e8;
+  --ui-bg-page-top: #faf9f2;
+  --ui-bg-muted: #f6f5ed;
+  --ui-bg-soft: #edf1e8;
+}
+
+/* Keep the landing page focused on the research question and answer.
+   Applicability/limitations now live in the final tutorial page. */
+.hero-scope-grid {
+  display: none;
+}
+
+.hero-compare {
+  display: grid;
+  max-width: 760px;
+  gap: 14px;
+  margin: 18px auto 24px;
+}
+
+.hero-compare .bg-side-head,
+.hero-compare .bg-side-tag {
+  display: none;
+}
+
+.hero-compare .bg-side {
+  background: var(--paper-scene-bg);
+  border-color: rgba(118, 144, 106, 0.28);
+  box-shadow: 0 10px 26px rgba(28, 57, 46, 0.07);
+}
+
+.hero-compare .bg-side-canvas {
+  background: var(--paper-scene-bg);
+}
+
+.hero-inner {
+  max-width: 900px;
+}
+
+.hero-abs {
+  max-width: 860px;
+  margin-bottom: 20px;
+  font-size: clamp(19px, 1.7vw, 22px);
+  line-height: 1.78;
+}
+
+.hero-meta {
+  margin-top: 6px;
+  margin-bottom: 24px;
+}
+
+/* Presentation mode uses module-level scenes. Give each short scene a larger
+   stage so the Canvas and core explanation are readable from a distance. */
+.presentation-dock {
+  max-width: 1180px;
+}
+
+main.is-presentation {
+  max-width: 1280px;
+  padding-inline: 18px;
+}
+
+main.is-presentation section.chap {
+  min-height: calc(100vh - 118px);
+  padding: 38px 46px 44px;
+}
+
+main.is-presentation .chap-title {
+  margin-bottom: 18px;
+  font-size: clamp(34px, 3vw, 44px);
+  line-height: 1.2;
+}
+
+main.is-presentation .analogy-card {
+  min-height: 164px;
+  margin-bottom: 22px;
+}
+
+main.is-presentation .analogy-visual {
+  width: 300px;
+}
+
+main.is-presentation .analogy-title {
+  font-size: 19px;
+}
+
+main.is-presentation .analogy-text,
+main.is-presentation .module-desc {
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+main.is-presentation .module-head h4 {
+  font-size: 23px;
+}
+
+main.is-presentation .module-body {
+  padding: 24px 30px 30px;
+}
+
+main.is-presentation .paper-widget canvas,
+main.is-presentation .module-body > canvas {
+  width: min(100%, 700px) !important;
+}
+
+main.is-presentation .ctrl button,
+main.is-presentation .paper-task-tabs button,
+main.is-presentation .paper-stepper button,
+main.is-presentation .paper-nav-actions button,
+main.is-presentation .paper-view-tabs button,
+main.is-presentation .final-boundary-tabs button {
+  min-height: 46px;
+  font-size: 16px;
+}
+
+main.is-presentation .feedback,
+main.is-presentation .insight-bar {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* Paper-specific explanatory prose: turn each analogy into a compact
+   "intuition -> causal chain -> conclusion" teaching block. */
+.concept-lead,
+.concept-payoff {
+  display: block;
+}
+
+.concept-lead {
+  margin-bottom: 8px;
+  color: var(--ink-2);
+}
+
+.concept-chain {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 5px 0 8px;
+  color: var(--orange);
+  line-height: 1.45;
+}
+
+.concept-chain b {
+  color: var(--orange);
+  font-weight: 800;
+}
+
+.concept-chain i {
+  color: var(--paper-restoration-green);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.concept-payoff {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.module-desc b,
+.insight-bar b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* Paper-specific mechanism explorers. These controls deliberately use
+   building, scrubbing and viewpoint switching instead of quiz-only choices. */
+.agentic-widget,
+.training-widget {
+  position: relative;
+}
+
+.agentic-widget canvas,
+.training-widget canvas {
+  box-shadow: 0 16px 40px rgba(28, 57, 46, 0.08);
+}
+
+.paper-explorer-toolbar,
+.paper-scrubber {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(118, 144, 106, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 253, 247, 0.92);
+  box-shadow: 0 8px 24px rgba(28, 57, 46, 0.05);
+}
+
+.paper-control-label,
+.paper-scrubber-head {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.paper-task-tabs,
+.paper-view-tabs,
+.paper-stepper,
+.paper-nav-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paper-task-tabs {
+  margin-top: 9px;
+}
+
+.paper-task-tabs button,
+.paper-stepper button,
+.paper-nav-actions button,
+.paper-view-tabs button {
+  min-height: 40px;
+  border: 1px solid rgba(118, 144, 106, 0.38);
+  border-radius: 11px;
+  background: #fffdf8;
+  color: var(--ink-2);
+  font-weight: 750;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.paper-task-tabs button:hover,
+.paper-stepper button:hover,
+.paper-nav-actions button:hover:not(:disabled),
+.paper-view-tabs button:hover {
+  transform: translateY(-1px);
+  border-color: var(--blue);
+  box-shadow: 0 7px 16px rgba(37, 79, 132, 0.12);
+}
+
+.paper-task-tabs button.active,
+.paper-view-tabs button.active {
+  border-color: var(--blue);
+  background: #e8f1fb;
+  color: var(--blue);
+  box-shadow: inset 0 0 0 1px rgba(37, 79, 132, 0.1);
+}
+
+.paper-stepper {
+  margin-top: 10px;
+}
+
+.paper-stepper button {
+  flex: 1 1 132px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.paper-stepper button span,
+.paper-view-tabs button span {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ui-bg-soft);
+}
+
+.paper-stepper button.done {
+  border-color: rgba(40, 125, 73, 0.42);
+  background: #eef8f0;
+  color: var(--green);
+}
+
+.paper-stepper button.active {
+  border-color: var(--blue);
+  background: #e8f1fb;
+  color: var(--blue);
+  box-shadow: 0 7px 16px rgba(37, 79, 132, 0.1);
+}
+
+.paper-stepper button.active span {
+  background: var(--blue);
+  color: white;
+}
+
+.paper-nav-actions {
+  justify-content: flex-end;
+  margin: 10px 0 4px;
+}
+
+.paper-nav-actions button {
+  min-width: 112px;
+}
+
+.paper-nav-actions button.primary {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.paper-nav-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.paper-scrubber-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.paper-scrubber-head strong {
+  color: var(--blue);
+}
+
+.paper-scrubber input[type='range'] {
+  width: 100%;
+  margin: 14px 0 5px;
+  accent-color: var(--blue);
+  cursor: ew-resize;
+}
+
+.paper-scrubber-labels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.paper-scrubber-labels button {
+  padding: 3px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.paper-scrubber-labels button.active {
+  color: var(--blue);
+}
+
+.paper-scrubber-labels button:first-child {
+  text-align: left;
+}
+
+.paper-scrubber-labels button:nth-child(2) {
+  text-align: center;
+}
+
+.paper-scrubber-labels button:last-child {
+  text-align: right;
+}
+
+.paper-view-tabs {
+  margin: 10px 0 4px;
+}
+
+.paper-view-tabs button {
+  flex: 1 1 140px;
+}
+
+.paper-view-tabs button.active span {
+  background: var(--blue);
+  color: white;
+}
+
+/* A large, page-like final summary for applicability and limitations. */
+.final-boundary-page {
+  margin-top: 26px;
+}
+
+.final-boundary-intro {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border: 1px solid rgba(37, 79, 132, 0.22);
+  border-radius: 14px;
+  background: #f4f8fc;
+}
+
+.final-boundary-intro strong {
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+}
+
+.final-boundary-intro span {
+  color: var(--ink-2);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.final-boundary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.final-boundary-card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(118, 144, 106, 0.32);
+  border-top: 6px solid var(--green);
+  border-radius: 16px;
+  background: #f3faf5;
+  box-shadow: 0 13px 30px rgba(28, 57, 46, 0.08);
+}
+
+.final-boundary-card.is-requirements {
+  border-top-color: var(--blue);
+  background: #f1f6fc;
+}
+
+.final-boundary-card.is-limits {
+  border-top-color: var(--orange);
+  background: #fff8ec;
+}
+
+.final-boundary-card-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(31, 56, 48, 0.12);
+}
+
+.final-boundary-icon {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.is-requirements .final-boundary-icon {
+  background: var(--blue);
+}
+
+.is-limits .final-boundary-icon {
+  background: var(--orange);
+}
+
+.final-boundary-card-head span:not(.final-boundary-icon) {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.final-boundary-card-head h5 {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+}
+
+.final-boundary-headline {
+  min-height: 88px;
+  margin: 18px 0 14px;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.final-boundary-card ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.final-boundary-card li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--ink-2);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.final-boundary-card li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--green);
+  content: '•';
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.is-requirements li::before {
+  color: var(--blue);
+}
+
+.is-limits li::before {
+  color: var(--orange);
+}
+
+.final-boundary-conclusion {
+  margin-top: 18px;
+  padding: 17px 21px;
+  border-left: 5px solid var(--blue);
+  border-radius: 10px;
+  background: #eef4fb;
+  color: var(--ink-2);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.final-boundary-conclusion strong {
+  color: var(--blue);
+}
+
+main.is-presentation .final-boundary-intro strong,
+main.is-presentation .final-boundary-card-head h5 {
+  font-size: 26px;
+}
+
+main.is-presentation .final-boundary-headline {
+  font-size: 20px;
+}
+
+main.is-presentation .final-boundary-card li,
+main.is-presentation .final-boundary-conclusion {
+  font-size: 18px;
+}
+
+@media (max-width: 640px) {
+  .hero-abs {
+    font-size: 18px;
+    line-height: 1.72;
+  }
+
+  .hero-compare {
+    grid-template-columns: 1fr;
+  }
+
+  main.is-presentation {
+    padding-inline: 8px;
+  }
+
+  main.is-presentation section.chap {
+    min-height: auto;
+    padding: 22px 16px 28px;
+  }
+
+  main.is-presentation .chap-title {
+    font-size: 28px;
+  }
+
+  main.is-presentation .analogy-visual {
+    width: 100%;
+  }
+
+  main.is-presentation .paper-widget canvas,
+  main.is-presentation .module-body > canvas {
+    width: 100% !important;
+  }
+
+  .concept-chain {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .concept-chain i {
+    transform: rotate(90deg);
+    margin-left: 12px;
+  }
+
+  .paper-explorer-toolbar,
+  .paper-scrubber {
+    padding: 12px;
+  }
+
+  .paper-scrubber-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .paper-stepper button {
+    flex-basis: calc(50% - 4px);
+  }
+
+  .paper-nav-actions button {
+    flex: 1;
+  }
+
+  .final-boundary-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .final-boundary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .final-boundary-headline {
+    min-height: 0;
+  }
+}

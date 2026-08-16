@@ -1,0 +1,233 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-desk: #e7eddf;
+  --paper-sheet: #fffdf7;
+  --paper-ink: #21324a;
+  --paper-proof: #92400e;
+  --paper-guide: #27446e;
+  --paper-approve: #228d5c;
+  --paper-warning: #c43f52;
+  --paper-marker: #d97706;
+}
+
+.paper-original-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.paper-original-figure {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.paper-original-caption,
+.evidence-note {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.architecture-figure {
+  margin: 0 0 18px;
+}
+
+.architecture-figure .paper-original-figure {
+  max-height: none;
+  background: #fff;
+}
+
+.architecture-figure .paper-original-caption {
+  margin-top: 8px;
+}
+
+#chap-2 > .analogy-card {
+  display: none;
+}
+
+.module-desc:empty {
+  display: none;
+}
+
+.embed-takeaway:empty {
+  display: none;
+}
+
+.dpo-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.dpo-control-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 210px) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.dpo-control-row input[type="range"] {
+  width: 100%;
+  min-width: 0;
+}
+
+.dpo-objective-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .dpo-controls {
+    display: grid;
+  }
+
+  .dpo-control-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .dpo-objective-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+.evidence-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.evidence-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.evidence-pill.fact { color: var(--green); border-color: color-mix(in srgb, var(--green) 40%, white); }
+.evidence-pill.demo { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 35%, white); }
+.evidence-pill.missing { color: var(--red); border-color: color-mix(in srgb, var(--red) 35%, white); }
+
+.aesthetic-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.eria-evaluation-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.eria-holdout-note {
+  padding: 14px 16px;
+  border-left: 4px solid var(--green);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--green) 8%, white);
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+.result-reader {
+  display: grid;
+  gap: 14px;
+}
+
+.result-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.result-section-head strong {
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.result-section-head span,
+.result-boundary {
+  color: var(--muted);
+}
+
+.result-original-figure {
+  margin: 0;
+}
+
+.result-original-figure img {
+  display: block;
+  width: 100%;
+  max-height: 980px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.result-quant-head {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.result-summary > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.result-summary span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.result-table-wrap {
+  margin: 0;
+}
+
+.result-conclusion {
+  margin: 0;
+  color: var(--green);
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.result-boundary {
+  margin: 0;
+  line-height: 1.65;
+}
+
+@media (max-width: 720px) {
+  .paper-original-grid { grid-template-columns: 1fr; }
+  .paper-original-figure { max-height: 300px; }
+  .aesthetic-flow-grid { grid-template-columns: 1fr; }
+  .result-summary { grid-template-columns: 1fr; }
+}
