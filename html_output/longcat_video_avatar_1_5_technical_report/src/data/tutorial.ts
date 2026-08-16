@@ -248,7 +248,7 @@ export const tutorial: TutorialData = {
       title: '终点：Production-ready Avatar 做到了什么？',
       badge: 'both',
       badgeLabel: '结果与边界',
-      bridge: '方法讲完，不能只看“更快”或“更稳”这样的口号。本章回到论文 Table 2，分别读取人类相似度与四类问题率，回答两个问题：<b>Base 保留了什么表现力，Fast 又用哪些质量取舍换来 8 NFE 部署</b>。',
+      bridge: '方法讲完，需要回答两个层次的问题。先用 Table 2 看清 <b>Base 与 Fast 的内部取舍</b>；再回到 Figures 1 与 8–16，把 LongCat 1.5 放进八个代表性系统中，判断它在开源路线和商业闭源系统之间究竟处在什么位置。',
       analogy: {
         title: '把主观观感和具体问题分开评估',
         text: '人类相似度采用 1–5 分，四类质量指标统计问题发生率；读表前先看清<b>该指标是越高越好，还是越低越好</b>。',
@@ -262,10 +262,17 @@ export const tutorial: TutorialData = {
           desc: '所有数值来自论文 Table 2。指标已经按汇报顺序分组：先讲 <b>Base 略优的表现力指标</b>，再集中讲 <b>Fast 更优的部署质量指标</b>。',
           componentId: 'result-console',
         },
+        {
+          kind: 'module',
+          id: '7.2',
+          title: '放回行业坐标：与开源、闭源模型逐项比较',
+          desc: '切换论文报告的单人/多人拟人度和四项专家问题率，观察 LongCat 1.5 与 <b>LongCat 1.0、InfiniteTalk、OmniAvatar</b> 等公开模型，以及 <b>HeyGen、OmniHuman 1.5、Hedra、Kling Avatar 2.0</b> 等商业或未公开权重系统之间的相对位置。',
+          componentId: 'cross-model-bench',
+        },
       ],
-      insight: 'Base（150 NFE）的动作多样性、细腻表情和镜头动态更丰富，整体人类相似度与口型同步也更占优势。Fast（8 NFE）的视觉稳定性更高，手部、身体和面部畸变更少，前向评估次数约为 Base 的 1/18.75，更适合成本敏感的大规模部署。',
+      insight: 'Base（150 NFE）保留更丰富的动作、表情和镜头动态；Fast（8 NFE）降低了畸变与跳帧，更适合成本敏感的部署。横向比较中，LongCat 1.5 在主体畸变、画面跳帧和口型问题率上领先，但单人/多人拟人度略低于 v1.0，面部表情自然度也没有超过 OmniHuman 1.5 等系统。它的核心价值是以开放权重提供一组更均衡、更易部署的能力。',
       takeaways: [
-        { icon: '📊', title: '评测规模', desc: '508 组输入、770 名众包评测者、13240 条判断和 10 名专家。' },
+        { icon: '📊', title: '行业坐标', desc: '同一 benchmark 对比 8 个系统，并区分单人、多人和专家问题率。' },
         { icon: '🎬', title: 'Base：表现力', desc: '150 NFE 保留更丰富的动作、微表情、口型细节和镜头动态。' },
         { icon: '🚀', title: 'Fast：部署性', desc: '8 NFE 带来更高稳定性和更低畸变率，大幅减少前向计算。' },
       ],

@@ -5,7 +5,7 @@ import {
 } from './StudioScenes';
 import {
   FailureLab, SolutionMap, PhonemeCompare, AudioAlignment, FrameRewardProbe,
-  HandPresence, NfeRace, LoraMemory, SpeakerRouting, DataCuration, ResultConsole,
+  HandPresence, NfeRace, LoraMemory, SpeakerRouting, DataCuration, ResultConsole, CrossModelBench,
 } from './MechanismWidgets';
 
 export interface WidgetProps {
@@ -35,3 +35,4 @@ widgetRegistry['lora-memory'] = LoraMemory;
 widgetRegistry['speaker-routing'] = SpeakerRouting;
 widgetRegistry['data-curation'] = DataCuration;
 widgetRegistry['result-console'] = ResultConsole;
+widgetRegistry['cross-model-bench'] = CrossModelBench;

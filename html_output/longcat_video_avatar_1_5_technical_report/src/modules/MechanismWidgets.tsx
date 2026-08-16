@@ -293,3 +293,69 @@ export const ResultConsole:React.FC<WidgetProps>=()=>{
   ];
   return <div><Canvas canvasRef={ref} label="Base 与 Fast 论文结果卡片对比"/><div className="lc-metric-groups"><div className="base"><b>Base 略优 · 先讲表现力</b><div>{[0,1].map(i=><button key={metrics[i].name} className={`chip ${metric===i?'selected':''}`} onClick={()=>setMetric(i)}>{metrics[i].name}</button>)}</div></div><div className="fast"><b>Fast 更优 · 再讲部署性</b><div>{[2,3,4,5].map(i=><button key={metrics[i].name} className={`chip ${metric===i?'selected':''}`} onClick={()=>setMetric(i)}>{metrics[i].name}</button>)}</div></div></div><div className={`feedback ${fastWins?'good':'lc-base-win'}`}>{summaries[metric]} 表中数值来自论文 Table 2，评测包含 508 组图像—音频输入。</div><div className="lc-model-summary"><div className="lc-model-card base"><b>Base · 150 NFE</b><span>动作多样性、微表情、口型细节和镜头动态更丰富，适合追求表现力的场景。</span></div><div className="lc-model-card fast"><b>Fast · 8 NFE</b><span>稳定性更高，手部、身体和面部畸变更少；前向评估次数减少约 18.75 倍，更适合规模化部署。</span></div></div><div className="lc-evidence-grid"><span>770 名众包评测者</span><span>13,240 条判断</span><span>10 名领域专家</span><span>口型以 0.5× 复核</span></div></div>;
 };
+
+type CrossModel = {
+  name:string;
+  access:'open'|'closed';
+  single:number;
+  multi?:number;
+  subject:number;
+  jumpcut:number;
+  lip:number;
+  expression:number;
+};
+const crossModels:CrossModel[]=[
+  {name:'LongCat 1.5',access:'open',single:3.336,multi:2.730,subject:23.1,jumpcut:.8,lip:31.6,expression:7.0},
+  {name:'LongCat 1.0',access:'open',single:3.567,multi:2.768,subject:45.8,jumpcut:7.0,lip:37.0,expression:6.7},
+  {name:'InfiniteTalk',access:'open',single:3.334,multi:2.339,subject:40.1,jumpcut:13.9,lip:32.7,expression:5.5},
+  {name:'HeyGen',access:'closed',single:3.208,subject:26.5,jumpcut:1.1,lip:33.3,expression:3.7},
+  {name:'OmniHuman 1.5',access:'closed',single:3.052,subject:55.1,jumpcut:3.6,lip:40.7,expression:1.2},
+  {name:'Hedra',access:'closed',single:2.908,subject:28.1,jumpcut:5.0,lip:61.8,expression:5.0},
+  {name:'Kling Avatar 2.0',access:'closed',single:2.953,subject:47.7,jumpcut:3.8,lip:38.1,expression:9.0},
+  {name:'OmniAvatar',access:'open',single:2.933,subject:46.0,jumpcut:6.4,lip:58.4,expression:3.5},
+];
+const crossMetrics=[
+  {key:'single',label:'单人拟人度',direction:'越高越好',figure:'Figure 8',higher:true,digits:3},
+  {key:'multi',label:'多人拟人度',direction:'越高越好',figure:'Figure 8',higher:true,digits:3},
+  {key:'subject',label:'主体畸变率',direction:'越低越好',figure:'Figure 10',higher:false,digits:1},
+  {key:'jumpcut',label:'画面跳帧率',direction:'越低越好',figure:'Figure 12',higher:false,digits:1},
+  {key:'lip',label:'口型问题率',direction:'越低越好',figure:'Figure 13',higher:false,digits:1},
+  {key:'expression',label:'表情不自然率',direction:'越低越好',figure:'Figure 16',higher:false,digits:1},
+] as const;
+const crossSummaries=[
+  '单人拟人度由 LongCat 1.0 以 3.567 分领先；LongCat 1.5 为 3.336，与 InfiniteTalk 的 3.334 基本持平。',
+  '论文只对具备多人能力的三个模型报告这一项：LongCat 1.0 为 2.768，LongCat 1.5 为 2.730，InfiniteTalk 为 2.339。',
+  'LongCat 1.5 的主体畸变率最低，为 23.1%；HeyGen 以 26.5% 排在第二。',
+  'LongCat 1.5 的画面跳帧率为 0.8%，在八个被测系统中最低；HeyGen 为 1.1%。',
+  'LongCat 1.5 的口型问题率为 31.6%，略低于 InfiniteTalk 的 32.7% 和 HeyGen 的 33.3%。',
+  '面部表情自然度是 LongCat 1.5 的相对短板：OmniHuman 1.5 的问题率最低，仅 1.2%；LongCat 1.5 为 7.0%。',
+];
+const commercialAB=[
+  {name:'HeyGen',ours:48.7,tie:11.1,other:40.1},
+  {name:'Kling Avatar 2.0',ours:60.5,tie:10.7,other:28.8},
+  {name:'OmniHuman 1.5',ours:55.3,tie:11.5,other:33.1},
+];
+
+export const CrossModelBench:React.FC<WidgetProps>=()=>{
+  const [metric,setMetric]=useState(0);const spec=crossMetrics[metric];
+  const ref=useCanvas(ctx=>{
+    const values=crossModels.map(m=>m[spec.key] as number|undefined);const reported=values.filter((v):v is number=>v!==undefined);const max=Math.max(...reported)*1.08;
+    const rows=crossModels.map((model,i)=>({model,value:values[i]})).sort((a,b)=>{if(a.value===undefined)return 1;if(b.value===undefined)return-1;return spec.higher?b.value-a.value:a.value-b.value;});
+    txt(ctx,`${spec.label} · ${spec.direction}`,26,25,c.text,16,true);rr(ctx,585,8,148,27,'#fff',13);ctxt(ctx,`${spec.figure} · 论文原值`,659,26,c.muted,10,true);
+    rows.forEach((row,i)=>{const y=45+i*35;const ours=row.model.name==='LongCat 1.5';const open=row.model.access==='open';const color=ours?c.green:open?c.blue:'#8b95a5';
+      if(ours){rr(ctx,20,y-6,718,31,'#eef8f3',8);rr(ctx,20,y-6,4,31,c.green,2);}
+      ctxt(ctx,row.value===undefined?'—':String(i+1),35,y+13,row.value===undefined?c.muted:ours?c.green:c.text,10,true);
+      txt(ctx,row.model.name,51,y+13,ours?c.green:c.text,row.model.name.length>16?9.5:10.5,true);
+      rr(ctx,157,y-2,37,19,open?'#eaf1f8':'#f2eef9',8);ctxt(ctx,open?'开源':'闭源',175.5,y+11,open?c.blue:c.purple,8.2,true);
+      if(row.value===undefined){rr(ctx,211,y-1,474,18,'#f3f5f8',8);ctxt(ctx,'论文未报告该模型的多人结果',448,y+12,c.muted,8.8);txt(ctx,'—',704,y+13,c.muted,10,true);return;}
+      rr(ctx,211,y,474,12,'#edf1f5',6);rr(ctx,211,y,Math.max(8,474*row.value/max),12,color,6);txt(ctx,`${row.value.toFixed(spec.digits)}${spec.higher?'':'%'}`,696,y+11,color,9.5,true);
+    });
+    rr(ctx,26,332,707,28,'#fff',10);txt(ctx,'排序随指标方向自动变化',42,351,c.muted,9.5);txt(ctx,'绿色：本文 Fast · 蓝色：公开代码/权重 · 灰紫：商业或未公开权重',260,351,c.text,9.5,true);
+  },[metric],760,372);
+  const abRef=useCanvas(ctx=>{
+    txt(ctx,'匿名 A/B：相同输入下，评测者更偏好哪一个？',25,23,c.text,14.5,true);txt(ctx,'仅单人样本 · Figure 1b',575,23,c.muted,9.5,true);
+    commercialAB.forEach((r,i)=>{const y=48+i*39;txt(ctx,`vs. ${r.name}`,25,y+13,c.text,r.name.length>14?9.5:10.5,true);const x=157,w=568;rr(ctx,x,y,w,23,'#eef1f4',7);rr(ctx,x,y,w*r.ours/100,23,c.green,7);rr(ctx,x+w*r.ours/100,y,w*r.tie/100,23,'#d8dee7',0);txt(ctx,`${r.ours}%`,x+10,y+16,'#fff',9.5,true);ctxt(ctx,`${r.tie}%`,x+w*(r.ours+r.tie/2)/100,y+16,c.muted,8.2,true);ctxt(ctx,`${r.other}%`,x+w*(r.ours+r.tie+r.other/2)/100,y+16,c.text,9,true);});
+    rr(ctx,157,166,12,12,c.green,4);txt(ctx,'LongCat 1.5 获胜',176,176,c.green,9.5,true);rr(ctx,302,166,12,12,'#d8dee7',4);txt(ctx,'平局',321,176,c.muted,9.5,true);rr(ctx,382,166,12,12,'#aab2bf',4);txt(ctx,'对手获胜',401,176,c.text,9.5,true);
+  },[],760,190);
+  return <div><Canvas canvasRef={ref} label="LongCat 1.5 与开源及闭源数字人模型的论文指标排行榜" width={760} height={372}/><ChipRow labels={crossMetrics.map(x=>x.label)} value={metric} onChange={setMetric}/><div className={`feedback ${metric===5?'lc-base-win':'good'}`}>{crossSummaries[metric]} 排名只适用于论文自建 benchmark 与对应评测协议。</div><div className="lc-subfigure-head"><span>COMMERCIAL A/B</span><b>面对三套商业系统，LongCat 1.5 的整体偏好是否占优？</b></div><Canvas canvasRef={abRef} label="LongCat 1.5 与 HeyGen、Kling Avatar 2.0、OmniHuman 1.5 的匿名偏好测试" width={760} height={190} compact/><div className="lc-availability"><div className="open"><b>公开代码与权重</b><span>LongCat 1.5 · LongCat 1.0 · InfiniteTalk · OmniAvatar</span></div><div className="closed"><b>商业或未公开权重</b><span>HeyGen · OmniHuman 1.5 · Hedra · Kling Avatar 2.0</span></div></div><div className="lc-pipeline-note"><b>两种证据不能混读。</b>上方排行榜来自绝对评分或专家问题率；A/B 图让评测者在同一输入的两个匿名结果之间直接选择。开放状态按论文发布期的官方代码与权重可用性归类，所有性能数字均来自本文 Figures 1、8、10、12、13、16。</div></div>;
+};
