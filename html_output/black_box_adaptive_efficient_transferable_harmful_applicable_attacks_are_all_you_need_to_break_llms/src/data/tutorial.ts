@@ -17,12 +17,12 @@ export const tutorial: TutorialData = {
     oldMethod: {
       head: '传统越狱攻击：各有长短',
       desc: '梯度类（GCG）偏效率却常需白盒；自适应（PAIR）更贴目标但贵；微调攻击器（JR1）利迁移却难适配。六维难全占。',
-      figure: '/images/radar_traditional.png',
+      figure: `${import.meta.env.BASE_URL}images/radar_traditional.png`,
     },
     newMethod: {
       head: 'IHO：六维更均衡',
       desc: '相对传统平均，IHO 在黑盒访问、适用、迁移、自适应、效率与真危害上更齐：扩散攻击器 + 迭代 DPO，可自适应也可摊销迁移。',
-      figure: '/images/radar_iho.png',
+      figure: `${import.meta.env.BASE_URL}images/radar_iho.png`,
     },
   },
   chapters: [
