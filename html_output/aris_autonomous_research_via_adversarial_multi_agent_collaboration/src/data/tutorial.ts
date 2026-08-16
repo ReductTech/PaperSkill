@@ -1,0 +1,281 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  meta: {
+    titleEn: 'ARIS: Autonomous Research via Adversarial Multi-Agent Collaboration',
+    titleZh: 'ARIS：用对抗式多智能体协作做自主科研',
+    venue: 'Technical Report, 2026',
+    authors: 'ARIS Team',
+    affiliation: 'Open-source autonomous research harness',
+    domain: '自主科研系统 / 多智能体协作 / 科研可信审计',
+    coreProblem: '大模型已经能写代码、跑实验和组织论文，但长流程科研最危险的是生成一套看似完整、实际证据不足的科研叙事。',
+    coreInsight: 'ARIS 的核心不是训练科研大模型，而是搭建自主科研框架，把科研过程拆成可调度、可复查、可追责的系统。',
+    keywords: ['自主科研框架', 'claim', 'evidence'],
+  },
+  hero: {
+    oldMethod: {
+      desc: '单个智能体一路完成选题、实验、写作和自评，速度快，但共享盲点很难被发现。',
+      figure: undefined,
+      componentId: 'hero-old',
+    },
+    newMethod: {
+      desc: 'ARIS 用异构互审、模块化工作流和证据审计，把自动科研变成可调度、可复查、可追责的过程。',
+      figure: undefined,
+      componentId: 'hero-new',
+    },
+  },
+  chapters: [
+    {
+      kind: 'chapter',
+      id: 'chap-1',
+      title: 'AI 写论文，是救星还是宿敌？',
+      badge: 'both',
+      badgeLabel: '问题入口',
+      bridge: 'AI 已经能帮科研人读文献、写代码、跑实验、写论文；真正危险的不是它完全不会写，而是它写得很像真的。',
+      analogy: {
+        title: '像一本装订精美的实验记录本',
+        text: '封面整齐、章节完整、图表好看，不代表里面每一句结论都被实验支撑。ARIS 先把这个风险摆到桌面上。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '1.1',
+          title: '完整叙事不等于可靠科研',
+          desc: '点击不同风险，观察“像论文”与“可信论文”之间差在哪里。',
+          componentId: 'risk-lens',
+        },
+      ],
+      insight: '这篇文章真正关心的不是 AI 能不能生成论文，而是 AI 生成的科研过程能不能被检查、被纠错、被约束。',
+      formula: {
+        lead: '本页可以压缩成一句话：',
+        unicode: '危险 = 流畅文本 + 薄弱证据 + 过度主张',
+        symbols: [
+          { sym: '流畅文本', desc: '让错误不容易被第一眼发现' },
+          { sym: '薄弱证据', desc: '实验、引用或数字不足以支撑结论' },
+          { sym: '过度主张', desc: '把局部结果写成普遍结论' },
+        ],
+      },
+      takeaways: [
+        { icon: '问', title: '问题转向', desc: '重点从“会不会写”转为“能不能查”。' },
+        { icon: '险', title: '核心风险', desc: '最可怕的是看似完整、实则不可靠。' },
+        { icon: '引', title: '自然引出', desc: 'ARIS 用系统设计处理这个风险。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-2',
+      title: 'ARIS 的核心不是训练科研大模型，而是搭建自主科研框架',
+      badge: 'inf',
+      badgeLabel: '核心思路',
+      bridge: 'ARIS 不是训练一个会科研的大模型，而是把多个模型、工具、工作流和审计机制组织成一个自主科研框架。',
+      analogy: {
+        title: '像一份带证据栏的科研检查单',
+        text: '每个阶段不只写“完成了”，还要留下产物、审查意见和证据指向，不能只靠一个模型自己说自己对。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '2.1',
+          title: '三件事撑起自主科研框架',
+          desc: '异构多智能体互审、模块化科研工作流、证据到主张审计共同支撑 ARIS。',
+          componentId: 'harness-triad',
+        },
+        {
+          kind: 'module',
+          id: '2.2',
+          title: '同模型自审与异构互审对比',
+          desc: '上下两条流程自动推进，展示同模型容易保留共享盲点，异构 reviewer 更会追问 evidence。',
+          componentId: 'review-mode-switch',
+        },
+      ],
+      insight: 'ARIS 的判断很直白：长流程科研不能相信单个模型一路冲到底，必须把生成、审查和证据约束组织成框架。',
+      formula: {
+        lead: '三件事可以概括为：',
+        unicode: '可靠性提升 = 异构互审 + 模块化科研工作流 + 证据到主张审计',
+        symbols: [
+          { sym: '异构互审', desc: '用不同模型和角色减少共享盲点' },
+          { sym: '模块化科研工作流', desc: '把复杂科研拆成有产物的阶段' },
+          { sym: '证据审计', desc: '要求论文主张回到证据' },
+        ],
+      },
+      takeaways: [
+        { icon: '系', title: '不是训练模型', desc: '重点是搭建自主科研框架，而不是训练新的科研大模型。' },
+        { icon: '审', title: '互审关键', desc: '异构 reviewer 更容易暴露同源盲点。' },
+        { icon: '证', title: '证据约束', desc: 'claim 必须能被 evidence 拉住。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-3',
+      title: '静态骨架：三层架构先把责任分清',
+      badge: 'inf',
+      badgeLabel: '系统架构',
+      bridge: '这一页先看静态骨架：谁调度，谁产出，谁把关。责任分清后，自动科研才不是一团混在一起的生成过程。',
+      analogy: {
+        title: '像一间分区清楚的审稿室',
+        text: '墙上排流程，桌上做实验和写稿，最后有人逐条核对证据。责任分开，问题才容易定位。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '3.1',
+          title: '三层架构图',
+          desc: '从上到下查看编排层、执行层、保障层，看清每一层负责什么。',
+          componentId: 'layer-map',
+        },
+        {
+          kind: 'module',
+          id: '3.2',
+          title: '每层有哪些 skill',
+          desc: '点击不同层级，直接查看这一层对应的典型 skill 名称。',
+          componentId: 'responsibility-sorter',
+        },
+      ],
+      insight: '三层架构的好处是把“调度、产出、检查”分开，让错误更容易暴露在系统边界上。',
+      formula: {
+        lead: '三层关系可以概括为：',
+        unicode: '编排层推进 workflow；执行层产出 artifact；保障层审计 claim',
+        symbols: [
+          { sym: 'workflow', desc: '从想法到论文的阶段化流程' },
+          { sym: 'artifact', desc: '代码、实验结果、图表、草稿等可检查产物' },
+          { sym: 'claim', desc: '论文中对方法和结果做出的主张' },
+        ],
+      },
+      takeaways: [
+        { icon: '编', title: '编排层', desc: '负责调度 workflow、effort 和 reviewer。' },
+        { icon: '执', title: '执行层', desc: '负责调用 skill 和 tool，产出 artifact。' },
+        { icon: '保', title: '保障层', desc: '负责审计 claim、核对 evidence 和检查论文。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-4',
+      title: '由静到动：从 idea 到 rebuttal 的自动科研主线',
+      badge: 'trn',
+      badgeLabel: '运行流程',
+      bridge: '有了静态三层，ARIS 再把它放进真实科研流程：同一套三层结构，会在每个阶段动态协同。',
+      analogy: {
+        title: '像一条会留下凭证的科研路线',
+        text: '每一站都不只是往前走，还要留下能被下一站和保障层读取的材料。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '4.1',
+          title: '五个科研 workflow 如何跑起来',
+          desc: '五个阶段每 2 秒自动流转，展示当前阶段在做什么、留下什么 artifact、哪一层最突出。',
+          componentId: 'workflow-timeline',
+        },
+      ],
+      insight: '由静到动的关键是：三层不是画在图里的静态分工，而是在每个科研阶段同时推进、产出和检查。',
+      formula: {
+        lead: '五阶段主线是：',
+        unicode: 'idea → experiment → review → writing → rebuttal',
+        symbols: [
+          { sym: 'idea', desc: '提出候选研究想法' },
+          { sym: 'experiment', desc: '把想法变成能运行的实验' },
+          { sym: 'review', desc: '多轮审查和修改' },
+          { sym: 'writing', desc: '组织论文草稿' },
+          { sym: 'rebuttal', desc: '形成审稿回应文本' },
+        ],
+      },
+      takeaways: [
+        { icon: '动', title: '流程化', desc: '科研任务被拆成连续工作流。' },
+        { icon: '物', title: '产物化', desc: '每一步都留下可检查 artifact。' },
+        { icon: '审', title: '协同化', desc: '三层在每个阶段动态参与。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-5',
+      title: '动静之间的核心：证据到主张三道闸门',
+      badge: 'both',
+      badgeLabel: '全场重点',
+      bridge: '流程能跑起来还不够。ARIS 最关键的地方，是把实验结果和论文 claim 逐层对齐，防止“写得像真的”。',
+      analogy: {
+        title: '像给论文每句话贴证据标签',
+        text: '不是看到漂亮结论就放行，而是问三遍：实验有没有跑对，结果能不能支持，论文有没有写过头。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '5.1',
+          title: '三阶段审计级联',
+          desc: '依次点亮实验完整性、结果到主张、论文主张三道闸门。',
+          componentId: 'audit-cascade',
+        },
+        {
+          kind: 'module',
+          id: '5.2',
+          title: 'Claim 能不能写进论文？',
+          desc: '把左侧 claim 拖到右侧 evidence 审核区，下方显示支持、部分支持或不支持。',
+          componentId: 'claim-evidence-matcher',
+        },
+      ],
+      insight: 'ARIS 审的不是句子顺不顺，而是这句话有没有资格写进论文。',
+      formula: {
+        lead: '三道闸门对应三类问题：',
+        unicode: '实验是否可信？结果是否支撑？论文是否越界？',
+        symbols: [
+          { sym: '实验是否可信', desc: '代码、设置、运行记录是否完整' },
+          { sym: '结果是否支撑', desc: '数字和图表能否推出该结论' },
+          { sym: '论文是否越界', desc: '最终文字有没有夸大或偷换范围' },
+        ],
+      },
+      takeaways: [
+        { icon: '闸', title: '三道闸门', desc: '从实验到结果再到论文文本逐层检查。' },
+        { icon: '证', title: '证据优先', desc: 'claim 不能脱离 evidence 自己膨胀。' },
+        { icon: '核', title: '核心价值', desc: '把科研自动化变成可审计自动化。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-6',
+      title: '一次真实运行与理性反思',
+      badge: 'both',
+      badgeLabel: '结果边界',
+      bridge: '作者展示了一次 overnight run：系统完成多轮审稿修改、运行二十多次 GPU 实验，并删除不被支持的主张；但这不是万能证明。',
+      analogy: {
+        title: '像一次被记录下来的模拟投稿',
+        text: '成绩提高很重要，但更重要的是过程里哪些主张被删掉、哪些风险仍然留给人来判断。',
+        componentId: 'analogy-notebook',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '6.1',
+          title: '四轮 review-revise 发生了什么',
+          desc: '点击第 1 到第 4 轮，看评分、实验数量和 unsupported claims 如何变化。',
+          componentId: 'run-case',
+        },
+        {
+          kind: 'module',
+          id: '6.2',
+          title: 'ARIS 仍然不能替代科研判断',
+          desc: '切换限制项，理解为什么 ARIS 是降风险系统，而不是保证正确的机器。',
+          componentId: 'limit-switch',
+        },
+      ],
+      insight: '这篇文章的价值在于给自主科研加上自我怀疑的结构，但最终科学责任仍然在人。',
+      formula: {
+        lead: '最后的边界应当说清楚：',
+        unicode: 'ARIS 降低幻觉风险 ≠ 保证科研正确',
+        symbols: [
+          { sym: '降低风险', desc: '通过分工、互审和审计发现一部分问题' },
+          { sym: '不保证正确', desc: '仍可能有错误、偏见、隐私和评价偏差' },
+        ],
+      },
+      takeaways: [
+        { icon: '数', title: '案例有效', desc: '一次运行中分数从 5.0 提升到 7.5。' },
+        { icon: '删', title: '审计有用', desc: '系统删除了缺少证据支撑的论文主张。' },
+        { icon: '界', title: '边界清楚', desc: '它是科研助手和把关框架，不是科学真理机器。' },
+      ],
+    },
+  ],
+  bilibili: [],
+};
