@@ -1,0 +1,52 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { PbfAntiClump } from './pbf-anti-clump';
+import { PbfConvergence } from './pbf-convergence';
+import { PbfFinishing } from './pbf-finishing';
+import { PbfHero } from './pbf-hero';
+import { PbfLambda } from './pbf-lambda';
+import { PbfLoop } from './pbf-loop';
+import { PbfNeighbors } from './pbf-neighbors';
+import { PbfOldNew } from './pbf-old-new';
+import { PbfPipeline } from './pbf-pipeline';
+import { PbfPositionCorrection } from './pbf-position-correction';
+import { PbfResults } from './pbf-results';
+import { PbfStability } from './pbf-stability';
+import { HoudiniSurface } from './houdini-surface';
+import { WaterState } from './water-state';
+import { CompensationLab } from './compensation-lab';
+import { ConstraintStory } from './constraint-story';
+import { FourMinuteState } from './four-minute-state';
+import { IncompressibilityDemo } from './incompressibility-demo';
+import { ProjectionDemo } from './projection-demo';
+import { TalkRecap } from './talk-recap';
+import { TimestepDemo } from './timestep-demo';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['pbf-anti-clump'] = PbfAntiClump;
+widgetRegistry['pbf-convergence'] = PbfConvergence;
+widgetRegistry['pbf-finishing'] = PbfFinishing;
+widgetRegistry['pbf-hero'] = PbfHero;
+widgetRegistry['pbf-lambda'] = PbfLambda;
+widgetRegistry['pbf-loop'] = PbfLoop;
+widgetRegistry['pbf-neighbors'] = PbfNeighbors;
+widgetRegistry['pbf-old-new'] = PbfOldNew;
+widgetRegistry['pbf-pipeline'] = PbfPipeline;
+widgetRegistry['pbf-position-correction'] = PbfPositionCorrection;
+widgetRegistry['pbf-results'] = PbfResults;
+widgetRegistry['pbf-stability'] = PbfStability;
+widgetRegistry['houdini-surface'] = HoudiniSurface;
+widgetRegistry['water-state'] = WaterState;
+widgetRegistry['compensation-lab'] = CompensationLab;
+widgetRegistry['constraint-story'] = ConstraintStory;
+widgetRegistry['four-minute-state'] = FourMinuteState;
+widgetRegistry['incompressibility-demo'] = IncompressibilityDemo;
+widgetRegistry['projection-demo'] = ProjectionDemo;
+widgetRegistry['talk-recap'] = TalkRecap;
+widgetRegistry['timestep-demo'] = TimestepDemo;
