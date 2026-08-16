@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { ActionMemoryBoard } from './action-memory-board';
+import { ActionIdentitySplit } from './action-identity-split';
+import { ArchitectureMap } from './architecture-map';
+import { BenchmarkRace } from './benchmark-race';
+import { ClosedLoopStress } from './closed-loop-stress';
+import { ConditionalWindow } from './conditional-window';
+import { DataSourceLens } from './data-source-lens';
+import { DeploymentTradeoffs } from './deployment-tradeoffs';
+import { DistillationSteps } from './distillation-steps';
+import { FullStackRepair } from './full-stack-repair';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { LifeScene } from './life-scene';
+import { LongForcingDrift } from './longforcing-drift';
+import { SharedKit } from './shared-kit';
+import { TeacherStudentCompare } from './teacher-student-compare';
+import { CausalLongForcingCore } from './causal-longforcing-core';
+import { LongForcingEvidence } from './longforcing-figure10';
+import { ChapterOneLoopCompare } from './chapter-one-loop-compare';
+import { ChapterTwoDataSources } from './chapter-two-data-sources';
+import { ChapterThreeActionIdentity } from './chapter-three-action-identity';
+import { ChapterFiveTeacherStudent } from './chapter-five-teacher-student';
+import { ChapterSixDistillationStages } from './chapter-six-distillation-stages';
+import { ChapterEightArchitecture } from './chapter-eight-architecture';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['action-memory-board'] = ActionMemoryBoard;
+widgetRegistry['action-identity-split'] = ActionIdentitySplit;
+widgetRegistry['architecture-map'] = ArchitectureMap;
+widgetRegistry['benchmark-race'] = BenchmarkRace;
+widgetRegistry['closed-loop-stress'] = ClosedLoopStress;
+widgetRegistry['conditional-window'] = ConditionalWindow;
+widgetRegistry['data-source-lens'] = DataSourceLens;
+widgetRegistry['deployment-tradeoffs'] = DeploymentTradeoffs;
+widgetRegistry['distillation-steps'] = DistillationSteps;
+widgetRegistry['full-stack-repair'] = FullStackRepair;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['life-scene'] = LifeScene;
+widgetRegistry['longforcing-drift'] = LongForcingDrift;
+widgetRegistry['shared-kit'] = SharedKit;
+widgetRegistry['teacher-student-compare'] = TeacherStudentCompare;
+widgetRegistry['causal-longforcing-core'] = CausalLongForcingCore;
+widgetRegistry['longforcing-evidence'] = LongForcingEvidence;
+widgetRegistry['chapter-one-loop-compare'] = ChapterOneLoopCompare;
+widgetRegistry['chapter-two-data-sources'] = ChapterTwoDataSources;
+widgetRegistry['chapter-three-action-identity'] = ChapterThreeActionIdentity;
+widgetRegistry['chapter-five-teacher-student'] = ChapterFiveTeacherStudent;
+widgetRegistry['chapter-six-distillation-stages'] = ChapterSixDistillationStages;
+widgetRegistry['chapter-eight-architecture'] = ChapterEightArchitecture;

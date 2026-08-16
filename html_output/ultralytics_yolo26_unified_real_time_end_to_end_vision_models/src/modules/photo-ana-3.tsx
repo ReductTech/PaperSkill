@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna3:React.FC<WidgetProps>=()=> <AnalogyScene action="distance" label="填写 0–15 距离权重"/>;

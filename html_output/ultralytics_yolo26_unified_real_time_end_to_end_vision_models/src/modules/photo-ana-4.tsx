@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna4:React.FC<WidgetProps>=()=> <AnalogyScene action="search" label="扩大候选搜索区"/>;

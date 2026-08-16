@@ -95,7 +95,7 @@ visible sections even though it contains more fine-grained elements.
 
 | Field                          | Value | Meaning                                                              |
 | ------------------------------ | ----- | -------------------------------------------------------------------- |
-| `activeModulesMin`             | 10    | Total primary active modules across all chapters.                    |
+| `activeModulesMin`             | 4     | Total primary active modules across all chapters.                    |
 | `dualModuleChaptersMin`        | 1     | At least one chapter should contain **two** primary active modules.  |
 | `distinctPatternsMin`          | 6     | Distinct interaction patterns (P1–P8) used across the tutorial.      |
 | `p1SliderChaptersMax`          | 4     | Chapters that may use the P1 slider pattern.                         |

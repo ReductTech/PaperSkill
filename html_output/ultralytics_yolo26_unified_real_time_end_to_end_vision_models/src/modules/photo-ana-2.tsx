@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna2:React.FC<WidgetProps>=()=> <AnalogyScene action="report" label="选择唯一主报告"/>;
