@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { OfficialGif } from './hy-paper-evidence';
+import { EvidenceMediaDrawer } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C={bg:'#f5f8f0',floor:'#dce8d2',line:'#d7deea',ink:'#21324a',muted:'#68778f',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#d97706',purple:'#7c3aed',brown:'#92400e',white:'#fff'};
@@ -138,7 +138,10 @@ export const HyArchitecture:React.FC<WidgetProps>=()=>{
       <details><summary>为什么 3DGS 单独第二阶段训练？</summary><p>论文先联合训练点图、深度、相机和法线等几何头，再冻结几何参数，只训练 3DGS 头，以解耦几何学习与外观建模。</p></details>
     </div>
 
-    <OfficialGif src="/images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方仓库展示 WorldMirror 2.0 从多视图或视频输入恢复可浏览三维资产。该 GIF 用于理解产品流程，不替代论文表格中的定量评测。" alt="HY-World 2.0 官方多视图与视频重建演示" />
+    <div className="evidence-media-stack">
+      <EvidenceMediaDrawer mediaType="论文原图" src="/images/figure-12-worldmirror.png" title="论文 Figure 12：WorldMirror 2.0 多模态重建架构" caption="论文原图用于核对 Any-Modal 输入、共享骨干与多输出头的真实连接方式。上方配线盘是教学重绘，不改变论文定义的输入与输出范围。" alt="论文 Figure 12 WorldMirror 2.0 架构原图" />
+      <EvidenceMediaDrawer mediaType="官方 GIF" src="/images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方仓库展示 WorldMirror 2.0 从多视图或视频输入恢复可浏览三维资产。该 GIF 用于理解产品流程，不替代论文表格中的定量评测。" alt="HY-World 2.0 官方多视图与视频重建演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
+    </div>
   </div>;
 };
 

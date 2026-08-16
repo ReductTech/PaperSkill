@@ -217,3 +217,34 @@ export const OfficialGif: React.FC<OfficialGifProps> = ({ src, title, caption, a
     </figcaption>
   </figure>
 );
+
+type EvidenceMediaDrawerProps = {
+  mediaType: '论文原图' | '官方架构图' | '官方 GIF';
+  src: string;
+  title: string;
+  caption: string;
+  alt: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
+};
+
+export const EvidenceMediaDrawer: React.FC<EvidenceMediaDrawerProps> = ({
+  mediaType,
+  src,
+  title,
+  caption,
+  alt,
+  sourceUrl = 'https://arxiv.org/abs/2604.14268',
+  sourceLabel = '查看原始来源 ↗',
+}) => (
+  <details className="evidence-media-drawer">
+    <summary>
+      <div><span>{mediaType}</span><strong>{title}</strong><small>灰色提示：点击展开图片或 GIF；素材用于核对真实结构与效果，不替代论文定量结果。</small></div>
+      <b>点击展开</b>
+    </summary>
+    <figure>
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+      <figcaption><p>{caption}</p><a href={sourceUrl} target="_blank" rel="noreferrer">{sourceLabel}</a></figcaption>
+    </figure>
+  </details>
+);

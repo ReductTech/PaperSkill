@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { OfficialGif, PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C={bg:'#f5f8f0',floor:'#dce8d2',line:'#d7deea',ink:'#21324a',muted:'#68778f',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#d97706',purple:'#7c3aed',brown:'#92400e',white:'#fff'};
-function CanvasView({width=560,height=250,animate=false,draw}:{width?:number;height?:number;animate?:boolean;draw:(ctx:CanvasRenderingContext2D,time:number)=>void}){const ref=useRef<HTMLCanvasElement>(null);const drawRef=useRef(draw);drawRef.current=draw;useEffect(()=>{const canvas=ref.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,width,height)}catch{return}let raf:number|null=null;const paint=(time:number)=>{drawRef.current(ctx,time);canvas.classList.add('is-ready');if(animate)raf=requestAnimationFrame(paint)};const start=()=>{if(raf===null)raf=requestAnimationFrame(paint)};const stop=()=>{if(raf!==null)cancelAnimationFrame(raf);raf=null};const disconnect=observeCanvas(canvas,start,stop);return()=>{stop();disconnect()}},[width,height,animate,draw]);return <canvas ref={ref} width={width} height={height}/>}
+function CanvasView({width=560,height=250,animate=false,draw}:{width?:number;height?:number;animate?:boolean;draw:(ctx:CanvasRenderingContext2D,time:number)=>void}){const ref=useRef<HTMLCanvasElement>(null);const drawRef=useRef(draw);const repaintRef=useRef<()=>void>(()=>undefined);drawRef.current=draw;useEffect(()=>{const canvas=ref.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,width,height)}catch{return}let raf:number|null=null;const paint=(time:number)=>{drawRef.current(ctx,time);canvas.classList.add('is-ready');if(animate)raf=requestAnimationFrame(paint)};repaintRef.current=()=>paint(performance.now());const start=()=>{if(raf===null)raf=requestAnimationFrame(paint)};const stop=()=>{if(raf!==null)cancelAnimationFrame(raf);raf=null};const disconnect=observeCanvas(canvas,start,stop);return()=>{stop();disconnect();repaintRef.current=()=>undefined}},[width,height,animate]);useEffect(()=>{if(!animate)repaintRef.current()},[draw,animate]);return <canvas ref={ref} width={width} height={height}/>}
 function clear(ctx:CanvasRenderingContext2D,w:number,h:number){ctx.clearRect(0,0,w,h);ctx.fillStyle=C.bg;ctx.fillRect(0,0,w,h);ctx.fillStyle=C.floor;ctx.fillRect(0,h*.72,w,h*.28);ctx.strokeStyle='#b8c9a7';ctx.lineWidth=1;for(let x=20;x<w;x+=48){ctx.beginPath();ctx.moveTo(x,h*.72);ctx.lineTo(x-20,h);ctx.stroke()}}
 function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color=C.ink,size=14,align:CanvasTextAlign='left'){ctx.fillStyle=color;ctx.font=`700 ${size}px Segoe UI, sans-serif`;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.textAlign='left'}
 function camera(ctx:CanvasRenderingContext2D,x:number,y:number,color=C.blue,s=.8){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=color;ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-25,-14,50,28,6);ctx.fill();ctx.stroke();ctx.fillStyle=C.white;ctx.beginPath();ctx.arc(4,0,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=C.orange;ctx.beginPath();ctx.arc(4,0,4,0,Math.PI*2);ctx.fill();ctx.restore()}
@@ -144,7 +144,7 @@ export const HyComposition:React.FC<WidgetProps>=()=>{
     </div>
 
     <PaperTable tableId="table-9" />
-    <div className="official-gif-grid"><OfficialGif src="/images/official-mesh.gif" title="轻量 Mesh 漫游" caption="官方演示展示从生成结果得到的可漫游完整三维资产，帮助理解网格为何需要兼顾碰撞代理与快速加载。" alt="HY-World 2.0 官方轻量网格漫游演示" /></div>
+    <EvidenceMediaDrawer mediaType="官方 GIF" src="/images/official-mesh.gif" title="轻量 Mesh 漫游与交付效果" caption="腾讯混元官方演示展示从生成结果得到的可漫游完整三维资产，帮助理解高斯预算、网格碰撞代理与快速加载最终服务于什么。该 GIF 不对应论文表 9 的独立指标。" alt="HY-World 2.0 官方轻量网格漫游演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
   </div>;
 };
 

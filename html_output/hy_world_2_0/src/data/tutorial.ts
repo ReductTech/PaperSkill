@@ -59,7 +59,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "1.2",
           "title": "四任务共享路径总图",
-          "desc": "在同一张系统大图中比较文本、单图、多视图与视频四种输入。点击任务卡切换生成或重建支路，两条路径汇入唯一的 WorldMirror 2.0，再落成下方共享资产输出。",
+          "desc": "在同一张系统大图中比较文本、单图、多视图与视频四种输入。点击任务卡切换生成或重建支路，两条路径汇入唯一的 WorldMirror 2.0；下方可展开论文 Figure 2 核对整体架构。",
           componentId: "hy-mission-planner"
         },
         {
@@ -67,8 +67,7 @@ export const tutorial: TutorialData = {
           "id": "1.3",
           "title": "统一系统边界透视台",
           "desc": "逐条展开五个证据切片，让系统大图只高亮当前关系；直接区分三条论文支持的关系与“单体网络”“实时生成”两类常见误读，无需连续答题。",
-          componentId: "hy-boundary-compare",
-          "figure": "/images/figure-2-architecture.png"
+          componentId: "hy-boundary-compare"
         }
       ],
       "insight": "世界模型是一个任务家族而不是单一输出格式；HY-World 2.0 的核心选择是把生成与重建接到可持久保存、可运行的显式三维资产上。",
@@ -107,7 +106,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "2.1",
           "title": "全景三层修复扫描仪",
-          "desc": "切换相机元数据、潜空间边界和解码像素三种故障层，再拖动扫描线比较修复前后，理解隐式映射、循环填充与线性融合为什么各自不可替代。",
+          "desc": "切换相机元数据、潜空间边界和解码像素三种故障层，再拖动无闪烁扫描线比较修复前后；下方可展开官方架构图核对 Circle Padding 与 Pixel Blending。",
           componentId: "hy-panorama"
         },
         {
@@ -154,7 +153,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "3.1",
           "title": "WorldNav 五层规划回放",
-          "desc": "选择五类轨迹任务之一，逐层查看场景语义与 NavMesh、候选均匀采样、Ray-casting 碰撞筛选、双向贪心连接和尾部修剪；最后让相机按折线分段长度移动并在拐点真实转向。",
+          "desc": "选择五类轨迹任务之一，逐层查看 NavMesh、均匀采样、Ray-casting、双向连接和尾部修剪；最后让相机沿折线真实转向，并展开官方轨迹图对照实际三维场景。",
           componentId: "hy-trajectory"
         }
       ],
@@ -457,9 +456,8 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "8.1",
           "title": "Any-Modal 架构配线盘",
-          "desc": "以多视图图像为必需输入，独立接入位姿、内参和深度先验，再检查五个同时在线的 DPT 输出头及无先验 / 全先验的论文端点。",
-          componentId: "hy-architecture",
-          "figure": "/images/figure-12-worldmirror.png"
+          "desc": "以多视图图像为必需输入，独立接入位姿、内参和深度先验，再检查五个 DPT 输出头；下方可分别展开论文 Figure 12 与官方重建 GIF。",
+          componentId: "hy-architecture"
         },
         {
           kind: "module",
@@ -505,14 +503,14 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "9.1",
           "title": "高斯预算帕累托实验",
-          "desc": "调节最大高斯数量与最低 PSNR，在表 9 的五个真实配置中寻找可行点、最低数量推荐与被支配方案，再展开原表核对完整指标。",
+          "desc": "平滑调节最大高斯数量与最低 PSNR，在表 9 的五个配置中寻找可行点与最低数量推荐；可展开原表和官方轻量 Mesh GIF 核对数字与交付效果。",
           componentId: "hy-composition"
         },
         {
           kind: "module",
           "id": "9.2",
           "title": "WorldLens 运行时实验",
-          "desc": "切换 IBL 环境光照、碰撞代理和角色漫游三种运行时能力，观察同一资产如何被重新照亮、阻挡穿模并支持第三人称折线跟随；官方 GIF 放在此处作为真实案例参照。",
+          "desc": "切换 IBL 环境光照、碰撞代理和角色漫游三种运行时能力，观察同一资产如何被重新照亮、阻挡穿模并支持第三人称折线跟随；下方可展开官方交互 GIF。",
           componentId: "hy-worldlens-lab"
         }
       ],

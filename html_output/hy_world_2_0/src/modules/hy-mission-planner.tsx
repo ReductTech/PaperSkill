@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { EvidenceMediaDrawer } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type InputMode = '文本' | '单图' | '多视图' | '视频';
@@ -186,6 +187,8 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
           <p><b>使用边界</b>{mission.caution}</p>
         </div>
       </section>
+
+      <EvidenceMediaDrawer mediaType="论文原图" src="/images/figure-2-architecture.png" title="论文 Figure 2：HY-World 2.0 整体系统架构" caption="论文原图展示世界生成与世界重建两条输入路径如何汇入共享的重建与三维资产环节。上方任务图是为四种输入重新编排的教学视图。" alt="论文 Figure 2 HY-World 2.0 整体架构原图" />
 
       <div className={`feedback ${isGeneration ? '' : 'good'}`}>
         四种输入不是四套彼此独立的模型：文本与单图共享生成主链，多视图与视频共享重建入口，两条路径最终都依赖 WorldMirror 2.0 形成显式三维资产。官网展示的导出格式属于产品能力说明，论文数字仍需按各自协议阅读。

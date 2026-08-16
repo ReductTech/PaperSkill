@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -11,6 +11,7 @@ const C = {
 function CanvasView({ width = 560, height = 240, animate = false, draw }: { width?: number; height?: number; animate?: boolean; draw: (ctx: CanvasRenderingContext2D, time: number) => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const drawRef = useRef(draw);
+  const repaintRef = useRef<() => void>(() => undefined);
   drawRef.current = draw;
   useEffect(() => {
     const canvas = ref.current;
@@ -23,11 +24,13 @@ function CanvasView({ width = 560, height = 240, animate = false, draw }: { widt
       canvas.classList.add('is-ready');
       if (animate) raf = requestAnimationFrame(paint);
     };
+    repaintRef.current = () => paint(performance.now());
     const start = () => { if (raf === null) raf = requestAnimationFrame(paint); };
     const stop = () => { if (raf !== null) cancelAnimationFrame(raf); raf = null; };
     const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
-  }, [width, height, animate, draw]);
+    return () => { stop(); disconnect(); repaintRef.current = () => undefined; };
+  }, [width, height, animate]);
+  useEffect(() => { if (!animate) repaintRef.current(); }, [draw, animate]);
   return <canvas ref={ref} width={width} height={height} />;
 }
 
@@ -310,6 +313,7 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
       <details><summary>“补全”是否等于真实观测？</summary><p>不是。隐式映射可以根据数据先验生成输入视角外的环境，但未见区域仍是生成结果，不能当作真实测量或确定几何。</p></details>
     </div>
 
+    <EvidenceMediaDrawer mediaType="官方架构图" src="/images/official-stage-pano.webp" title="HY-Pano 2.0：从透视条件到 ERP 与双层接缝修复" caption="官方图同时展示透视条件、ERP 结果、潜空间 Circle Padding 与像素空间 Pixel Blending。可用它核对上方扫描线实验中的三层机制位置。" alt="HY-Pano 2.0 官方全景生成与接缝修复架构图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
     <PaperTable tableId="table-4" />
   </div>;
 };
