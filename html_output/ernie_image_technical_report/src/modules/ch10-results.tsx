@@ -114,10 +114,6 @@ export function Ch10ResultsWidget({ chapterId, moduleId }: WidgetProps) {
 
   return (
     <section className="result-reader" aria-label="论文原始评测结果" data-chapter={chapterId} data-module={moduleId}>
-      <div className="result-section-head">
-        <strong>定性结果图</strong>
-        <span>切换查看论文中的三组原始模型对比。</span>
-      </div>
       <div className="chip-row" role="radiogroup" aria-label="选择论文定性结果图">
         {QUALITATIVE_OPTIONS.map(([key, item]) => (
           <button
