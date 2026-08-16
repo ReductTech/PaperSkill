@@ -75,20 +75,29 @@ function wrapText(
   if (line) ctx.fillText(line, x, cy);
 }
 
-// 边界脆弱：同一文档的两个版本（扰动前后），输出对不上
-function drawFragileScene(ctx: CanvasRenderingContext2D): void {
-  // 左：原文档（干净的三行）
+// 边界脆弱：文档变化极小，输出 B 却成了乱码。
+// 原文档略放大；扰动后的文档为原文档的 0.8 倍，内容完全相同。
+function drawDoc(ctx: CanvasRenderingContext2D, cx: number, cy: number, scale: number): void {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(56, 74, 92, 56);
+  ctx.fillRect(-50, -30, 100, 60);
   ctx.strokeStyle = AXIS;
   ctx.lineWidth = 1;
-  ctx.strokeRect(56.5, 74.5, 91, 55);
+  ctx.strokeRect(-50 + 0.5, -30 + 0.5, 99, 59);
   ctx.fillStyle = INK;
   ctx.font = '10px sans-serif';
   ctx.textAlign = 'left';
-  ctx.fillText('领料单', 64, 90);
-  ctx.fillText('纸张 ×3 ¥128', 64, 106);
-  ctx.fillText('合计 ¥384', 64, 122);
+  ctx.fillText('领料单', -42, -14);
+  ctx.fillText('纸张 ×3 ¥128', -42, 4);
+  ctx.fillText('合计 ¥384', -42, 20);
+  ctx.restore();
+}
+
+function drawFragileScene(ctx: CanvasRenderingContext2D): void {
+  // 左：原文档（略放大，100×60）
+  drawDoc(ctx, 102, 102, 1);
   // 扰动箭头
   ctx.strokeStyle = BLUE;
   ctx.lineWidth = 1.5;
@@ -105,35 +114,26 @@ function drawFragileScene(ctx: CanvasRenderingContext2D): void {
   ctx.fill();
   ctx.fillStyle = MUTED;
   ctx.font = '10px sans-serif';
-  ctx.fillText('扰动', 160, 94);
-  // 右：扰动后的同一文档（内容歪斜错位）
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(192, 74, 92, 56);
-  ctx.strokeStyle = AXIS;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(192.5, 74.5, 91, 55);
-  ctx.fillStyle = INK;
-  ctx.fillText('领料单', 200, 90);
-  ctx.fillText('纸〓 ×3 ¥128', 200, 106);
-  ctx.fillStyle = RED;
-  ctx.fillText('合计 ¥?84', 200, 122);
-  // 下方输出对比：同一样本的两条输出对不上
+  ctx.fillText('轻微扰动', 156, 94);
+  // 右：扰动后的同一文档——内容完全相同，整体缩小到 0.8 倍
+  drawDoc(ctx, 238, 102, 0.8);
+  // 下方输出对比：文档几乎没变，输出 B 却成了乱码
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(56, 150, 110, 20);
   ctx.strokeStyle = AXIS;
   ctx.strokeRect(56.5, 150.5, 109, 19);
   ctx.fillStyle = INK;
   ctx.font = '10px monospace';
-  ctx.fillText('输出 A：纸张×3', 62, 164);
+  ctx.fillText('输出 A：纸张×3 ¥128', 62, 164);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(174, 150, 110, 20);
   ctx.strokeStyle = AXIS;
   ctx.strokeRect(174.5, 150.5, 109, 19);
   ctx.fillStyle = RED;
-  ctx.fillText('输出 B：纸§×3', 180, 164);
+  ctx.fillText('输出 B：?#§×*?§×#', 180, 164);
   ctx.fillStyle = MUTED;
   ctx.font = '11px sans-serif';
-  ctx.fillText('同一文档，输出对不上', 96, 190);
+  ctx.fillText('文档几乎没变，输出 B 却成了乱码', 74, 190);
 }
 
 // 覆盖稀疏：密集的样本簇与一个远离群体的孤立样本
@@ -172,7 +172,7 @@ function drawSparseScene(ctx: CanvasRenderingContext2D): void {
   ctx.textAlign = 'left';
 }
 
-// 监督不可靠：原标签与三位专家的结果对不上
+// 监督不可靠：原标签与三位专家的结果对不上（专家1、2 输出一致且不同于原标签）
 function drawSupervisionScene(ctx: CanvasRenderingContext2D): void {
   // 原标签卡（被红叉标记为可疑）
   ctx.fillStyle = '#ffffff';
@@ -193,35 +193,37 @@ function drawSupervisionScene(ctx: CanvasRenderingContext2D): void {
   ctx.moveTo(130, 90);
   ctx.lineTo(66, 120);
   ctx.stroke();
-  // 三位专家结果（两位彼此一致，与标签不同）
+  // 三位专家输出：专家1、2 一致（¥348），专家3 不同（¥421）
+  const expertValues = ['¥348', '¥348', '¥421'];
   for (let i = 0; i < 3; i++) {
-    const ex = 176 + i * 48;
+    const ex = 166 + i * 54;
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(ex, 84, 40, 30);
+    ctx.fillRect(ex, 84, 46, 44);
     ctx.strokeStyle = AXIS;
     ctx.lineWidth = 1;
-    ctx.strokeRect(ex + 0.5, 84.5, 39, 29);
+    ctx.strokeRect(ex + 0.5, 84.5, 45, 43);
     ctx.fillStyle = INK;
     ctx.font = '10px sans-serif';
     ctx.fillText('专家' + (i + 1), ex + 6, 98);
+    ctx.fillText(expertValues[i], ex + 6, 114);
     ctx.strokeStyle = i < 2 ? GREEN : RED;
     ctx.lineWidth = 2;
     ctx.beginPath();
     if (i < 2) {
-      ctx.moveTo(ex + 14, 108);
-      ctx.lineTo(ex + 18, 112);
-      ctx.lineTo(ex + 26, 102);
+      ctx.moveTo(ex + 28, 104);
+      ctx.lineTo(ex + 32, 108);
+      ctx.lineTo(ex + 40, 98);
     } else {
-      ctx.moveTo(ex + 14, 102);
-      ctx.lineTo(ex + 26, 112);
-      ctx.moveTo(ex + 26, 102);
-      ctx.lineTo(ex + 14, 112);
+      ctx.moveTo(ex + 28, 98);
+      ctx.lineTo(ex + 40, 108);
+      ctx.moveTo(ex + 40, 98);
+      ctx.lineTo(ex + 28, 108);
     }
     ctx.stroke();
   }
   ctx.fillStyle = MUTED;
   ctx.font = '11px sans-serif';
-  ctx.fillText('专家结果与标签对不上 → 标签可疑', 74, 190);
+  ctx.fillText('专家 1、2 一致（¥348）≠ 原标签 → 标签可疑', 48, 158);
 }
 
 export const Ch1Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
@@ -317,7 +319,7 @@ export const Ch1Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       // legend
       ctx.fillStyle = MUTED;
       ctx.font = '11px sans-serif';
-      ctx.fillText('蓝框=当前选中', 30, 210);
+      ctx.fillText('', 30, 210);
     };
 
     const tick = () => {

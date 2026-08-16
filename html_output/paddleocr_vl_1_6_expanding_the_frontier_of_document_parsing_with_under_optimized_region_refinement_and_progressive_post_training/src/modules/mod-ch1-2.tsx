@@ -27,7 +27,7 @@ const FEEDBACK: Record<Route, { text: string; cls: 'good' | '' }> = {
     cls: 'good',
   },
   fix: {
-    text: '路由 B：监督不可靠样本的已有标签经<b>三位专家独立核对</b>——有支持就保留、两专家一致就替换、全不一致进精炼，修正后的标签重新进入训练集。',
+    text: '路由 B：监督不可靠样本的已有标签经<b>三位专家独立核对</b>——有支持就保留、至少两位专家一致就替换、全不一致进精炼，修正后的标签重新进入训练集。',
     cls: 'good',
   },
 };
@@ -132,13 +132,11 @@ export const Ch1Mod2: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       box(ctx, 312, 130, 228, 44, '保留 / 替换 /\n判定-修正', '#eaf6ee', GREEN, INK);
       ctx.globalAlpha = 1;
 
-      // 底部注记
+      // 底部注记（单行，保持在画布内）
       ctx.fillStyle = MUTED;
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('两类弱区用于定向检索新数据，一类弱区用于修正已有标签', 20, 212);
-      ctx.fillStyle = MUTED;
-      ctx.fillText('绿色框 = 修复后的训练数据', 20, 232);
+      ctx.fillText('两类弱区用于定向检索新数据，一类弱区用于修正已有标签 · 绿色框 = 修复后的训练数据', 20, 214);
 
       if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
       rafRef.current = requestAnimationFrame(() => render(stateRef.current));

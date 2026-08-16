@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { AnalogyCh1 } from './ana-ch1';
+import { AnalogyCh10 } from './ana-ch10';
+import { AnalogyCh2 } from './ana-ch2';
+import { AnalogyCh3 } from './ana-ch3';
+import { AnalogyCh4 } from './ana-ch4';
+import { AnalogyCh5 } from './ana-ch5';
+import { AnalogyCh6 } from './ana-ch6';
+import { AnalogyCh7 } from './ana-ch7';
+import { AnalogyCh8 } from './ana-ch8';
+import { AnalogyCh9 } from './ana-ch9';
+import { Ch1Unification } from './ch1-unification';
+import { Ch10EvidenceRace } from './ch10-evidence-race';
+import { Ch2Modalities } from './ch2-modalities';
+import { Ch3TokenLayout } from './ch3-token-layout';
+import { Ch4AttentionMask } from './ch4-attention-mask';
+import { Ch5Conditioning } from './ch5-conditioning';
+import { Ch6Inference } from './ch6-inference';
+import { Ch7FlowTraining } from './ch7-flow-training';
+import { Ch8MotArchitecture } from './ch8-mot-architecture';
+import { Ch8TimeAlignment } from './ch8-time-alignment';
+import { Ch9ActionInterface } from './ch9-action-interface';
+import { HeroContrast } from './hero-contrast';
+import { StudioKitWidget } from './studio-kit';
+import { Ch0Glossary } from './ch0-glossary';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ana-ch1'] = AnalogyCh1;
+widgetRegistry['ana-ch10'] = AnalogyCh10;
+widgetRegistry['ana-ch2'] = AnalogyCh2;
+widgetRegistry['ana-ch3'] = AnalogyCh3;
+widgetRegistry['ana-ch4'] = AnalogyCh4;
+widgetRegistry['ana-ch5'] = AnalogyCh5;
+widgetRegistry['ana-ch6'] = AnalogyCh6;
+widgetRegistry['ana-ch7'] = AnalogyCh7;
+widgetRegistry['ana-ch8'] = AnalogyCh8;
+widgetRegistry['ana-ch9'] = AnalogyCh9;
+widgetRegistry['ch1-unification'] = Ch1Unification;
+widgetRegistry['ch10-evidence-race'] = Ch10EvidenceRace;
+widgetRegistry['ch2-modalities'] = Ch2Modalities;
+widgetRegistry['ch3-token-layout'] = Ch3TokenLayout;
+widgetRegistry['ch4-attention-mask'] = Ch4AttentionMask;
+widgetRegistry['ch5-conditioning'] = Ch5Conditioning;
+widgetRegistry['ch6-inference'] = Ch6Inference;
+widgetRegistry['ch7-flow-training'] = Ch7FlowTraining;
+widgetRegistry['ch8-mot-architecture'] = Ch8MotArchitecture;
+widgetRegistry['ch8-time-alignment'] = Ch8TimeAlignment;
+widgetRegistry['ch9-action-interface'] = Ch9ActionInterface;
+widgetRegistry['hero-contrast'] = HeroContrast;
+widgetRegistry['studio-kit'] = StudioKitWidget;
+widgetRegistry['ch0-glossary'] = Ch0Glossary;

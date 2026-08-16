@@ -3,9 +3,9 @@ import { setupCanvas, observeCanvas, clamp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // 模块 5.1：三分支共识：保留、替换、精炼（P4 芯片）。
-// 选择「全部不一致」时自动演示 4 轮判定-修正循环（每轮约 1.5s，
+// 选择「全部不一致」时自动播放 4 轮判定-修正循环（每轮约 1.5s，
 // 依次高亮 ①渲染→②比对→③修正），结束后停住并高亮「转人工」；
-// 可用「重新演示」再次播放。其余分支为静态呈现。
+// 可用「重新播放」再次播放。其余分支为静态呈现。
 
 const W = 560;
 const H = 240;
@@ -22,7 +22,7 @@ type Branch = 'keep' | 'replace' | 'refine';
 
 const BRANCH_LABELS: Record<Branch, string> = {
   keep: '至少一位专家支持',
-  replace: '两位专家一致',
+  replace: '至少两位专家一致',
   refine: '全部不一致',
 };
 
@@ -205,13 +205,6 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         drawMark(ctx, CARDS[0].x + 59, 62, 'cross');
         drawMark(ctx, CARDS[1].x + 104, 30, 'tick');
         drawMark(ctx, CARDS[2].x + 104, 30, 'tick');
-        // 绿色替换箭头：两位一致专家 → 原答案位置
-        ctx.strokeStyle = GREEN;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(CARDS[2].x + 8, 24);
-        ctx.quadraticCurveTo(240, 8, CARDS[0].x + 110, 20);
-        ctx.stroke();
       } else {
         for (let i = 0; i < 4; i++) drawMark(ctx, CARDS[i].x + 59, 62, 'cross');
       }
@@ -271,7 +264,7 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     s.activeIdx = -1;
     s.runStart = performance.now();
     s.playing = true;
-    setFeedback({ text: '全都不一致——自动演示判定-修正循环…', cls: '' });
+    setFeedback({ text: '全都不一致——自动判定-修正循环…', cls: '' });
   };
 
   const onChip = (b: Branch) => {
@@ -284,7 +277,7 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     if (b === 'keep') {
       setFeedback({ text: '原标签得到至少一位专家支持——标签保留，样本照常使用。', cls: 'good' });
     } else if (b === 'replace') {
-      setFeedback({ text: '原标签与所有专家都不一致，但两位专家彼此一致——用共识结果替换原标签。', cls: 'good' });
+      setFeedback({ text: '原标签与所有专家都不一致，但至少两位专家彼此一致——用共识结果替换原标签。', cls: 'good' });
     } else {
       startRefineRun();
     }
@@ -304,7 +297,7 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         s.finished = true;
         s.activeIdx = -1;
         setFeedback({
-          text: 'T 轮后仍不一致——转人工预标注（演示 T=4）。',
+          text: 'T 轮后仍不一致——转人工预标注。',
           cls: '',
         });
       }
@@ -314,7 +307,7 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       s.round = TOTAL_ROUNDS;
       s.activeIdx = -1;
       setFeedback({
-        text: 'T 轮后仍不一致——转人工预标注（演示 T=4）。',
+        text: 'T 轮后仍不一致——转人工预标注。',
         cls: '',
       });
     }
@@ -345,7 +338,7 @@ export const Ch4Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       <div className="ctrl">
         {branch === 'refine' ? (
           <button type="button" className="chip" onClick={startRefineRun}>
-            重新演示
+            重新播放
           </button>
         ) : null}
       </div>

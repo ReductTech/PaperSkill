@@ -1,0 +1,131 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-hill: #b8c9a7;
+  --paper-hill-dark: #76906a;
+  --paper-road-edge: #92400e;
+}
+
+/* ---------- Formula block ----------
+   The bundled .fe-formula is an inline-block with overflow-x:auto, which both
+   clipped the hover tooltips and let long expressions break at arbitrary points.
+   Here each equation owns a line, every symbol group is nowrap, and overflow is
+   visible so the [data-tip] tooltip can escape the box. */
+.fe-formula {
+  display: block;
+  overflow: visible;
+  max-width: none;
+  padding: 16px 20px;
+  font-size: 22px;
+  line-height: 2.15;
+  text-align: center;
+  white-space: normal;
+}
+.fe-formula .fx-line {
+  display: block;
+}
+.fe-formula .fx-line + .fx-line {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.fe-formula .fx-tag {
+  margin-left: 10px;
+  color: var(--slate-2);
+  font-family: "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+/* A symbol group never splits across lines, and reads as hoverable. */
+.fe-formula [data-tip] {
+  border-bottom: 1px dotted rgba(39, 68, 110, 0.5);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.fe-formula [data-tip]:hover {
+  background: var(--blue-soft);
+}
+.formula-explain {
+  overflow: visible;
+}
+@media (max-width: 760px) {
+  .fe-formula {
+    padding: 12px 10px;
+    font-size: 18px;
+    line-height: 2;
+  }
+}
+
+/* ---------- §1 demo clips ---------- */
+.demo-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  margin-top: 10px;
+  background: #0d1420;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  overflow: hidden;
+}
+/* Sits behind the clip so the stage is never an unexplained black box while the
+   browser is still fetching the mp4. */
+.demo-stage::before {
+  content: "演示片段加载中…";
+  position: absolute;
+  color: #7c8ba1;
+  font-size: 14px;
+}
+.demo-video {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 720px;
+}
+.demo-caption {
+  margin: 12px 2px 0;
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.8;
+}
+.demo-credit {
+  margin: 8px 2px 0;
+  color: var(--slate-2);
+  font-size: 13px;
+}
+
+/* ---------- §1 three difficulties ---------- */
+.prob-title {
+  margin: 12px 2px 6px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.prob-solved {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--green-soft);
+  border-left: 4px solid var(--green);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  color: var(--ink);
+  font-size: 14.5px;
+}
+
+/* ---------- shared stable detail region for architecture-style modules ---------- */
+.detail-panel {
+  min-height: 64px;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.8;
+}
