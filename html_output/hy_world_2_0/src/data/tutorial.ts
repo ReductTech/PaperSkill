@@ -563,7 +563,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "10.2",
           "title": "模型能力进化图鉴",
-          "desc": "点击模型与功能交叉单元格，对比 HY-World 历代、重建前代和外部参照的能力、用途、2.0 改进点与证据边界。",
+          "desc": "点击模型与功能交叉单元格，再沿同一能力轴切换历代与外部参照，对比用途、2.0 改进点与证据边界。",
           componentId: "hy-model-evolution"
         }
       ],

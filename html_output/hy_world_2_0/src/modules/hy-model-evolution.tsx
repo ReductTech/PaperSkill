@@ -273,6 +273,11 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
   const selectedState = selectedModel.capabilities[selectedCapability.id];
   const selectedStatus = statusMeta[selectedState.status];
   const visibleModels = matrixScope === 'lineage' ? orderedModels.filter((model) => lineageIds.has(model.id)) : orderedModels;
+  const axisStates = visibleModels.map((model) => ({ model, state: model.capabilities[selectedCapability.id] }));
+  const axisCounts = axisStates.reduce<Record<Status, number>>(
+    (counts, item) => ({ ...counts, [item.state.status]: counts[item.state.status] + 1 }),
+    { complete: 0, partial: 0, qualitative: 0, unreported: 0, closed: 0 },
+  );
 
   const changeScope = (nextScope: MatrixScope) => {
     setMatrixScope(nextScope);
@@ -304,7 +309,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
         <div className={`evolution-matrix ${matrixScope}`} role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 历代与外部模型能力比较'}>
           <div className="evolution-corner" role="columnheader">功能 \ 模型</div>
           {visibleModels.map((model) => (
-            <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''}`} role="columnheader">
+            <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''} ${model.id === selectedModel.id ? 'selected-column' : ''}`} role="columnheader">
               <strong>{model.shortName}</strong>
               <span>{model.kind}</span>
               <time dateTime={model.publishedIso}>{model.published}</time>
@@ -313,7 +318,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
 
           {capabilities.map((capability) => (
             <React.Fragment key={capability.id}>
-              <div className="evolution-capability-head" role="rowheader">
+              <div className={`evolution-capability-head ${capability.id === selectedCapability.id ? 'selected-row' : ''}`} role="rowheader">
                 <strong>{capability.shortName}</strong>
                 <span>{capability.name}</span>
               </div>
@@ -325,7 +330,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
                   <button
                     key={`${model.id}-${capability.id}`}
                     type="button"
-                    className={`evolution-cell ${state.status} ${isSelected ? 'selected' : ''}`}
+                    className={`evolution-cell ${state.status} ${capability.id === selectedCapability.id ? 'same-axis' : ''} ${model.id === selectedModel.id ? 'same-model' : ''} ${isSelected ? 'selected' : ''}`}
                     disabled={isDisabled}
                     onClick={() => {
                       setSelectedModelId(model.id);
@@ -346,6 +351,40 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
         </div>
       </div>
       <p className="evolution-scroll-hint">灰色提示：窄屏时请在矩阵内部左右滑动；范围切换只改变可见列，不改变能力判断。“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
+
+      <section className="evolution-axis-focus" aria-live="polite" aria-label={`${selectedCapability.name}同轴对照`}>
+        <header>
+          <div>
+            <span>当前比较轴</span>
+            <strong>{selectedCapability.name}</strong>
+          </div>
+          <small>
+            完整 {axisCounts.complete} · 局部 {axisCounts.partial} · 定性 {axisCounts.qualitative} · 未报告 {axisCounts.unreported} · 闭源 {axisCounts.closed}
+          </small>
+        </header>
+        <p>{selectedCapability.purpose}</p>
+        <div className="evolution-axis-models" role="group" aria-label={`切换${selectedCapability.name}的比较模型`}>
+          {axisStates.map(({ model, state }) => {
+            const isSelected = model.id === selectedModel.id;
+            const isDisabled = state.status === 'unreported';
+            return (
+              <button
+                key={model.id}
+                type="button"
+                className={`${state.status} ${isSelected ? 'selected' : ''}`}
+                disabled={isDisabled}
+                aria-pressed={isSelected}
+                aria-label={`${model.name}，${selectedCapability.name}：${statusMeta[state.status].label}${isDisabled ? '，不可展开' : ''}`}
+                onClick={() => setSelectedModelId(model.id)}
+              >
+                <strong>{model.shortName}</strong>
+                <span>{statusMeta[state.status].label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <small>同轴对照带只复述当前引用范围内的证据状态，不把不同模型目标压成统一排名。</small>
+      </section>
 
       <section className={`evolution-detail ${selectedState.status}`} aria-live="polite">
         <header className="evolution-detail-head">
