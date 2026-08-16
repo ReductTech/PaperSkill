@@ -29,7 +29,7 @@ export const tutorial: TutorialData = {
       title: 'LLM 范式启发下的通用视觉学习器',
       badge: 'both',
       badgeLabel: '结论 · LLM 启发',
-      bridge: '本文的核心结论是：图像生成训练扮演着与 LLM 预训练相似的角色，能够形成强大且通用的表征；轻量指令微调主要教模型遵循任务并按指定格式交卷。后续六章依次解释接口、任务与证据。',
+      bridge: '本文的核心结论是：图像生成训练扮演着与 LLM 预训练相似的角色，能够形成强大且通用的表征；轻量指令微调主要教模型遵循任务并按指定格式交卷。后续五章依次解释接口、任务与证据。',
       analogy: {
         title: '一位成熟的制图师，只缺少统一的交付规范',
         text: '制图师已经在长期绘图中学会物体、空间与远近关系，却还不会按分割、深度或法线的标准格式交卷。论文借鉴 LLM 的路线：保留生成预训练获得的基础能力，再用少量指令示例教会任务遵循与输出格式。',
@@ -174,14 +174,14 @@ export const tutorial: TutorialData = {
           kind: "module",
           id: '4.1',
           title: '米制深度通过颜色路径可逆编码',
-          desc: '先用论文图 7 核对真实距离，再输入米制深度，观察无上界数值如何压入 [0,1)、沿论文图 5 同朝向的 RGB 路径编码并反解。核心公式与参数默认保留，扩展色图和实现条件放入技术说明。',
+          desc: '先用论文图 7 核对真实距离，再输入米制深度，观察无上界数值如何压入 [0,1)、沿论文图 5 同朝向的 RGB 路径编码并反解。核心公式与参数默认保留，论文表 6 的完整模型对比默认收起。',
           componentId: 'depth-color-bijection',
         },
         {
           kind: "module",
           id: '4.2',
           title: '表面法线直接映射到 RGB 三通道',
-          desc: '拖动相机空间单位法线，或从合法法线调色板直接选色，观察 (x,y,z)、方向箭头、颜色与 R/G/B 数值同步更新。论文图 8 的猫咪局部使用高分辨率三列对照，完整通道公式放入技术折叠区。',
+          desc: '拖动相机空间单位法线，或从合法法线调色板直接选色，观察 (x,y,z)、方向箭头、颜色与 R/G/B 数值同步更新。论文图 8 的猫咪局部使用高分辨率三列对照，论文表 7 的完整模型对比默认收起。',
           componentId: 'surface-normal-encoding',
         },
       ],
@@ -257,46 +257,6 @@ export const tutorial: TutorialData = {
     {
       kind: "chapter",
       id: 'chap-6',
-      title: '代表性实验支撑核心结论',
-      badge: 'both',
-      badgeLabel: '实验 · 公平比较',
-      bridge: '三类代表证据依次覆盖二维语义、三维深度和生成能力保留。它们分别检验任务覆盖、与专用模型竞争的能力，以及轻量微调是否明显破坏原生成能力；其余结果收录在完整证据账本中。',
-      analogy: {
-        title: '先核对图例和比例尺，再比较地图',
-        text: '两张地图上的线更长，不一定表示同一件事。评审员先检查区域、比例尺、方向和制图规则；只有标签一致的数字进入同一赛道，其余结果在旁边说明。',
-        componentId: 'benchmark-race',
-      },
-      modules: [
-        {
-          kind: "module",
-          id: '6.1',
-          title: '三条代表证据与完整证据账本',
-          desc: '默认只在 Cityscapes 零样本、深度匹配四数据集与生成保留之间切换；每项数字都携带数据集、训练背景、系统组成和指标方向。完整的 2D、3D 与生成评测可以在折叠账本中继续核对。',
-          componentId: 'benchmark-race',
-        },
-      ],
-      insight: '三条代表证据共同支撑论文的核心结论：Cityscapes 零样本 69.9 对 65.2，深度共同四数据集 0.929 对 0.918，文生图/编辑人评 53.5% 与 47.8% 围绕平手线。法线、组合系统和完整数据集平均保留在证据账本中。',
-      takeaways: [
-        {
-          icon: '🏷️',
-          title: '数字必须携带协议',
-          desc: '数据集、迁移设置、系统组成、指标与方向缺一不可。',
-        },
-        {
-          icon: '📊',
-          title: '2D 与 3D 都有独立证据',
-          desc: '语义、实例、指代、推理分割、深度和法线分别接受对应标准指标检验。',
-        },
-        {
-          icon: '⚖️',
-          title: '不同范围不能硬排一条榜',
-          desc: '四数据集与六数据集、零样本与域内训练、单模型与组合系统必须分开。',
-        },
-      ],
-    },
-    {
-      kind: "chapter",
-      id: 'chap-7',
       title: '论文贡献与适用边界',
       badge: 'both',
       badgeLabel: '结论 · 证据边界',
@@ -309,7 +269,7 @@ export const tutorial: TutorialData = {
       modules: [
         {
           kind: "module",
-          id: '7.1',
+          id: '6.1',
           title: '为核心结论与越界表述盖章',
           desc: '围绕“预训练表征”“RGB 统一接口”和“是否能推广到所有生成器”判断证据边界，并在可展开的清单中核对适用条件与限制。',
           componentId: 'claim-stamp',
@@ -346,14 +306,14 @@ export const tutorial: TutorialData = {
     {
       bvid: 'BV1RSJs6yEKa',
       title: 'Google统一CV大模型：Vision Banana',
-      reason: '围绕统一视觉接口与主要任务展开概览，适合学完七章后复盘核心方法。',
+      reason: '围绕统一视觉接口与主要任务展开概览，适合学完六章后复盘核心方法。',
       cover: 'https://i1.hdslb.com/bfs/archive/38e6abf4b4dfb7693898091272746f8aa2a1f0f7.jpg',
       views: '7763播放',
     },
     {
       bvid: 'BV1KVTJ6DEyY',
       title: 'Vision Banana:Image Generators are Generalist Vision Learners论文分享',
-      reason: '标题直接对应论文，提供中文论文分享视角，可与交互页面的七章结构对照观看。',
+      reason: '标题直接对应论文，提供中文论文分享视角，可与交互页面的六章结构对照观看。',
       cover: 'https://i0.hdslb.com/bfs/archive/e0e75b6d346f35f9106f1d02b1e2d4eadf3227f4.jpg',
       views: '1038播放',
     },

@@ -379,6 +379,41 @@ export const DepthColorBijection: React.FC<WidgetProps> = ({ chapterId, moduleId
           </ul>
         </div>
       </details>
+      <details className="paper-technical-details paper-benchmark-details">
+        <summary>查看论文表 6：完整深度评测与模型对比</summary>
+        <div className="paper-technical-details-body">
+          <section className="paper-benchmark-section">
+            <h4>单目度量深度估计｜六个公开基准</h4>
+            <p className="paper-benchmark-source">论文表 6；零样本迁移。δ₁ 越高越好，AbsRel 越低越好。</p>
+            <div className="paper-table-scroll wide" role="region" aria-label="论文表6单目度量深度完整评测，可横向滚动" tabIndex={0}>
+              <table className="paper" aria-label="单目度量深度模型对比">
+                <thead>
+                  <tr><th>数据或要求</th><th>指标</th><th>DepthLM-7B</th><th>Depth Anything V3</th><th>Depth Pro</th><th>UniK3D</th><th>MoGe-2</th><th>Vision Banana</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>推理使用相机内参</td><td>—</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>—</td><td><strong>—</strong></td></tr>
+                  <tr><td>训练使用相机内参</td><td>—</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><strong>—</strong></td></tr>
+                  <tr><td>所有基准平均</td><td>δ₁ ↑</td><td>部分*</td><td>部分*</td><td>0.715</td><td>0.823</td><td>0.802</td><td><strong>0.882</strong></td></tr>
+                  <tr><td>所有基准平均</td><td>AbsRel ↓</td><td>—</td><td>—</td><td>—</td><td>0.156</td><td>0.144</td><td><strong>0.116</strong></td></tr>
+                  <tr><td>NYU</td><td>δ₁ ↑</td><td>0.915</td><td>0.963</td><td>0.961</td><td>0.965</td><td>0.961</td><td><strong>0.948</strong></td></tr>
+                  <tr><td>NYU</td><td>AbsRel ↓</td><td>—</td><td>0.070</td><td>—</td><td>0.074</td><td>0.0733</td><td><strong>0.081</strong></td></tr>
+                  <tr><td>iBims1</td><td>δ₁ ↑</td><td>0.920</td><td>—</td><td>0.913</td><td>0.919</td><td>0.830</td><td><strong>0.934</strong></td></tr>
+                  <tr><td>iBims1</td><td>AbsRel ↓</td><td>—</td><td>—</td><td>—</td><td>0.104</td><td>0.136</td><td><strong>0.078</strong></td></tr>
+                  <tr><td>ETH3D</td><td>δ₁ ↑</td><td>0.718</td><td>0.917</td><td>0.415</td><td>0.687</td><td>0.908</td><td><strong>0.935</strong></td></tr>
+                  <tr><td>ETH3D</td><td>AbsRel ↓</td><td>—</td><td>0.104</td><td>0.327</td><td>0.236</td><td>0.104</td><td><strong>0.103</strong></td></tr>
+                  <tr><td>DIODE-Indoor</td><td>δ₁ ↑</td><td>—</td><td>0.838</td><td>0.671</td><td>0.713</td><td>0.664</td><td><strong>0.917</strong></td></tr>
+                  <tr><td>DIODE-Indoor</td><td>AbsRel ↓</td><td>—</td><td>0.123</td><td>0.199</td><td>0.161</td><td>0.175</td><td><strong>0.108</strong></td></tr>
+                  <tr><td>KITTI</td><td>δ₁ ↑</td><td>—</td><td>0.953</td><td>0.843‡</td><td>0.812</td><td>0.629</td><td><strong>0.915</strong></td></tr>
+                  <tr><td>KITTI</td><td>AbsRel ↓</td><td>—</td><td>0.086</td><td>0.121‡</td><td>0.174</td><td>0.181</td><td><strong>0.107</strong></td></tr>
+                  <tr><td>nuScenes</td><td>δ₁ ↑</td><td>0.865†</td><td>—</td><td>0.491</td><td>0.840</td><td>0.820</td><td><strong>0.643</strong></td></tr>
+                  <tr><td>nuScenes</td><td>AbsRel ↓</td><td>—</td><td>—</td><td>0.287</td><td>0.189</td><td>0.195</td><td><strong>0.219</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="paper-benchmark-note">* DepthLM-7B 与 Depth Anything V3 只报告各自覆盖的四个数据集；在 NYU、ETH3D、DIODE、KITTI 四个共同数据集上，Vision Banana 与 Depth Anything V3 的平均 δ₁ 分别为 0.929 和 0.918。† DepthLM 使用 nuScenes 训练。‡ 数值由 Depth Anything V3 论文报告。</p>
+          </section>
+        </div>
+      </details>
     </div>
   );
 };

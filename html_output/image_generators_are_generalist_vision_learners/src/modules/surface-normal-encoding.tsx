@@ -471,6 +471,30 @@ export const SurfaceNormalEncoding: React.FC<WidgetProps> = ({ chapterId, module
           </ul>
         </div>
       </details>
+      <details className="paper-technical-details paper-benchmark-details">
+        <summary>查看论文表 7：完整法线评测与模型对比</summary>
+        <div className="paper-technical-details-body">
+          <section className="paper-benchmark-section">
+            <h4>表面法线估计｜三个室内基准与 VKitti</h4>
+            <p className="paper-benchmark-source">论文表 7；mean 与 median 均为角度误差，越低越好。</p>
+            <div className="paper-table-scroll wide" role="region" aria-label="论文表7表面法线完整评测，可横向滚动" tabIndex={0}>
+              <table className="paper" aria-label="表面法线模型对比">
+                <thead>
+                  <tr><th>方法</th><th>室内平均 mean ↓</th><th>室内平均 median ↓</th><th>NYUv2 mean ↓</th><th>NYUv2 median ↓</th><th>DIODE-indoor mean ↓</th><th>DIODE-indoor median ↓</th><th>ScanNet mean ↓</th><th>ScanNet median ↓</th><th>VKitti mean ↓</th><th>VKitti median ↓</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Marigold</td><td>19.606</td><td>11.828</td><td>20.864</td><td>11.134</td><td>16.671</td><td>12.084</td><td>21.284</td><td>12.268</td><td>—</td><td>—</td></tr>
+                  <tr><td>DSINE</td><td>17.017</td><td>10.190</td><td><strong>16.400</strong></td><td><strong>8.400</strong></td><td>18.453</td><td>13.871</td><td>16.200</td><td>8.300</td><td>28.900</td><td>9.900</td></tr>
+                  <tr><td>StableNormal</td><td>17.168</td><td>10.028</td><td>19.707</td><td>10.527</td><td><strong>13.701</strong></td><td><strong>9.460</strong></td><td>18.098</td><td>10.097</td><td>—</td><td>—</td></tr>
+                  <tr><td>Lotus-2-Normal</td><td>16.558</td><td>—</td><td>16.900</td><td>N/A</td><td>18.575</td><td>N/A</td><td><strong>14.200</strong></td><td>N/A</td><td><strong>28.894</strong></td><td><strong>9.677</strong></td></tr>
+                  <tr className="paper-benchmark-method"><td><strong>Vision Banana</strong></td><td><strong>15.549</strong></td><td><strong>9.300</strong></td><td>17.778</td><td>8.876</td><td>13.818</td><td>11.556</td><td>15.052</td><td><strong>7.468</strong></td><td>29.063</td><td>10.699</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="paper-benchmark-note">Vision Banana 在三个室内数据集的平均 mean/median 角误差最低；在 VKitti 上略逊于 Lotus-2，但 Lotus-2 使用了 VKitti 训练，而 Vision Banana 没有使用任何受测基准的训练集。</p>
+          </section>
+        </div>
+      </details>
       <p className="note">图 8 的定性比较显示 Vision Banana 保留了更细的表面纹理；但在 Virtual KITTI 2 上，它的 mean/median 角误差为 29.063°/10.699°，略高于使用该数据训练的 Lotus-2（28.894°/9.677°）。视觉细节与数值误差必须分别陈述。</p>
     </div>
   );

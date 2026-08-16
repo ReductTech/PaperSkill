@@ -1,6 +1,5 @@
 import React from 'react';
 import { ExampleSlider } from './exampleSlider';
-import { BenchmarkRace } from './benchmark-race';
 import { ClaimStamp } from './claim-stamp';
 import { DecodeReversibility } from './decode-reversibility';
 import { DepthColorBijection } from './depth-color-bijection';
@@ -20,7 +19,6 @@ export interface WidgetProps {
 
 export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
 widgetRegistry['example-slider'] = ExampleSlider;
-widgetRegistry['benchmark-race'] = BenchmarkRace;
 widgetRegistry['claim-stamp'] = ClaimStamp;
 widgetRegistry['decode-reversibility'] = DecodeReversibility;
 widgetRegistry['depth-color-bijection'] = DepthColorBijection;
