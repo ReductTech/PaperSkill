@@ -21,7 +21,7 @@ const NODES: Record<NodeId, ArchitectureNode> = {
   },
   text: {
     label: 'Ministral-3（3B）', shortLabel: '文本编码器', role: '文本编码器',
-    fact: 'Ministral-3（3B）把提示转换成供生成器使用的文字条件。',
+    fact: 'Ministral-3（3B）把提示词转换成text token。',
   },
   latent: {
     label: 'FLUX.2 VAE', shortLabel: 'VAE 潜空间', role: '图像潜空间',
@@ -29,7 +29,7 @@ const NODES: Record<NodeId, ArchitectureNode> = {
   },
   dit: {
     label: '8B 单流 DiT', shortLabel: '8B 单流 DiT', role: '核心生成器',
-    fact: '论文明确说明 ERNIE-Image 建立在 8B 单流 DiT 架构上。完整内部层次未公开。',
+    fact: ' ERNIE-Image 建立在 8B 单流 DiT 架构上。',
   },
   decoder: {
     label: 'VAE 解码端', shortLabel: 'VAE 解码', role: '潜变量到图像',

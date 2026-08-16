@@ -24,6 +24,7 @@ const durations: Record<string, number> = {
   '5': 3200,
   '6': 3000,
   '7': 3200,
+  '8': 3100,
   '9': 3000,
   '10': 3100,
 };
@@ -34,8 +35,9 @@ const ariaLabels: Record<string, string> = {
   '3': '一张校样卡滑向覆盖与质量的平衡标记。',
   '4': '一个裁切框扩展到标出的分辨率引导线。',
   '5': '一支笔把简短说明改写为用户式请求。',
-  '6': '一个平衡旋钮转到锚定后的安全位置。',
+  '6': '一枚旋钮从红色投机区转向绿色锚定区，并在安全位置稳定下来。',
   '7': '一张校样沿八个函数评估刻度前进到终点。',
+  '8': '一支笔沿着方向标记移动，让模糊校样逐渐形成清晰结构。',
   '9': '一只放大镜比较一对校样并停在选择上。',
   '10': '一个审批章压到当前协议的结果卡上。',
 };
@@ -153,22 +155,106 @@ function scene5(ctx: CanvasRenderingContext2D, progress: number) {
 
 function scene6(ctx: CanvasRenderingContext2D, progress: number) {
   const q = phase(progress);
-  const cx = 88;
-  const cy = 64;
-  ctx.save();
-  ctx.strokeStyle = posterColor('border');
-  ctx.lineWidth = 8;
+  const cx = 122;
+  const cy = 63;
+  const start = -2.68;
+  const safe = -0.46;
+  const settled = q < 0.86
+    ? q / 0.86
+    : 1 - Math.sin(((q - 0.86) / 0.14) * Math.PI) * 0.035;
+  const angle = start + (safe - start) * settled;
+
+  ctx.fillStyle = 'rgba(33, 50, 74, 0.12)';
   ctx.beginPath();
-  ctx.arc(cx, cy, 31, Math.PI * 0.76, Math.PI * 2.24);
+  ctx.ellipse(cx + 2, cy + 25, 49, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const face = ctx.createRadialGradient(cx - 10, cy - 13, 3, cx, cy, 47);
+  face.addColorStop(0, '#ffffff');
+  face.addColorStop(0.72, '#f4f7f0');
+  face.addColorStop(1, '#d7deea');
+  ctx.fillStyle = face;
+  ctx.strokeStyle = posterColor('current');
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 45, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.save();
+  ctx.lineWidth = 7;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = posterColor('failure');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 36, start, -1.56);
+  ctx.stroke();
+  ctx.strokeStyle = posterColor('input');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 36, -1.48, -1.02);
+  ctx.stroke();
+  ctx.strokeStyle = posterColor('success');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 36, -0.94, safe);
   ctx.stroke();
   ctx.restore();
+
+  for (let i = 0; i <= 10; i += 1) {
+    const tickAngle = start + (safe - start) * (i / 10);
+    const inner = 26;
+    const outer = i === 0 || i === 10 ? 31 : 29;
+    ctx.strokeStyle = i < 5 ? posterColor('failure') : i > 7 ? posterColor('success') : posterColor('muted');
+    ctx.globalAlpha = 0.4;
+    ctx.lineWidth = i === 0 || i === 10 ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(tickAngle) * inner, cy + Math.sin(tickAngle) * inner);
+    ctx.lineTo(cx + Math.cos(tickAngle) * outer, cy + Math.sin(tickAngle) * outer);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(-1.7 + q * 2.15);
-  drawTool(ctx, 'knob', 0, 0, 1, q > 0.78 ? posterColor('success') : posterColor('input'), true);
+  ctx.rotate(angle);
+  const needleColor = settled > 0.78
+    ? posterColor('success')
+    : settled < 0.48
+    ? posterColor('failure')
+    : posterColor('input');
+  ctx.strokeStyle = needleColor;
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-5, 0);
+  ctx.lineTo(29, 0);
+  ctx.stroke();
+  ctx.fillStyle = needleColor;
+  ctx.beginPath();
+  ctx.arc(29, 0, 4, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
-  drawPoster(ctx, 156, 34, 55, 58, 0.55 + q * 0.4, posterColor('current'));
-  if (q > 0.82) drawProofFrame(ctx, 151, 29, 65, 68, posterColor('success'));
+
+  const hub = ctx.createRadialGradient(cx - 3, cy - 4, 1, cx, cy, 10);
+  hub.addColorStop(0, '#ffffff');
+  hub.addColorStop(0.25, posterColor('border'));
+  hub.addColorStop(1, posterColor('current'));
+  ctx.fillStyle = hub;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  const targetX = cx + Math.cos(safe) * 36;
+  const targetY = cy + Math.sin(safe) * 36;
+  ctx.strokeStyle = `rgba(34, 141, 92, ${0.18 + Math.max(0, settled - 0.74) * 2.2})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(targetX, targetY, 7 + settled * 3, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = posterColor('failure');
+  ctx.font = '700 10px "Segoe UI", sans-serif';
+  ctx.fillText('投机', 51, 112);
+  ctx.fillStyle = posterColor('success');
+  ctx.fillText('锚定', 169, 112);
 }
 
 function scene7(ctx: CanvasRenderingContext2D, progress: number) {
@@ -183,6 +269,15 @@ function scene7(ctx: CanvasRenderingContext2D, progress: number) {
   const proofX = left + (right - left) * q - 19;
   drawPoster(ctx, proofX, 40, 38, 32, 0.4 + q * 0.55, posterColor('current'));
   if (q > 0.93) drawTargetMark(ctx, 218, 55, posterColor('success'), q);
+}
+
+function scene8(ctx: CanvasRenderingContext2D, progress: number) {
+  const q = phase(progress);
+  drawPoster(ctx, 75, 21, 98, 82, 0.22 + q * 0.73, q > 0.84 ? posterColor('success') : posterColor('current'));
+  line(ctx, 32, 98, 72, 72, posterColor('border'), 2, true);
+  line(ctx, 72, 72, 132, 52, posterColor('input'), 2);
+  drawTool(ctx, 'pen', 35 + q * 103, 96 - q * 46, 0.78, posterColor('input'), true);
+  if (q > 0.86) drawTargetMark(ctx, 201, 61, posterColor('success'), q);
 }
 
 function scene9(ctx: CanvasRenderingContext2D, progress: number) {
@@ -212,6 +307,7 @@ function drawScene(ctx: CanvasRenderingContext2D, chapterId: string, progress: n
     case '5': scene5(ctx, progress); break;
     case '6': scene6(ctx, progress); break;
     case '7': scene7(ctx, progress); break;
+    case '8': scene8(ctx, progress); break;
     case '9': scene9(ctx, progress); break;
     case '10': scene10(ctx, progress); break;
     default:
