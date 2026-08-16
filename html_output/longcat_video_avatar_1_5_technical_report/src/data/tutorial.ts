@@ -259,7 +259,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '7.1',
           title: '切换指标，读懂 Base 与 Fast 的真实权衡',
-          desc: '所有数值来自论文 Table 2。指标已经按汇报顺序分组：先讲 <b>Base 略优的表现力指标</b>，再集中讲 <b>Fast 更优的部署质量指标</b>。',
+          desc: '所有质量数值来自论文 Table 2。指标按汇报顺序分组：先讲 <b>Base 略优的表现力指标</b>，再集中讲 <b>Fast 更优的部署质量指标</b>；最后用 150 NFE 与 8 NFE 展示论文实际报告的推理成本差异。',
           componentId: 'result-console',
         },
         {
