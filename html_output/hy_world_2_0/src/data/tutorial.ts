@@ -51,8 +51,8 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "1.1",
-          "title": "世界任务调度台",
-          "desc": "选择文本、单图、多视图或视频，把输入条件映射到生成或重建路径，并检查各阶段与可观察输出。",
+          "title": "四任务共享路径总图",
+          "desc": "在同一张系统大图中比较文本、单图、多视图与视频四种输入。点击任务卡切换生成或重建路径，当前经过的模块与共享输出被高亮，其余模块灰显。",
           componentId: "hy-mission-planner"
         },
         {
