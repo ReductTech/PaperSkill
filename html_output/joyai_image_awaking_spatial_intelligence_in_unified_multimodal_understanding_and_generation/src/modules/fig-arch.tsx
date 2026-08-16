@@ -105,7 +105,7 @@ export function FigArch() {
         ))}
       </div>
       <div className="arch-figure-stage" style={{ '--route-color': route.color } as React.CSSProperties}>
-        <img src="/images/fig-architecture.png?v=figure4-full-2" alt="论文 Figure 4：JoyAI-Image 统一架构" />
+        <img src="./images/fig-architecture.png?v=figure4-full-2" alt="论文 Figure 4：JoyAI-Image 统一架构" />
         <RouteOverlay route={active} />
       </div>
       <div className="arch-route-readout" style={{ '--route-color': route.color } as React.CSSProperties}>

@@ -24,7 +24,7 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '1.1', title: '点选统一架构的三个部件', desc: '<strong>点击</strong> MLLM / VAE / MMDiT，区分“理解接口、潜变量压缩、条件生成核”三种职责。', componentId: 'sec1-mod1' },
         { kind: 'module', id: '1.2', title: '从语义条件到新视角：信息怎样往返？', desc: '<strong>逐步点击</strong>，看 MLLM 的隐藏状态如何为生成/编辑提供条件；在 TwNV 推理中，空间编辑器合成的新视角又如何成为 Reasoner 的补充输入。', componentId: 'sec2-mod1' },
-        { kind: 'module', id: '1.3', title: '论文原图：统一架构', desc: 'Figure 4：理解直接输出语言；生成与编辑则将 MLLM 的隐藏状态作为 MMDiT 的条件，同时由 VAE 连接像素与潜空间。', componentId: 'fig-arch', figure: '/images/fig-architecture.png' }
+        { kind: 'module', id: '1.3', title: '论文原图：统一架构', desc: 'Figure 4：理解直接输出语言；生成与编辑则将 MLLM 的隐藏状态作为 MMDiT 的条件，同时由 VAE 连接像素与潜空间。', componentId: 'fig-arch', figure: './images/fig-architecture.png' }
       ],
       insight: '“统一”指三项任务被纳入同一框架，并由 MLLM 提供共同语义接口；理解路径不经过 VAE/MMDiT，三项任务也不共享同一套监督数据或评价指标。',
       takeaways: [
@@ -39,7 +39,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '类比：导演绕着场景取景', text: '只看一个镜头容易误判前后与远近；不断<strong>换角度取景</strong>，才能确认物体的尺度、朝向和相互关系。', componentId: 'sec3-ana' },
       modules: [
         { kind: 'module', id: '2.1', title: '拖动 3D box，体验跨视角锚点', desc: '<strong>拖动</strong>立方体旋转：3D oriented bounding box 同时编码中心、尺度和朝向，可投影到多个视角。', componentId: 'sec3-mod1' },
-        { kind: 'module', id: '2.2', title: '论文原图：OpenSpatial 数据引擎', desc: 'Figure 5：以 3D box 为锚点，从 3D 扫描与网络视频建立 object-frame 索引，再合成单视角与多视角 QA。', componentId: 'fig-spatial', figure: '/images/fig-spatial.png' }
+        { kind: 'module', id: '2.2', title: '论文原图：OpenSpatial 数据引擎', desc: 'Figure 5：以 3D box 为锚点，从 3D 扫描与网络视频建立 object-frame 索引，再合成单视角与多视角 QA。', componentId: 'fig-spatial', figure: './images/fig-spatial.png' }
       ],
       insight: '训练并非“课程学习”：论文采用空间专项 SFT、按数据集配比采样、动态序列打包；仅在通用数据上施加 KL 蒸馏，从而保住原有通用能力而不阻碍空间知识注入。',
       formula: { lead: '空间专项微调的总目标为标准监督损失加通用能力保持项；后者只用于通用数据。', unicode: 'L = L<sub>SFT</sub> + λL<sub>KL</sub>', symbols: [{ sym: 'L_SFT', desc: '空间与通用多模态样本的监督微调损失' }, { sym: 'L_KL', desc: '冻结教师在响应 token 上提供的层平均 KL 约束' }] },
@@ -56,7 +56,7 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '3.1', title: '主路线：Data → Training → Results', desc: '<strong>依次点击</strong>三层，先弄清训练数据提供了什么，再追踪四阶段训练各自解决的问题，最后按数据集核对论文结果。', componentId: 'sec-generation-roadmap' },
         { kind: 'module', id: '3.2', title: 'Training 细节：Flow Matching 到底学什么？', desc: '<strong>滑动</strong>时间步 t，观察基础生成目标如何学习噪声潜变量到图像潜变量之间的速度；它贯穿预训练，但不是全部训练策略。', componentId: 'sec4-mod1' },
-        { kind: 'module', id: '3.3', title: 'Results 的视觉证据：多视角生成案例', desc: 'Figure 2 提供定性结果：同一提示生成多个一致视角。量化结论则在右侧按 LongText、CVTG、OneIG、DPG 与 CoReBench 分开核对。', componentId: 'fig-capabilities', figure: '/images/fig-capabilities.png' }
+        { kind: 'module', id: '3.3', title: 'Results 的视觉证据：多视角生成案例', desc: 'Figure 2 提供定性结果：同一提示生成多个一致视角。量化结论则在右侧按 LongText、CVTG、OneIG、DPG 与 CoReBench 分开核对。', componentId: 'fig-capabilities', figure: './images/fig-capabilities.png' }
       ],
       insight: '完整因果链是：多粒度/OCR/多视角数据提供专项监督 → 渐进预训练建立覆盖 → 续训缩窄到高质量分布 → SFT 强化文字与多视角 → Flow-GRPO 对齐美学和文本一致性 → 分数据集验证，而不是把所有提升笼统归因于 RL。',
       takeaways: [
@@ -71,7 +71,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '编辑契约：变化边界由指令决定', text: 'Editing 不预设人物、主题或场景必须保持不变。模型先从指令中判断<strong>哪些内容应该改变</strong>，再尽量保持<strong>指令未涉及的内容</strong>；Spatial Editing 进一步要求物体或相机变化满足明确的几何关系。', componentId: 'sec6-ana' },
       modules: [
         { kind: 'module', id: '4.1', title: '主路线：Data → Training → Results', desc: '<strong>依次点击</strong>三层。Data 中重点比较 Static-Camera 与 Dynamic-Camera 两条空间分支；Training 追踪四个阶段；Results 优先核对 SpatialEdit-Bench。', componentId: 'sec-editing-roadmap' },
-        { kind: 'module', id: '4.2', title: '论文原图：两条 Spatial Editing 数据分支', desc: 'Figure 10：上方 Dynamic-Camera 分支采样 yaw、pitch、distance；下方 Static-Camera 分支固定相机并生成物体移动、旋转与缩放。', componentId: 'fig-edit', figure: '/images/fig-edit-pipeline.png' },
+        { kind: 'module', id: '4.2', title: '论文原图：两条 Spatial Editing 数据分支', desc: 'Figure 10：上方 Dynamic-Camera 分支采样 yaw、pitch、distance；下方 Static-Camera 分支固定相机并生成物体移动、旋转与缩放。', componentId: 'fig-edit', figure: './images/fig-edit-pipeline.png' },
         { kind: 'module', id: '4.3', title: '操纵空间时，哪些内容该改、哪些必须保留？', desc: '<strong>切换</strong>属性修改、物体变换与相机变换，观察目标变化与身份、布局、非目标区域保持之间的约束。', componentId: 'sec-edit-mod1' }
       ],
       insight: '空间编辑的关键不是增加一类文字指令，而是用 3D 场景生成几何上无歧义的源图—目标图对：Static-Camera 解耦物体变化与背景保持，Dynamic-Camera 解耦相机运动与场景结构保持。',
@@ -101,7 +101,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '类比：换到看得见关键关系的位置再判断', text: '被遮挡或前后关系不清时，不急着猜答案；先<strong>走到合适的观察位置</strong>，再结合原视角和新视角作判断。', componentId: 'sec6-ana' },
       modules: [
         { kind: 'module', id: '6.1', title: '切换“单视角 / 新视角”推理', desc: '<strong>拨动开关</strong>，比较只有原图时的几何歧义，与 Planner 选视角、Synthesizer 合成后再推理的差别。', componentId: 'sec6-mod1' },
-        { kind: 'module', id: '6.2', title: '论文原图：TwNV 的三阶段流程', desc: 'Figure 13：Planner 产生 6-DoF 相机运动，Synthesizer 生成 I₁，Reasoner 联合 {I₀, I₁} 回答空间问题。', componentId: 'fig-twnv', figure: '/images/fig-twnv.png' }
+        { kind: 'module', id: '6.2', title: '论文原图：TwNV 的三阶段流程', desc: 'Figure 13：Planner 产生 6-DoF 相机运动，Synthesizer 生成 I₁，Reasoner 联合 {I₀, I₁} 回答空间问题。', componentId: 'fig-twnv', figure: './images/fig-twnv.png' }
       ],
       insight: '这是论文在推理阶段给出的主动求证流程：MLLM Planner 规划需要暴露的几何证据，JoyAI-Image-Edit 执行相机运动并合成新视角，Reasoner 再联合原图与新图完成空间判断。',
       takeaways: [
@@ -164,7 +164,7 @@ export const tutorial: TutorialData = {
               title: 'OpenSpatial：怎样批量构造空间监督？',
               desc: 'Figure 5 展示 box-centric 数据引擎：先从 3D 扫描或网络视频获得场景级 3D OBB，再投影到各帧并以 mask 做跨视角校验，最终将 3D/2D box、实例 mask、局部点云和度量信息写入统一 object-frame index。',
               componentId: 'fig-spatial',
-              figure: '/images/fig-spatial.png'
+              figure: './images/fig-spatial.png'
             },
             {
               kind: 'module' as const,
@@ -193,7 +193,7 @@ export const tutorial: TutorialData = {
               title: 'Figure 14：新视角怎样解决真实空间问题？',
               desc: '论文展示两个代表性 case：<strong>高度比较</strong>与<strong>垂直关系消歧</strong>。对比 Input、Qwen-Image-Edit、Nano Banana Pro 与 JoyAI-Image-Edit，观察不同新视角是否真正暴露了作答所需的空间证据。',
               componentId: 'sec-twnv-cases',
-              figure: '/images/fig-twnv-cases.png'
+              figure: './images/fig-twnv-cases.png'
             },
             {
               kind: 'module' as const,
@@ -201,7 +201,7 @@ export const tutorial: TutorialData = {
               title: 'Figure 15：生成的新视角真的具有几何一致性吗？',
               desc: '<strong>切换</strong>“单图重建 / 加入新视角重建”。论文将生成视角送入 VGGT，观察点云与相机姿态是否变得更稠密、更完整。',
               componentId: 'sec-twnv-reconstruction',
-              figure: '/images/fig-reconstruction.png'
+              figure: './images/fig-reconstruction.png'
             }
           ]
         };

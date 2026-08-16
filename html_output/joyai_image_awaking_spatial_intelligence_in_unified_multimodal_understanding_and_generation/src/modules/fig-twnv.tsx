@@ -4,7 +4,7 @@ export function FigTwnv() {
   return (
     <div className="figure-evidence twnv-evidence">
       <div className="twnv-paper-crop">
-        <img src="/images/fig-twnv.png" alt="论文 Figure 13：Thinking with Novel Views 三阶段流程" />
+        <img src="./images/fig-twnv.png" alt="论文 Figure 13：Thinking with Novel Views 三阶段流程" />
       </div>
       <div className="evidence-legend">
         <div className="legend-title">论文原图 · Figure 13：TwNV 三阶段流程</div>

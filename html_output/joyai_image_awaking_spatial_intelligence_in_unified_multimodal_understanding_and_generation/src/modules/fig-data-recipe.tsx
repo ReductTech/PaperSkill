@@ -16,7 +16,7 @@ export function FigDataRecipe() {
       </div>
 
       <div className={`data-recipe-figure focus-${focus}`}>
-        <img src="/images/fig-data-recipe.png" alt="论文 Figure 7：空间理解训练数据分布" />
+        <img src="./images/fig-data-recipe.png" alt="论文 Figure 7：空间理解训练数据分布" />
         <div className="data-recipe-shade" aria-hidden="true" />
       </div>
 
