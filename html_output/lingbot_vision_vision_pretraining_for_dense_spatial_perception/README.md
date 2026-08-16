@@ -31,7 +31,3 @@ npm run preview   # 预览构建结果
 - `--orange` 用户强调，`--purple` 辅助机制
 
 切勿把 `--accent` 重新定义成别的语义角色。
-
-## 图片来源
-
-本教程 `public/images/` 中的示意图均来自论文原图（*LingBot-Vision: Vision Pretraining for Dense Spatial Perception*，arXiv:2607.05247，https://arxiv.org/abs/2607.05247），仅用于本教程的教学展示；交互式 Canvas 机制示意图（Random vs Boundary Mask / Corner Voting / NFA 等）为本项目自绘。
