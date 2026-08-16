@@ -231,7 +231,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           id: '5.1',
           title: '四条证据共同完成能力归因',
-          desc: '依次查看原生成预训练、低比例任务数据、数据来源与生成能力保留。边界折叠区列出未公开的混合比例、训练步数和完整基础架构，区分论文事实与示意图。',
+          desc: '依次查看原生成预训练、低比例任务数据、数据来源与生成能力保留，理解论文如何把多条证据连成能力归因链。',
           componentId: 'instruction-mix',
         },
       ],

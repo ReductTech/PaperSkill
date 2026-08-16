@@ -4,8 +4,8 @@ import type { WidgetProps } from './registry';
 
 const W=560,H=250,MW=244,MH=130;
 const C={desk:'#f5f8f0',paper:'#fff',shadow:'#b8c9a7',contour:'#76906a',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#d97706',purple:'#7c3aed',text:'#21324a',muted:'#68778f',border:'#d7deea'};
-type Phase='base'|'add'|'source'|'preserve';type Source='generation'|'2d'|'3d';type Judgment='idle'|'correct'|'incorrect';
-interface MixState{phase:Phase;sourceFocus:Source;hasMixed:boolean;dropletProgress:number;judgment:Judgment;}
+type Phase='base'|'add'|'source'|'preserve';type Source='generation'|'2d'|'3d';
+interface MixState{phase:Phase;sourceFocus:Source;hasMixed:boolean;dropletProgress:number;}
 function compactMode(id:string){return !/^\d+(\.\d+)?$/.test(id);}
 function sheet(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number){ctx.fillStyle=C.shadow;ctx.fillRect(x+3,y+4,w,h);ctx.fillStyle=C.paper;ctx.fillRect(x,y,w,h);ctx.strokeStyle=C.border;ctx.strokeRect(x,y,w,h);}
 function dropper(ctx:CanvasRenderingContext2D,x:number,y:number){ctx.strokeStyle=C.blue;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+15,y+32);ctx.stroke();ctx.fillStyle=C.blue;ctx.beginPath();ctx.ellipse(x-4,y-6,7,18,-.45,0,Math.PI*2);ctx.fill();}
@@ -18,29 +18,20 @@ function drawMain(ctx:CanvasRenderingContext2D,state:MixState){ctx.clearRect(0,0
   const progress=state.hasMixed?state.dropletProgress:0;dropper(ctx,235,48);if(state.hasMixed){drop(ctx,262,lerp(78,116,clamp(progress,0,1)));ctx.strokeStyle=C.green;ctx.globalAlpha=.7;ctx.beginPath();ctx.ellipse(94,122,20+25*progress,9+10*progress,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
   ctx.fillStyle='#fff7ed';ctx.fillRect(192,136,135,54);ctx.strokeStyle=state.sourceFocus==='generation'?C.blue:C.orange;ctx.strokeRect(192,136,135,54);ctx.fillStyle=C.text;ctx.font='10px Segoe UI';const source=state.sourceFocus==='generation'?'原图像生成数据':state.sourceFocus==='2d'?'2D 网页图像标注':'3D 合成渲染数据';ctx.fillText(source,205,158);ctx.fillText(state.hasMixed?'定性：很低比例':'尚未加入',205,176);
   outputCard(ctx,390,48,'普通生成',state.phase==='base'||state.phase==='preserve','gen');outputCard(ctx,390,100,'分割 RGB',state.phase==='add'||state.phase==='source','seg');outputCard(ctx,390,152,'深度 RGB',state.phase==='add'||state.phase==='source','depth');
-  ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(160,122);ctx.lineTo(188,122);ctx.moveTo(328,122);ctx.lineTo(384,122);ctx.stroke();if(state.phase==='preserve')seal(ctx,348,190,'近似保留');if(state.judgment==='incorrect'){ctx.strokeStyle=C.red;ctx.setLineDash([5,4]);ctx.strokeRect(181,126,158,74);ctx.setLineDash([]);ctx.fillStyle=C.red;ctx.fillText('不可按面积读比例',200,214);}}
+  ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(160,122);ctx.lineTo(188,122);ctx.moveTo(328,122);ctx.lineTo(384,122);ctx.stroke();if(state.phase==='preserve')seal(ctx,348,190,'近似保留');}
 
-export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const compact=compactMode(moduleId);const canvasRef=useRef<HTMLCanvasElement>(null);const [state,setState]=useState<MixState>({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0,judgment:'idle'});
+export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const compact=compactMode(moduleId);const canvasRef=useRef<HTMLCanvasElement>(null);const [state,setState]=useState<MixState>({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0});
   useEffect(()=>{const canvas=canvasRef.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,compact?MW:W,compact?MH:H);}catch{return;}const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;let raf:number|null=null;const frame=(now:number)=>{compact?drawMini(ctx,now,reduced):drawMain(ctx,state);canvas.classList.add('is-ready');raf=compact&&!reduced?requestAnimationFrame(frame):null;};const start=()=>{if(raf===null)raf=requestAnimationFrame(frame);};const stop=()=>{if(raf!==null)cancelAnimationFrame(raf);raf=null;};const disconnect=observeCanvas(canvas,start,stop);return()=>{stop();disconnect();};},[compact,state]);
   const feedback=useMemo(()=>{if(state.phase==='base')return'Nano Banana Pro 先通过图像生成预训练获得广泛生成先验；此时不保证稳定输出可解码的视觉任务格式。';if(state.phase==='add')return'论文把视觉任务数据以“很低比例”混入原训练混合；具体比例没有披露。';if(state.phase==='source')return state.sourceFocus==='2d'?'2D 指令数据来自网页抓取图像的内部模型标注。':state.sourceFocus==='3d'?'3D 指令数据来自渲染引擎生成的合成数据；深度训练不使用真实世界深度数据。':'对应评测基准的训练数据没有进入指令微调混合。';return'下方两项人类偏好记录接近 50% 分界，证据支持“近似持平”，不是每项都更好。';},[state]);
   if(compact)return <canvas ref={canvasRef} width={MW} height={MH} aria-label="滴管向原生成调色盘加入定性的少量任务格式数据"/>;
   const setPhase=(phase:Phase)=>setState(s=>phase==='base'?{...s,phase,sourceFocus:'generation',hasMixed:false,dropletProgress:0}:{...s,phase,hasMixed:true,dropletProgress:1});
-  const judgmentText=state.judgment==='correct'?'证据边界守住了：定性低比例 ≠ 已知百分比。':state.judgment==='incorrect'?'请撤回这个数字：论文没有给出比例，任何百分比都会是杜撰。':'';
   return <div>
     <div className="paper-step-group" role="group" aria-label="训练混合阶段"><button type="button" aria-current={state.phase==='base'?'step':undefined} onClick={()=>setPhase('base')}>① 看原训练混合</button><button type="button" aria-current={state.phase==='add'?'step':undefined} onClick={()=>setPhase('add')}>② 加入视觉任务数据</button><button type="button" aria-current={state.phase==='source'?'step':undefined} onClick={()=>setPhase('source')}>③ 核对数据来源</button><button type="button" aria-current={state.phase==='preserve'?'step':undefined} onClick={()=>setPhase('preserve')}>④ 查看保留能力</button></div>
     <div className="paper-choice-group" role="group" aria-label="数据来源"><button type="button" aria-pressed={state.sourceFocus==='generation'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'generation'}))}>原图像生成数据</button><button type="button" aria-pressed={state.sourceFocus==='2d'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'2d'}))}>2D 网页图像标注</button><button type="button" aria-pressed={state.sourceFocus==='3d'} onClick={()=>setState(s=>({...s,phase:'source',hasMixed:true,dropletProgress:1,sourceFocus:'3d'}))}>3D 合成渲染数据</button></div>
-    <div className="paper-action-group"><button type="button" onClick={()=>setState(s=>({...s,phase:'add',hasMixed:true,dropletProgress:s.dropletProgress===1?.65:1}))}>演示少量数据加入</button><button type="button" className="paper-reset-button" onClick={()=>setState({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0,judgment:'idle'})}>重置训练示意</button></div>
+    <div className="paper-action-group"><button type="button" onClick={()=>setState(s=>({...s,phase:'add',hasMixed:true,dropletProgress:s.dropletProgress===1?.65:1}))}>演示少量数据加入</button><button type="button" className="paper-reset-button" onClick={()=>setState({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0})}>重置训练示意</button></div>
     <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} style={{maxWidth:'100%',height:'auto'}} aria-label="原图像生成数据保持在混合中，少量视觉任务数据只作定性示意"/>
     <div className={`feedback ${state.phase==='preserve'?'good':''}`} role="status" aria-live="polite">{feedback}</div>
     <dl className="paper-fact-grid"><dt>GenAI-Bench 文生图</dt><dd>Vision Banana 对 Nano Banana Pro 胜率 53.5%</dd><dt>ImgEdit 图像编辑</dt><dd>Vision Banana 对 Nano Banana Pro 胜率 47.8%</dd><dt>读法</dt><dd>50% 表示双方持平；两项合看支持近似保留生成能力。</dd></dl>
-    <details className="paper-technical-details">
-      <summary>证据边界：论文没有公开哪些训练细节</summary>
-      <div className="paper-technical-details-body">
-        <fieldset><legend>能否根据动画中绿色液滴的面积，推断视觉任务数据占 1% 或其他具体比例？</legend><div className="paper-choice-group paper-choice-stack"><button type="button" aria-pressed={state.judgment==='incorrect'} onClick={()=>setState(s=>({...s,judgment:'incorrect'}))}>绿色面积就是论文真实比例</button><button type="button" aria-pressed={state.judgment==='correct'} onClick={()=>setState(s=>({...s,judgment:'correct'}))}>这里只能表示“很低比例”</button></div></fieldset>
-        {judgmentText&&<div className={`feedback ${state.judgment==='correct'?'good':'bad'}`} role="status">{judgmentText}</div>}
-        <ul><li>论文未公开视觉数据的精确混合比例；任何百分比、扇形图刻度或按面积推算都属于发明。</li><li>“轻量指令微调”不等于已知训练步数、算力、损失细节或 Nano Banana Pro 完整架构，这些均不可补写。</li><li>“未使用评测基准训练集”不等于“没有视觉监督数据”；模型仍使用内部标注的 2D 数据和合成 3D 数据。</li><li>两项生成评测只支持近似保留：53.5% 略高于持平线、47.8% 略低于持平线，不能表述成所有生成能力都提升。</li></ul>
-      </div>
-    </details>
   </div>;
 };
 export default InstructionMix;
