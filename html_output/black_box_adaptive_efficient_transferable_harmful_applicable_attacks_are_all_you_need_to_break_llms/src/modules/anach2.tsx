@@ -5,7 +5,7 @@ export const AnaCh2: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   return (
     <img
       id={`cv-${chapterId}-${moduleId}`}
-      src="/images/tools-vs-skill.png"
+      src={`${import.meta.env.BASE_URL}images/tools-vs-skill.png`}
       alt="换工具还是练手法"
       width={244}
       height={130}

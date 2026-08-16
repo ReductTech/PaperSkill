@@ -25,7 +25,7 @@ export const AnaCh1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     <video
       id={`cv-${chapterId}-${moduleId}`}
       ref={videoRef}
-      src="/images/safe-metal.mp4"
+      src={`${import.meta.env.BASE_URL}images/safe-metal.mp4`}
       width={244}
       height={130}
       autoPlay

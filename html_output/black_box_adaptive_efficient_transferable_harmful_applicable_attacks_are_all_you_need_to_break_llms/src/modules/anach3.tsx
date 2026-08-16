@@ -5,7 +5,7 @@ export const AnaCh3: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   return (
     <img
       id={`cv-${chapterId}-${moduleId}`}
-      src="/images/bidirectional.png"
+      src={`${import.meta.env.BASE_URL}images/bidirectional.png`}
       alt="按标签双向填空"
       width={244}
       height={130}

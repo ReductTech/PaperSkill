@@ -109,7 +109,7 @@ export const Ch1Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = '/images/lock-checklist.png';
+    img.src = `${import.meta.env.BASE_URL}images/lock-checklist.png`;
     img.onload = () => {
       imgRef.current = img;
       setImgReady(true);
