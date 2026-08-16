@@ -3,6 +3,7 @@ import { observeCanvas } from '../lib/canvasKit';
 import {
   PAL,
   clearScene,
+  createAutoplay,
   drawBasket,
   drawInset,
   drawLegend,
@@ -11,7 +12,9 @@ import {
   drawSceneLabel,
   drawTargetWidthGuide,
   drawYarnBall,
+  rampSteps,
   setupCrispCanvas,
+  useAutoplay,
 } from './knitKit';
 import type { WidgetProps } from './registry';
 
@@ -142,8 +145,7 @@ export const Ch1M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     };
   }, []);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const m = Number(e.target.value);
+  const apply = (m: number) => {
     stateRef.current.minutes = m;
     setMinutes(m);
     if (m <= 15) {
@@ -158,6 +160,17 @@ export const Ch1M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     }
   };
 
+  // Autoplay sweeps 1 -> 60 minutes so the monotone degradation is visible
+  // without dragging. Any manual move stops it.
+  const demo = useAutoplay({ steps: rampSteps(1, 60, 24), intervalMs: 380 }, (m: number) =>
+    apply(Math.round(m))
+  );
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    demo.stop();
+    apply(Number(e.target.value));
+  };
+
   return (
     <div>
       <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} />
@@ -166,6 +179,9 @@ export const Ch1M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           连续生成时长 <span className="val">{minutes} 分钟</span>
         </label>
         <input type="range" min={1} max={60} step={1} value={minutes} onChange={onChange} />
+        <button className={demo.btnClass} onClick={demo.toggle}>
+          {demo.label}
+        </button>
       </div>
       <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>
     </div>

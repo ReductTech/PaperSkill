@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas } from '../lib/canvasKit';
-import { PAL, clearPanel, drawInset, drawLegend, drawSceneLabel, wrapText, setupCrispCanvas } from './knitKit';
+import {
+  PAL,
+  clearPanel,
+  drawInset,
+  drawLegend,
+  drawSceneLabel,
+  rampSteps,
+  wrapText,
+  setupCrispCanvas,
+  useAutoplay,
+} from './knitKit';
 import type { WidgetProps } from './registry';
 
 const W = 720;
@@ -165,8 +175,7 @@ export const Ch7M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     };
   }, []);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const t = Number(e.target.value) / 100;
+  const apply = (t: number) => {
     stateRef.current.noiseT = t;
     setNoiseT(t);
     const gap = Math.abs(DATA_MU + 0.2 * (1 - t) - DATA_MU);
@@ -186,6 +195,17 @@ export const Ch7M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     }
   };
 
+  // Autoplay raises t so the two noised distributions slide into each other, then
+  // stops where they overlap — the state DMD is actually optimizing for.
+  const demo = useAutoplay({ steps: rampSteps(0.05, 0.95, 20), intervalMs: 320 }, (t: number) =>
+    apply(t)
+  );
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    demo.stop();
+    apply(Number(e.target.value) / 100);
+  };
+
   return (
     <div>
       <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} />
@@ -201,6 +221,9 @@ export const Ch7M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           value={Math.round(noiseT * 100)}
           onChange={onChange}
         />
+        <button className={demo.btnClass} onClick={demo.toggle}>
+          {demo.label}
+        </button>
       </div>
       <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>
     </div>

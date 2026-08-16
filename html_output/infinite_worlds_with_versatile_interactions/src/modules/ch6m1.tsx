@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas } from '../lib/canvasKit';
-import { PAL, clearPanel, drawInset, drawLegend, drawSceneLabel, wrapText, setupCrispCanvas } from './knitKit';
+import {
+  PAL,
+  clearPanel,
+  drawInset,
+  drawLegend,
+  drawSceneLabel,
+  wrapText,
+  setupCrispCanvas,
+  useAutoplay,
+} from './knitKit';
 import type { WidgetProps } from './registry';
 
 const W = 720;
@@ -195,11 +204,20 @@ export const Ch6M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     );
   };
 
+  // Autoplay fills the six output cells one at a time and stops on the last one,
+  // where the payoff line lands: every cell came out the same.
+  const demo = useAutoplay({ steps: [0, 1, 2, 3, 4, 5], intervalMs: 1500 }, (n: number) => goto(n));
+
+  const manual = (n: number) => {
+    demo.stop();
+    goto(n);
+  };
+
   return (
     <div>
       <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H} />
       <div className="step-ctrl">
-        <button className="tiny ghost" onClick={() => goto(step - 1)} disabled={step === 0}>
+        <button className="tiny ghost" onClick={() => manual(step - 1)} disabled={step === 0}>
           上一点
         </button>
         <span className="step-label">
@@ -207,13 +225,16 @@ export const Ch6M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         </span>
         <button
           className="tiny"
-          onClick={() => goto(step + 1)}
+          onClick={() => manual(step + 1)}
           disabled={step === POINTS - 1}
         >
           {step === POINTS - 1 ? '已到终点' : '下一点'}
         </button>
-        <button className="tiny ghost" onClick={() => goto(0)}>
+        <button className="tiny ghost" onClick={() => manual(0)}>
           重置
+        </button>
+        <button className={demo.btnClass} onClick={demo.toggle}>
+          {demo.label}
         </button>
       </div>
       <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>

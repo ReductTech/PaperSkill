@@ -9,7 +9,9 @@ import {
   drawScarf,
   drawSceneLabel,
   drawYarnBall,
+  rampSteps,
   setupCrispCanvas,
+  useAutoplay,
 } from './knitKit';
 import type { WidgetProps } from './registry';
 
@@ -174,7 +176,23 @@ export const Ch2M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     return clamp((y - 172) / 110, -MAX_A, MAX_A);
   };
 
+  // Autoplay swings the needle through the full range and back, so the reader
+  // sees which of the six Plucker components move together without dragging.
+  const demo = useAutoplay(
+    {
+      steps: [
+        ...rampSteps(0, MAX_A, 7),
+        ...rampSteps(MAX_A, -MAX_A, 13).slice(1),
+        ...rampSteps(-MAX_A, 0, 7).slice(1),
+      ],
+      intervalMs: 260,
+      loop: true,
+    },
+    (a: number) => apply(a)
+  );
+
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    demo.stop();
     stateRef.current.dragging = true;
     e.currentTarget.setPointerCapture(e.pointerId);
     apply(angleFromEvent(e.clientX, e.clientY));
@@ -213,8 +231,14 @@ export const Ch2M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           max={34}
           step={1}
           value={Math.round(angle * 57.3)}
-          onChange={(e) => apply(Number(e.target.value) / 57.3)}
+          onChange={(e) => {
+            demo.stop();
+            apply(Number(e.target.value) / 57.3);
+          }}
         />
+        <button className={demo.btnClass} onClick={demo.toggle}>
+          {demo.label}
+        </button>
       </div>
       <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>
     </div>

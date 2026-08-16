@@ -1,6 +1,8 @@
 // Shared knitting drawing kit for this tutorial. Every paper-specific widget imports
 // from here so all chapters share one visual vocabulary. Not a registered widget.
 
+import { useEffect, useRef, useState } from 'react';
+
 export const PAL = {
   scene: '#f5f8f0',
   envLight: '#b8c9a7',
@@ -499,6 +501,145 @@ export function setupCrispCanvas(
     detach: () => {
       if (ro) ro.disconnect();
       window.removeEventListener('resize', onWinResize);
+    },
+  };
+}
+
+/**
+ * Shared "自动演示" driver for interactive modules.
+ *
+ * Every module here already exposes one `apply(value)` (or `select(index)`)
+ * entry point that writes the learner's choice into `stateRef` and updates the
+ * feedback line. Autoplay reuses exactly that entry point on a timer, so the
+ * demo can never drift out of sync with manual control — it IS manual control,
+ * driven by a clock.
+ *
+ * The demo is a teaching aid, not a replacement: any manual interaction calls
+ * `stop()`, so touching a slider or chip hands control straight back.
+ *
+ * `steps` are visited in order and the run stops on the last one (`loop: false`,
+ * the default) or wraps around forever (`loop: true`). `intervalMs` is how long
+ * each step is held.
+ */
+export interface AutoplayOpts<T> {
+  steps: T[];
+  intervalMs: number;
+  loop?: boolean;
+}
+
+export interface AutoplayDriver {
+  start: () => void;
+  stop: () => void;
+  isRunning: () => boolean;
+}
+
+/**
+ * Timer core, framework-free so it can be driven from a React ref.
+ * `onStep` receives each value in turn; `onEnd` fires when a non-looping run
+ * finishes so the caller can flip its button state back.
+ */
+export function createAutoplay<T>(
+  opts: AutoplayOpts<T>,
+  onStep: (value: T, index: number) => void,
+  onEnd: () => void
+): AutoplayDriver {
+  let timer: ReturnType<typeof setInterval> | null = null;
+  let i = 0;
+
+  const stop = () => {
+    if (timer !== null) {
+      clearInterval(timer);
+      timer = null;
+    }
+  };
+
+  const start = () => {
+    stop();
+    if (opts.steps.length === 0) return;
+    i = 0;
+    onStep(opts.steps[0], 0);
+    timer = setInterval(() => {
+      i += 1;
+      if (i >= opts.steps.length) {
+        if (opts.loop) {
+          i = 0;
+        } else {
+          stop();
+          onEnd();
+          return;
+        }
+      }
+      onStep(opts.steps[i], i);
+    }, opts.intervalMs);
+  };
+
+  return { start, stop, isRunning: () => timer !== null };
+}
+
+/** Evenly spaced numeric steps, inclusive of both ends — for slider demos. */
+export function rampSteps(from: number, to: number, count: number): number[] {
+  if (count < 2) return [to];
+  const out: number[] = [];
+  for (let k = 0; k < count; k += 1) out.push(from + ((to - from) * k) / (count - 1));
+  return out;
+}
+
+/**
+ * React binding for `createAutoplay`.
+ *
+ * Usage in a module:
+ *   const demo = useAutoplay({ steps: [...], intervalMs: 700 }, apply);
+ *   ...
+ *   <button className={demo.btnClass} onClick={demo.toggle}>{demo.label}</button>
+ *
+ * and call `demo.stop()` at the top of every manual handler so touching a
+ * control hands control back to the learner immediately.
+ *
+ * `onStep` is read through a ref, so it always sees the latest closure without
+ * restarting the timer.
+ */
+export function useAutoplay<T>(
+  opts: AutoplayOpts<T>,
+  onStep: (value: T, index: number) => void
+): {
+  playing: boolean;
+  label: string;
+  btnClass: string;
+  toggle: () => void;
+  stop: () => void;
+} {
+  const [playing, setPlaying] = useState(false);
+  const stepRef = useRef(onStep);
+  stepRef.current = onStep;
+  const driverRef = useRef<AutoplayDriver | null>(null);
+
+  if (!driverRef.current) {
+    driverRef.current = createAutoplay(
+      opts,
+      (v, i) => stepRef.current(v, i),
+      () => setPlaying(false)
+    );
+  }
+
+  // Stop the timer if the module scrolls out of the tree.
+  useEffect(() => () => driverRef.current?.stop(), []);
+
+  const stop = () => {
+    driverRef.current?.stop();
+    setPlaying(false);
+  };
+
+  return {
+    playing,
+    label: playing ? '暂停演示' : '自动演示',
+    btnClass: playing ? 'tiny' : 'tiny ghost',
+    stop,
+    toggle: () => {
+      if (driverRef.current?.isRunning()) stop();
+      else {
+        driverRef.current?.start();
+        setPlaying(true);
+      }
     },
   };
 }

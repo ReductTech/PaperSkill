@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, clamp } from '../lib/canvasKit';
-import { PAL, clearPanel, drawInset, drawLegend, drawSceneLabel, wrapText, setupCrispCanvas } from './knitKit';
+import {
+  PAL,
+  clearPanel,
+  drawInset,
+  drawLegend,
+  drawSceneLabel,
+  rampSteps,
+  wrapText,
+  setupCrispCanvas,
+  useAutoplay,
+} from './knitKit';
 import type { WidgetProps } from './registry';
 
 const W = 720;
@@ -293,7 +303,20 @@ export const Ch3M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     return clamp((x - XA) / (XB - XA), 0, 1);
   };
 
+  // Autoplay sweeps t across the whole interpolation line and back. The point is
+  // negative evidence: the velocity arrow never changes while t moves, which is
+  // easier to trust when the sweep is smooth and hands-off.
+  const demo = useAutoplay(
+    {
+      steps: [...rampSteps(0, 1, 16), ...rampSteps(1, 0, 16).slice(1)],
+      intervalMs: 220,
+      loop: true,
+    },
+    (t: number) => apply(t)
+  );
+
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    demo.stop();
     stateRef.current.dragging = true;
     e.currentTarget.setPointerCapture(e.pointerId);
     apply(tFromEvent(e.clientX));
@@ -332,8 +355,14 @@ export const Ch3M1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           max={100}
           step={1}
           value={Math.round(tPos * 100)}
-          onChange={(e) => apply(Number(e.target.value) / 100)}
+          onChange={(e) => {
+            demo.stop();
+            apply(Number(e.target.value) / 100);
+          }}
         />
+        <button className={demo.btnClass} onClick={demo.toggle}>
+          {demo.label}
+        </button>
       </div>
       <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>
     </div>
