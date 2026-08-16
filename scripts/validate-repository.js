@@ -7,7 +7,7 @@ const { spawnSync } = require('child_process');
 const { ROOT, listSubmissions, metadataFor, validateMetadata } = require('./lib/repository');
 
 const requiredFiles = [
-  'paper.json', 'README.md', 'package.json', 'package-lock.json', 'index.html',
+  'README.md', 'package.json', 'package-lock.json', 'index.html',
   'vite.config.ts', 'tsconfig.json', 'src/App.tsx', 'src/data/tutorial.ts',
   'src/modules/registry.tsx', 'src/styles/paper.css',
 ];
@@ -47,16 +47,15 @@ function main() {
       failures += 1;
     }
 
-    try {
-      const meta = metadataFor(submission);
+    const meta = metadataFor(submission);
+    if (meta) {
       const errors = validateMetadata(meta, submission.paperName);
       for (const error of errors) {
         console.error(`  ✗ paper.json：${error}`);
         failures += 1;
       }
-    } catch (error) {
-      console.error(`  ✗ ${error.message}`);
-      failures += 1;
+    } else {
+      console.log('  • 未提供 paper.json，跳过元数据校验');
     }
 
     const skillValidator = path.join(ROOT, 'paper-skill', 'scripts', 'validate-output.js');

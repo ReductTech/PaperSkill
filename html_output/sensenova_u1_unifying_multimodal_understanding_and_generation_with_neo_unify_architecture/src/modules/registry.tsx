@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { DualCfgLab } from './dual-cfg-lab';
+import { DataConstructionMap } from './data-construction-map';
+import { EvidenceRace } from './evidence-race';
+import { FlowNoiseLab } from './flow-noise-lab';
+import { HeroContrast } from './hero-contrast';
+import { InterfaceChoice } from './interface-choice';
+import { JointObjectiveLab } from './joint-objective-lab';
+import { MotArchitecture } from './mot-architecture';
+import { PostTrainingRoute } from './post-training-route';
+import { PatchLens } from './patch-lens';
+import { RopeMask } from './rope-mask';
+import { SamplerSteps } from './sampler-steps';
+import { ServingKernel } from './serving-kernel';
+import { StudioAnalogy } from './studio-analogy';
+import { StudioKitPlaceholder } from './studio-kit';
+import { StreamRoles } from './stream-roles';
+import { SystemOverview } from './system-overview';
+import { InputPaths } from './input-paths';
+import { InferenceRoute } from './inference-route';
+import { TrainingCurriculum } from './training-curriculum';
+import { TrainingFlowMap } from './training-flow-map';
+import { UnificationCompare } from './unification-compare';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['dual-cfg-lab'] = DualCfgLab;
+widgetRegistry['data-construction-map'] = DataConstructionMap;
+widgetRegistry['evidence-race'] = EvidenceRace;
+widgetRegistry['flow-noise-lab'] = FlowNoiseLab;
+widgetRegistry['hero-contrast'] = HeroContrast;
+widgetRegistry['interface-choice'] = InterfaceChoice;
+widgetRegistry['joint-objective-lab'] = JointObjectiveLab;
+widgetRegistry['mot-architecture'] = MotArchitecture;
+widgetRegistry['post-training-route'] = PostTrainingRoute;
+widgetRegistry['patch-lens'] = PatchLens;
+widgetRegistry['rope-mask'] = RopeMask;
+widgetRegistry['sampler-steps'] = SamplerSteps;
+widgetRegistry['serving-kernel'] = ServingKernel;
+widgetRegistry['studio-analogy'] = StudioAnalogy;
+widgetRegistry['studio-kit'] = StudioKitPlaceholder;
+widgetRegistry['stream-roles'] = StreamRoles;
+widgetRegistry['system-overview'] = SystemOverview;
+widgetRegistry['input-paths'] = InputPaths;
+widgetRegistry['inference-route'] = InferenceRoute;
+widgetRegistry['training-curriculum'] = TrainingCurriculum;
+widgetRegistry['training-flow-map'] = TrainingFlowMap;
+widgetRegistry['unification-compare'] = UnificationCompare;
