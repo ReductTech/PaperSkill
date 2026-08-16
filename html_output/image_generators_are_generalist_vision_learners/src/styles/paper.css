@@ -678,46 +678,65 @@
   margin-top: 14px;
 }
 
-.paper-benchmark-summary-list {
+.paper-technical-details summary.paper-benchmark-summary-trigger {
   display: grid;
-  gap: 9px;
-  margin-top: 14px;
-}
-
-.paper-benchmark-summary {
-  display: grid;
-  grid-template-columns: minmax(150px, auto) 1fr;
+  grid-template-columns: auto minmax(190px, auto) 1fr;
   gap: 12px;
   align-items: center;
-  margin-top: 14px;
-  padding: 11px 13px;
-  border: 1px solid #bfd6c4;
+  list-style: none;
   border-left: 4px solid var(--paper-success);
-  border-radius: 10px;
   background: #f3faf5;
 }
 
-.paper-benchmark-summary-list .paper-benchmark-summary {
-  margin-top: 0;
+.paper-benchmark-summary-trigger::-webkit-details-marker {
+  display: none;
 }
 
-.paper-benchmark-summary span {
+.paper-benchmark-summary-trigger::before {
+  content: '▸';
   color: var(--paper-success);
-  font-size: 13px;
+  font-size: 15px;
+  transition: transform 160ms ease;
+}
+
+.paper-benchmark-details[open] > .paper-benchmark-summary-trigger::before {
+  transform: rotate(90deg);
+}
+
+.paper-benchmark-summary-title {
+  color: var(--paper-current);
+  font-size: 14px;
   font-weight: 800;
 }
 
-.paper-benchmark-summary p {
-  margin: 0;
+.paper-benchmark-summary-copy {
+  display: grid;
+  gap: 7px;
   color: var(--paper-text);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.paper-benchmark-summary-copy > span {
+  display: block;
+}
+
+.paper-benchmark-summary-copy strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--paper-success);
+  font-weight: 800;
 }
 
 @media (max-width: 560px) {
-  .paper-benchmark-summary {
-    grid-template-columns: 1fr;
+  .paper-technical-details summary.paper-benchmark-summary-trigger {
+    grid-template-columns: auto 1fr;
     gap: 5px;
+  }
+
+  .paper-benchmark-summary-copy {
+    grid-column: 2;
   }
 }
 

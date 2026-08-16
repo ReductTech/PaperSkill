@@ -302,16 +302,15 @@ export const PromptColor: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         <dt>解码方式</dt><dd>{current.output}</dd>
         <dt>系统与指标边界</dt><dd>{current.boundary}</dd>
       </dl>
-      <div className="paper-benchmark-summary-list" aria-label={`${current.label}性能概括`}>
-        {current.benchmarks.map((benchmark) => (
-          <section className="paper-benchmark-summary" key={`${benchmark.title}-summary`}>
-            <span>{benchmark.title}</span>
-            <p>{benchmark.summary}</p>
-          </section>
-        ))}
-      </div>
       <details className="paper-technical-details paper-benchmark-details">
-        <summary>查看论文完整评测与模型对比</summary>
+        <summary className="paper-benchmark-summary-trigger">
+          <span className="paper-benchmark-summary-title">查看论文完整评测与模型对比</span>
+          <span className="paper-benchmark-summary-copy">
+            {current.benchmarks.map((benchmark) => (
+              <span key={`${benchmark.title}-summary`}><strong>{benchmark.title}</strong>{benchmark.summary}</span>
+            ))}
+          </span>
+        </summary>
         <div className="paper-technical-details-body">
           {current.benchmarks.map((benchmark) => (
             <section className="paper-benchmark-section" key={benchmark.title}>

@@ -18,10 +18,10 @@ interface DecodeState {
 }
 
 const SAMPLE_RECORDS: Record<SampleId, { label: string; rgb: [number, number, number] }> = {
-  'cat-pixel': { label: '猫区域像素', rgb: [248, 8, 5] },
-  'lock-pixel': { label: '门锁区域像素', rgb: [255, 182, 193] },
-  'exit-pixel': { label: '出口标志像素', rgb: [190, 170, 255] },
-  'background-pixel': { label: '背景区域像素', rgb: [255, 255, 0] },
+  'cat-pixel': { label: '红色区域像素', rgb: [248, 8, 5] },
+  'lock-pixel': { label: '粉色区域像素', rgb: [255, 182, 193] },
+  'exit-pixel': { label: '紫色区域像素', rgb: [190, 170, 255] },
+  'background-pixel': { label: '黄色区域像素', rgb: [255, 255, 0] },
 };
 
 const SEMANTIC_LEGEND: Array<{ label: SemanticLabel; rgb: [number, number, number] }> = [

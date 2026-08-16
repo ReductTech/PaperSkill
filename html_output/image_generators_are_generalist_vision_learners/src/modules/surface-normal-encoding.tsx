@@ -471,12 +471,11 @@ export const SurfaceNormalEncoding: React.FC<WidgetProps> = ({ chapterId, module
           </ul>
         </div>
       </details>
-      <section className="paper-benchmark-summary" aria-label="表面法线性能概括">
-        <span>法线性能概括</span>
-        <p>Vision Banana 在三个室内基准上取得最佳平均 mean/median 角误差，达到 SOTA 水平；在室外 VKitti 上表现接近最佳，但略低于使用该数据集训练的 Lotus-2。</p>
-      </section>
       <details className="paper-technical-details paper-benchmark-details">
-        <summary>查看论文表 7：完整法线评测与模型对比</summary>
+        <summary className="paper-benchmark-summary-trigger">
+          <span className="paper-benchmark-summary-title">查看论文表 7：完整法线评测与模型对比</span>
+          <span className="paper-benchmark-summary-copy"><span><strong>法线性能概括</strong>Vision Banana 在三个室内基准上取得最佳平均 mean/median 角误差，达到 SOTA 水平；在室外 VKitti 上表现接近最佳，但略低于使用该数据集训练的 Lotus-2。</span></span>
+        </summary>
         <div className="paper-technical-details-body">
           <section className="paper-benchmark-section">
             <h4>表面法线估计｜三个室内基准与 VKitti</h4>
