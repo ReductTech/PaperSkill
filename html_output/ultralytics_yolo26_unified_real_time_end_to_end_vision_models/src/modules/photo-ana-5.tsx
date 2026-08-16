@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna5:React.FC<WidgetProps>=()=> <AnalogyScene action="coordinate" label="校准更新方向"/>;

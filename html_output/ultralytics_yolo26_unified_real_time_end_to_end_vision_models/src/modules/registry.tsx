@@ -1,0 +1,52 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { ArchitectureExplorer } from './architecture-explorer';
+import { AssignmentSteps } from './assignment-steps';
+import { DflDistanceExplorer } from './dfl-distance-explorer';
+import { DflEvidenceModes } from './dfl-evidence-modes';
+import { HeroNewMap } from './hero-new-map';
+import { HeroOldMap } from './hero-old-map';
+import { MusgdSpectrum } from './musgd-spectrum';
+import { O2mO2oCompare } from './o2m-o2o-compare';
+import { PhotoAna1 } from './photo-ana-1';
+import { PhotoAna2 } from './photo-ana-2';
+import { PhotoAna3 } from './photo-ana-3';
+import { PhotoAna4 } from './photo-ana-4';
+import { PhotoAna5 } from './photo-ana-5';
+import { PhotoAna6 } from './photo-ana-6';
+import { PhotoAna7 } from './photo-ana-7';
+import { PhotoAna8 } from './photo-ana-8';
+import { PredictionPointExplorer } from './prediction-point-explorer';
+import { ResultCompetition } from './result-competition';
+import { TaskExtensionSelector } from './task-extension-selector';
+import { TinyGtDrag } from './tiny-gt-drag';
+import { YoloShared } from './yolo-shared';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['architecture-explorer'] = ArchitectureExplorer;
+widgetRegistry['assignment-steps'] = AssignmentSteps;
+widgetRegistry['dfl-distance-explorer'] = DflDistanceExplorer;
+widgetRegistry['dfl-evidence-modes'] = DflEvidenceModes;
+widgetRegistry['hero-new-map'] = HeroNewMap;
+widgetRegistry['hero-old-map'] = HeroOldMap;
+widgetRegistry['musgd-spectrum'] = MusgdSpectrum;
+widgetRegistry['o2m-o2o-compare'] = O2mO2oCompare;
+widgetRegistry['photo-ana-1'] = PhotoAna1;
+widgetRegistry['photo-ana-2'] = PhotoAna2;
+widgetRegistry['photo-ana-3'] = PhotoAna3;
+widgetRegistry['photo-ana-4'] = PhotoAna4;
+widgetRegistry['photo-ana-5'] = PhotoAna5;
+widgetRegistry['photo-ana-6'] = PhotoAna6;
+widgetRegistry['photo-ana-7'] = PhotoAna7;
+widgetRegistry['photo-ana-8'] = PhotoAna8;
+widgetRegistry['prediction-point-explorer'] = PredictionPointExplorer;
+widgetRegistry['result-competition'] = ResultCompetition;
+widgetRegistry['task-extension-selector'] = TaskExtensionSelector;
+widgetRegistry['tiny-gt-drag'] = TinyGtDrag;
+widgetRegistry['yolo-shared'] = YoloShared;

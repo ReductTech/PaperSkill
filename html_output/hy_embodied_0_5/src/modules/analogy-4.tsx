@@ -1,0 +1,6 @@
+import React, { useEffect, useRef } from 'react';
+import { observeCanvas, setupCanvas } from '../lib/canvasKit';
+import type { WidgetProps } from './registry';
+
+export const Analogy4: React.FC<WidgetProps> = () => { const ref = useRef<HTMLCanvasElement>(null); useEffect(() => { const canvas = ref.current; if (!canvas) return; let ctx: CanvasRenderingContext2D; try { ctx = setupCanvas(canvas, 244, 130); } catch { return; } const render = () => { ctx.clearRect(0,0,244,130); ctx.fillStyle='#f5f8f0';ctx.fillRect(0,0,244,130); [[45,33],[45,65],[45,97]].forEach(([x,y],i)=>{ctx.strokeStyle=['#27446e','#7c3aed','#228d5c'][i];ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(x+8,y);ctx.lineTo(119,65);ctx.stroke();});ctx.strokeStyle='#92400e';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(108,49,23,32,8);ctx.stroke();ctx.beginPath();ctx.moveTo(131,65);ctx.lineTo(201,65);ctx.stroke();ctx.strokeStyle='#228d5c';ctx.beginPath();ctx.arc(209,65,10,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#21324a';ctx.font='13px system-ui';ctx.fillText('三路受力',12,120);ctx.fillText('稳住锚点',166,120);canvas.classList.add('is-ready');}; const d=observeCanvas(canvas,render,()=>{});render();return d;},[]); return <canvas ref={ref} width={244} height={130} role="img" aria-label="一个快挂扣住一个三点保护站，三路受力汇合到安全锚点"/>; };
+export default Analogy4;
