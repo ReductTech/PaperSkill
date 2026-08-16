@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v050',
+    version: 'V0.50',
+    alias: '万象镜检·烟火全绿姬',
+    focus: '相对资源、竖向巡检与统一比较语法',
+    modules: ['全教程静态图片路径', '5.2 随机五头巡检', '7.2 谱系矩阵统一', '7.3 同款效率分簇图', '8.2 版本星轨'],
+    note: '把部署路径、共享重建结构和两类模型比较统一到可复查、可重复操作的最终形态。',
+  },
+  {
     id: 'v049',
     version: 'V0.49',
     alias: '镜界巡检·星图映写姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['2.2 数据分布地图', '2.3 WorldNav 规划', '5.2 分阶段重建', '7.3 工程记录', '8.1 结论资料库'],
     note: '建立统一的审查边界，并把全文从十章收束为八章。',
   },
-  {
-    id: 'v047',
-    version: 'V0.47',
-    alias: '星轨校准·镜界巡游使',
-    focus: '曲线相机、全景故障与跨论文效率调研',
-    modules: ['1.2 曲线关键帧', '2.1 全景故障擦除', '2.3 候选淘汰', '3.2 SSM++', '7.3 效率资料'],
-    note: '把轨迹、故障症状和工程记录重新绑定到可核查的视觉证据。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v049');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v050');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">

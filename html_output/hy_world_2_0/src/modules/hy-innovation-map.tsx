@@ -21,7 +21,7 @@ const chains: Chain[] = [
     effect: '生成器获得全局上下文，后续关键帧不再只围绕初始视点重复采样。',
     evidence: 'Figure 2、Section 3、Table 1；五类轨迹的数量与用途由论文报告。',
     boundary: '轨迹是场景感知的启发式组合，不是论文证明的全局最优规划。',
-    locator: 'Figure 2 · Table 1', media: '/images/official-stage-nav.webp',
+    locator: 'Figure 2 · Table 1', media: './images/official-stage-nav.webp',
   },
   {
     id: 'consistency', subsystem: 'WorldStereo 2.0',
@@ -39,7 +39,7 @@ const chains: Chain[] = [
     effect: '新分辨率更接近区间内插值；单次前向可同时恢复相机、点图、深度、法线与 3DGS 属性。',
     evidence: 'Table 11 的 7-Scenes 高分辨率 Acc. 误差 0.079 -> 0.037；Table 14 报告多视图效率。',
     boundary: '5.60 秒只属于 H20 四卡、128 视图重建步骤，不代表 712 秒完整生成管线。',
-    locator: 'Figure 12 · Table 11/14', media: '/images/figure-12-worldmirror.png',
+    locator: 'Figure 12 · Table 11/14', media: './images/figure-12-worldmirror.png',
   },
   {
     id: 'asset', subsystem: '3DGS + WorldLens',
@@ -48,7 +48,7 @@ const chains: Chain[] = [
     effect: '同一世界可保存为紧凑显式资产，并在运行时被重新照明和交互探索。',
     evidence: 'Table 9 中高斯数从 6.000M 降到 1.381M，PSNR 25.176 -> 25.023；官方仓库展示 Mesh 与角色交互。',
     boundary: '约 77% 的数量减少并非无损；官方 GIF 不是统一帧率或物理准确率基准。',
-    locator: 'Table 9 · WorldLens', media: '/images/official-interactive.gif',
+    locator: 'Table 9 · WorldLens', media: './images/official-interactive.gif',
   },
 ];
 

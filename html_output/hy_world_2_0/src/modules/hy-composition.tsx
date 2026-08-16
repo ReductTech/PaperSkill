@@ -58,7 +58,7 @@ export const HyComposition:React.FC<WidgetProps>=()=>{const[step,setStep]=useSta
   <div className="composition-metric-ledger"><div><span>高斯数量</span><strong>{d.count.toFixed(3)}M</strong><small>越低越轻</small></div><div><span>PSNR</span><strong>{d.psnr.toFixed(3)}</strong><small>越高越好</small></div><div><span>SSIM</span><strong>{d.ssim.toFixed(3)}</strong><small>越高越好</small></div><div><span>LPIPS</span><strong>{d.lpips.toFixed(3)}</strong><small>越低越好</small></div></div>
   <div className={`feedback ${step==='final'?'good':step==='voxel'?'bad':''}`}>{step==='final'?'相对 6M 基线，高斯减少约 77%，PSNR 下降 0.153 dB，LPIPS 增加 0.006；这是有代价的紧凑表示，不是无损压缩。':d.lesson}</div>
   <div className="composition-glossary-grid"><details><summary>MaskGaussian 怎么删点？</summary><p>它用 Gumbel-Softmax 学习每个高斯的存在掩码，并以稀疏损失鼓励低激活高斯被永久剪枝。</p></details><details><summary>为什么天空不适合普通增密？</summary><p>天空缺少可靠深度监督，位置梯度可能驱动高斯在空中克隆和分裂，形成漂浮伪影。</p></details></div>
-  <PaperTable tableId="table-9"/><EvidenceMediaDrawer mediaType="官方 GIF" src="/images/official-mesh.gif" title="轻量 Mesh 漫游与交付效果" caption="官方演示用于理解资产压缩最终服务于加载与漫游，不对应 Table 9 的独立指标。" alt="官方轻量 Mesh 漫游" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/>
+  <PaperTable tableId="table-9"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-mesh.gif" title="轻量 Mesh 漫游与交付效果" caption="官方演示用于理解资产压缩最终服务于加载与漫游，不对应 Table 9 的独立指标。" alt="官方轻量 Mesh 漫游" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/>
   </div>;};
 
 export default HyComposition;

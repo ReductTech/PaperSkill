@@ -309,8 +309,8 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
         <button type="button" className={matrixScope === 'external' ? 'selected' : ''} aria-pressed={matrixScope === 'external'} onClick={() => changeScope('external')}><strong>对比其它谱系</strong><small>HY 2.0 + GenEx + video2world + Marble 1.0</small></button>
       </div>
 
-      <div className={`evolution-matrix-scroll ${matrixScope}`} tabIndex={matrixScope === 'lineage' ? 0 : -1} aria-label={matrixScope === 'lineage' ? 'HY 谱系能力矩阵，窄屏可横向滚动' : '其它谱系能力矩阵，一屏完整显示'}>
-        <div className={`evolution-matrix ${matrixScope}`} role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 与外部模型能力比较'}>
+      <div className="evolution-matrix-scroll unified" tabIndex={0} aria-label={matrixScope === 'lineage' ? 'HY 谱系能力矩阵，窄屏可横向滚动' : '其它谱系能力矩阵，窄屏可横向滚动'}>
+        <div className="evolution-matrix lineage" role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 与外部模型能力比较'}>
           <div className="evolution-corner" role="columnheader">功能 \ 模型</div>
           {visibleModels.map((model) => (
             <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''} ${model.id === selectedModel.id ? 'selected-column' : ''}`} role="columnheader">
@@ -354,7 +354,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
           ))}
         </div>
       </div>
-      <p className="evolution-scroll-hint">灰色提示：{matrixScope === 'lineage' ? 'HY 谱系在窄屏时可于矩阵内部左右滑动；' : '其它谱系已压缩为一屏，无需横向滑动；'}范围切换只改变可见列，不改变能力判断。“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
+      <p className="evolution-scroll-hint">灰色提示：两种谱系使用同一矩阵宽度、表头、状态单元格和窄屏滚动规则；范围切换只改变可见列，不改变能力判断。“未报告”不等于“不支持”，因此保持灰色且不可点击。</p>
 
       <section className="evolution-axis-focus" aria-live="polite" aria-label={`${selectedCapability.name}同轴对照`}>
         <header>

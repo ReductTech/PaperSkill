@@ -128,7 +128,7 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
     <div className={`feedback ${reveal === 100 ? 'good' : reveal === 0 ? 'bad' : ''}`}>{active.conclusion} {reveal === 100 ? '当前已完整显示修复后状态。' : reveal === 0 ? '当前完整保留故障状态。' : '继续拖动可检查边界与主体是否同时恢复。'}</div>
     <section className="panorama-evidence-boundary"><header><span>论文证据</span><strong>Table 4 报告完整系统，不是三个开关的独立消融</strong></header><div><p>Section 3.2 明确描述三层机制；I2P 中 CLIP-I 从 HY-World 1.0 的 0.831 提升到 HY-Pano 2.0 的 0.844。</p><strong>0.831 → 0.844</strong><small>CLIP-I，越高越好</small></div></section>
     <div className="panorama-glossary-grid"><details><summary>ERP 为什么首尾相接？</summary><p>ERP 将球面展开为矩形，因此最左列与最右列在球面上是相邻方向。</p></details><details><summary>补全是否等于测量？</summary><p>不是。输入视角外的区域来自生成先验，不能当成真实观测或确定几何。</p></details></div>
-    <EvidenceMediaDrawer mediaType="官方架构图" src="/images/official-stage-pano.webp" title="HY-Pano 2.0：隐式映射与双层接缝修复" caption="官方图用于核对透视条件、ERP 输出、Circle Padding 与 Pixel Blending 的真实位置。" alt="HY-Pano 2.0 官方架构图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
+    <EvidenceMediaDrawer mediaType="官方架构图" src="./images/official-stage-pano.webp" title="HY-Pano 2.0：隐式映射与双层接缝修复" caption="官方图用于核对透视条件、ERP 输出、Circle Padding 与 Pixel Blending 的真实位置。" alt="HY-Pano 2.0 官方架构图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
     <PaperTable tableId="table-4" />
   </div>;
 };

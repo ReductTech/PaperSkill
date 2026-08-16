@@ -103,7 +103,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '固定同一相对位置并切换 L/M/H，直接比较整数索引进入训练外范围与归一化坐标保持可比的因果差异。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '在一张从左到右、再进入下一行的大结构图中，为固定三图委托接入 Pose、K、Depth，观察共享骨干如何分流五个输出头；只有带问题的教学候选会被退回，正常候选直接通过。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '沿“竖排 RGB/Pose/K/Depth → 中央共享骨干 → 竖排五步巡检”执行重建；每次运行会为五类输出随机抽取多种正确或错误候选，小画布展示症状，全部通过时触发隐藏烟花。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {
@@ -151,8 +151,8 @@ export const tutorial: TutorialData = {
       analogy: { title: '比较相机前，先统一拍摄条件', text: '模型、指标、数据集和硬件必须一起选择；不同任务不能揉成一个总分。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择一个旧问题并切换连接机制，观察规划、记忆、重建与运行时为何不能互相替代；匹配后展开论文证据与外推边界。', componentId: 'hy-innovation-map' },
-        { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；外部谱系压缩为一屏展示，不再横向滑动，只对资料已报告的能力开放详情并标注发表时间。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '在“本文 Table 14 / 其它模型公开记录”之间切换：论文内配置按同协议零基线比例绘制，跨论文显存、秒数和 FPS 分组显示并保留全部硬件与测量边界。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再切换历代模型与外部谱系；两种范围使用完全相同的矩阵宽度、表头、状态单元格与窄屏滚动规则，只对资料已报告的能力开放详情并标注发表时间。', componentId: 'hy-model-evolution' },
+        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '在“本文 Table 14 / 其它模型公开记录”之间切换：两边统一使用模型选择、指标选择与分簇柱状图；跨论文记录另附硬件、输入、单位和测量范围，统一界面不等于统一协议。', componentId: 'hy-performance-compare' },
       ],
       insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；表 4、表 12、表 14 可以在各自协议内画比例图，跨论文资源记录只能带完整条件并列阅读。',
       takeaways: [
