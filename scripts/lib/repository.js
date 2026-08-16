@@ -53,26 +53,8 @@ function validateMetadata(meta, expectedPaperName) {
 
 function metadataFor(submission) {
   const file = path.join(submission.dir, 'paper.json');
-  if (!fs.existsSync(file)) return null;
+  if (!fs.existsSync(file)) throw new Error(`${path.relative(ROOT, file)} 不存在`);
   return readJson(file);
-}
-
-function buildCatalogRecord(submission) {
-  const meta = metadataFor(submission);
-  if (meta) return catalogRecord(meta);
-  return {
-    paperName: submission.paperName,
-    title: submission.paperName,
-    authors: [],
-    year: null,
-    venue: '',
-    paperUrl: '',
-    participants: [],
-    topics: [],
-    skillVersion: '',
-    status: 'review',
-    tutorialUrl: `papers/${submission.paperName}/`,
-  };
 }
 
 function catalogRecord(meta) {
@@ -91,4 +73,4 @@ function catalogRecord(meta) {
   };
 }
 
-module.exports = { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, readJson, listSubmissions, validateMetadata, metadataFor, buildCatalogRecord, catalogRecord };
+module.exports = { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, readJson, listSubmissions, validateMetadata, metadataFor, catalogRecord };
