@@ -302,7 +302,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
 
       <div className="evolution-scope-switch" role="group" aria-label="选择模型比较范围">
         <button type="button" className={matrixScope === 'lineage' ? 'selected' : ''} aria-pressed={matrixScope === 'lineage'} onClick={() => changeScope('lineage')}><strong>只看 HY 谱系</strong><small>2.0 → 1.5 → 1.0 → WorldMirror 1.0</small></button>
-        <button type="button" className={matrixScope === 'all' ? 'selected' : ''} aria-pressed={matrixScope === 'all'} onClick={() => changeScope('all')}><strong>查看全部参照</strong><small>追加 GenEx、video2world 与 Marble 1.0</small></button>
+        <button type="button" className={matrixScope === 'all' ? 'selected' : ''} aria-pressed={matrixScope === 'all'} onClick={() => changeScope('all')}><strong>对比其它谱系</strong><small>加入 GenEx、video2world 与 Marble 1.0</small></button>
       </div>
 
       <div className="evolution-matrix-scroll" tabIndex={0} aria-label="模型能力矩阵，可横向滚动">

@@ -51,13 +51,20 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "1.1",
-          "title": "四任务共享路径总图",
-          "desc": "在同一张系统大图中比较文本、单图、多视图与视频四种输入。点击任务卡切换生成或重建路径，当前经过的模块与共享输出被高亮，其余模块灰显。",
-          componentId: "hy-mission-planner"
+          "title": "四阶段造物管线：从世界种子到三维资产",
+          "desc": "点击下一步，让同一世界依次获得全景上下文、互补轨迹、跨视角关键帧和显式三维几何；每一步都用独立动画、输入输出与论文边界解释系统为何逐步完善。",
+          componentId: "hy-creation-pipeline"
         },
         {
           kind: "module",
           "id": "1.2",
+          "title": "四任务共享路径总图",
+          "desc": "在同一张系统大图中比较文本、单图、多视图与视频四种输入。点击任务卡切换生成或重建支路，两条路径汇入唯一的 WorldMirror 2.0，再落成下方共享资产输出。",
+          componentId: "hy-mission-planner"
+        },
+        {
+          kind: "module",
+          "id": "1.3",
           "title": "统一系统边界透视台",
           "desc": "逐条展开五个证据切片，让系统大图只高亮当前关系；直接区分三条论文支持的关系与“单体网络”“实时生成”两类常见误读，无需连续答题。",
           componentId: "hy-boundary-compare",

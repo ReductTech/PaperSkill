@@ -71,7 +71,6 @@ const generationStages = [
   { id: 'pano', name: 'HY-Pano 2.0' },
   { id: 'nav', name: 'WorldNav' },
   { id: 'stereo', name: 'WorldStereo 2.0' },
-  { id: 'mirror', name: 'WorldMirror 2.0' },
 ] as const;
 
 export const HyMissionPlanner: React.FC<WidgetProps> = () => {
@@ -83,7 +82,6 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
     pano: mission.panoDetail ?? '生成支路未启用',
     nav: mission.navDetail ?? '生成支路未启用',
     stereo: mission.stereoDetail ?? '生成支路未启用',
-    mirror: mission.mirrorDetail,
   };
 
   return (
@@ -132,7 +130,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
                 <div className="mission-map-stages">
                   {generationStages.map((stage, index) => (
                     <React.Fragment key={stage.id}>
-                      <div className={`mission-map-stage ${isGeneration ? 'active' : 'muted'} ${stage.id === 'mirror' ? 'shared' : ''}`}>
+                      <div className={`mission-map-stage ${isGeneration ? 'active' : 'muted'}`}>
                         <b>{index + 1}</b>
                         <span>{stage.name}</span>
                         <small>{generationDetail[stage.id]}</small>
@@ -140,6 +138,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
                       {index < generationStages.length - 1 ? <i className="mission-map-arrow" aria-hidden="true">→</i> : null}
                     </React.Fragment>
                   ))}
+                  <i className="mission-map-arrow" aria-hidden="true">→</i>
                 </div>
               </section>
 
@@ -152,21 +151,25 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
                     <small>{mission.anyModalDetail ?? '重建支路未启用'}</small>
                   </div>
                   <i className="mission-map-arrow" aria-hidden="true">→</i>
-                  <div className={`mission-map-stage shared ${!isGeneration ? 'active' : 'muted'}`}>
-                    <b>2</b>
-                    <span>WorldMirror 2.0</span>
-                    <small>{mission.mirrorDetail}</small>
-                  </div>
                 </div>
               </section>
             </div>
 
+            <section className="mission-shared-core" aria-label="生成与重建共享的 WorldMirror 2.0">
+              <div className="mission-shared-feeds" aria-hidden="true">
+                <span className={isGeneration ? 'active generation' : 'generation'}>生成路径 ↘</span>
+                <span className={!isGeneration ? 'active reconstruction' : 'reconstruction'}>重建路径 ↗</span>
+              </div>
+              <b>共享重建核心</b>
+              <strong>WorldMirror 2.0</strong>
+              <small>{mission.mirrorDetail}</small>
+              <em>两条路径在这里汇合</em>
+            </section>
+
             <section className="mission-shared-output" aria-label="当前路径输出">
-              <span>共享落点</span>
-              <strong>显式三维资产</strong>
-              <small>生成路径与重建路径最终都接到可保存、可渲染的空间表示。</small>
-              <div>{mission.outputs.map((output) => <b key={output}>{output}</b>)}</div>
-              <i aria-hidden="true">→ WorldLens</i>
+              <div><span>共享落点</span><strong>显式三维资产</strong><small>WorldMirror 2.0 把生成观察或真实观察统一落成可保存、可渲染的空间表示。</small></div>
+              <div className="mission-output-assets">{mission.outputs.map((output) => <b key={output}>{output}</b>)}</div>
+              <i aria-hidden="true">交给 WorldLens → 实时渲染与漫游</i>
             </section>
           </div>
         </div>
