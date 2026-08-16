@@ -16,6 +16,7 @@ interface BenchmarkRow {
 
 interface BenchmarkTable {
   title: string;
+  summary: string;
   source: string;
   metrics: string[];
   rows: BenchmarkRow[];
@@ -54,6 +55,7 @@ const TASKS: Record<Task, TaskRecord> = {
     benchmarks: [
       {
         title: '语义分割｜Cityscapes val',
+        summary: 'Vision Banana 的 mIoU 为 69.9，在表中零样本迁移方法里表现最佳，并超过 SAM 3 的 65.2；但仍低于使用域内训练数据的 SegMan-L。',
         source: '论文表 2；指标为 mIoU，越高越好。',
         metrics: ['mIoU ↑'],
         rows: [
@@ -87,6 +89,7 @@ const TASKS: Record<Task, TaskRecord> = {
     benchmarks: [
       {
         title: '实例分割｜SA-Co/Gold',
+        summary: 'Vision Banana + Gemini 3.1 Flash-Lite 取得表中最佳零样本结果，cgF₁ 为 47.5；这是组合系统成绩，且主指标仍低于使用域内数据训练的 SAM 3。',
         source: '论文表 3；三项指标均为越高越好。',
         metrics: ['cgF₁ ↑', 'IL_MCC ↑', 'pmF₁ ↑'],
         rows: [
@@ -121,6 +124,7 @@ const TASKS: Record<Task, TaskRecord> = {
     benchmarks: [
       {
         title: '指代表达分割｜RefCOCOg UMD val',
+        summary: 'Vision Banana 单模型取得表中最佳零样本 cIoU 73.8，略高于 SAM 3 + Gemini 2.5 Pro 的 73.4；但仍低于使用 RefCOCOg 训练集的方法。',
         source: '论文表 4；指标为 cIoU，越高越好。',
         metrics: ['cIoU ↑'],
         rows: [
@@ -135,6 +139,7 @@ const TASKS: Record<Task, TaskRecord> = {
       },
       {
         title: '指代表达分割｜ReasonSeg val',
+        summary: 'Vision Banana + Gemini 2.5 Pro 取得表中最高 gIoU 79.3，达到 SOTA 水平；该结果属于单轮组合流水线，不能归因于 Vision Banana 单模型。',
         source: '论文表 5；指标为 gIoU，越高越好。',
         metrics: ['gIoU ↑'],
         rows: [
@@ -297,6 +302,14 @@ export const PromptColor: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         <dt>解码方式</dt><dd>{current.output}</dd>
         <dt>系统与指标边界</dt><dd>{current.boundary}</dd>
       </dl>
+      <div className="paper-benchmark-summary-list" aria-label={`${current.label}性能概括`}>
+        {current.benchmarks.map((benchmark) => (
+          <section className="paper-benchmark-summary" key={`${benchmark.title}-summary`}>
+            <span>{benchmark.title}</span>
+            <p>{benchmark.summary}</p>
+          </section>
+        ))}
+      </div>
       <details className="paper-technical-details paper-benchmark-details">
         <summary>查看论文完整评测与模型对比</summary>
         <div className="paper-technical-details-body">

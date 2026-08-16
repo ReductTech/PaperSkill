@@ -379,6 +379,10 @@ export const DepthColorBijection: React.FC<WidgetProps> = ({ chapterId, moduleId
           </ul>
         </div>
       </details>
+      <section className="paper-benchmark-summary" aria-label="单目度量深度性能概括">
+        <span>深度性能概括</span>
+        <p>Vision Banana 达到 SOTA 水平：在完整报告六个基准的模型中，它的平均 δ₁ 最高、AbsRel 最低；在与 Depth Anything V3 共同评测的四个数据集上，平均 δ₁ 也以 0.929 超过 0.918。</p>
+      </section>
       <details className="paper-technical-details paper-benchmark-details">
         <summary>查看论文表 6：完整深度评测与模型对比</summary>
         <div className="paper-technical-details-body">
