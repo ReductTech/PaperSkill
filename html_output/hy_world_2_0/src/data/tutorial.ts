@@ -22,6 +22,7 @@ export const tutorial: TutorialData = {
       bridge: '一段视频可以展示新视角，却不能直接保存墙、门和物体的空间状态；本章从这个应用缺口出发，看生成与重建如何分工并汇入同一显式三维交付。',
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
+        { kind: 'module', id: '1.0', title: '全文速览：为什么做、怎么做、做到什么', desc: '先用一张系统地图抓住论文主线，再进入后续模块拆解每个组件。', componentId: 'hy-paper-overview' },
         { kind: 'module', id: '1.1', title: '什么样的输出才算一个可用世界？', desc: '用回访、遮挡与动作测试区分四类世界状态。', componentId: 'hy-world-model-basics' },
         { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '逐步播放全景、规划、扩展和重建四个阶段。', componentId: 'hy-creation-pipeline' },
         { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击输入卡，查看四种输入如何汇入同一 WorldMirror 2.0。', componentId: 'hy-mission-planner' },

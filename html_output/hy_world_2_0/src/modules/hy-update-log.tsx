@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v058',
+    version: 'V0.58',
+    alias: '启程星册·首章导览姬',
+    focus: '速览从封面归位第一章',
+    modules: ['1.0 全文速览', '首章专家导航入口', 'Hero 封面减负', 'quick-overview 锚点迁移', '组件职责拆分'],
+    note: '把全文概述和快速展示入口从 Hero 移到第一章最前端，封面恢复为纯粹的论文定位与新旧方法对照；Quick Read 固定导航仍保留完整八站论证链。',
+  },
+  {
     id: 'v057',
     version: 'V0.57',
     alias: '一屏星图·极速讲解姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['5.2 Pose/K/Depth 静态接口', '5.2 单一共享前向', 'Table 11 双端点边界', '无效状态清理', '输入规则响应式布局'],
     note: '确认旧版 Pose、K、Depth 选择只改变高亮路径，不改变五头随机结果后，删除三个点击开关及其状态；可选先验改为静态接口说明，模块只保留共享前向与输出巡检这一项有意义的主操作。',
   },
-  {
-    id: 'v055',
-    version: 'V0.55',
-    alias: '星屑退潮·轻卷萤火姬',
-    focus: '烟花消散与主线文本减负',
-    modules: ['5.2 烟花生命周期', '5.2 先验扩展资料', '7.1 证据边界折叠', '模块入口短文案', '完整审查信息保留'],
-    note: '修复提前重跑后烟花最后一帧残留的问题，让庆祝效果爆发后自然衰减并彻底清空；同时压缩主界面重复说明，把先验解释、教学边界和创新证据移入本节扩展资料。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v057');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v058');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
