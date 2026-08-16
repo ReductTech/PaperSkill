@@ -77,8 +77,8 @@ const TASKS: Record<Task, TaskRecord> = {
     ],
     figureNumber: '图 3',
     promptExamples: [
-      { label: '左侧结果', text: '将每瓣大蒜分别涂成不同颜色，背景设为黑色。' },
-      { label: '右侧结果', text: '将每块牛肉分别涂成不同颜色，背景设为黑色。' },
+      { label: '左侧结果', text: '将每瓣大蒜分别涂成不同颜色。' },
+      { label: '右侧结果', text: '将每块牛肉分别涂成不同颜色。' },
     ],
     prompt: '只给目标名词短语与背景色，例如“每瓣大蒜分别使用不同颜色”。',
     output: '模型为数量未知的实例动态配色，再通过去噪聚类恢复离散掩码。',
@@ -112,7 +112,7 @@ const TASKS: Record<Task, TaskRecord> = {
     ],
     figureNumber: '图 4',
     promptExamples: [
-      { label: '指代查询', text: '将穿粉色 T 恤的男子标为白色，其余区域标为绿色。' },
+      { label: '指代查询', text: '将穿粉色 T 恤的男子标为白色，另一名男子标为绿色。' },
     ],
     prompt: '直接描述目标，例如“穿粉色 T 恤的男子”。',
     output: '生成与自由文本所指对象对应的掩码，不依赖固定类别名。',
