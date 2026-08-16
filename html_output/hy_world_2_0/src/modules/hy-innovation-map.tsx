@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type Chain = {
@@ -109,17 +110,18 @@ export const HyInnovationMap: React.FC<WidgetProps> = () => {
 
       <div className={`innovation-chain-status ${matched ? 'good' : 'bad'}`}>
         <strong>{matched ? '证据链已闭合' : '机制与问题错位'}</strong>
-        <span>{matched ? selected.evidence : '论文创新不是可互换的功能清单：规划、记忆、重建与运行时分别处理不同瓶颈。'}</span>
+        <span>{matched ? '旧问题、作者工作和结果已经对应；详细证据边界可按需展开。' : '规划、记忆、重建与运行时分别处理不同瓶颈。'}</span>
       </div>
 
-      {matched ? <div className="innovation-proof-grid">
-        <article><span>贡献类型</span><p>{selected.contribution}</p></article>
-        <article><span>论文支持到哪里</span><p>{selected.evidence}</p></article>
-        <article><span>不能外推到哪里</span><p>{selected.boundary}</p></article>
-        {selected.media ? <figure><img src={selected.media} alt={`${selected.subsystem} 相关论文或官方素材`} /><figcaption>补充视觉材料；图片或 GIF 只帮助理解对应模块，不替代论文实验。</figcaption></figure> : null}
-      </div> : null}
-
       <p className="innovation-hint">灰色提示：先选旧问题，再尝试切换连接机制。该模块不计分，只用错位反馈说明每项创新究竟解决哪一类瓶颈。</p>
+      {matched ? <SectionExtras hint="贡献类型、论文定位、外推边界与视觉材料">
+        <div className="innovation-proof-grid">
+          <article><span>贡献类型</span><p>{selected.contribution}</p></article>
+          <article><span>论文支持到哪里</span><p>{selected.evidence}</p></article>
+          <article><span>不能外推到哪里</span><p>{selected.boundary}</p></article>
+          {selected.media ? <figure><img src={selected.media} alt={`${selected.subsystem} 相关论文或官方素材`} /><figcaption>图片或 GIF 帮助理解模块，不替代论文实验。</figcaption></figure> : null}
+        </div>
+      </SectionExtras> : null}
     </div>
   );
 };

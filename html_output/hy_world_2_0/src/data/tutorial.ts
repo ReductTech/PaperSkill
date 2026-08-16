@@ -22,7 +22,7 @@ export const tutorial: TutorialData = {
       bridge: '一段视频可以展示新视角，却不能直接保存墙、门和物体的空间状态；本章从这个应用缺口出发，看生成与重建如何分工并汇入同一显式三维交付。',
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '1.1', title: '什么样的输出才算一个可用世界？', desc: '用回访、遮挡与动作压力测试，区分生成画面、真实重建、在线像素世界与持久显式三维。', componentId: 'hy-world-model-basics' },
+        { kind: 'module', id: '1.1', title: '什么样的输出才算一个可用世界？', desc: '用回访、遮挡与动作测试区分四类世界状态。', componentId: 'hy-world-model-basics' },
         { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '逐步播放全景、规划、扩展和重建四个阶段。', componentId: 'hy-creation-pipeline' },
         { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击输入卡，查看四种输入如何汇入同一 WorldMirror 2.0。', componentId: 'hy-mission-planner' },
       ],
@@ -54,7 +54,7 @@ export const tutorial: TutorialData = {
       bridge: '路线确定后，作者用 Keyframe-VAE、GGM 与 SSM++ 同时处理关键帧细节、全局骨架和局部对应。',
       analogy: { title: '少拍关键照片，并随时对照地图与相册', text: '关键帧保细节，GGM 看全局骨架，SSM++ 找局部参考。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '3.1', title: '关键帧取景沙盘', desc: '自由选择 8 个候选视角中的 3 帧，比较重复度、视角跨度和覆盖结构，理解 Keyframe-VAE 的取舍。', componentId: 'hy-keyframes' },
+        { kind: 'module', id: '3.1', title: '关键帧取景沙盘', desc: '从 8 个候选中选 3 帧，权衡重复度、跨度与覆盖。', componentId: 'hy-keyframes' },
         { kind: 'module', id: '3.2', title: 'GGM × SSM++ 双记忆实验', desc: '切换记忆组合，区分全局骨架与局部参考。', componentId: 'hy-memory' },
       ],
       insight: 'GGM 管“大尺度结构不能自相矛盾”，SSM++ 管“局部纹理和对应关系能对上”；两种记忆解决的尺度不同。',
@@ -127,7 +127,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '先把照片标尺对齐，再删掉重复测量点', text: '几何先统一坐标，之后才有资格在画质、数量和漂浮物之间做资产压缩。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '6.1', title: '3DGS 配方逐步重建实验', desc: '切换五个真实配置，同时检查细节、漂浮物和高斯数量。', componentId: 'hy-composition' },
-        { kind: 'module', id: '6.2', title: 'WorldLens 运行时实验', desc: '切换 IBL 光照、碰撞代理和角色漫游，区分“资产已经生成后的实时交互”与“完整世界实时生成”。', componentId: 'hy-worldlens-lab' },
+        { kind: 'module', id: '6.2', title: 'WorldLens 运行时实验', desc: '切换光照、碰撞与漫游，区分资产运行和世界生成。', componentId: 'hy-worldlens-lab' },
       ],
       insight: 'MaskGaussian 以可学习存在概率抑制冗余与漂浮物；WorldLens 负责资产进入运行时后的光照、碰撞和角色，不负责重新生成世界。',
       formula: {
@@ -150,9 +150,9 @@ export const tutorial: TutorialData = {
       bridge: '先把每项作者工作接回它要解决的旧问题，再用消融、协议内指标和代际对比检查效果。',
       analogy: { title: '比较相机前，先统一拍摄条件', text: '模型、指标、数据集和硬件必须一起选择；不同任务不能揉成一个总分。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '7.1', title: '作者工作与创新证据链', desc: '选择旧问题，匹配作者提出或升级的工作，并查看贡献类型、结果与证据边界。', componentId: 'hy-innovation-map' },
+        { kind: 'module', id: '7.1', title: '作者工作与创新证据链', desc: '把旧问题与作者工作配对，再检查结果与边界。', componentId: 'hy-innovation-map' },
         { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '用统一矩阵比较 HY 谱系与其它模型的已报告能力。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '选择模型与指标；跨论文记录始终保留硬件和输入条件。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '按协议选择模型与指标；跨论文记录保留硬件条件。', componentId: 'hy-performance-compare' },
       ],
       insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；表 4、表 12、表 14 可以在各自协议内画比例图，跨论文资源记录只能带完整条件并列阅读。',
       takeaways: [
@@ -167,7 +167,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '交付世界时附上测量条件、功能说明与评论索引', text: '实验数字回到论文，规划与重建功能看官方展示，行业意义阅读署名文章自己的观点。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '8.1', title: '结论地图、官方功能与逐篇评论', desc: '切换论文证据与官方功能展示，并分别展开两篇第三方文章的独立观点。', componentId: 'hy-evidence-court' },
-        { kind: 'module', id: '8.2', title: '版本星轨与完整更新日志', desc: '切换最近三个大型版本，快速展示每轮调整的重点模块与审查目标；完整 TUTORIAL_CHANGELOG.md 默认折叠，现场需要追溯时再展开。', componentId: 'hy-update-log' },
+        { kind: 'module', id: '8.2', title: '版本星轨与完整更新日志', desc: '查看最近版本；完整更新日志按需展开。', componentId: 'hy-update-log' },
       ],
       insight: '最稳妥的结论是：HY-World 2.0 的贡献不在一个万能总分，而在把开放域观察生成、前馈几何恢复、紧凑显式资产和运行时接成完整链路；它仍是分钟级离线世界生产系统。',
       takeaways: [

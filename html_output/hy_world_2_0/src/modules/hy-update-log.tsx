@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v055',
+    version: 'V0.55',
+    alias: '星屑退潮·轻卷萤火姬',
+    focus: '烟花消散与主线文本减负',
+    modules: ['5.2 烟花生命周期', '5.2 先验扩展资料', '7.1 证据边界折叠', '模块入口短文案', '完整审查信息保留'],
+    note: '修复提前重跑后烟花最后一帧残留的问题，让庆祝效果爆发后自然衰减并彻底清空；同时压缩主界面重复说明，把先验解释、教学边界和创新证据移入本节扩展资料。',
+  },
+  {
     id: 'v054',
     version: 'V0.54',
     alias: '归航星带·无刻领航姬',
@@ -19,25 +27,17 @@ const releases = [
     modules: ['Hero 四分钟入口', '八章关键锚点', '1.1 世界状态压力测试', 'Canvas 标签字号', '全教程演示字体'],
     note: '新增可分享的四分钟专家展示模式，每章只链接一个关键落点；移除独立四问罗盘，让问题、意义、作者工作与结果沿系统故事自然出现，并系统提高投屏可读性。',
   },
-  {
-    id: 'v052',
-    version: 'V0.52',
-    alias: '起源星图·论证导航姬',
-    focus: '背景前置、贡献证据与逐篇评论',
-    modules: ['1.1 四问阅读罗盘', '八章论证顺序', '7.1 作者工作证据链', '8.1 官方功能展示', '8.1 逐篇第三方评论'],
-    note: '把教程从模块百科重排为论文论证：先讲为何重要和作者做了什么，再用方法、实验、官方功能与署名评论逐层验证。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v054');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v055');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
     <div className="learning-contract">
-      <div><span>为什么展示</span><p>现场演示不只需要最终页面，也需要说明每轮修改具体解决了什么问题。</p></div>
-      <div><span>本次操作</span><p>切换最近三个版本，查看别名、重点模块和审查目标；需要追溯时再展开完整日志。</p></div>
-      <div><span>应得判断</span><p>版本号对应可复查的模块变化，萌系别名只帮助记忆，不替代事实、验证结果和边界记录。</p></div>
+      <div><span>为什么展示</span><p>说明每轮修改解决了什么问题。</p></div>
+      <div><span>本次操作</span><p>切换最近版本；需要时展开完整日志。</p></div>
+      <div><span>应得判断</span><p>版本号对应可复查的模块变化。</p></div>
     </div>
 
     <section className="update-log-stage">
