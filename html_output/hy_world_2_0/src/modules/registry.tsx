@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { HyAnalogy } from './hy-analogy';
+import { HyArchitecture } from './hy-architecture';
+import { HyBoundaryCompare } from './hy-boundary-compare';
+import { HyComposition } from './hy-composition';
+import { HyCreationPipeline } from './hy-creation-pipeline';
+import { HyDmdLab } from './hy-dmd-lab';
+import { HyEvidenceCourt } from './hy-evidence-court';
+import { HyHero } from './hy-hero';
+import { HyInnovationMap } from './hy-innovation-map';
+import { HyKeyframes } from './hy-keyframes';
+import { HyMemory } from './hy-memory';
+import { HyMissionPlanner } from './hy-mission-planner';
+import { HyModelEvolution } from './hy-model-evolution';
+import { HyPanorama } from './hy-panorama';
+import { HyPanoramaCuration } from './hy-panorama-curation';
+import { HyPerformanceCompare } from './hy-performance-compare';
+import { HyResolution } from './hy-resolution';
+import { HyTrainingStages } from './hy-training-stages';
+import { HyTrajectory } from './hy-trajectory';
+import { HyUpdateLog } from './hy-update-log';
+import { HyWorldModelBasics } from './hy-world-model-basics';
+import { HyWorldLensLab } from './hy-worldlens-lab';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['hy-analogy'] = HyAnalogy;
+widgetRegistry['hy-architecture'] = HyArchitecture;
+widgetRegistry['hy-boundary-compare'] = HyBoundaryCompare;
+widgetRegistry['hy-composition'] = HyComposition;
+widgetRegistry['hy-creation-pipeline'] = HyCreationPipeline;
+widgetRegistry['hy-dmd-lab'] = HyDmdLab;
+widgetRegistry['hy-evidence-court'] = HyEvidenceCourt;
+widgetRegistry['hy-hero'] = HyHero;
+widgetRegistry['hy-innovation-map'] = HyInnovationMap;
+widgetRegistry['hy-keyframes'] = HyKeyframes;
+widgetRegistry['hy-memory'] = HyMemory;
+widgetRegistry['hy-mission-planner'] = HyMissionPlanner;
+widgetRegistry['hy-model-evolution'] = HyModelEvolution;
+widgetRegistry['hy-panorama'] = HyPanorama;
+widgetRegistry['hy-panorama-curation'] = HyPanoramaCuration;
+widgetRegistry['hy-performance-compare'] = HyPerformanceCompare;
+widgetRegistry['hy-resolution'] = HyResolution;
+widgetRegistry['hy-training-stages'] = HyTrainingStages;
+widgetRegistry['hy-trajectory'] = HyTrajectory;
+widgetRegistry['hy-update-log'] = HyUpdateLog;
+widgetRegistry['hy-world-model-basics'] = HyWorldModelBasics;
+widgetRegistry['hy-worldlens-lab'] = HyWorldLensLab;

@@ -1,0 +1,1 @@
+import React from 'react'; import type { WidgetProps } from './registry'; import {InteractiveLab} from './omni-shared-preview'; export const OmniLab6:React.FC<WidgetProps>=()=> <InteractiveLab variant={6}/>;
