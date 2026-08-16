@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { PaperTable } from './hy-paper-evidence';
+import { PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = { bg: '#f5f8f0', line: '#d7deea', ink: '#21324a', muted: '#68778f', blue: '#27446e', green: '#228d5c', red: '#c43f52', orange: '#d97706', purple: '#7c3aed', white: '#fff' };
@@ -70,9 +70,9 @@ export const HyMemory: React.FC<WidgetProps> = () => {
   const active = modes[mode];
   return <div className="memory-rebuild">
     <div className="learning-contract">
-      <div><span>为什么学</span><p>WorldStereo 会沿多条轨迹生成关键帧；如果每条路线只顾自己，同一扇门会在不同视角漂移。</p></div>
-      <div><span>本次操作</span><p>依次切换无记忆、仅 GGM、仅 SSM++ 和双记忆，观察结构位置与局部纹理分别由谁负责。</p></div>
-      <div><span>应得判断</span><p>GGM 是全局几何锚点，SSM++ 是局部相关视角检索；它们不是两个同类缓存。</p></div>
+      <div><span>为什么学</span><p>跨路线观察需要保持一致。</p></div>
+      <div><span>本次操作</span><p>切换四种记忆组合。</p></div>
+      <div><span>应得判断</span><p>GGM 守骨架，SSM++ 补细节。</p></div>
     </div>
     <div className="memory-definition-grid">
       <section className="ggm-definition"><span>全局几何记忆</span><strong>GGM = Global-Geometric Memory</strong><p>把 360° 全景点云从目标相机渲染成粗几何条件，用来固定墙、门、转角等全局结构。它不是保存全部历史 token 的通用缓存。</p></section>
@@ -90,9 +90,11 @@ export const HyMemory: React.FC<WidgetProps> = () => {
     <MemoryCanvas mode={mode} />
     <div className="memory-role-ledger"><div><span>结构结果</span><strong>{active.geometry}</strong></div><div><span>纹理结果</span><strong>{active.texture}</strong></div></div>
     <div className={`feedback ${mode === 'both' ? 'good' : mode === 'none' ? 'bad' : ''}`}>{active.conclusion}</div>
-    <section className="memory-paper-spotlight"><header><span>论文 Table 8</span><strong>这些数值属于完整配置行，不由上方动画计算</strong></header><div className="memory-evidence-cards"><div><span>相机控制基线</span><strong>PSNR 16.13</strong><small>SSIM 0.474 · PSNRm 28.81</small></div><div className={mode === 'both' ? 'active' : ''}><span>配置 A · GGM + SSM++</span><strong>PSNR 20.94</strong><small>SSIM 0.640 · PSNRm 30.27</small></div><div><span>A* · 时间拼接替代</span><strong>PSNR 19.83</strong><small>SSIM 0.581 · PSNRm 29.77</small></div><div><span>配置 F · 完整中训</span><strong>PSNR 21.63</strong><small>SSIM 0.669 · PSNRm 30.76</small></div></div><p>配置 F 还包含可训练 FFN、数据增强、相机嵌入和更大 batch，不能把全部提升只归因于双记忆。</p></section>
-    <div className="memory-glossary-grid"><details><summary>SSM++ 如何选择参考？</summary><p>它只检索与目标视角最相关的历史关键帧，并让检索帧直接进入主 DiT。</p></details><details><summary>为什么采用空间拼接？</summary><p>检索帧与目标帧横向组成 2W 配对并共享时间索引，使模型把它们理解为同一时刻的两种空间观察。</p></details></div>
-    <PaperTable tableId="table-8" />
+    <SectionExtras>
+      <section className="memory-paper-spotlight"><header><span>论文 Table 8</span><strong>这些数值属于完整配置行，不由上方动画计算</strong></header><div className="memory-evidence-cards"><div><span>相机控制基线</span><strong>PSNR 16.13</strong><small>SSIM 0.474 · PSNRm 28.81</small></div><div className={mode === 'both' ? 'active' : ''}><span>配置 A · GGM + SSM++</span><strong>PSNR 20.94</strong><small>SSIM 0.640 · PSNRm 30.27</small></div><div><span>A* · 时间拼接替代</span><strong>PSNR 19.83</strong><small>SSIM 0.581 · PSNRm 29.77</small></div><div><span>配置 F · 完整中训</span><strong>PSNR 21.63</strong><small>SSIM 0.669 · PSNRm 30.76</small></div></div><p>配置 F 还包含可训练 FFN、数据增强、相机嵌入和更大 batch，不能把全部提升只归因于双记忆。</p></section>
+      <div className="memory-glossary-grid"><details><summary>SSM++ 如何选择参考？</summary><p>它只检索与目标视角最相关的历史关键帧，并让检索帧直接进入主 DiT。</p></details><details><summary>为什么采用空间拼接？</summary><p>检索帧与目标帧横向组成 2W 配对并共享时间索引，使模型把它们理解为同一时刻的两种空间观察。</p></details></div>
+      <PaperTable tableId="table-8" />
+    </SectionExtras>
   </div>;
 };
 

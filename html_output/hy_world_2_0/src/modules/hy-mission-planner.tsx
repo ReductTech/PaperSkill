@@ -88,7 +88,7 @@ export const HyMissionPlanner: React.FC<WidgetProps> = () => {
 
   return (
     <div className="mission-planner">
-      <div className="learning-contract"><div><span>为什么学</span><p>四种输入并不走同一条前处理路线；线索多少决定系统是先生成观察，还是直接重建。</p></div><div><span>本次操作</span><p>点击任一输入任务卡，观察高亮路径如何改变，未经过的模块会同步变灰。</p></div><div><span>应得判断</span><p>文本/单图走生成主链，多视图/视频跳过前三阶段，但两条路线都在 WorldMirror 2.0 汇合。</p></div></div>
+      <div className="learning-contract"><div><span>为什么学</span><p>输入丰富度决定系统分流。</p></div><div><span>本次操作</span><p>点击任务卡切换高亮路径。</p></div><div><span>应得判断</span><p>两条路线共享 WorldMirror。</p></div></div>
       <section className={`mission-atlas ${isGeneration ? 'generation' : 'reconstruction'}`} aria-live="polite">
         <header className="mission-atlas-head">
           <div>

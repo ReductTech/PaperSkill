@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { WidgetProps } from './registry';
-import { PaperTable } from './hy-paper-evidence';
+import { PaperTable, SectionExtras } from './hy-paper-evidence';
 
 type GroupId = 'panorama' | 'geometry' | 'nvs' | 'efficiency';
 type Direction = 'higher' | 'lower';
@@ -213,7 +213,7 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
 
   return (
     <div className="cluster-compare">
-      <div className="learning-contract"><div><span>为什么学</span><p>论文跨全景、几何、NVS 与效率报告多种指标；不同协议和方向不能揉成一个总分。</p></div><div><span>本次操作</span><p>选择协议、模型与指标；每个指标都从零基线按原始数值比例绘制。</p></div><div><span>应得判断</span><p>柱子只表达数值大小。低优指标更短才更好；OOM 与未报告保持未知，不能反向或补齐成“更高更优”。</p></div></div>
+      <div className="learning-contract"><div><span>为什么学</span><p>指标必须放回对应协议。</p></div><div><span>本次操作</span><p>选择协议、模型与指标。</p></div><div><span>应得判断</span><p>低优指标短柱更好，缺失保持未知。</p></div></div>
       <div className="performance-groups" role="tablist" aria-label="选择性能比较协议">
         {([
           ['panorama', '全景生成', 'Table 4 · I2P'],
@@ -251,19 +251,21 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
         <div className="cluster-legend">{visibleMetrics.map((metric) => <span key={metric.id}><i style={{ background: metric.color }} />{metric.label}（{metric.direction === 'higher' ? '越高越好' : '越低越好'}）</span>)}</div>
       </section>
 
-      <div className="performance-boundary"><strong>严格零基线比例</strong><span>{showingCrossEfficiency ? '柱高 = 各论文原始打印数值 / 当前指标最大已报告值；相同画法只统一阅读操作，不消除硬件、任务和单位差异。' : '柱高 = 原始数值 / 当前指标最大已报告值。'} AUC、PSNR、SSIM、FPS 等越高越好；AbsRel、LPIPS、显存、时间越低越好，因此后者的短柱才更优。不同指标不能相加、平均或构造综合分数。</span></div>
-      {showingCrossEfficiency ? <section className="cross-efficiency-records">
-        <header><span>公开记录条件卡</span><strong>选择上方模型后，仍需逐条核对测量边界</strong><small>GB 与 GiB 保留原论文单位；FPS 不倒数；骨干成本不冒充完整多头重建。</small></header>
-        <div>
-          {crossPaperEfficiency.filter((record) => selectedModels.includes(record.id)).map((record) => <article key={record.id}>
-            <div><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a></div>
-            <span>{record.hardware}</span>
-            <span>{record.input}</span>
-            <b>{record.memory} · {record.time}</b>
-            <p>{record.scope}</p>
-          </article>)}
-        </div>
-      </section> : <PaperTable tableId={tableId} />}
+      <SectionExtras hint={showingCrossEfficiency ? '柱高规则、硬件条件与公开记录来源' : '柱高规则与对应论文原表'}>
+        <div className="performance-boundary"><strong>严格零基线比例</strong><span>{showingCrossEfficiency ? '柱高 = 各论文原始打印数值 / 当前指标最大已报告值；相同画法只统一阅读操作，不消除硬件、任务和单位差异。' : '柱高 = 原始数值 / 当前指标最大已报告值。'} AUC、PSNR、SSIM、FPS 等越高越好；AbsRel、LPIPS、显存、时间越低越好，因此后者的短柱才更优。不同指标不能相加、平均或构造综合分数。</span></div>
+        {showingCrossEfficiency ? <section className="cross-efficiency-records">
+          <header><span>公开记录条件卡</span><strong>选择上方模型后，仍需逐条核对测量边界</strong><small>GB 与 GiB 保留原论文单位；FPS 不倒数；骨干成本不冒充完整多头重建。</small></header>
+          <div>
+            {crossPaperEfficiency.filter((record) => selectedModels.includes(record.id)).map((record) => <article key={record.id}>
+              <div><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a></div>
+              <span>{record.hardware}</span>
+              <span>{record.input}</span>
+              <b>{record.memory} · {record.time}</b>
+              <p>{record.scope}</p>
+            </article>)}
+          </div>
+        </section> : <PaperTable tableId={tableId} />}
+      </SectionExtras>
     </div>
   );
 };

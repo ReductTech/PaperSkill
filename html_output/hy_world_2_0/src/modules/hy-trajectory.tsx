@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -204,7 +204,7 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
 
   return (
     <div className="trajectory-lab trajectory-planner">
-      <div className="learning-contract"><div><span>为什么学</span><p>相机轨迹决定 WorldStereo 会生成哪些新观察；五类轨迹分别处理通用覆盖、物体背面、重建盲区、远端和俯视结构。</p></div><div><span>本次操作</span><p>先切换任务，再逐层查看候选、碰撞淘汰、连接和最终回放。</p></div><div><span>应得判断</span><p>五类任务不是同一折线换颜色，而是目标对象、覆盖形态和执行条件都不同。</p></div></div>
+      <div className="learning-contract"><div><span>为什么学</span><p>轨迹决定系统会看到什么。</p></div><div><span>本次操作</span><p>切换任务并逐层回放规划。</p></div><div><span>应得判断</span><p>五类任务具有不同约束。</p></div></div>
       <div className="trajectory-task-switch" role="tablist" aria-label="选择 WorldNav 轨迹任务">
         {(Object.keys(routeData) as TrajectoryName[]).map((name) => (
           <button key={name} type="button" role="tab" aria-selected={trajectory === name} className={trajectory === name ? 'selected' : ''} onClick={() => changeTrajectory(name)}>
@@ -300,8 +300,10 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
       </div>
 
       <div className="feedback good">五类路线及“最大数量”来自论文表 1；均匀采样、Ray-casting、双向贪心与尾部修剪采用知乎文章的工程讲解视角，不被表述为论文证明的全局最优算法。</div>
-      <EvidenceMediaDrawer mediaType="官方架构图" src="./images/official-stage-nav.webp" title="WorldNav 五类轨迹在真实三维场景中的分布" caption="官方图把常规、环绕、重建感知、漫游与航拍轨迹叠加在真实场景上。可用它核对上方 NavMesh 教学动画与实际三维轨迹之间的对应关系。" alt="WorldNav 五类相机轨迹官方示意图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
-      <PaperTable tableId="table-1" />
+      <SectionExtras hint="真实三维轨迹图与论文表 1">
+        <EvidenceMediaDrawer mediaType="官方架构图" src="./images/official-stage-nav.webp" title="WorldNav 五类轨迹在真实三维场景中的分布" caption="官方图把常规、环绕、重建感知、漫游与航拍轨迹叠加在真实场景上。可用它核对上方 NavMesh 教学动画与实际三维轨迹之间的对应关系。" alt="WorldNav 五类相机轨迹官方示意图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
+        <PaperTable tableId="table-1" />
+      </SectionExtras>
     </div>
   );
 };

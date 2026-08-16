@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type RecipeId = 'real' | 'synthetic' | 'mixed-clean' | 'mixed-dirty';
@@ -79,9 +80,9 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
   const active = recipes[recipe];
   return <div className="curation-microscope">
     <div className="learning-contract">
-      <div><span>为什么学</span><p>HY-Pano 的世界先验来自训练分布；缺少某类场景或保留污染，都会在生成结果中反复出现。</p></div>
-      <div><span>本次操作</span><p>切换四种数据配方，观察语义覆盖、真实感、标签能力与污染风险如何共同变化。</p></div>
-      <div><span>应得判断</span><p>真实与合成不是二选一；论文采用双源互补，并明确过滤接缝与拍摄设备污染。</p></div>
+      <div><span>为什么学</span><p>训练分布决定生成先验。</p></div>
+      <div><span>本次操作</span><p>切换数据配方观察覆盖与污染。</p></div>
+      <div><span>应得判断</span><p>双源互补仍需要质量过滤。</p></div>
     </div>
     <div className="curation-recipe-tabs" role="tablist" aria-label="选择全景数据配方">
       {(Object.keys(recipes) as RecipeId[]).map((id) => <button key={id} type="button" role="tab" aria-selected={recipe === id} className={recipe === id ? 'selected' : ''} onClick={() => setRecipe(id)}><strong>{recipes[id].title}</strong><small>{id === 'mixed-clean' ? '论文思路' : id === 'mixed-dirty' ? '失败对照' : '单源对照'}</small></button>)}
@@ -109,8 +110,10 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
       <p>这里解释的是因果方向，不是论文公开的数据配比。论文明确报告双源策展和质量过滤，但没有给出四项教学百分比的测量值。</p>
     </section>
     <div className={`feedback ${recipe === 'mixed-clean' ? 'good' : recipe === 'mixed-dirty' ? 'bad' : ''}`}>{recipe === 'mixed-clean' ? '双源互补与质量过滤同时成立：分布更广，污染捷径没有被一起收入。' : recipe === 'mixed-dirty' ? '覆盖率看似最高，但错误模式也最强；这正说明“更多样本”不能代替清洗。' : '单源能贡献一部分能力，但会留下另一侧缺口。'}</div>
-    <section className="curation-paper-boundary"><span>论文事实与教学抽象</span><p>Section 3.1 明确描述高分辨率真实全景、UE 合成资产，以及对明显 stitching artifacts 和相机设备入镜样本的过滤。上方分布点和百分比是教学抽象，不是论文样本截图或固定配比。</p></section>
-    <div className="curation-glossary-grid"><details><summary>什么是 domain gap？</summary><p>真实拍摄与引擎渲染在材质、光照、噪声和纹理统计上存在分布差异。</p></details><details><summary>为什么设备入镜危险？</summary><p>若支架或相机反复出现，模型可能把它学成全景场景的一部分，而不是采集过程的偶然污染。</p></details></div>
+    <SectionExtras hint="论文事实边界与数据策展术语">
+      <section className="curation-paper-boundary"><span>论文事实与教学抽象</span><p>Section 3.1 明确描述高分辨率真实全景、UE 合成资产，以及对明显 stitching artifacts 和相机设备入镜样本的过滤。上方分布点和百分比是教学抽象，不是论文样本截图或固定配比。</p></section>
+      <div className="curation-glossary-grid"><details><summary>什么是 domain gap？</summary><p>真实拍摄与引擎渲染在材质、光照、噪声和纹理统计上存在分布差异。</p></details><details><summary>为什么设备入镜危险？</summary><p>若支架或相机反复出现，模型可能把它学成全景场景的一部分，而不是采集过程的偶然污染。</p></details></div>
+    </SectionExtras>
   </div>;
 };
 

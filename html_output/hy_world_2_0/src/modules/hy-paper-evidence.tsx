@@ -1,5 +1,25 @@
 import React from 'react';
 
+type SectionExtrasProps = {
+  title?: string;
+  hint?: string;
+  children: React.ReactNode;
+};
+
+export const SectionExtras: React.FC<SectionExtrasProps> = ({
+  title = '本节扩展资料',
+  hint = '论文边界、术语解释、原图与完整表格',
+  children,
+}) => (
+  <details className="section-extras">
+    <summary>
+      <div><strong>{title}</strong><small>{hint}</small></div>
+      <b>按需展开</b>
+    </summary>
+    <div className="section-extras-body">{children}</div>
+  </details>
+);
+
 export type PaperTableId = 'table-1' | 'table-4' | 'table-8' | 'table-9' | 'table-10' | 'table-11' | 'table-12' | 'table-14';
 
 type PaperTableSpec = {

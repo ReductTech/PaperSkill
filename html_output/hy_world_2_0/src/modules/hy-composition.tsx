@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type StepId='baseline'|'voxel'|'densify'|'mask'|'final';
@@ -50,15 +50,17 @@ function CompositionCanvas({step}:{step:StepId}){
 }
 
 export const HyComposition:React.FC<WidgetProps>=()=>{const[step,setStep]=useState<StepId>('baseline');const d=steps[step];return <div className="composition-rebuild">
-  <div className="learning-contract"><div><span>为什么学</span><p>WorldMirror 输出的初始 3DGS 可达 6M，高质量但过重；直接删点又会破坏纹理，普通增密还会在天空产生漂浮物。</p></div><div><span>本次操作</span><p>按论文 Table 9 的五个配方逐步切换，观察墙面细节、天空漂浮物和高斯数量如何一起变化。</p></div><div><span>应得判断</span><p>最终方案不是单一压缩技巧，而是体素降采样、非天空增密与 MaskGaussian 的因果组合。</p></div></div>
+  <div className="learning-contract"><div><span>为什么学</span><p>3DGS 需要兼顾画质与体积。</p></div><div><span>本次操作</span><p>切换五个论文配置。</p></div><div><span>应得判断</span><p>降采样、增密与剪枝缺一不可。</p></div></div>
   <div className="composition-step-tabs" role="tablist" aria-label="选择 3DGS 配方">{(Object.keys(steps) as StepId[]).map((id,index)=><button key={id} type="button" role="tab" aria-selected={step===id} className={step===id?'selected':''} onClick={()=>setStep(id)}><b>{index+1}</b><span>{steps[id].title}</span><small>{steps[id].code}</small></button>)}</div>
   <div className="composition-process-strip" aria-label="3DGS 五步配方因果链">{(Object.keys(steps) as StepId[]).map((id,index)=>{const currentIndex=(Object.keys(steps) as StepId[]).indexOf(step);return <React.Fragment key={id}><article className={index===currentIndex?'active':index<currentIndex?'done':''}><span>{index+1}</span><strong>{steps[id].title}</strong><small>{index===0?'画质上限':index===1?'先减体积':index===2?'找回细节':index===3?'删除冗余':'限制错误增密'}</small></article>{index<4?<i>→</i>:null}</React.Fragment>;})}</div>
   <CompositionCanvas step={step}/>
   <section className="composition-causal-card"><div><span>这一步为什么存在</span><strong>{d.why}</strong></div><i>→</i><div><span>画面上应该看到</span><strong>{d.lesson}</strong></div></section>
   <div className="composition-metric-ledger"><div><span>高斯数量</span><strong>{d.count.toFixed(3)}M</strong><small>越低越轻</small></div><div><span>PSNR</span><strong>{d.psnr.toFixed(3)}</strong><small>越高越好</small></div><div><span>SSIM</span><strong>{d.ssim.toFixed(3)}</strong><small>越高越好</small></div><div><span>LPIPS</span><strong>{d.lpips.toFixed(3)}</strong><small>越低越好</small></div></div>
   <div className={`feedback ${step==='final'?'good':step==='voxel'?'bad':''}`}>{step==='final'?'相对 6M 基线，高斯减少约 77%，PSNR 下降 0.153 dB，LPIPS 增加 0.006；这是有代价的紧凑表示，不是无损压缩。':d.lesson}</div>
-  <div className="composition-glossary-grid"><details><summary>MaskGaussian 怎么删点？</summary><p>它用 Gumbel-Softmax 学习每个高斯的存在掩码，并以稀疏损失鼓励低激活高斯被永久剪枝。</p></details><details><summary>为什么天空不适合普通增密？</summary><p>天空缺少可靠深度监督，位置梯度可能驱动高斯在空中克隆和分裂，形成漂浮伪影。</p></details></div>
-  <PaperTable tableId="table-9"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-mesh.gif" title="轻量 Mesh 漫游与交付效果" caption="官方演示用于理解资产压缩最终服务于加载与漫游，不对应 Table 9 的独立指标。" alt="官方轻量 Mesh 漫游" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/>
+  <SectionExtras>
+    <div className="composition-glossary-grid"><details><summary>MaskGaussian 怎么删点？</summary><p>它用 Gumbel-Softmax 学习每个高斯的存在掩码，并以稀疏损失鼓励低激活高斯被永久剪枝。</p></details><details><summary>为什么天空不适合普通增密？</summary><p>天空缺少可靠深度监督，位置梯度可能驱动高斯在空中克隆和分裂，形成漂浮伪影。</p></details></div>
+    <PaperTable tableId="table-9"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-mesh.gif" title="轻量 Mesh 漫游与交付效果" caption="官方演示用于理解资产压缩最终服务于加载与漫游，不对应 Table 9 的独立指标。" alt="官方轻量 Mesh 漫游" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/>
+  </SectionExtras>
   </div>;};
 
 export default HyComposition;

@@ -158,7 +158,7 @@ export const HyCreationPipeline: React.FC<WidgetProps> = () => {
   const selectStage = (next: number) => { if (next === stageIndex && animating) return; setStageIndex(next); setAnimationKey((value) => value + 1); };
   const next = () => selectStage(stageIndex === stages.length - 1 ? 0 : stageIndex + 1);
   return <div className={`creation-pipeline ${animating ? 'is-animating' : ''}`}>
-    <div className="learning-contract"><div><span>为什么学</span><p>四个子系统各自修复一个不同瓶颈，不能只记住系统名称。</p></div><div><span>本次操作</span><p>逐步点击四个阶段；每次清空画布，只演示该阶段新增的能力。</p></div><div><span>应得判断</span><p>生成路径先补观察，再规划、扩展关键帧，最后由共享 WorldMirror 恢复显式三维资产。</p></div></div>
+    <div className="learning-contract"><div><span>为什么学</span><p>四阶段各解决一个瓶颈。</p></div><div><span>本次操作</span><p>逐步播放四段独立动画。</p></div><div><span>应得判断</span><p>补观察后再恢复显式三维。</p></div></div>
     <div className="creation-stage-tabs" role="tablist" aria-label="选择四阶段造物管线步骤">{stages.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={stageIndex === index} className={stageIndex === index ? 'selected' : index < stageIndex ? 'complete' : ''} onClick={() => selectStage(index)}><b>{index + 1}</b><span>{item.name}</span><small>{item.short}</small></button>)}</div>
     <div className="creation-stage-main">
       <div className="creation-canvas-shell"><PipelineCanvas stageIndex={stageIndex} animationKey={animationKey} onAnimationChange={setAnimating} /><div className="creation-canvas-caption"><span>独立场景 {stageIndex + 1} / 4</span><strong>{stage.short}</strong></div><div className="creation-animation-state" aria-live="polite"><i aria-hidden="true" /><span>{animating ? '功能动画演示中' : '动画完成，可继续探索'}</span></div></div>

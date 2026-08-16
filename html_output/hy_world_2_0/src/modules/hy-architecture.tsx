@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type PriorId = 'pose' | 'intrinsics' | 'depth';
@@ -94,7 +94,7 @@ function createInspectionResults() {
   return results;
 }
 
-const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSample; active: boolean }> = ({ output, sample, active }) => {
+const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSample; active: boolean; revealed: boolean }> = ({ output, sample, active, revealed }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -116,6 +116,21 @@ const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSampl
     ctx.strokeStyle = '#8996a8';
     ctx.lineWidth = 1;
     ctx.strokeRect(6.5, 6.5, width - 13, height - 13);
+
+    if (!revealed) {
+      ctx.strokeStyle = '#9aa8b8';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 4]);
+      ctx.strokeRect(38, 22, 104, 34);
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#68778f';
+      ctx.font = '700 11px Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('等待输出头生成候选', 90, 43);
+      ctx.textAlign = 'left';
+      return;
+    }
+
     const verdictColor = sample.verdict === 'pass' ? '#228d5c' : '#c2414b';
 
     if (output.id === 'camera') {
@@ -194,9 +209,16 @@ const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSampl
     ctx.fillStyle = verdictColor;
     ctx.fillRect(7, 70, width - 14, 5);
     ctx.globalAlpha = 1;
-  }, [active, output, sample]);
+    ctx.fillStyle = verdictColor;
+    ctx.fillRect(126, 8, 45, 17);
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 10px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(sample.verdict === 'pass' ? '✓ 通过' : '× 错误', 148.5, 20);
+    ctx.textAlign = 'left';
+  }, [active, output, revealed, sample]);
 
-  return <canvas ref={canvasRef} className="reconstruction-output-canvas" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className="reconstruction-output-canvas is-ready" aria-hidden="true" />;
 };
 
 export const HyArchitecture: React.FC<WidgetProps> = () => {
@@ -219,7 +241,7 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
   useEffect(() => {
     if (!running) return;
     if (cursor >= runSteps.length - 1) { setRunning(false); return; }
-    const timer = window.setTimeout(() => setCursor((value) => value + 1), stage.startsWith('inspect-') ? 1050 : 850);
+    const timer = window.setTimeout(() => setCursor((value) => value + 1), stage.startsWith('inspect-') ? 720 : 560);
     return () => window.clearTimeout(timer);
   }, [cursor, runSteps, running, stage]);
 
@@ -235,9 +257,11 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
     setFocusOutput('camera');
   };
 
-  const run = () => {
+  const run = (forceAllPass = false) => {
     const selected = priors.filter((prior) => activePriors.includes(prior.id)).map((prior) => prior.id);
-    setInspectionResults(createInspectionResults());
+    setInspectionResults(forceAllPass
+      ? Object.fromEntries(outputs.map((output) => [output.id, chooseSample(output, 'pass')])) as Record<OutputId, InspectionSample>
+      : createInspectionResults());
     setRunSteps(['rgb', ...selected, 'shared', 'heads', ...outputs.map((output) => `inspect-${output.id}` as StepId), 'done']);
     setCursor(0);
     setFocusOutput('camera');
@@ -276,17 +300,18 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       { x: rect.width * .22, y: rect.height * .35 },
       { x: rect.width * .5, y: rect.height * .2 },
       { x: rect.width * .78, y: rect.height * .38 },
+      { x: rect.width * .5, y: rect.height * .56 },
     ];
-    const particles = bursts.flatMap((burst, burstIndex) => Array.from({ length: 30 }, (_, index) => {
-      const angle = index / 30 * Math.PI * 2;
-      const speed = 45 + (index % 7) * 8;
+    const particles = bursts.flatMap((burst, burstIndex) => Array.from({ length: 42 }, (_, index) => {
+      const angle = index / 42 * Math.PI * 2;
+      const speed = 52 + (index % 8) * 8;
       return { x: burst.x, y: burst.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, color: colors[(index + burstIndex) % colors.length] };
     }));
     const started = performance.now();
     let frame = 0;
     const draw = (now: number) => {
       const elapsed = (now - started) / 1000;
-      const fade = Math.max(0, 1 - elapsed / 1.9);
+      const fade = Math.max(0, 1 - elapsed / 3.4);
       ctx.clearRect(0, 0, rect.width, rect.height);
       particles.forEach((particle) => {
         const x = particle.x + particle.vx * elapsed;
@@ -294,11 +319,11 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
         ctx.globalAlpha = fade;
         ctx.fillStyle = particle.color;
         ctx.beginPath();
-        ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+        ctx.arc(x, y, 3.1, 0, Math.PI * 2);
         ctx.fill();
       });
       ctx.globalAlpha = 1;
-      if (elapsed < 1.9) frame = window.requestAnimationFrame(draw);
+      if (elapsed < 3.4) frame = window.requestAnimationFrame(draw);
       else ctx.clearRect(0, 0, rect.width, rect.height);
     };
     frame = window.requestAnimationFrame(draw);
@@ -307,9 +332,9 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
 
   return <div className="architecture-rebuild">
     <div className="learning-contract">
-      <div><span>为什么学</span><p>WorldMirror 不是为相机、深度、点图和 3DGS 各跑一套模型，而是先建立一份共享的跨视图空间理解。</p></div>
-      <div><span>本次操作</span><p>勾选现有先验并播放流程，观察证据怎样逐项接入、共享骨干怎样复用计算、五个输出怎样依次接受质量检查。</p></div>
-      <div><span>应得判断</span><p>Any-Modal 表示 Pose、K、Depth 可有可无；共享骨干复用空间理解，多输出头保留不同预测格式与训练阶段。</p></div>
+      <div><span>为什么学</span><p>五类输出共享同一份跨视图空间理解。</p></div>
+      <div><span>本次操作</span><p>选择先验，运行并检查五个输出头。</p></div>
+      <div><span>应得判断</span><p>先验可缺省；共享骨干只前向一次。</p></div>
     </div>
 
     <section className="reconstruction-brief">
@@ -318,13 +343,14 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       <div className="reconstruction-prior-console">
         <span>把手头已有的证据接入输入</span>
         {priors.map((prior) => <button key={prior.id} type="button" disabled={running} className={activePriors.includes(prior.id) ? 'selected' : ''} aria-pressed={activePriors.includes(prior.id)} onClick={() => toggle(prior.id)}><b>{prior.short}</b><small>{prior.label}</small></button>)}
-        <button type="button" className="reconstruction-run" disabled={running} onClick={run}><span aria-hidden="true">{running ? '●' : '▶'}</span>{running ? '流程播放中' : hasRun ? '重新播放' : '执行重建'}</button>
+        <button type="button" className="reconstruction-run" disabled={running} onClick={() => run(false)}><span aria-hidden="true">{running ? '●' : '▶'}</span>{running ? '流程播放中' : hasRun ? '重新播放' : '执行重建'}</button>
+        <button type="button" className="reconstruction-celebrate" disabled={running} onClick={() => run(true)} title="让五个教学候选全部通过，并预览烟花"><span aria-hidden="true">✦</span>全绿预览</button>
       </div>
       <p>{selectedPriorDetails.length === 0 ? '当前不提供额外先验。训练时每种先验以 0.5 概率独立丢弃，因此这不是非法输入。' : selectedPriorDetails.map((prior) => prior.effect).join(' ')}</p>
     </section>
 
     <section className={`reconstruction-flowboard reconstruction-vertical ${reached('heads') ? 'heads-ready' : ''} ${allPassed ? 'all-pass' : ''}`} aria-live="polite">
-      <canvas ref={fireworksRef} className="reconstruction-fireworks" aria-hidden="true" />
+      <canvas ref={fireworksRef} className="reconstruction-fireworks is-ready" aria-hidden="true" />
       <header><div><span>竖排输入 → 共享空间理解 → 竖排五步检验</span><strong>Any-Modal 共享重建与随机候选巡检</strong></div><p>{stageMessage}</p></header>
       <div className="reconstruction-vertical-system">
         <section className="reconstruction-input-column">
@@ -366,7 +392,7 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
                 style={{ '--output-color': output.color } as React.CSSProperties}
               >
                 <span className="inspection-order">0{index + 1}</span>
-                <OutputPreviewCanvas output={output} sample={sample} active={checking || checked} />
+                <OutputPreviewCanvas output={output} sample={sample} active={checking || checked} revealed={reached('heads')} />
                 <span className="output-card-copy">
                   <span className="output-card-title"><strong>{output.label}</strong><b>{checking ? sample.verdict === 'reject' ? '发现错误' : '扫描通过' : checked ? sample.verdict === 'reject' ? '已退回' : '可交付' : '待检'}</b></span>
                   <small>{output.check}</small>
@@ -387,10 +413,12 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
     </div>
 
     <div className={`feedback ${allPassed || stage === 'done' && activePriors.length === 3 ? 'good' : ''}`}>{!hasRun ? '先配置现有证据并执行重建。每次运行都会为五个输出重新抽取候选。' : allPassed ? `${resultBoundary} 本轮五项候选全部通过，已触发隐藏烟花；这不代表真实系统必然一次全对。` : `${resultBoundary} 有问题的候选会退回，正常候选直接保留，再进入后续深度对齐与 3DGS 资产优化。`}</div>
-    <section className="architecture-evidence-strip"><header><span>Table 11 · 7-Scenes 高分辨率端点</span><strong>Acc. / Comp. 越低越好</strong></header><div className="architecture-evidence-pair"><div className={hasRun && activePriors.length === 0 ? 'active' : ''}><span>仅图像</span><strong>Acc. 0.037 · Comp. 0.040</strong><small>WorldMirror 2.0，756×1036</small></div><i>→</i><div className={hasRun && activePriors.length === 3 ? 'active' : ''}><span>图像 + 全部先验</span><strong>Acc. 0.012 · Comp. 0.016</strong><small>Pose + K + Depth</small></div></div><p>论文没有在 Table 11 报告所有部分先验组合，不能对中间状态插值出数字。</p></section>
-    <div className="architecture-glossary-grid"><details><summary>为什么共享骨干？</summary><p>相机、深度与点图都依赖同一跨视图对应关系，共享特征可避免每个任务重复学习空间匹配。</p></details><details><summary>为什么还要多个头？</summary><p>相机是全局参数，点图、深度、法线是像素级几何，3DGS 是可渲染属性，它们需要不同解码形式和监督。</p></details><details><summary>3DGS 为何第二阶段训练？</summary><p>论文先联合训练几何头，再冻结几何参数单独训练 3DGS 头，以解耦几何学习与外观建模。</p></details></div>
-    <div className="evidence-media-stack"><EvidenceMediaDrawer mediaType="论文原图" src="./images/figure-12-worldmirror.png" title="论文 Figure 12：WorldMirror 2.0 架构" caption="用于核对 Any-Modal 输入、共享骨干和多输出头的真实连接。" alt="WorldMirror 2.0 架构原图"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方演示帮助理解最终任务流程，不替代论文指标。" alt="官方多视图重建演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/></div>
-    <PaperTable tableId="table-11"/>
+    <SectionExtras>
+      <section className="architecture-evidence-strip"><header><span>Table 11 · 7-Scenes 高分辨率端点</span><strong>Acc. / Comp. 越低越好</strong></header><div className="architecture-evidence-pair"><div className={hasRun && activePriors.length === 0 ? 'active' : ''}><span>仅图像</span><strong>Acc. 0.037 · Comp. 0.040</strong><small>WorldMirror 2.0，756×1036</small></div><i>→</i><div className={hasRun && activePriors.length === 3 ? 'active' : ''}><span>图像 + 全部先验</span><strong>Acc. 0.012 · Comp. 0.016</strong><small>Pose + K + Depth</small></div></div><p>论文没有在 Table 11 报告所有部分先验组合，不能对中间状态插值出数字。</p></section>
+      <div className="architecture-glossary-grid"><details><summary>为什么共享骨干？</summary><p>相机、深度与点图都依赖同一跨视图对应关系，共享特征可避免每个任务重复学习空间匹配。</p></details><details><summary>为什么还要多个头？</summary><p>相机是全局参数，点图、深度、法线是像素级几何，3DGS 是可渲染属性，它们需要不同解码形式和监督。</p></details><details><summary>3DGS 为何第二阶段训练？</summary><p>论文先联合训练几何头，再冻结几何参数单独训练 3DGS 头，以解耦几何学习与外观建模。</p></details></div>
+      <div className="evidence-media-stack"><EvidenceMediaDrawer mediaType="论文原图" src="./images/figure-12-worldmirror.png" title="论文 Figure 12：WorldMirror 2.0 架构" caption="用于核对 Any-Modal 输入、共享骨干和多输出头的真实连接。" alt="WorldMirror 2.0 架构原图"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方演示帮助理解最终任务流程，不替代论文指标。" alt="官方多视图重建演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/></div>
+      <PaperTable tableId="table-11"/>
+    </SectionExtras>
   </div>;
 };
 
