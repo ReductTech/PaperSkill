@@ -60,7 +60,7 @@ const fixes=[
 ];
 export const SolutionMap:React.FC<WidgetProps>=()=>{
   const [selected,setSelected]=useState(0);
-  const ref=useCanvas(ctx=>{txt(ctx,'问题',42,26,c.muted,12,true);txt(ctx,'原来',233,26,c.muted,12,true);txt(ctx,'LongCat 1.5',518,26,c.muted,12,true);fixes.forEach((f,i)=>{const y=38+i*52;const active=i===selected;rr(ctx,28,y,160,36,active?c.red:'#fff',9);rr(ctx,214,y,218,36,active?'#fff':'#fff',9);rr(ctx,492,y,240,36,active?f.color:'#fff',9);txt(ctx,f.problem,48,y+23,active?'#fff':c.text,13,true);txt(ctx,f.from,230,y+23,active?c.red:c.muted,12,true);txt(ctx,f.to,510,y+23,active?'#fff':f.color,12,true);line(ctx,442,y+18,480,y+18,active?f.color:c.border,active?5:2);ctx.fillStyle=active?f.color:c.border;ctx.beginPath();ctx.moveTo(480,y+18);ctx.lineTo(469,y+11);ctx.lineTo(469,y+25);ctx.fill();});rr(ctx,118,300,524,24,'#fff',8);txt(ctx,fixes[selected].detail,210,317,fixes[selected].color,13,true);},[selected]);
+  const ref=useCanvas(ctx=>{txt(ctx,'问题',42,26,c.muted,12,true);txt(ctx,'原来',233,26,c.muted,12,true);txt(ctx,'LongCat 1.5',518,26,c.muted,12,true);fixes.forEach((f,i)=>{const y=38+i*52;const active=i===selected;rr(ctx,28,y,160,36,active?c.red:'#fff',9);rr(ctx,214,y,218,36,active?'#fff':'#fff',9);rr(ctx,492,y,240,36,active?f.color:'#fff',9);txt(ctx,f.problem,48,y+23,active?'#fff':c.text,13,true);txt(ctx,f.from,230,y+23,active?c.red:c.muted,12,true);txt(ctx,f.to,510,y+23,active?'#fff':f.color,12,true);line(ctx,442,y+18,480,y+18,active?f.color:c.border,active?5:2);ctx.fillStyle=active?f.color:c.border;ctx.beginPath();ctx.moveTo(480,y+18);ctx.lineTo(469,y+11);ctx.lineTo(469,y+25);ctx.fill();});rr(ctx,118,300,524,24,'#fff',8);ctxt(ctx,fixes[selected].detail,380,317,fixes[selected].color,13,true);},[selected]);
   return <div><Canvas canvasRef={ref} label="五类产品障碍从旧方案到 LongCat 1.5 的变化"/><ChipRow labels={fixes.map(x=>x.problem)} value={selected} onChange={setSelected}/><div className="feedback good"><b>{fixes[selected].from} → {fixes[selected].to}</b>：{fixes[selected].detail}</div></div>;
 };
 
@@ -92,43 +92,46 @@ export const AudioAlignment:React.FC<WidgetProps>=()=>{
     }else if(step===1){for(let i=0;i<5;i++){const x=60+i*132;const count=i<4?8:1;rr(ctx,x,181,104,68,i===4?c.orange:c.blue,9);txt(ctx,`组 ${i+1}`,x+28,204,'#fff',12,true);txt(ctx,i<4?'8 层取均值':'单独保留',x+18,230,'#fff',11);const fill=Math.min(count,Math.ceil(local*count));for(let j=0;j<fill;j++){rr(ctx,x+10+j*(84/Math.max(1,count)),258,7,16,c.green,2);}}txt(ctx,'输出 5 个通道 × 1280 维',269,283,c.green,12,true);
     }else if(step===2){txt(ctx,'Whisper 特征 · 50 Hz',58,181,c.blue,12,true);for(let i=0;i<24;i++){ctx.fillStyle=i<=Math.floor(local*23)?c.blue:c.border;ctx.beginPath();ctx.arc(60+i*27,201,4,0,Math.PI*2);ctx.fill();}txt(ctx,'视频帧 · 25 FPS',58,236,c.green,12,true);for(let i=0;i<12;i++){rr(ctx,60+i*54,247,26,20,i<=Math.floor(local*11)?c.green:c.border,5);line(ctx,73+i*54,221,73+i*54,247,c.orange,1,[3,3]);}txt(ctx,'线性插值：每个视频帧获得对应声学表示',386,284,c.orange,12,true);
     }else if(step===3){for(let i=0;i<8;i++){const x=64+i*72;rr(ctx,x,183,45,32,i<=Math.floor(local*7)?c.green:c.border,7);txt(ctx,`F${i+1}`,x+13,204,i<=Math.floor(local*7)?'#fff':c.muted,11,true);}for(let i=0;i<2;i++){const x=210+i*230;rr(ctx,x,246,116,31,c.blue,8);txt(ctx,`潜变量 ${i+1}`,x+27,267,'#fff',11,true);for(let j=0;j<4;j++)line(ctx,86+(i*4+j)*72,215,x+58,246,c.orange,1.5);}txt(ctx,'Audio Projector 汇总邻域，使音频长度匹配 VAE 的 4× 时间下采样',85,166,c.orange,11,true);
-    }else{const nodes=[['Text Cross-Attn',70,c.blue],['Audio Cross-Attn',294,c.green],['FFN',548,c.blue]] as const;nodes.forEach((n,i)=>{rr(ctx,n[1],191,i===1?174:134,58,n[2],10);txt(ctx,n[0],n[1]+16,225,'#fff',12,true);if(i<2){line(ctx,n[1]+(i===1?174:134),220,nodes[i+1][1]-12,220,c.orange,4);}});const tokenX=70+Math.min(1,local)*478;ctx.fillStyle=c.orange;ctx.beginPath();ctx.arc(tokenX,174,8,0,Math.PI*2);ctx.fill();txt(ctx,'Audio ∈ ℝ^(T×5×1280) · 按潜变量时间步注入',197,276,c.green,13,true);}
+    }else{
+      txt(ctx,'每个 DiT block 内，视觉 token 沿主干依次更新；文本和音频从侧面提供条件',48,169,c.muted,11);
+      const blocks=[['视觉 xₜ',48,76,c.blue],['3D Self-Attn',147,112,c.blue],['Text Cross-Attn',286,118,c.blue],['Audio Cross-Attn',431,128,c.green],['FFN',586,84,c.blue]] as const;
+      blocks.forEach((n,i)=>{const active=Math.min(4,Math.floor(local*5))===i;rr(ctx,n[1],213,n[2],43,active?c.orange:n[3],9);ctxt(ctx,n[0],n[1]+n[2]/2,239,'#fff',i===0||i===4?10.5:10,true);if(i<4)line(ctx,n[1]+n[2]+4,234,blocks[i+1][1]-5,234,active?c.orange:c.border,3);});
+      rr(ctx,292,177,106,25,'#eef3f9',7);ctxt(ctx,'UMT5 文本特征',345,194,c.blue,9.5,true);line(ctx,345,202,345,211,c.blue,2);
+      rr(ctx,442,177,106,25,'#eef8f3',7);ctxt(ctx,'对齐音频 Aₜ',495,194,c.green,9.5,true);line(ctx,495,202,495,211,c.green,2);
+      txt(ctx,'adaLN gate',443,273,c.purple,9,true);line(ctx,485,258,485,266,c.purple,1.5,[3,3]);
+      ctxt(ctx,'输出：被文本语义与当前音频时刻共同调制的视觉 token',380,286,c.green,11.5,true);
+    }
   },[]);
   const macroRef=useCanvas((ctx,time)=>{const p=progressRef.current;const active=Math.min(3,Math.floor(p*4));const pulse=.55+.45*Math.sin(time/260);
-    txt(ctx,'宏观视角：音频与视频沿两条支路对齐到同一潜变量时刻',26,25,c.text,15,true);
-    txt(ctx,'AUDIO',28,60,c.green,10,true);txt(ctx,'VIDEO',28,135,c.blue,10,true);
+    txt(ctx,'宏观视角：统一架构接收不同视觉配置，音频始终作为独立条件支路',26,23,c.text,14.5,true);
+    txt(ctx,'AUDIO CONDITION',26,54,c.green,9.5,true);txt(ctx,'VISUAL INPUT MODES',26,93,c.blue,9.5,true);
 
-    // Audio branch: waveform -> Whisper features -> projector -> latent tokens.
-    line(ctx,83,58,145,58,c.green,2);ctx.strokeStyle=c.green;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=62;i+=3){const x=83+i,y=58+Math.sin(i*.42+time/310)*7*(.4+.6*Math.sin(i*.12)**2);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
-    rr(ctx,158,38,112,39,'#fff',8);ctxt(ctx,'Whisper-large',214,55,c.green,11,true);ctxt(ctx,'33 层 · 50 Hz',214,70,c.muted,9);
-    line(ctx,270,57,289,57,c.green,2);
-    for(let i=0;i<16;i++){const x=294+i*9;const group=Math.floor(i/4);rr(ctx,x,48,6,19,group===active?c.orange:'#cbd8e6',2);}
-    txt(ctx,'25 FPS audio features',294,82,c.muted,9,true);
-    line(ctx,441,57,458,57,c.green,2);
-    rr(ctx,462,38,86,39,'#fff',8);ctxt(ctx,'Audio Projector',505,55,c.green,10,true);ctxt(ctx,'时间压缩 4×',505,70,c.muted,9);
+    line(ctx,135,52,171,52,c.green,2);ctx.strokeStyle=c.green;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=36;i+=3){const x=135+i,y=52+Math.sin(i*.55+time/310)*6;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+    rr(ctx,180,33,108,37,'#fff',8);ctxt(ctx,'Whisper-large',234,49,c.green,10.5,true);ctxt(ctx,'50 Hz → 25 FPS',234,63,c.muted,8.5);
+    line(ctx,288,51,303,51,c.green,2);rr(ctx,307,33,105,37,'#fff',8);ctxt(ctx,'Audio Projector',359.5,49,c.green,9.5,true);ctxt(ctx,'时间压缩 4×',359.5,63,c.muted,8.5);
 
-    // Video branch: frames -> VAE -> latent tokens.
-    for(let i=0;i<16;i++){const x=83+i*9;const group=Math.floor(i/4);rr(ctx,x,122,6,19,group===active?c.orange:'#cbd8e6',2);}
-    txt(ctx,'25 FPS video frames',83,156,c.muted,9,true);
-    line(ctx,230,131,247,131,c.blue,2);
-    rr(ctx,251,112,92,39,'#fff',8);ctxt(ctx,'3D VAE',297,129,c.blue,11,true);ctxt(ctx,'时间压缩 4×',297,144,c.muted,9);
-    line(ctx,343,131,547,131,c.blue,2);
+    rr(ctx,27,100,136,38,'#fff',8);ctxt(ctx,'参考图像 / 上下文视频',95,116,c.blue,9.5,true);ctxt(ctx,'AI2V / Video Continuation',95,131,c.muted,7.8);
+    line(ctx,163,119,177,119,c.blue,2);rr(ctx,181,100,78,38,'#fff',8);ctxt(ctx,'3D VAE',220,116,c.blue,10.5,true);ctxt(ctx,'→ Ref / Context',220,131,c.muted,8);
+    rr(ctx,181,148,78,28,'#eef3f9',8);ctxt(ctx,'Noise Latents',220,166,c.blue,9,true);
+    line(ctx,259,119,278,119,c.blue,2);line(ctx,259,162,278,136,c.blue,2);
+    rr(ctx,282,105,130,52,'#fff',8);ctxt(ctx,'时间拼接',347,124,c.blue,10,true);ctxt(ctx,'Ref / Context + Noise',347,141,c.muted,8.5);
 
-    // Matching audio/video latent tokens. Same temporal index lights together.
+    // Audio/visual latent sequences share the generated-video time index.
     for(let i=0;i<4;i++){
-      const x=563+i*15;const on=i===active;
-      rr(ctx,x,48,11,19,on?c.orange:'#d7e1eb',3);
-      rr(ctx,x,122,11,19,on?c.orange:'#d7e1eb',3);
-      if(on){ctx.save();ctx.globalAlpha=.18+.12*pulse;rr(ctx,x-4,43,19,103,c.orange,6);ctx.restore();line(ctx,x+5.5,67,x+5.5,122,c.orange,1.5,[3,3]);}
+      const x=438+i*15;const on=i===active;
+      rr(ctx,x,42,11,18,on?c.orange:'#d7e1eb',3);rr(ctx,x,119,11,18,on?c.orange:'#d7e1eb',3);
+      if(on){ctx.save();ctx.globalAlpha=.18+.12*pulse;rr(ctx,x-4,37,19,105,c.orange,6);ctx.restore();line(ctx,x+5.5,60,x+5.5,119,c.orange,1.5,[3,3]);}
     }
-    ctxt(ctx,'Aₜ',591,82,c.green,10,true);ctxt(ctx,'Vₜ',591,156,c.blue,10,true);
-    line(ctx,624,57,646,83,c.green,2);line(ctx,624,131,646,110,c.blue,2);
-    rr(ctx,650,72,84,62,c.blue,10);ctxt(ctx,'DiT Block',692,95,'#fff',11,true);ctxt(ctx,'Audio Cross-Attn',692,114,'#fff',8.5,true);ctxt(ctx,'Aₜ ↔ Vₜ',692,128,'#d9f4e6',9,true);
+    ctxt(ctx,'Aₜ',466,75,c.green,9.5,true);ctxt(ctx,'Vₜ',466,151,c.blue,9.5,true);
+    line(ctx,412,51,434,51,c.green,2);line(ctx,412,131,434,131,c.blue,2);
+    line(ctx,500,51,535,78,c.green,2);line(ctx,500,131,535,105,c.blue,2);
+    rr(ctx,539,66,128,58,c.blue,10);ctxt(ctx,'Shared DiT Block',603,87,'#fff',10.5,true);ctxt(ctx,'Text CA → Audio CA',603,104,'#fff',8.5,true);ctxt(ctx,'Aₜ 条件化 Vₜ',603,118,'#d9f4e6',8.5,true);
+    line(ctx,667,95,681,95,c.green,2);rr(ctx,685,78,50,34,'#edf8f2',8);ctxt(ctx,'视频',710,99,c.green,10,true);
 
-    rr(ctx,83,181,651,24,'#fff',8);ctxt(ctx,`当前对齐：第 ${active+1} 个潜变量时间步 · 同一窗口的 Aₜ 与 Vₜ 一起进入 DiT`,408.5,197,active===3?c.green:c.orange,10.5,true);
+    rr(ctx,27,188,708,19,'#fff',8);ctxt(ctx,'AT2V：只用 Noise · AI2V：Reference + Noise · VC：Context + Noise · 三种模式都接收音频条件',381,201,c.muted,9.5,true);
   },[],760,218);
   const change=(n:number)=>{const v=n/100;setPlaying(false);setProgress(v);progressRef.current=v;};const step=Math.min(4,Math.floor(progress*5));
-  return <div><Canvas canvasRef={ref} label="Whisper 33 层特征分组、时间对齐与 DiT 注入动画"/><div className="ctrl"><button className="btn" onClick={()=>setPlaying(v=>!v)}>{playing?'暂停动画':'继续播放'}</button><input aria-label="拖动查看音频对齐过程" type="range" min="0" max="99" value={Math.round(progress*100)} onChange={e=>change(Number(e.target.value))}/><span className="val">{step+1} / 5</span></div><div className={`feedback ${step===4?'good':''}`}>{alignSteps[step][1]}。拖动时间轴可停在任一阶段查看细节。</div><div className="lc-subfigure-head"><span>PIPELINE VIEW</span><b>这些对齐操作在整套模型里做什么？</b></div><Canvas canvasRef={macroRef} label="音频特征与视频帧经过四倍时间压缩后对齐并进入 DiT" width={760} height={218} compact/><div className="lc-pipeline-note"><b>对齐发生在潜变量时间轴。</b>Audio Projector 生成的音频潜变量序列，与 3D VAE 生成的视频潜变量序列拥有相同的时间长度；相同索引的 Aₜ 随后通过 Audio Cross-Attention 控制 Vₜ。</div></div>;
+  return <div><Canvas canvasRef={ref} label="Whisper 33 层特征分组、时间对齐与 DiT 注入动画"/><div className="ctrl"><button className="btn" onClick={()=>setPlaying(v=>!v)}>{playing?'暂停动画':'继续播放'}</button><input aria-label="拖动查看音频对齐过程" type="range" min="0" max="99" value={Math.round(progress*100)} onChange={e=>change(Number(e.target.value))}/><span className="val">{step+1} / 5</span></div><div className={`feedback ${step===4?'good':''}`}>{alignSteps[step][1]}。拖动时间轴可停在任一阶段查看细节。</div><div className="lc-subfigure-head"><span>PIPELINE VIEW</span><b>整个模型到底接收 Image + Audio，还是 Video + Audio？</b></div><Canvas canvasRef={macroRef} label="多种视觉潜变量配置与音频条件在统一 DiT 中汇合" width={760} height={218} compact/><div className="lc-pipeline-note"><b>答案是“按任务选择视觉输入”。</b>AI2V 把参考图像编码成 reference latent；视频续写把上下文视频编码成 context latent；AT2V 只提供 noise latents。视觉潜变量与噪声在时间维拼接，音频特征压缩到对应潜变量长度后，通过 Audio Cross-Attention 注入。</div></div>;
 };
 
 export const FrameRewardProbe:React.FC<WidgetProps>=()=>{
@@ -141,21 +144,55 @@ export const FrameRewardProbe:React.FC<WidgetProps>=()=>{
 };
 
 export const HandPresence:React.FC<WidgetProps>=()=>{
-  const [hands,setHands]=useState(0);
+  const [hands,setHands]=useState(0);const [pipelineStage,setPipelineStage]=useState(0);const [pipelineAuto,setPipelineAuto]=useState(true);
+  useEffect(()=>{if(!pipelineAuto)return;const timer=window.setInterval(()=>setPipelineStage(v=>(v+1)%5),1700);return()=>window.clearInterval(timer);},[pipelineAuto]);
   const ref=useCanvas(ctx=>{txt(ctx,'首帧手部检查如何接入偏好优化',28,27,c.text,17,true);const nodes=[['I2V / 续写样本',28,150,c.blue],['MediaPipe 检测',215,150,hands?c.green:c.red],['手部样本比例',402,150,hands?c.orange:c.muted],['Per-frame GRPO',589,143,hands?c.green:c.blue]] as const;nodes.forEach((n,i,a)=>{rr(ctx,n[1],44,n[2],42,n[3],9);txt(ctx,n[0],n[1]+14,70,'#fff',12,true);if(i<a.length-1)line(ctx,n[1]+n[2],65,a[i+1][1]-10,65,hands?c.green:c.border,3);});
     rr(ctx,28,112,300,186,'#fff',13);txt(ctx,'条件首帧',48,139,c.blue,13,true);ctx.fillStyle=c.blue;ctx.beginPath();ctx.arc(177,177,31,0,Math.PI*2);ctx.fill();line(ctx,177,208,177,261,c.text,7);line(ctx,177,225,128,260,hands?c.orange:c.text,9);line(ctx,177,225,226,260,hands?c.orange:c.text,9);if(hands){ctx.strokeStyle=c.orange;ctx.lineWidth=4;ctx.strokeRect(111,246,33,29);ctx.strokeRect(210,246,33,29);}txt(ctx,hands?'检测结果：双手可见':'检测结果：未发现可见手部',50,288,hands?c.green:c.red,13,true);
     rr(ctx,360,112,372,84,hands?'#f0faf4':'#f8f9fb',12);txt(ctx,hands?'提高这类样本在偏好优化中的比例':'保持普通采样，不建立手部专项监督',382,142,hands?c.green:c.muted,14,true);txt(ctx,hands?'逐帧奖励可针对手部变形提供信号':'无手首帧无法提供有效的条件手部监督',382,171,hands?c.text:c.muted,12);
     rr(ctx,360,214,372,84,'#fff',12);txt(ctx,'面部质量走哪条路径？',382,242,c.purple,13,true);txt(ctx,'多奖励 GRPO + 数据清洗 + 蒸馏共同改善',382,270,c.text,12,true);txt(ctx,'论文未设置对应的首帧面部检查',382,290,c.muted,11);
   },[hands]);
-  return <div><Canvas canvasRef={ref} label="首帧手部检测接入 Per-frame GRPO 的训练管线"/><ChipRow labels={['首帧无手','首帧有手']} value={hands} onChange={setHands}/><div className={`feedback ${hands?'good':'bad'}`}>{hands?'MediaPipe 检测到可见手部后，训练会提高这类样本的占比，让手部奖励拥有更多有效监督机会。':'该样本仍可参与整体偏好优化，但不会被当作手部专项监督样本。'}</div></div>;
+  const pipelineRef=useCanvas((ctx,time)=>{const stages=[['任务样本','首帧检查'],['策略 Rollout','生成一组视频'],['多奖励模型','得到 rₖ,ⱼ'],['组相对优势','ΣwₖÂₖ,ⱼ'],['Diffusion Policy','Loss → 更新 DiT']] as const;
+    txt(ctx,'宏观视角：首帧筛样与逐帧奖励如何进入一次 GRPO 更新',26,24,c.text,14.5,true);
+    stages.forEach((s,i)=>{const x=25+i*146;const active=i===pipelineStage;rr(ctx,x,50,126,54,active?c.orange:'#fff',9);ctxt(ctx,s[0],x+63,72,active?'#fff':i===4?c.green:c.blue,10.5,true);ctxt(ctx,s[1],x+63,91,active?'#fff':c.muted,8.8);if(i<4)line(ctx,x+126,77,x+143,77,i<pipelineStage?c.green:c.border,2);});
+    const travel=(time%1700)/1700;const startX=25+pipelineStage*146,endX=Math.min(735,startX+126);ctx.fillStyle=c.orange;ctx.beginPath();ctx.arc(startX+12+travel*(endX-startX-24),112,3.5,0,Math.PI*2);ctx.fill();
+    rr(ctx,25,125,205,76,hands?'#eef8f3':'#f6f8fb',9);ctxt(ctx,hands?'MediaPipe：手可见 → 提高采样优先级':'无手首帧 → 保持普通采样',127.5,150,hands?c.green:c.muted,9.5,true);ctxt(ctx,'它改变样本分布，不单独定义 hand loss',127.5,173,c.purple,8.8,true);ctxt(ctx,'手部相关样本增多',127.5,190,c.orange,8.5);
+    rr(ctx,247,125,488,76,'#fff',9);txt(ctx,'每个时间分区 j',266,146,c.blue,9.5,true);txt(ctx,'rₖ,ⱼ → 组内归一化 Âₖ,ⱼ → 加权和 Âtotal,ⱼ',266,168,c.text,10.5,true);txt(ctx,'对应时间分区的优势作用到已存储去噪 transition，形成 diffusion policy loss',266,190,c.green,9.2,true);
+    ctxt(ctx,'局部手部变形得到更直接的训练信号；论文没有公布独立“手部奖励公式”',380,220,c.muted,9.5,true);
+  },[pipelineStage,hands],760,230);
+  return <div><Canvas canvasRef={ref} label="首帧手部检测接入 Per-frame GRPO 的训练管线"/><ChipRow labels={['首帧无手','首帧有手']} value={hands} onChange={setHands}/><div className={`feedback ${hands?'good':'bad'}`}>{hands?'MediaPipe 检测到可见手部后，训练会提高这类样本的占比，让多奖励 GRPO 获得更多包含手部的有效监督机会。':'该样本仍可参与整体偏好优化，但不会被优先选入手部相关样本。'}</div><div className="lc-subfigure-head"><span>TRAINING VIEW</span><b>首帧检查、逐帧奖励与策略损失怎样串起来？</b></div><Canvas canvasRef={pipelineRef} label="首帧手部筛样、策略 rollout、逐帧奖励和扩散策略损失的宏观流程" width={760} height={230} compact/><div className="ctrl"><button className="btn secondary" onClick={()=>setPipelineAuto(v=>!v)}>{pipelineAuto?'暂停宏观动画':'继续宏观动画'}</button><input aria-label="控制 Per-frame GRPO 宏观阶段" type="range" min="0" max="4" value={pipelineStage} onChange={e=>{setPipelineAuto(false);setPipelineStage(Number(e.target.value));}}/><span className="val">{pipelineStage+1} / 5</span></div></div>;
 };
 
 export const NfeRace:React.FC<WidgetProps>=()=>{
-  const [run,setRun]=useState(0);const started=useRef(0);
-  const ref=useCanvas((ctx,time)=>{if(run&&started.current===0)started.current=time;const elapsed=run?(time-started.current)/1000:0;const base=Math.min(1,elapsed/4.5);const fast=Math.min(1,elapsed/.9);txt(ctx,'同一噪声起点 · 相同终点尺度',30,31,c.text,17,true);
-    [['Base',base,150,c.blue],['Fast',fast,8,c.green]].forEach((r,i)=>{const y=90+i*105;txt(ctx,`${r[0]} · ${r[2]} NFE`,32,y-16,r[3] as string,15,true);rr(ctx,32,y,670,28,c.border,14);rr(ctx,32,y,670*(r[1] as number),28,r[3] as string,14);ctx.fillStyle=r[3] as string;ctx.beginPath();ctx.arc(32+670*(r[1] as number),y+14,18,0,Math.PI*2);ctx.fill();});txt(ctx,'NFE 数量 ≠ 端到端耗时',514,310,c.orange,13,true);},[run]);
-  const start=()=>{started.current=0;setRun(v=>v+1);};
-  return <div><Canvas canvasRef={ref} label="Base 与 Fast 前向评估次数对比"/><div className="ctrl"><button className="btn" onClick={start}>从同一噪声开始</button><span className="val">150 vs 8 NFE</span></div><div className="feedback good">Fast 将前向评估次数减少约 18.75 倍；论文未给出足以换算为相同墙钟加速倍数的完整测速。</div></div>;
+  const stages=[
+    {title:'教师定目标',short:'Base 分布',detail:'多步 Base 提供高质量目标分布 pteacher。'},
+    {title:'学生少步生成',short:'8 NFE',detail:'Generator Gθ 从噪声出发，只走 8 次前向得到当前分布 pG。'},
+    {title:'双 Score 比较',short:'real − fake',detail:'Real Score 与 Fake Score 分别估计目标分布和学生分布的方向。'},
+    {title:'反向 KL 更新',short:'pG → pteacher',detail:'两条 score 的差形成更新方向，推动 8 步学生分布靠近教师。'},
+  ] as const;
+  const [stage,setStage]=useState(0);const [auto,setAuto]=useState(true);const stageRef=useRef(0);const autoRef=useRef(true);
+  useEffect(()=>{if(!auto)return;const timer=window.setInterval(()=>setStage(v=>{const next=(v+1)%4;stageRef.current=next;return next;}),2500);return()=>window.clearInterval(timer);},[auto]);
+  const ref=useCanvas((ctx,time)=>{const stage=stageRef.current;const local=autoRef.current?Math.min(1,(time%2500)/1700):1;const teacherCenter=188;const studentCenter=stage===3?286-(98*local):286;
+    const curve=(center:number,color:string,alpha=1)=>{ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();for(let x=54;x<=462;x+=4){const q=(x-center)/55;const y=198-69*Math.exp(-q*q/2);if(x===54)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();ctx.restore();};
+    txt(ctx,'DMD2：用分布匹配把多步扩散蒸馏为 8-NFE 生成器',25,23,c.text,14.5,true);
+    stages.forEach((s,i)=>{const x=25+i*181;const active=i===stage;rr(ctx,x,37,164,43,active?c.orange:'#fff',8);ctxt(ctx,`${i+1}. ${s.title}`,x+82,55,active?'#fff':i===3?c.green:c.blue,9.8,true);ctxt(ctx,s.short,x+82,71,active?'#fff':c.muted,8.2);if(i<3)line(ctx,x+164,59,x+178,59,i<stage?c.green:c.border,2);});
+
+    rr(ctx,25,94,462,124,'#fff',11);txt(ctx,'生成分布',43,116,c.text,11,true);txt(ctx,'pteacher',358,116,c.blue,9,true);txt(ctx,'pG',426,116,c.green,9,true);line(ctx,344,112,354,112,c.blue,3);line(ctx,412,112,422,112,c.green,3);
+    line(ctx,54,198,462,198,c.border,2);curve(teacherCenter,c.blue,stage===1?.32:1);curve(studentCenter,c.green,stage===0?.22:1);
+    if(stage===0){for(let i=0;i<13;i++){const x=108+(i*29)%166,y=188-((i*17)%45);ctx.fillStyle='rgba(39,68,110,.32)';ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();}ctxt(ctx,'Base / teacher：用多步采样刻画目标分布',256,210,c.blue,9.2,true);}
+    if(stage===1){for(let i=0;i<8;i++){const x=62+i*34;ctx.fillStyle=i<7?c.green:'#fff';ctx.strokeStyle=c.green;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,207,4.5,0,Math.PI*2);ctx.fill();ctx.stroke();}txt(ctx,'噪声 → 8 个校正点 → pG',330,211,c.green,8.8,true);}
+    if(stage===2){const sampleX=248;line(ctx,sampleX,139,sampleX,198,c.orange,2,[4,4]);rr(ctx,112,139,104,25,c.blue,7);ctxt(ctx,'Real Score  sreal',164,156,'#fff',8.8,true);rr(ctx,280,139,104,25,c.purple,7);ctxt(ctx,'Fake Score  sfake',332,156,'#fff',8.8,true);line(ctx,216,151,sampleX-7,151,c.blue,2);line(ctx,280,151,sampleX+7,151,c.purple,2);ctxt(ctx,'同一个噪声尺度 xt 上比较两条方向',256,210,c.orange,9.2,true);}
+    if(stage===3){line(ctx,286,177,studentCenter+8,177,c.orange,3);ctxt(ctx,'∇θ DKL(pG ∥ pteacher)  ∝  sreal − sfake',256,210,c.orange,9.2,true);}
+
+    rr(ctx,505,94,230,124,stage===3?'#eef8f3':'#f7f9fc',11);txt(ctx,`STEP ${stage+1}`,524,117,stage===3?c.green:c.orange,9,true);txt(ctx,stages[stage].title,524,142,c.text,14,true);const detailLines=stage===0?['多步 Base 提供','高质量目标分布']:stage===1?['8 次前向先得到','有偏差的 pG']:stage===2?['两个 score 分别看','目标与学生的方向']:['利用方向差更新 Gθ','让 pG 逐渐重合'];detailLines.forEach((s,i)=>txt(ctx,s,524,167+i*20,i===1&&stage===3?c.green:c.muted,10.5,i===1&&stage===3));
+
+  },[],760,228);
+  const nfeRef=useCanvas(ctx=>{txt(ctx,'推理成本单独看：NFE 统计一次采样需要多少次网络前向',25,22,c.text,14,true);
+    txt(ctx,'Base',25,58,c.blue,11,true);rr(ctx,91,37,315,31,'#fff',8);ctxt(ctx,'50 个扩散步 × 每步约 3 次前向',248.5,58,c.text,10.5,true);line(ctx,406,52,429,52,c.blue,2);rr(ctx,433,37,112,31,c.blue,8);ctxt(ctx,'150 NFE',489,58,'#fff',11,true);
+    txt(ctx,'Fast',25,98,c.green,11,true);rr(ctx,91,77,315,31,'#fff',8);ctxt(ctx,'8 个蒸馏采样步 × 每步 1 次前向',248.5,98,c.text,10.5,true);line(ctx,406,92,429,92,c.green,2);rr(ctx,433,77,112,31,c.green,8);ctxt(ctx,'8 NFE',489,98,'#fff',11,true);
+    rr(ctx,570,37,165,71,'#fff7e8',10);ctxt(ctx,'前向次数减少',652.5,61,c.orange,10,true);ctxt(ctx,'约 18.75×',652.5,86,c.orange,18,true);ctxt(ctx,'不等同于墙钟加速倍数',652.5,101,c.muted,8.2);
+  },[],760,122);
+  const choose=(n:number)=>{stageRef.current=n;autoRef.current=false;setStage(n);setAuto(false);};const toggle=()=>setAuto(v=>{autoRef.current=!v;return !v;});
+  return <div><Canvas canvasRef={ref} label="DMD2 教师目标、8 步生成、双 Score 比较和反向 KL 更新" width={760} height={228} compact/><div className="ctrl"><button className="btn secondary" onClick={toggle}>{auto?'暂停自动演示':'继续自动演示'}</button><input aria-label="控制 DMD2 蒸馏阶段" type="range" min="0" max="3" value={stage} onChange={e=>choose(Number(e.target.value))}/><span className="val">{stage+1} / 4 · {stages[stage].title}</span></div><div className="feedback good"><b>{stages[stage].title}：</b>{stages[stage].detail} DMD2 属于生成模型蒸馏，匹配的是生成分布。</div><div className="lc-subfigure-head"><span>INFERENCE COST</span><b>150 NFE 与 8 NFE 分别是怎样算出来的？</b></div><Canvas canvasRef={nfeRef} label="Base 150 NFE 与 Fast 8 NFE 的独立计算对比" width={760} height={122} compact/><div className="lc-pipeline-note">这里比较的是 <b>Network Function Evaluations</b>：Base 的 50 个扩散步包含约 150 次网络前向，Fast 直接以 8 次前向完成采样。NFE 减少约 18.75 倍，实际墙钟加速还会受到硬件、序列长度和工程实现影响。</div></div>;
 };
 
 const roles=[['Generator LoRA','W + ΔWᴳ','生成 8-NFE 样本'],['Fake Score LoRA','W + ΔWᶠ','估计生成分布的 score'],['Real Score','仅使用 W','教师分布提供 real-score guidance']];
@@ -182,8 +219,16 @@ export const SpeakerRouting:React.FC<WidgetProps>=()=>{
     people.forEach((person,i)=>{ctx.fillStyle=person.color;ctx.beginPath();ctx.arc(person.x,133,29,0,Math.PI*2);ctx.fill();const bgMoving=i===2&&stage===2;const mouth=i<2&&stage>=1?pulse:bgMoving?pulse:2;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(person.x,142,9,mouth,0,0,Math.PI*2);ctx.stroke();ctx.strokeStyle=stage===0?c.orange:stage===3&&i===2?c.purple:c.border;ctx.lineWidth=3;ctx.strokeRect(person.x-47,96,94,91);rr(ctx,person.x-62,190,124,40,c.bg,7);ctxt(ctx,stage===0?`Track ${i<2?String.fromCharCode(65+i):'BG'}`:person.name,person.x,207,person.color,12,true);if(stage>=1&&i<2)ctxt(ctx,'ASD: speaking',person.x,224,c.green,10,true);});
     if(stage===2){rr(ctx,492,78,222,21,'#fff0f2',7);ctxt(ctx,'目标音频错误覆盖背景区域',603,93,c.red,10,true);}if(stage===3){rr(ctx,492,78,222,21,'#f0f8f4',7);ctxt(ctx,'背景类别 → 专用静音条件',603,93,c.purple,10,true);}txt(ctx,stage===3?'背景嘴部静止，仍可保留视线、呼吸和姿态微动':'区域与音轨的绑定会逐步建立',28,323,stage===3?c.green:c.muted,12,true);
   },[]);
+  const macroRef=useCanvas((ctx,time)=>{const stage=stageRef.current;const active=stage===3?4:stage;const nodes=[['人物区域','Boxes / 类别'],['空间关联','L-RoPE + Ref Attn'],['音频条件','A / B / Silent'],['基础训练目标','Flow Matching MSE'],['推理结果','背景不随语音张嘴']] as const;
+    txt(ctx,'宏观视角：Silent Condition 如何从训练条件变成推理行为',26,23,c.text,14.5,true);
+    nodes.forEach((n,i)=>{const x=24+i*146;const on=i===active;const fail=stage===2&&i===2;rr(ctx,x,45,126,50,on?(fail?c.red:i===4?c.green:c.orange):'#fff',8);ctxt(ctx,n[0],x+63,65,on?'#fff':i===2?c.purple:c.blue,10,true);ctxt(ctx,n[1],x+63,83,on?'#fff':c.muted,7.8);if(i<4)line(ctx,x+126,70,x+143,70,i<active?c.green:c.border,2);});
+    rr(ctx,24,113,220,72,'#f7f9fc',9);txt(ctx,'训练样本中的条件配对',41,135,c.blue,10.5,true);txt(ctx,'目标 A ↔ Speech A',41,155,c.green,9.5);txt(ctx,'目标 B ↔ Speech B',41,172,c.green,9.5);txt(ctx,'背景区域 ↔ Silent Track',132,155,c.purple,9.5,true);
+    rr(ctx,263,113,224,72,stage===2?'#fff0f2':'#faf8ff',9);txt(ctx,'Audio Cross-Attention',280,135,stage===2?c.red:c.purple,10.5,true);txt(ctx,stage===2?'缺少背景条件 → 目标音频可泄漏':'区域 query 只读取对应 audio tokens',280,157,stage===2?c.red:c.text,9.2);txt(ctx,'Reference attention 建立人物区域对应',280,175,c.muted,8.8);
+    rr(ctx,506,113,230,72,'#eef8f3',9);txt(ctx,'同一个 Base Flow-Matching Loss',523,135,c.green,10.2,true);txt(ctx,'L = ‖vpred(xₜ,c,t) − vₜ‖²',523,157,c.text,10,true);txt(ctx,'c 中包含区域对应的 Speech / Silent',523,175,c.muted,8.8);
+    const mouth=stage===2?5+Math.abs(Math.sin(time/150))*7:2;ctx.fillStyle=stage===2?c.red:c.purple;ctx.beginPath();ctx.arc(380,207,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(380,211,5,mouth/3,0,0,Math.PI*2);ctx.stroke();ctxt(ctx,stage===2?'串音：背景被 Speech 驱动':'学到：Silent 不触发语音嘴部运动',520,212,stage===2?c.red:c.green,9.5,true);
+  },[],760,220);
   const choose=(n:number)=>{stageRef.current=n;setStage(n);setAuto(false);};
-  return <div><Canvas canvasRef={ref} label="多人跟踪、ASD、注意力绑定与 Silent Condition 自动动画"/><div className="ctrl"><button className="btn secondary" onClick={()=>setAuto(v=>!v)}>{auto?'暂停自动演示':'继续自动演示'}</button><input aria-label="控制 Silent Condition 绑定阶段" type="range" min="0" max="3" value={stage} onChange={e=>choose(Number(e.target.value))}/><span className="val">{stage+1} / 4 · {titles[stage]}</span></div><div className="feedback good">推理时，L-RoPE 与参考注意力把两个目标区域分别连接 Audio A、Audio B；额外的背景框类别避免区域混淆，Silent 音轨再为所有非目标人物提供明确条件。</div><div className="lc-evidence-grid"><span>ByteTrack：人物轨迹</span><span>ASD：说话区间</span><span>L-RoPE：区域—音轨</span><span>Silent：背景条件</span></div></div>;
+  return <div><Canvas canvasRef={ref} label="多人跟踪、ASD、注意力绑定与 Silent Condition 自动动画"/><div className="ctrl"><button className="btn secondary" onClick={()=>setAuto(v=>!v)}>{auto?'暂停自动演示':'继续自动演示'}</button><input aria-label="控制 Silent Condition 绑定阶段" type="range" min="0" max="3" value={stage} onChange={e=>choose(Number(e.target.value))}/><span className="val">{stage+1} / 4 · {titles[stage]}</span></div><div className="feedback good">推理时，L-RoPE 与参考注意力把两个目标区域分别连接 Audio A、Audio B；额外的背景框类别避免区域混淆，Silent 音轨再为所有非目标人物提供明确条件。</div><div className="lc-subfigure-head"><span>TRAINING VIEW</span><b>训练时怎样学会“背景人物听到静音就不要跟着说话”？</b></div><Canvas canvasRef={macroRef} label="多人区域音频绑定、Flow Matching 损失与 Silent Condition 推理效果" width={760} height={220} compact/><div className="lc-pipeline-note"><b>论文没有额外定义一项 Silent loss。</b>Silent 是条件设计：背景区域在训练数据中显式绑定静音音轨，条件 c 连同视频潜变量进入原有 Flow Matching MSE；模型由这些配对学到静音条件不应触发语音驱动的嘴部运动。</div><div className="lc-evidence-grid"><span>ByteTrack：人物轨迹</span><span>ASD：说话区间</span><span>L-RoPE：区域—音轨</span><span>Silent：背景条件</span></div></div>;
 };
 
 const filterSteps=[
@@ -198,7 +243,7 @@ export const DataCuration:React.FC<WidgetProps>=()=>{
   const ref=useCanvas((ctx,time)=>{txt(ctx,'数据质量决定监督质量',28,26,c.text,17,true);filterSteps.forEach((item,i)=>{const x=28+i*180;const active=i<=step;rr(ctx,x,43,155,38,active?(i===step?c.orange:c.blue):'#fff',9);txt(ctx,`${i+1}. ${item.title}`,x+19,68,active?'#fff':c.text,13,true);if(i<3)line(ctx,x+155,62,x+178,62,active?c.green:c.border,3);});
     if(step===0){sourceCards.forEach((s,i)=>{const col=i%3,row=Math.floor(i/3),x=28+col*244,y=105+row*82;rr(ctx,x,y,216,68,'#fff',10);txt(ctx,s[0],x+15,y+23,[c.blue,c.green,c.orange,c.purple,c.red,c.green][i],13,true);txt(ctx,s[1],x+66,y+23,c.muted,11);txt(ctx,`→ ${s[2]}`,x+15,y+51,c.text,12,true);});txt(ctx,'来源按“能为训练补什么能力”组织，直接混合容易带入分布噪声',28,307,c.orange,12,true);
     }else if(step===1){const tags=[['人物结构','人数 · 人脸 · 身体构图'],['音频状态','语音 · 人声分离'],['音画同步','偏移量 · 置信度'],['视觉质量','压缩 · 字幕 · 边框'],['镜头运动','景别 · 速度 · 运镜'],['语义字幕','全局 · 局部时间段']];tags.forEach((s,i)=>{const col=i%3,row=Math.floor(i/3),x=28+col*244,y=111+row*76;rr(ctx,x,y,216,61,'#fff',10);txt(ctx,s[0],x+15,y+23,c.blue,12,true);txt(ctx,s[1],x+15,y+46,c.muted,11);});rr(ctx,204,269,352,38,c.green,9);txt(ctx,'输出：可检索、可组合、可复用的结构化元数据',230,294,'#fff',12,true);
-    }else if(step===2){txt(ctx,'完整视频通过离线检查后，采样窗口仍可能落在坏片段上',40,111,c.muted,12);const bad=[3,7,10],segW=53;for(let i=0;i<12;i++){const x=50+i*segW;rr(ctx,x,150,44,58,bad.includes(i)?c.red:c.light,7);txt(ctx,bad.includes(i)?['转场','闪白','跳帧'][bad.indexOf(i)]:String(i+1),x+8,184,bad.includes(i)?'#fff':c.text,10,true);}const start=Math.floor((time/900)%9);const hasBad=bad.some(i=>i>=start&&i<start+4);ctx.strokeStyle=hasBad?c.red:c.green;ctx.lineWidth=5;ctx.strokeRect(46+start*segW,142,4*segW,74);txt(ctx,`当前训练窗口：片段 ${start+1}–${start+4}`,50,244,hasBad?c.red:c.green,13,true);rr(ctx,450,232,270,43,hasBad?c.red:c.green,9);txt(ctx,hasBad?'拦截：重新采样':'通过：送入训练',526,259,'#fff',13,true);txt(ctx,'在线检查项：时长 · 帧率 · 分辨率 · 曝光 · 边框 · 跳变 · 运动强度',50,306,c.text,11,true);
+    }else if(step===2){txt(ctx,'完整视频通过离线检查后，采样窗口仍可能落在坏片段上；干净窗口则直接通过',40,111,c.muted,12);const bad=[3,10],segW=53;for(let i=0;i<12;i++){const x=50+i*segW;rr(ctx,x,150,44,58,bad.includes(i)?c.red:c.light,7);txt(ctx,bad.includes(i)?['转场','跳帧'][bad.indexOf(i)]:String(i+1),x+8,184,bad.includes(i)?'#fff':c.text,10,true);}const start=Math.floor((time/1100)%9);const hasBad=bad.some(i=>i>=start&&i<start+4);ctx.strokeStyle=hasBad?c.red:c.green;ctx.lineWidth=5;ctx.strokeRect(46+start*segW,142,4*segW,74);txt(ctx,`当前训练窗口：片段 ${start+1}–${start+4}`,50,244,hasBad?c.red:c.green,13,true);rr(ctx,450,232,270,43,hasBad?c.red:c.green,9);ctxt(ctx,hasBad?'拦截：包含异常帧，重新采样':'通过：窗口内没有异常帧',585,259,'#fff',12.5,true);txt(ctx,'在线检查项：时长 · 帧率 · 分辨率 · 曝光 · 边框 · 跳变 · 运动强度',50,306,c.text,11,true);
     }else{const pipes=[['多人数据','ByteTrack → ASD','保留无重叠说话段'],['静音数据','Qwen3-Omni → Qwen3-VL','双模型一致才保留'],['情绪数据','Qwen3-Omni → EmotiEffLib','过滤弱峰值与噪声']];pipes.forEach((s,i)=>{const x=28+i*244;rr(ctx,x,112,216,143,'#fff',11);txt(ctx,s[0],x+16,140,[c.blue,c.purple,c.orange][i],13,true);rr(ctx,x+16,158,184,35,[c.blue,c.purple,c.orange][i],8);txt(ctx,s[1],x+29,181,'#fff',11,true);line(ctx,x+108,193,x+108,215,c.green,3);txt(ctx,s[2],x+20,238,c.text,11,true);});txt(ctx,'通用数据池提供基础能力，专项管线补足多人归因、静音微动和情绪表现',78,305,c.green,12,true);}
   },[step]);
   return <div><Canvas canvasRef={ref} label="两阶段数据清洗流程"/><div className="ctrl"><button className="btn secondary" onClick={()=>setStep(Math.max(0,step-1))} disabled={step===0}>上一步</button><span className="val">{step+1} / 4 · {filterSteps[step].title}</span><button className="btn" onClick={()=>setStep(Math.min(3,step+1))} disabled={step===3}>下一步</button></div><div className={`feedback ${step===3?'good':''}`}>{filterSteps[step].desc}</div></div>;
@@ -206,22 +251,22 @@ export const DataCuration:React.FC<WidgetProps>=()=>{
 
 const metrics=[
   {name:'单人人类相似度',base:3.389,fast:3.336,max:4,unit:'',higher:true},
+  {name:'协调性问题率',base:44.2,fast:45.0,max:60,unit:'%',higher:false},
   {name:'多人人类相似度',base:2.676,fast:2.730,max:4,unit:'',higher:true},
   {name:'合理性问题率',base:51.5,fast:32.4,max:60,unit:'%',higher:false},
-  {name:'协调性问题率',base:44.2,fast:45.0,max:60,unit:'%',higher:false},
   {name:'稳定性问题率',base:12.3,fast:4.3,max:20,unit:'%',higher:false},
   {name:'一致性问题率',base:6.2,fast:5.9,max:10,unit:'%',higher:false},
 ];
 export const ResultConsole:React.FC<WidgetProps>=()=>{
-  const [metric,setMetric]=useState(4);const m=metrics[metric];const fastWins=m.higher?m.fast>m.base:m.fast<m.base;
-  const ref=useCanvas(ctx=>{txt(ctx,m.name,30,29,c.text,18,true);rr(ctx,600,10,132,28,m.higher?'#eef4fb':'#fff6e8',14);txt(ctx,m.higher?'越高越好 ↑':'越低越好 ↓',622,29,m.higher?c.blue:c.orange,12,true);const cards=[{name:'BASE',nfe:'150 NFE',value:m.base,color:c.blue,x:28},{name:'FAST',nfe:'8 NFE',value:m.fast,color:fastWins?c.green:c.orange,x:402}];cards.forEach(card=>{rr(ctx,card.x,54,330,216,'#fff',14);rr(ctx,card.x,54,330,9,card.color,7);txt(ctx,card.name,card.x+22,90,card.color,15,true);txt(ctx,card.nfe,card.x+232,90,c.muted,12,true);txt(ctx,`${card.value}${m.unit}`,card.x+22,137,card.color,32,true);line(ctx,card.x+22,170,card.x+308,170,c.border,12);line(ctx,card.x+22,170,card.x+22+286*card.value/m.max,170,card.color,12);ctx.fillStyle=card.color;ctx.beginPath();ctx.arc(card.x+22+286*card.value/m.max,170,9,0,Math.PI*2);ctx.fill();txt(ctx,card.name==='BASE'?'教师质量基准':'蒸馏部署版本',card.x+22,211,c.text,13,true);txt(ctx,card.name==='BASE'?'表现力与细节更充分':fastWins?'当前指标更优':'当前指标存在取舍',card.x+22,239,card.name==='BASE'?c.blue:card.color,12);});const delta=Math.abs(m.fast-m.base);rr(ctx,247,284,266,32,fastWins?'#e8f6ee':'#fff3e1',16);txt(ctx,`Fast ${fastWins?'改善':'变化'} ${delta.toFixed(metric<2?3:1)}${m.unit}`,327,305,fastWins?c.green:c.orange,12,true);txt(ctx,'Table 2',30,311,c.muted,11,true);},[metric]);
+  const [metric,setMetric]=useState(0);const m=metrics[metric];const fastWins=m.higher?m.fast>m.base:m.fast<m.base;
+  const ref=useCanvas(ctx=>{txt(ctx,m.name,30,29,c.text,18,true);rr(ctx,600,10,132,28,m.higher?'#eef4fb':'#fff6e8',14);txt(ctx,m.higher?'越高越好 ↑':'越低越好 ↓',622,29,m.higher?c.blue:c.orange,12,true);const cards=[{name:'BASE',nfe:'150 NFE',value:m.base,color:fastWins?c.blue:c.green,x:28},{name:'FAST',nfe:'8 NFE',value:m.fast,color:fastWins?c.green:c.orange,x:402}];cards.forEach(card=>{rr(ctx,card.x,54,330,216,'#fff',14);rr(ctx,card.x,54,330,9,card.color,7);txt(ctx,card.name,card.x+22,90,card.color,15,true);txt(ctx,card.nfe,card.x+232,90,c.muted,12,true);txt(ctx,`${card.value}${m.unit}`,card.x+22,137,card.color,32,true);line(ctx,card.x+22,170,card.x+308,170,c.border,12);line(ctx,card.x+22,170,card.x+22+286*card.value/m.max,170,card.color,12);ctx.fillStyle=card.color;ctx.beginPath();ctx.arc(card.x+22+286*card.value/m.max,170,9,0,Math.PI*2);ctx.fill();txt(ctx,card.name==='BASE'?'Base 质量版本':'Fast 部署版本',card.x+22,211,c.text,13,true);txt(ctx,card.name==='BASE'?(fastWins?'当前指标略低':'当前指标更优'):(fastWins?'当前指标更优':'当前指标略低'),card.x+22,239,card.color,12,true);});const delta=Math.abs(m.fast-m.base);rr(ctx,247,284,266,32,fastWins?'#e8f6ee':'#eef4fb',16);ctxt(ctx,`${fastWins?'Fast':'Base'} 领先 ${delta.toFixed(m.unit?1:3)}${m.unit}`,380,305,fastWins?c.green:c.blue,12,true);txt(ctx,'Table 2',30,311,c.muted,11,true);},[metric]);
   const summaries=[
     '单人相似度小幅下降 0.053，Fast 基本保住了主观观感。',
+    '协调性问题率中 Base 低 0.8 个百分点，这一项体现了蒸馏的轻微取舍。',
     '多人相似度提高 0.054，Fast 在这一项略高于 Base。',
     '合理性问题率下降 19.1 个百分点，是 Fast 最明显的改善之一。',
-    '协调性问题率上升 0.8 个百分点，这一项体现了蒸馏带来的质量取舍。',
     '稳定性问题率从 12.3% 降至 4.3%，短步生成更稳定。',
     '一致性问题率下降 0.3 个百分点，两种版本接近。',
   ];
-  return <div><Canvas canvasRef={ref} label="Base 与 Fast 论文结果卡片对比"/><ChipRow labels={metrics.map(x=>x.name)} value={metric} onChange={setMetric}/><div className={`feedback ${fastWins?'good':'bad'}`}>{summaries[metric]} 表中数值来自论文 Table 2，评测包含 508 组图像—音频输入。</div><div className="lc-model-summary"><div className="lc-model-card base"><b>Base · 150 NFE</b><span>动作多样性、微表情、口型细节和镜头动态更丰富，适合追求表现力的场景。</span></div><div className="lc-model-card fast"><b>Fast · 8 NFE</b><span>稳定性更高，手部、身体和面部畸变更少；前向评估次数减少约 18.75 倍，更适合规模化部署。</span></div></div><div className="lc-evidence-grid"><span>770 名众包评测者</span><span>13,240 条判断</span><span>10 名领域专家</span><span>口型以 0.5× 复核</span></div></div>;
+  return <div><Canvas canvasRef={ref} label="Base 与 Fast 论文结果卡片对比"/><div className="lc-metric-groups"><div className="base"><b>Base 略优 · 先讲表现力</b><div>{[0,1].map(i=><button key={metrics[i].name} className={`chip ${metric===i?'selected':''}`} onClick={()=>setMetric(i)}>{metrics[i].name}</button>)}</div></div><div className="fast"><b>Fast 更优 · 再讲部署性</b><div>{[2,3,4,5].map(i=><button key={metrics[i].name} className={`chip ${metric===i?'selected':''}`} onClick={()=>setMetric(i)}>{metrics[i].name}</button>)}</div></div></div><div className={`feedback ${fastWins?'good':'lc-base-win'}`}>{summaries[metric]} 表中数值来自论文 Table 2，评测包含 508 组图像—音频输入。</div><div className="lc-model-summary"><div className="lc-model-card base"><b>Base · 150 NFE</b><span>动作多样性、微表情、口型细节和镜头动态更丰富，适合追求表现力的场景。</span></div><div className="lc-model-card fast"><b>Fast · 8 NFE</b><span>稳定性更高，手部、身体和面部畸变更少；前向评估次数减少约 18.75 倍，更适合规模化部署。</span></div></div><div className="lc-evidence-grid"><span>770 名众包评测者</span><span>13,240 条判断</span><span>10 名领域专家</span><span>口型以 0.5× 复核</span></div></div>;
 };

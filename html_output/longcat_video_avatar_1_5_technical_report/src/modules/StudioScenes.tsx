@@ -4,6 +4,8 @@ import type { WidgetProps } from './registry';
 
 const W = 560;
 const H = 210;
+const SCENE_W = 660;
+const SCENE_H = 178;
 const c = {
   bg: '#f5f8f0', panel: '#ffffff', booth: '#b8c9a7', dark: '#76906a',
   blue: '#27446e', green: '#228d5c', red: '#c43f52', orange: '#d97706',
@@ -172,7 +174,7 @@ function drawHeroPipeline(ctx: CanvasRenderingContext2D, variant: 'demo' | 'prod
     ctx.fillStyle = c.green;
     ctx.beginPath(); ctx.arc(pulseX, 109, 3.5, 0, Math.PI * 2); ctx.fill();
 
-    microLabel(ctx, 'PROGRESSIVE TRAINING', 34, 160, '#5d796f');
+    microLabel(ctx, 'PROGRESSIVE TRAINING', 176, 166, '#5d796f');
     const stages = [
       ['DATA', 34, 42, c.green, 8.2],
       ['BASE TRAINING', 88, 84, c.blue, 7.8],
@@ -181,11 +183,11 @@ function drawHeroPipeline(ctx: CanvasRenderingContext2D, variant: 'demo' | 'prod
     ] as const;
     stages.forEach(([text, x, w, color, size], i) => {
       ctx.fillStyle = i === 0 ? '#eef6f2' : '#f3f6fa';
-      roundRect(ctx, x, 169, w, 17, 8);
-      centeredLabel(ctx, text, x + w / 2, 177.5, color, size);
-      if (i < stages.length - 1) arrow(ctx, x + w + 3, 177.5, stages[i + 1][1] - 3, 177.5, '#9babc0');
+      roundRect(ctx, x, 174, w, 17, 8);
+      centeredLabel(ctx, text, x + w / 2, 182.5, color, size);
+      if (i < stages.length - 1) arrow(ctx, x + w + 3, 182.5, stages[i + 1][1] - 3, 182.5, '#9babc0');
     });
-    arrow(ctx, 419, 169, 462, 142, c.green, true);
+    arrow(ctx, 419, 174, 462, 142, c.green, true);
     centeredLabel(ctx, '† 仅用于多人背景区域', 284, 151, c.purple, 8, false);
   }
 }
@@ -213,62 +215,95 @@ function drawWave(ctx: CanvasRenderingContext2D, x: number, y: number, w: number
 
 const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) => {
   const ref = useRef<HTMLCanvasElement>(null);
+  const isHero = variant === 'demo' || variant === 'production';
+  const width = isHero ? W : SCENE_W;
+  const height = isHero ? H : SCENE_H;
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
-    const ctx = setupCanvas(canvas, W, H); let raf = 0; let running = false;
+    const ctx = setupCanvas(canvas, width, height); let raf = 0; let running = false;
     const draw = (now: number) => {
       const t = now / 1000; const p = (Math.sin(t * 1.8) + 1) / 2;
-      if (variant === 'demo' || variant === 'production') {
+      if (isHero) {
         drawHeroPipeline(ctx, variant, t);
         if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
         if (running) raf = requestAnimationFrame(draw);
         return;
       }
-      ctx.clearRect(0, 0, W, H); ctx.fillStyle = c.bg; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = c.panel; roundRect(ctx, 18, 18, 524, 174, 14);
-      ctx.strokeStyle = c.border; ctx.lineWidth = 2; ctx.strokeRect(28, 30, 504, 150);
+      ctx.clearRect(0, 0, width, height); ctx.fillStyle = c.bg; ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = c.panel; roundRect(ctx, 3, 3, 654, 172, 10);
+      ctx.strokeStyle = c.border; ctx.lineWidth = 1.5; ctx.strokeRect(9, 9, 642, 160);
 
       if (variant === 'audition') {
-        const items = [['嘴型', c.blue], ['肢体', c.red], ['成本', c.orange], ['多人', c.purple], ['长时', c.green]] as const;
-        items.forEach(([name, color], i) => {
-          const x = 62 + i * 98; ctx.fillStyle = color; ctx.globalAlpha = 0.25 + 0.65 * ((p + i * .19) % 1); roundRect(ctx, x, 72, 72, 58, 10); ctx.globalAlpha = 1;
-          label(ctx, name, x + 20, 106, color, true);
+        const progress = (t % 6) / 6;
+        microLabel(ctx, 'RESEARCH READINESS', 28, 28, c.muted);
+        microLabel(ctx, 'PRODUCTION READINESS', 508, 28, c.green);
+
+        ctx.fillStyle = '#f3f6fb'; roundRect(ctx, 26, 38, 128, 76, 10);
+        ctx.fillStyle = c.blue; roundRect(ctx, 26, 38, 5, 76, 3);
+        centeredLabel(ctx, '研究 Demo', 91, 61, c.blue, 13);
+        centeredLabel(ctx, '固定输入 · 短片', 91, 85, c.muted, 9, false);
+        centeredLabel(ctx, '一次成功', 91, 101, c.muted, 9, false);
+
+        ctx.fillStyle = '#eef8f3'; roundRect(ctx, 506, 38, 128, 76, 10);
+        ctx.fillStyle = c.green; roundRect(ctx, 629, 38, 5, 76, 3);
+        centeredLabel(ctx, '商业系统', 570, 61, c.green, 13);
+        centeredLabel(ctx, '开放输入 · 长时', 570, 85, c.muted, 9, false);
+        centeredLabel(ctx, '持续交付', 570, 101, c.muted, 9, false);
+
+        const gates = ['口型', '结构', '成本', '归因', '长时'];
+        const startX = 205; const gap = 64;
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(155, 77); ctx.lineTo(505, 77); ctx.stroke();
+        gates.forEach((name, i) => {
+          const x = startX + i * gap;
+          const passed = progress * 5 >= i + 0.5;
+          ctx.fillStyle = passed ? c.green : '#fff';
+          ctx.strokeStyle = passed ? c.green : '#b7c3d3';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(x, 77, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          if (passed) {
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(x - 4, 77); ctx.lineTo(x - 1, 81); ctx.lineTo(x + 5, 73); ctx.stroke();
+          }
+          centeredLabel(ctx, name, x, 103, passed ? c.green : c.muted, 8.5, true);
         });
-        label(ctx, '五项同时过关，才是产品验收', 158, 158, c.text, true);
+        const pulseX = 155 + progress * 350;
+        ctx.fillStyle = c.orange; ctx.beginPath(); ctx.arc(pulseX, 77, 4.5, 0, Math.PI * 2); ctx.fill();
+        centeredLabel(ctx, '五项可靠性同时成立，研究能力才具备产品形态', 330, 148, c.text, 11.5, true);
       } else if (variant === 'phoneme') {
-        drawSinger(ctx, 102, 96, c.blue, p); drawMic(ctx, 148, 98); drawWave(ctx, 202, 90, 290, 18 + p * 12, t * 5, c.green);
-        ['起音', '爆破', '收尾'].forEach((x, i) => label(ctx, x, 220 + i * 105, 145, i === Math.floor(p * 2.99) ? c.orange : c.muted, true));
+        drawSinger(ctx, 96, 69, c.blue, p); drawMic(ctx, 150, 71); drawWave(ctx, 215, 70, 385, 16 + p * 10, t * 5, c.green);
+        ['起音', '爆破', '收尾'].forEach((x, i) => label(ctx, x, 230 + i * 145, 132, i === Math.floor(p * 2.99) ? c.orange : c.muted, true));
       } else if (variant === 'review') {
-        const bad = Math.floor(p * 7.99); for (let i = 0; i < 8; i++) { const x = 48 + i * 61; ctx.fillStyle = i === bad ? c.red : c.booth; roundRect(ctx, x, 73, 46, 62, 8); label(ctx, String(i + 1), x + 18, 108, i === bad ? '#fff' : c.text, true); }
-        ctx.strokeStyle = c.orange; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(71 + bad * 61, 104, 31, 0, Math.PI * 2); ctx.stroke(); label(ctx, '逐帧定位', 235, 159, c.orange, true);
+        const bad = Math.floor(p * 7.99); for (let i = 0; i < 8; i++) { const x = 43 + i * 72; ctx.fillStyle = i === bad ? c.red : c.booth; roundRect(ctx, x, 49, 52, 61, 8); centeredLabel(ctx, String(i + 1), x + 26, 79, i === bad ? '#fff' : c.text, 13, true); }
+        ctx.strokeStyle = c.orange; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(69 + bad * 72, 79, 34, 0, Math.PI * 2); ctx.stroke(); centeredLabel(ctx, '整段总分找不到坏帧；逐帧奖励能圈出具体位置', 330, 145, c.orange, 11.5, true);
       } else if (variant === 'distill') {
-        const phase=(t%4)/4; const teacherX=58+phase*444; const anchors=8;
-        label(ctx,'教师模型给出完整分布方向',58,53,c.blue,true);
-        ctx.strokeStyle=c.blue;ctx.lineWidth=2;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(58,81);ctx.bezierCurveTo(178,35,322,130,502,74);ctx.stroke();ctx.setLineDash([]);
-        for(let i=0;i<30;i++){const x=58+i*(444/29);ctx.fillStyle=c.blue;ctx.globalAlpha=.25+.5*(i/29);ctx.beginPath();ctx.arc(x,81+Math.sin(i*.55)*18,2.5,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
-        ctx.fillStyle=c.blue;ctx.beginPath();ctx.arc(teacherX,81+Math.sin(phase*29*.55)*18,7,0,Math.PI*2);ctx.fill();
-        label(ctx,'学生模型学习 8 个关键校正点',58,129,c.green,true);
-        ctx.strokeStyle=c.border;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(58,154);ctx.lineTo(502,154);ctx.stroke();
-        for(let i=0;i<anchors;i++){const x=58+i*(444/(anchors-1));const active=i<=Math.floor(phase*anchors);ctx.fillStyle=active?c.green:'#fff';ctx.strokeStyle=c.green;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,154,active?8:6,0,Math.PI*2);ctx.fill();ctx.stroke();}
-        label(ctx,'DMD2：让短链生成分布靠近教师分布',139,184,c.orange,true);
+        const phase=(t%4)/4; const teacherX=45+phase*570; const anchors=8;
+        label(ctx,'教师：多步采样刻画完整分布',45,28,c.blue,true);
+        ctx.strokeStyle=c.blue;ctx.lineWidth=2;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(45,56);ctx.bezierCurveTo(205,15,398,104,615,50);ctx.stroke();ctx.setLineDash([]);
+        for(let i=0;i<34;i++){const x=45+i*(570/33);ctx.fillStyle=c.blue;ctx.globalAlpha=.25+.5*(i/33);ctx.beginPath();ctx.arc(x,56+Math.sin(i*.55)*15,2.5,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+        ctx.fillStyle=c.blue;ctx.beginPath();ctx.arc(teacherX,56+Math.sin(phase*33*.55)*15,7,0,Math.PI*2);ctx.fill();
+        label(ctx,'学生：8 个关键校正点逼近教师分布',45,104,c.green,true);
+        ctx.strokeStyle=c.border;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(45,128);ctx.lineTo(615,128);ctx.stroke();
+        for(let i=0;i<anchors;i++){const x=45+i*(570/(anchors-1));const active=i<=Math.floor(phase*anchors);ctx.fillStyle=active?c.green:'#fff';ctx.strokeStyle=c.green;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,128,active?7:5.5,0,Math.PI*2);ctx.fill();ctx.stroke();}
+        centeredLabel(ctx,'DMD2：让短链生成分布靠近教师分布',330,158,c.orange,11.5,true);
       } else if (variant === 'routing') {
-        [110, 280, 450].forEach((x, i) => drawSinger(ctx, x, 83, i === 2 ? c.purple : c.blue, i === 2 ? .05 : p));
-        ctx.strokeStyle = c.green; ctx.lineWidth = 4; [[92,154,110,108],[258,154,280,108]].forEach(v=>{ctx.beginPath();ctx.moveTo(v[0],v[1]);ctx.lineTo(v[2],v[3]);ctx.stroke();});
-        ctx.strokeStyle = c.purple; ctx.beginPath(); ctx.moveTo(468,154); ctx.lineTo(450,108); ctx.stroke();
-        label(ctx, 'Audio A', 65, 171, c.green, true); label(ctx, 'Audio B', 232, 171, c.green, true); label(ctx, 'Silent', 438, 171, c.purple, true);
+        [115, 330, 545].forEach((x, i) => drawSinger(ctx, x, 57, i === 2 ? c.purple : c.blue, i === 2 ? .05 : p));
+        ctx.strokeStyle = c.green; ctx.lineWidth = 4; [[98,126,115,82],[313,126,330,82]].forEach(v=>{ctx.beginPath();ctx.moveTo(v[0],v[1]);ctx.lineTo(v[2],v[3]);ctx.stroke();});
+        ctx.strokeStyle = c.purple; ctx.beginPath(); ctx.moveTo(562,126); ctx.lineTo(545,82); ctx.stroke();
+        label(ctx, 'Audio A', 68, 151, c.green, true); label(ctx, 'Audio B', 283, 151, c.green, true); label(ctx, 'Silent', 530, 151, c.purple, true);
       } else if (variant === 'cleaning') {
-        drawWave(ctx, 54, 105, 450, 24, t * 2, c.blue); const x = 70 + p * 410;
-        ctx.fillStyle = c.green; ctx.globalAlpha = .18; roundRect(ctx, 54, 60, Math.max(15, x - 54), 90, 8); ctx.globalAlpha = 1;
-        ctx.strokeStyle = c.orange; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, 53); ctx.lineTo(x, 157); ctx.stroke(); label(ctx, '窗口级质检', x - 38, 177, c.orange, true);
+        drawWave(ctx, 45, 79, 570, 22, t * 2, c.blue); const x = 62 + p * 535;
+        ctx.fillStyle = c.green; ctx.globalAlpha = .18; roundRect(ctx, 45, 36, Math.max(15, x - 45), 86, 8); ctx.globalAlpha = 1;
+        ctx.strokeStyle = c.orange; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, 29); ctx.lineTo(x, 131); ctx.stroke(); centeredLabel(ctx, '在线窗口级质检', x, 154, c.orange, 11, true);
       } else {
-        ctx.fillStyle='#f7f9fc';roundRect(ctx,48,49,216,112,12);ctx.fillStyle=c.blue;roundRect(ctx,48,49,216,8,8);
-        label(ctx,'BASE',68,80,c.blue,true);label(ctx,'150 NFE',174,80,c.orange,true);
-        label(ctx,'动作与镜头更丰富',68,111,c.text,true);label(ctx,'细腻表情 · 口型细节',68,137,c.muted);
-        ctx.fillStyle='#f4fbf7';roundRect(ctx,296,49,216,112,12);ctx.fillStyle=c.green;roundRect(ctx,296,49,216,8,8);
-        label(ctx,'FAST',316,80,c.green,true);label(ctx,'8 NFE',430,80,c.green,true);
-        label(ctx,'稳定性与合理性更强',316,111,c.text,true);label(ctx,'低畸变 · 适合部署',316,137,c.muted);
-        ctx.strokeStyle=c.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(264,105);ctx.lineTo(296,105);ctx.stroke();
-        label(ctx,'表现力与部署效率的权衡',177,184,c.orange,true);
+        ctx.fillStyle='#f7f9fc';roundRect(ctx,33,31,282,105,12);ctx.fillStyle=c.blue;roundRect(ctx,33,31,282,7,8);
+        label(ctx,'BASE',53,61,c.blue,true);label(ctx,'150 NFE',224,61,c.orange,true);
+        label(ctx,'动作与镜头更丰富',53,91,c.text,true);label(ctx,'细腻表情 · 口型细节',53,116,c.muted);
+        ctx.fillStyle='#f4fbf7';roundRect(ctx,345,31,282,105,12);ctx.fillStyle=c.green;roundRect(ctx,345,31,282,7,8);
+        label(ctx,'FAST',365,61,c.green,true);label(ctx,'8 NFE',550,61,c.green,true);
+        label(ctx,'稳定性与合理性更强',365,91,c.text,true);label(ctx,'低畸变 · 适合部署',365,116,c.muted);
+        ctx.strokeStyle=c.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(315,83);ctx.lineTo(345,83);ctx.stroke();
+        centeredLabel(ctx,'表现力与部署效率的权衡',330,158,c.orange,11.5,true);
       }
       if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
       if (running) raf = requestAnimationFrame(draw);
@@ -276,8 +311,8 @@ const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) 
     const start = () => { if (!running) { running = true; raf = requestAnimationFrame(draw); } };
     const stop = () => { running = false; cancelAnimationFrame(raf); };
     const disconnect = observeCanvas(canvas, start, stop); return () => { stop(); disconnect(); };
-  }, [variant]);
-  return <canvas ref={ref} width={W} height={H} aria-label="LongCat 论文概念动画" />;
+  }, [variant, width, height, isHero]);
+  return <canvas ref={ref} width={width} height={height} aria-label="LongCat 论文概念动画" />;
 };
 
 export const HeroDemo: React.FC<WidgetProps> = p => <StudioScene {...p} variant="demo" />;

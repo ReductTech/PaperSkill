@@ -209,11 +209,39 @@ section.chap::before {
 .insight-bar em { color: var(--blue); font-style: normal; font-weight: 700; }
 
 .analogy-card {
+  min-height: 0;
   border-color: rgba(217, 119, 6, 0.28);
   box-shadow: 0 10px 24px rgba(134, 92, 23, 0.055);
 }
 
-.analogy-title { font-size: 17px; }
+.analogy-visual {
+  width: 400px;
+  padding: 2px 3px;
+  background: transparent;
+}
+
+.analogy-visual canvas {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 6px;
+}
+
+.analogy-body { padding: 12px 20px; }
+.analogy-title { margin-bottom: 5px; font-size: 16.5px; }
+.analogy-text { font-size: 15.5px; line-height: 1.62; }
+
+#chap-1 .analogy-card {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(34, 141, 92, 0.09), transparent 28%),
+    linear-gradient(135deg, #f4f7fc 0%, #edf7f2 100%);
+  border-color: rgba(39, 68, 110, 0.18);
+  box-shadow: 0 12px 28px rgba(39, 68, 110, 0.08);
+}
+
+#chap-1 .analogy-visual { background: transparent; }
+#chap-1 .analogy-title { color: var(--blue); }
+#chap-1 .analogy-title::before { background: var(--green); }
 
 .lc-chip-row {
   justify-content: center;
@@ -275,10 +303,59 @@ section.chap::before {
 .lc-model-card b { color: var(--ink); }
 .lc-model-card span { color: var(--muted); font-size: 14px; line-height: 1.65; }
 
+.lc-metric-groups {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+  gap: 10px;
+  margin: 12px 0 8px;
+}
+
+.lc-metric-groups > div {
+  padding: 11px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top-width: 3px;
+  border-radius: var(--ui-radius-sm);
+}
+
+.lc-metric-groups > .base { border-top-color: var(--blue); }
+.lc-metric-groups > .fast { border-top-color: var(--green); }
+
+.lc-metric-groups b {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.lc-metric-groups > div > div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.lc-metric-groups .chip {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.lc-metric-groups .base .chip.selected { background: var(--blue); border-color: var(--blue); }
+.lc-metric-groups .fast .chip.selected { background: var(--green); border-color: var(--green); }
+
+.feedback.lc-base-win {
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-left-color: var(--blue);
+  font-style: normal;
+}
+
 @media (max-width: 720px) {
+  .analogy-visual { width: 100%; padding: 2px 3px; }
+  .analogy-body { padding: 13px 16px 16px; }
   .lc-routing-controls { grid-template-columns: 1fr; }
   .lc-evidence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lc-model-summary { grid-template-columns: 1fr; }
+  .lc-metric-groups { grid-template-columns: 1fr; }
   .lc-chip-row .chip { flex: 1 1 42%; justify-content: center; }
   .flow-step::after { display: none; }
   .lc-subfigure-head { align-items: flex-start; flex-direction: column; gap: 7px; }
