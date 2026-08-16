@@ -85,7 +85,7 @@ export const tutorial: TutorialData = {
           title: '改了哪里：保留三段底座，只替换解码器注意力',
           desc: '选择组件，对照论文 Figure 2 的继承路径与 R-SWA 改动。',
           componentId: 'unlimited-interactive',
-          figure: '/images/paper-fig2-architecture-animated.gif',
+          figure: './images/paper-fig2-architecture-animated.gif',
         },
       ],
       insight: '底座压缩输入；R-SWA 控制长输出成本。',
@@ -113,7 +113,7 @@ export const tutorial: TutorialData = {
           title: '第一步，划定可见范围：P 全局，Dₙ(t) 局部',
           desc: '调节查询位置 t 和示意窗口 n，对照论文式（1）—（2）；论文默认 n=128。',
           componentId: 'unlimited-interactive',
-          figure: '/images/paper-fig1-rswa-animated.gif',
+          figure: './images/paper-fig1-rswa-animated.gif',
         },
         {
           kind: 'module',
@@ -186,7 +186,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: '两类证据，回答同一个效率问题',
         text: 'Table 4：prefill=10、理想并发。',
-        figure: '/images/paper-fig3-kernel-animated.gif',
+        figure: './images/paper-fig3-kernel-animated.gif',
       },
       modules: [
         {
