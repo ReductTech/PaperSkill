@@ -1,0 +1,90 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --ui-bg-page: #eef5ff;
+  --ui-bg-page-top: #fbfdff;
+  --ui-accent: #1268e8;
+  --ui-accent-alt: #f08a24;
+  --ui-success: #22a06b;
+  --ui-danger: #d94a5f;
+  --paper-scene-bg: #f8fbff;
+  --paper-panel-blue: #eef5ff;
+  --paper-line-blue: #d7e4f5;
+}
+
+section.hero {
+  background:
+    linear-gradient(180deg, rgba(18, 104, 232, 0.06), rgba(255, 255, 255, 0) 34%),
+    #ffffff;
+}
+
+.hero-venue {
+  background: #eef5ff;
+  color: #1268e8;
+}
+
+.analogy-card {
+  display: grid;
+  grid-template-columns: minmax(540px, 1.25fr) minmax(360px, 1fr);
+  background: #ffffff;
+  border-color: #d7e4f5;
+}
+
+.analogy-visual {
+  width: auto;
+  min-width: 540px;
+  background: #f8fbff;
+}
+
+.analogy-visual canvas {
+  width: 100% !important;
+  max-width: 560px;
+  height: auto !important;
+}
+
+.analogy-title {
+  color: #1268e8;
+}
+
+.analogy-title::before {
+  background: #1268e8;
+}
+
+.wm-widget canvas {
+  background: #f8fbff;
+}
+
+.fe-formula,
+.fe-formula .fe-formula-sym,
+.fe-explain-sym {
+  font-family: "Times New Roman", Times, serif;
+}
+
+.fe-formula .fe-formula-sym {
+  border-bottom: 0;
+  text-decoration: none;
+}
+
+.fe-formula .fe-formula-sym.active {
+  border-bottom-color: transparent;
+}
+
+.fe-formula .formula-danger {
+  color: #d94a5f;
+}
+
+@media (max-width: 980px) {
+  .analogy-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .analogy-visual {
+    width: 100%;
+    min-width: 0;
+  }
+}

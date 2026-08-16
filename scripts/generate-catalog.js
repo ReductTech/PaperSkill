@@ -3,10 +3,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, listSubmissions, buildCatalogRecord } = require('./lib/repository');
+const { ROOT, listSubmissions, metadataFor, catalogRecord } = require('./lib/repository');
 
 const target = path.join(ROOT, 'catalog', 'papers.json');
-const records = listSubmissions().map((submission) => buildCatalogRecord(submission));
+const records = listSubmissions().map((submission) => catalogRecord(metadataFor(submission)));
 const next = `${JSON.stringify(records, null, 2)}\n`;
 
 if (process.argv.includes('--check')) {

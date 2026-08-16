@@ -1,0 +1,3 @@
+import React,{useState}from'react';
+const steps=[['1 / 3 先诊断','记录错误签名、保存可恢复产物；不要把异常直接当作“无结论”。','mid'],['2 / 3 Refine','结果弱但设计仍合理：调整实现、预算或实验条件，继续验证。','good'],['3 / 3 Pivot','方向根本不成立：把失败写进证据，返回假设生成而非反复重试。','bad']] as const;
+export function PivotRefine(){const [n,setN]=useState(0);const s=steps[n];return <div className="tool"><div className="step-board"><span>{s[0]}</span><b>{s[1]}</b></div><div className="step-controls"><button onClick={()=>setN(Math.max(0,n-1))} disabled={!n}>上一步</button><button onClick={()=>setN(Math.min(2,n+1))} disabled={n===2}>{n===2?'已完成':'下一步'}</button><button onClick={()=>setN(0)}>重置</button></div><div className={'feedback '+s[2]}>{n===2?'Pivot 不是失败的掩饰，而是带着已知失败模式重新提出问题。':'逐步区分“当前实验可修”与“研究方向需要重来”。'}</div></div>}

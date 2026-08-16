@@ -1,0 +1,6 @@
+import React, { useEffect, useRef } from 'react';
+import { observeCanvas, setupCanvas } from '../lib/canvasKit';
+import type { WidgetProps } from './registry';
+
+export const Analogy5: React.FC<WidgetProps> = () => { const ref=useRef<HTMLCanvasElement>(null); useEffect(()=>{const canvas=ref.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,244,130);}catch{return;}const render=()=>{ctx.clearRect(0,0,244,130);ctx.fillStyle='#f5f8f0';ctx.fillRect(0,0,244,130);ctx.strokeStyle='#b8c9a7';ctx.lineWidth=2;[[42,35],[85,82],[164,38],[198,88]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.stroke();});ctx.strokeStyle='#228d5c';ctx.lineWidth=4;ctx.beginPath();ctx.arc(142,68,15,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d7deea';ctx.beginPath();ctx.ellipse(106,72,21,12,-.25,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d97706';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(118,69);ctx.lineTo(137,68);ctx.stroke();ctx.fillStyle='#21324a';ctx.font='13px system-ui';ctx.fillText('沾粉的手',61,119);ctx.fillText('锚点',154,119);canvas.classList.add('is-ready');};const d=observeCanvas(canvas,render,()=>{});render();return d;},[]);return <canvas ref={ref} width={244} height={130} role="img" aria-label="一只沾粉的手标记一个绿色锚点岩点"/>;};
+export default Analogy5;

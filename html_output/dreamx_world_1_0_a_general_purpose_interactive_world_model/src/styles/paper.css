@@ -1,0 +1,43 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* DreamX-World road-trip theme scene colors (semantic roles per contract §5) */
+  --scene-bg: #f5f8f0;
+  --scene-ground: #b8c9a7;
+  --scene-depth: #76906a;
+  --road: #92400e;
+  --guide: #27446e;
+  --good: #228d5c;
+  --bad: #c43f52;
+  --emph: #d97706;
+  --aux: #7c3aed;
+  --ink: #21324a;
+  --muted: #68778f;
+  --axis: #d7deea;
+}
+
+/* F1: true matrix layout inside formula blocks (contract: Unicode/HTML only, no
+   KaTeX). Bracket illusion via rounded left/right borders; roomy cells replace
+   the cramped pseudo-matrix made of ⎡⎤⎣⎦ glyphs. Appended (not rewritten). */
+.fe-formula {
+  line-height: 2;
+}
+.fe-formula .mx {
+  display: inline-table;
+  vertical-align: middle;
+  margin: 0 6px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-left: 2.5px solid currentColor;
+  border-right: 2.5px solid currentColor;
+  border-radius: 10px;
+}
+.fe-formula .mx td {
+  padding: 4px 14px;
+  text-align: center;
+  white-space: nowrap;
+}
