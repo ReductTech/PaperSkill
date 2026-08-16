@@ -193,7 +193,8 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
     } else setter([...current, id]);
   };
 
-  const visibleModels = group.models.filter((model) => selectedModels.includes(model.id));
+  const orderedModels = [...group.models].sort((left, right) => Number(Boolean(right.target)) - Number(Boolean(left.target)));
+  const visibleModels = orderedModels.filter((model) => selectedModels.includes(model.id));
   const visibleMetrics = group.metrics.filter((metric) => selectedMetrics.includes(metric.id));
   const maxima = useMemo(() => Object.fromEntries(group.metrics.map((metric) => {
     const values = group.models.flatMap((model) => {
@@ -227,7 +228,7 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
 
       {groupId === 'efficiency' && !showingCrossEfficiency ? <label className="cluster-view-count"><span>输入视图数</span><select value={viewIndex} onChange={(event) => setViewIndex(Number(event.target.value))}>{viewCounts.map((count, index) => <option key={count} value={index}>{count} 视图</option>)}</select></label> : null}
       <div className="cluster-picker">
-        <fieldset><legend>选择模型</legend><div>{group.models.map((model) => <button key={model.id} type="button" aria-pressed={selectedModels.includes(model.id)} className={selectedModels.includes(model.id) ? 'selected' : ''} onClick={() => toggle(model.id, selectedModels, setSelectedModels)}>{model.label}</button>)}</div></fieldset>
+        <fieldset><legend>选择模型</legend><div>{orderedModels.map((model) => <button key={model.id} type="button" aria-pressed={selectedModels.includes(model.id)} className={selectedModels.includes(model.id) ? 'selected' : ''} onClick={() => toggle(model.id, selectedModels, setSelectedModels)}>{model.label}</button>)}</div></fieldset>
         <fieldset><legend>选择指标</legend><div>{group.metrics.map((metric) => <button key={metric.id} type="button" aria-pressed={selectedMetrics.includes(metric.id)} className={selectedMetrics.includes(metric.id) ? 'selected' : ''} onClick={() => toggle(metric.id, selectedMetrics, setSelectedMetrics)}><i style={{ background: metric.color }} />{metric.label}<small>{metric.direction === 'higher' ? '↑' : '↓'}</small></button>)}</div></fieldset>
       </div>
 
