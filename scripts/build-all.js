@@ -8,6 +8,9 @@ const { ROOT, listSubmissions } = require('./lib/repository');
 
 const outputArg = process.argv.includes('--output') ? process.argv[process.argv.indexOf('--output') + 1] : 'site/papers';
 const outputRoot = path.resolve(ROOT, outputArg);
+if (outputRoot !== ROOT && !outputRoot.startsWith(ROOT + path.sep)) {
+  throw new Error(`--output path must be within the repository root: ${outputRoot}`);
+}
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function valuesFor(flag) {
