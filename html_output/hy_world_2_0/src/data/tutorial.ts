@@ -28,9 +28,9 @@ export const tutorial: TutorialData = {
       ],
       insight: '核心不是“一个网络做完所有事”，而是让生成负责扩展观察，让重建负责恢复几何，并根据输入丰富度选择路径。',
       takeaways: [
-        { icon: '1', title: '视频会想象', desc: '开放域生成强，但没有显式三维几何保证。' },
-        { icon: '2', title: '重建会测量', desc: '多视图一致且可实时渲染，但不会补未观测区域。' },
-        { icon: '3', title: '系统做分工', desc: '稀疏输入先生成，丰富输入直接重建。' },
+        { icon: '🎬', title: '视频会想象', desc: '开放域生成强，但没有显式三维几何保证。' },
+        { icon: '📐', title: '重建会测量', desc: '多视图一致且可实时渲染，但不会补未观测区域。' },
+        { icon: '🧩', title: '系统做分工', desc: '稀疏输入先生成，丰富输入直接重建。' },
       ],
     },
     {
@@ -39,14 +39,14 @@ export const tutorial: TutorialData = {
       analogy: { title: '先转一圈看全，再绕开障碍补盲区', text: '全景负责建立地图感，路线负责决定下一张真正有价值的照片。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '2.1', title: '全景故障擦除实验', desc: '同一 ERP 场景只绘制一次，扫描线右侧局部叠加焦距拉伸、周期断边或颜色跳变；拖到 0% / 100% 可明确对应三种修复层级。', componentId: 'hy-panorama' },
-        { kind: 'module', id: '2.2', title: '全景数据配方显微镜', desc: '切换四种数据配方，同时追踪来源门、质量门、学到的先验与生成表现，理解双源互补为什么必须和污染过滤一起成立。', componentId: 'hy-panorama-curation' },
+        { kind: 'module', id: '2.2', title: '全景数据二维分布地图', desc: '在“常见现实→稀有想象”与“真实采集→可控合成”两条轴上切换四种数据配方，观察十二类场景、质量门、学到的先验与生成表现。', componentId: 'hy-panorama-curation' },
         { kind: 'module', id: '2.3', title: 'WorldNav 五层规划回放', desc: '所有路线先以虚线候选出现，再由 Ray-casting 逐条淘汰；幸存路线保持虚线直到最终连接完成，只有执行回放时变成实线。', componentId: 'hy-trajectory' },
       ],
       insight: '全景不是最终三维世界，而是后续场景解析和路线规划的世界种子；五类轨迹用不同观察方式补足背面、远端、空洞与顶部盲区。',
       takeaways: [
-        { icon: 'A', title: '先补全上下文', desc: '隐式映射减少对精确相机内参的依赖。' },
-        { icon: 'B', title: '再分配视角', desc: '常规、环绕、重建感知、漫游与航拍互补。' },
-        { icon: 'C', title: '规划受几何约束', desc: '路线必须结合 NavMesh、障碍与可达区域。' },
+        { icon: '🌐', title: '先补全上下文', desc: '隐式映射减少对精确相机内参的依赖。' },
+        { icon: '🧭', title: '再分配视角', desc: '常规、环绕、重建感知、漫游与航拍互补。' },
+        { icon: '🚧', title: '规划受几何约束', desc: '路线必须结合 NavMesh、障碍与可达区域。' },
       ],
     },
     {
@@ -68,9 +68,9 @@ export const tutorial: TutorialData = {
         ],
       },
       takeaways: [
-        { icon: 'K', title: '关键帧保真', desc: '减少时间冗余压缩，保留跨视角高频细节。' },
-        { icon: 'G', title: 'GGM 守骨架', desc: '用粗几何锚点约束多条路线。' },
-        { icon: 'S', title: 'SSM++ 补细节', desc: '检索最相关历史视角做局部对应。' },
+        { icon: '📸', title: '关键帧保真', desc: '减少时间冗余压缩，保留跨视角高频细节。' },
+        { icon: '🏗️', title: 'GGM 守骨架', desc: '用粗几何锚点约束多条路线。' },
+        { icon: '🔍', title: 'SSM++ 补细节', desc: '检索最相关历史视角做局部对应。' },
       ],
     },
     {
@@ -92,9 +92,9 @@ export const tutorial: TutorialData = {
         ],
       },
       takeaways: [
-        { icon: '1', title: '先控制', desc: '领域适配建立关键帧空间与相机条件。' },
-        { icon: '2', title: '再记忆', desc: '中训加入 GGM 与 SSM++。' },
-        { icon: '3', title: '后压缩', desc: '成熟教师才能被蒸馏为四步学生。' },
+        { icon: '🎯', title: '先控制', desc: '领域适配建立关键帧空间与相机条件。' },
+        { icon: '🧠', title: '再记忆', desc: '中训加入 GGM 与 SSM++。' },
+        { icon: '⚡', title: '后压缩', desc: '成熟教师才能被蒸馏为四步学生。' },
       ],
     },
     {
@@ -103,7 +103,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '固定同一相对位置并切换 L/M/H，直接比较整数索引进入训练外范围与归一化坐标保持可比的因果差异。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '为固定的三图资产交付委托接入现有 Pose、K、Depth，执行一次共享前向，再逐个检查 Camera、Pointmap、Depth、Normal 与 3DGS 输出头的职责。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '为固定三图委托选择 Pose、K、Depth，播放“逐项接入→共享骨干→五头分流→质量验收”动画；坏候选丢弃仅是教学验收示意，不冒充论文新增网络。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {
@@ -116,9 +116,9 @@ export const tutorial: TutorialData = {
         ],
       },
       takeaways: [
-        { icon: 'R', title: '位置变插值', desc: '归一化坐标减少训练外分辨率外推。' },
-        { icon: 'M', title: '多先验可选', desc: '图像必需，位姿、内参和深度按条件接入。' },
-        { icon: 'H', title: '共享骨干多头', desc: '一次前向联合恢复多种几何输出。' },
+        { icon: '📍', title: '位置变插值', desc: '归一化坐标减少训练外分辨率外推。' },
+        { icon: '🧩', title: '多先验可选', desc: '图像必需，位姿、内参和深度按条件接入。' },
+        { icon: '🌲', title: '共享骨干多头', desc: '一次前向联合恢复多种几何输出。' },
       ],
     },
     {
@@ -140,9 +140,9 @@ export const tutorial: TutorialData = {
         ],
       },
       takeaways: [
-        { icon: 'A', title: '先线性对齐', desc: '把逐帧深度尺度与偏移拉回共同坐标。' },
-        { icon: 'G', title: '再压缩高斯', desc: '增密与概率稀疏化共同控制细节和冗余。' },
-        { icon: 'W', title: '最后进运行时', desc: '生成阶段与实时交互阶段必须分开表述。' },
+        { icon: '📏', title: '先线性对齐', desc: '把逐帧深度尺度与偏移拉回共同坐标。' },
+        { icon: '✨', title: '再压缩高斯', desc: '增密与概率稀疏化共同控制细节和冗余。' },
+        { icon: '🎮', title: '最后进运行时', desc: '生成阶段与实时交互阶段必须分开表述。' },
       ],
     },
     {
@@ -152,27 +152,27 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择一个旧问题并切换连接机制，观察规划、记忆、重建与运行时为何不能互相替代；匹配后展开论文证据与外推边界。', componentId: 'hy-innovation-map' },
         { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；只对资料已报告的能力开放详情，并标注发表时间。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '论文内指标继续严格按零基线比例绘制；效率页另列 Fast3R、VGGT、CUT3R 与 π³ 的显存或时间记录，并保留硬件、输入规模、测量范围与未报告项。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '论文内指标继续严格按零基线比例绘制；跨论文效率拆成显存、秒级墙钟和 FPS 三组条形图，并保留硬件、输入规模、测量范围与未报告项。', componentId: 'hy-performance-compare' },
       ],
       insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；表 4、表 12、表 14 可以在各自协议内画比例图，跨论文资源记录只能带完整条件并列阅读。',
       takeaways: [
-        { icon: 'P', title: '问题对应机制', desc: '规划、记忆、重建和运行时各修复不同瓶颈。' },
-        { icon: 'C', title: '能力不等于总榜', desc: '谱系图说明覆盖范围，不产生跨任务排名。' },
-        { icon: 'D', title: '数据必须带协议', desc: '低优指标、OOM 和非领先结果都要保留。' },
+        { icon: '🔗', title: '问题对应机制', desc: '规划、记忆、重建和运行时各修复不同瓶颈。' },
+        { icon: '🧬', title: '能力不等于总榜', desc: '谱系图说明覆盖范围，不产生跨任务排名。' },
+        { icon: '🧪', title: '数据必须带协议', desc: '低优指标、OOM 和非领先结果都要保留。' },
       ],
     },
     {
-      kind: 'chapter', id: 'chap-8', title: '证据边界、开源使用与最终判断', badge: 'both', badgeLabel: '阅读收束',
-      bridge: '最后不再做连续判题，而是按“论文报告、官方展示、第三方解读、未报告”整理结论。读者可以快速检查一句话能说到哪里，以及还缺什么条件。',
-      analogy: { title: '交付世界时附上测量条件与来源标签', text: '数字看论文，产品能力看官方资料，体验看署名观点，未报告就保持未知。', componentId: 'hy-analogy' },
+      kind: 'chapter', id: 'chap-8', title: '最终判断、观点汇总与资料星图', badge: 'both', badgeLabel: '阅读收束',
+      bridge: '贯穿全文后，用四句话收束系统价值、技术抓手、现实边界与外部看法；再按证据层级检查关键结论，最后把论文、代码、演示、权重、文章与相关工作收入可展开资料库。',
+      analogy: { title: '交付世界时附上测量条件、来源标签与继续阅读地图', text: '数字看论文，产品能力看官方资料，体验看署名观点，未报告就保持未知。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '8.1', title: '证据边界仪表盘', desc: '按四种证据层级浏览协议性能、局部效率、Marble 比较、运行时能力、知乎工程直觉与许可证边界，不计分、不连续答题。', componentId: 'hy-evidence-court' },
+        { kind: 'module', id: '8.1', title: '结论地图与继续阅读资料库', desc: '先汇总论文、官方资料和第三方文章能共同支持的四个判断，再浏览证据边界、完成两道不计分快问，并从下拉资料库进入论文、代码、演示、权重、许可证、相关文章与相关论文。', componentId: 'hy-evidence-court' },
       ],
       insight: '最稳妥的结论是：HY-World 2.0 把稀疏输入生成、丰富输入重建、显式资产和运行时接到同一工程框架；它仍是分钟级离线世界生产系统，外部闭源模型也缺少统一定量协议。',
       takeaways: [
-        { icon: 'E', title: '论文事实', desc: '核心结构、公式、数字与消融回到原文定位。' },
-        { icon: 'O', title: '官方状态', desc: '开放模块、演示能力和许可证看当前官方资料。' },
-        { icon: 'U', title: '未知保持未知', desc: '未报告不等于不支持，也不等于已经证明。' },
+        { icon: '📖', title: '论文事实', desc: '核心结构、公式、数字与消融回到原文定位。' },
+        { icon: '🌐', title: '官方状态', desc: '开放模块、演示能力和许可证看当前官方资料。' },
+        { icon: '🌫️', title: '未知保持未知', desc: '未报告不等于不支持，也不等于已经证明。' },
       ],
     },
   ],

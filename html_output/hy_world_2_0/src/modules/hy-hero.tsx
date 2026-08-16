@@ -87,17 +87,57 @@ function metricBars(ctx: CanvasRenderingContext2D, labels: string[], values: num
   labels.forEach((t, i) => { label(ctx, t, x, y + i * 32, C.muted, 12); ctx.fillStyle = C.line; ctx.fillRect(x + 78, y - 12 + i * 32, maxW, 14); ctx.fillStyle = colors[i]; ctx.fillRect(x + 78, y - 12 + i * 32, maxW * values[i] / max, 14); label(ctx, String(values[i]), x + 84 + maxW, y + i * 32, C.ink, 12); });
 }
 
+function miniView(ctx: CanvasRenderingContext2D, x: number, y: number, shift: number, color: string, alpha = 1) {
+  ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = C.white; ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.fillRect(x, y, 62, 42); ctx.strokeRect(x, y, 62, 42);
+  ctx.fillStyle = '#d9e8f2'; ctx.fillRect(x + 4, y + 4, 54, 18);
+  ctx.fillStyle = '#a8bc9c'; ctx.fillRect(x + 4, y + 22, 54, 16);
+  ctx.fillStyle = C.orange; ctx.fillRect(x + 25 + shift, y + 14, 13, 24);
+  ctx.fillStyle = C.ink; ctx.fillRect(x + 9 - shift * .3, y + 24, 15, 14); ctx.restore();
+}
+
+function wireRoom(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, completion = 1, broken = false) {
+  const edges: Array<[number, number, number, number]> = [
+    [0, 24, 64, 0], [64, 0, 126, 25], [126, 25, 65, 54], [65, 54, 0, 24],
+    [0, 24, 0, 88], [65, 54, 65, 116], [126, 25, 126, 88],
+    [0, 88, 65, 116], [65, 116, 126, 88], [65, 54, 65, 116],
+  ];
+  const visible = Math.ceil(edges.length * clamp(completion, 0, 1));
+  ctx.save(); ctx.translate(x, y); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  edges.forEach(([x1, y1, x2, y2], index) => {
+    if (index >= visible || (broken && (index === 2 || index === 6 || index === 8))) return;
+    ctx.setLineDash(broken && index > 5 ? [6, 5] : []); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  if (!broken && completion > .75) {
+    [[18,60],[43,72],[83,65],[104,47],[86,96],[35,94]].forEach(([px,py], index) => { ctx.fillStyle = index % 2 ? C.orange : C.green; ctx.globalAlpha = .55 + index * .06; ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);ctx.fill(); });
+  }
+  ctx.restore();
+}
+
 export const HyHero: React.FC<WidgetProps> = ({ moduleId }) => (
   <CanvasView width={520} height={180} animate draw={(ctx, time) => {
-    clearStudio(ctx, 520, 180); const p = (Math.sin(time / 1100) + 1) / 2;
+    clearStudio(ctx, 520, 180); const cycle = (time % 4200) / 4200; const p = easeInOutQuad(cycle < .72 ? cycle / .72 : 1);
     if (moduleId === 'old') {
-      const path: Array<[number, number]> = [[50,130],[160,85],[260,120],[390,70]];
-      route(ctx, path, C.red, 3, [8,6]); const [x, y] = pointOnRoute(path, p); camera(ctx, x, y, C.red, .85);
-      target(ctx, 430, 68, false); label(ctx, '想象会漂移', 36, 32, C.red, 14); label(ctx, '重建会留白', 360, 150, C.red, 14);
+      label(ctx, '逐帧想象', 34, 25, C.red, 13); label(ctx, '只恢复已观察区域', 310, 25, C.red, 13);
+      [0,1,2].forEach((index) => miniView(ctx, 34 + index * 72, 58 + index * 8, p * index * 7, C.red, .95 - index * .12));
+      ctx.strokeStyle = C.red; ctx.lineWidth = 2; ctx.setLineDash([5,5]); ctx.beginPath(); ctx.moveTo(47,123);ctx.bezierCurveTo(104,145,174,105,235,137);ctx.stroke();ctx.setLineDash([]);
+      label(ctx, '主体与背景逐渐错位', 132, 158, C.red, 10, 'center');
+      wireRoom(ctx, 333, 43, C.red, 1, true);
+      ctx.fillStyle = 'rgba(196,63,82,.10)';ctx.fillRect(438,68,44,72);ctx.strokeStyle=C.red;ctx.setLineDash([6,5]);ctx.strokeRect(438,68,44,72);ctx.setLineDash([]);
+      label(ctx, '未见区域留空', 460, 157, C.red, 10, 'center');
     } else {
-      const path: Array<[number, number]> = [[50,130],[150,90],[245,108],[335,72],[430,58]];
-      route(ctx, path, C.blue, 5); const [x, y] = pointOnRoute(path, p); camera(ctx, x, y, C.blue, .85);
-      target(ctx, 455, 56, true); label(ctx, '按输入条件切换目标', 36, 32, C.blue, 14); label(ctx, '生成 + 重建', 385, 150, C.green, 14);
+      label(ctx, '扩展观察', 34, 25, C.blue, 13); label(ctx, '凝结为显式三维资产', 306, 25, C.green, 13);
+      miniView(ctx, 44, 69, 0, C.orange, 1);
+      const orbit = [[140,46],[178,78],[155,120],[91,128]];
+      orbit.forEach(([x,y], index) => {
+        const appear = clamp(p * 5 - index, 0, 1); miniView(ctx, x, y, (index - 1.5) * 2, C.blue, appear);
+        if (appear > 0) { ctx.strokeStyle='rgba(39,68,110,.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(104,90);ctx.lineTo(x+31,y+21);ctx.stroke(); }
+      });
+      ctx.fillStyle = C.green; ctx.beginPath(); ctx.arc(278,92,6 + Math.sin(time/180)*2,0,Math.PI*2);ctx.fill();
+      route(ctx, [[225,92],[278,92],[322,92]], C.green, 4);
+      wireRoom(ctx, 342, 39, C.green, p, false);
+      label(ctx, p > .92 ? '可保存 · 可渲染 · 可交互' : '多视图正在对齐', 406, 160, p > .92 ? C.green : C.blue, 10, 'center');
     }
   }} />
 );

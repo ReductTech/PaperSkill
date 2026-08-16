@@ -227,7 +227,15 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
             ctx.strokeStyle=C.purple;ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(470,78,42,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);label(ctx,'覆盖空洞',470,82,C.purple,10,'center');
             for(let i=0;i<4;i+=1){ctx.strokeStyle='rgba(124,58,237,'+(.22+i*.12)+')';ctx.beginPath();ctx.moveTo(350+i*18,150-i*15);ctx.lineTo(470,78);ctx.stroke();}
           } else if (trajectory === '漫游') {
-            ctx.fillStyle='rgba(217,119,6,.12)';ctx.fillRect(64,62,438,54);ctx.strokeStyle=C.orange;ctx.lineWidth=2;ctx.strokeRect(64,62,438,54);label(ctx,'走廊 / 街道远端',438,92,C.orange,11,'center');
+            const vanishing: Point = [506,88];
+            ctx.save();
+            ctx.strokeStyle='rgba(217,119,6,.46)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
+            [[84,244],[162,244],[286,244]].forEach(([x,y])=>{ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(vanishing[0],vanishing[1]);ctx.stroke();});
+            ctx.setLineDash([]);
+            [[342,106,34,48],[406,96,25,34],[454,91,17,24]].forEach(([x,y,w,h])=>{ctx.strokeStyle='rgba(217,119,6,.62)';ctx.strokeRect(x,y,w,h);});
+            ctx.fillStyle=C.orange;ctx.beginPath();ctx.arc(vanishing[0],vanishing[1],5,0,Math.PI*2);ctx.fill();
+            ctx.restore();
+            label(ctx,'沿可走区域望向远端',520,38,C.orange,11,'right');
           } else {
             ctx.strokeStyle=C.brown;ctx.lineWidth=2;for(let i=0;i<4;i+=1){ctx.strokeRect(94+i*96,78+i*18,68,48);}label(ctx,'抬高视点，补屋顶与平台',310,42,C.brown,11,'center');
             ctx.fillStyle='rgba(146,64,14,.12)';ctx.beginPath();ctx.moveTo(488,50);ctx.lineTo(430,168);ctx.lineTo(540,168);ctx.closePath();ctx.fill();

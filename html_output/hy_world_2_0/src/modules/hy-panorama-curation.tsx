@@ -36,17 +36,37 @@ const recipes: Record<RecipeId, {
 function DistributionView({ recipe }: { recipe: RecipeId }) {
   const d = recipes[recipe];
   const points = [
-    { x: 14, y: 72, k: '室内' }, { x: 27, y: 40, k: '街景' }, { x: 42, y: 66, k: '自然' },
-    { x: 61, y: 34, k: '奇幻' }, { x: 76, y: 58, k: '科幻' }, { x: 88, y: 24, k: '极端视角' },
+    { x: 12, y: 16, k: '客厅', source: 'real' },
+    { x: 22, y: 28, k: '街景', source: 'real' },
+    { x: 34, y: 18, k: '自然地貌', source: 'real' },
+    { x: 43, y: 35, k: '夜景人群', source: 'real' },
+    { x: 51, y: 69, k: '工业空间', source: 'synthetic' },
+    { x: 59, y: 54, k: '古城遗迹', source: 'synthetic' },
+    { x: 66, y: 79, k: '水下世界', source: 'synthetic' },
+    { x: 72, y: 42, k: '航拍峡谷', source: 'synthetic' },
+    { x: 79, y: 66, k: '科幻舱', source: 'synthetic' },
+    { x: 86, y: 84, k: '浮空遗迹', source: 'synthetic' },
+    { x: 91, y: 52, k: '巨构室内', source: 'synthetic' },
+    { x: 95, y: 24, k: '极端视点', source: 'synthetic' },
   ];
-  const visible = recipe === 'real' ? 3 : recipe === 'synthetic' ? 5 : 6;
+  const isCovered = (source: string) => recipe === 'mixed-clean' || recipe === 'mixed-dirty' || recipe === source;
   return <div className={`curation-distribution ${recipe}`}>
-    <div className="curation-axis"><span>现实常见</span><span>想象 / 稀有</span></div>
-    <div className="curation-point-field">
-      {points.map((point, index) => <i key={point.k} className={index < visible ? 'covered' : 'missing'} style={{ left: `${point.x}%`, top: `${point.y}%` }}><b>{point.k}</b></i>)}
-      {recipe === 'mixed-dirty' ? <><em className="seam-pollution">接缝捷径</em><em className="rig-pollution">设备入镜</em></> : null}
+    <header><span>二维训练分布地图</span><strong>{d.title}</strong></header>
+    <div className="curation-plane">
+      <span className="curation-y-label top">真实采集主导</span>
+      <span className="curation-y-label bottom">可控合成主导</span>
+      <span className="curation-x-label left">常见现实</span>
+      <span className="curation-x-label right">稀有 / 想象</span>
+      <div className="curation-grid-lines" aria-hidden="true" />
+      {points.map((point) => <i
+        key={point.k}
+        className={`${isCovered(point.source) ? 'covered' : 'missing'} ${point.source}`}
+        style={{ left: `${point.x}%`, top: `${point.y}%` }}
+      ><b>{point.k}</b></i>)}
+      {recipe === 'mixed-dirty' ? <><em className="seam-pollution">接缝被学成场景边界</em><em className="rig-pollution">支架被学成固定物体</em></> : null}
     </div>
-    <p>{d.source}</p>
+    <div className="curation-plane-legend"><span><i className="real" />真实来源类别</span><span><i className="synthetic" />合成来源类别</span><span><i className="missing" />当前配方缺口</span></div>
+    <p>{d.source}。点位只说明两类来源在“语义稀有度 × 数据生成方式”上的互补关系。</p>
   </div>;
 }
 

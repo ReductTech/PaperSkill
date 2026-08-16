@@ -34,7 +34,7 @@ function ResolutionCanvas({level,ratio}:{level:number;ratio:number}){
 }
 
 export const HyResolution:React.FC<WidgetProps>=()=>{
-  const[level,setLevel]=useState(1);const[ratio,setRatio]=useState(.7);const d=levels[level];
+  const[level,setLevel]=useState(0);const[ratio,setRatio]=useState(.05);const d=levels[level];
   return <div className="resolution-rebuild">
     <div className="learning-contract"><div><span>为什么学</span><p>WorldMirror 要接受不同分辨率和视图数；整数位置会让高分辨率推理进入训练外坐标。</p></div><div><span>本次操作</span><p>固定同一物体的相对位置，切换 L/M/H 或移动物体，比较整数索引与归一化坐标。</p></div><div><span>应得判断</span><p>Normalized RoPE 把“位置外推”改成固定区间内的重新采样，因此跨分辨率更稳定。</p></div></div>
     <div className="resolution-levels" role="tablist" aria-label="选择论文分辨率">{levels.map((item,index)=><button key={item.name} type="button" role="tab" aria-selected={level===index} className={level===index?'selected':''} onClick={()=>setLevel(index)}><strong>{item.name}</strong><span>{item.px}</span></button>)}</div>

@@ -89,22 +89,27 @@ const viewCounts = [32, 64, 128, 256] as const;
 const crossPaperEfficiency = [
   {
     model: 'WorldMirror 2.0', paper: 'HY-World 2.0 · Table 14', hardware: '1× NVIDIA H20', input: '32 视图 · 518×378 · BF16', memory: '15.10 GB/卡', time: '2.11 s',
+    memoryValue: 15.10, seconds: 2.11, fps: null,
     scope: 'WorldMirror 2.0 单卡 BF16 推理；与本模块同论文，可继续在上方切换视图数。', source: 'https://arxiv.org/abs/2604.14268',
   },
   {
     model: 'Fast3R', paper: 'Fast3R · Table 2', hardware: '1× NVIDIA A100', input: '32 视图 · 512×384', memory: '13.25 GiB', time: '0.509 s',
+    memoryValue: 13.25, seconds: .509, fps: null,
     scope: '单次多视图前向；论文另报 DUSt3R 在 48 视图全局对齐阶段 OOM。', source: 'https://arxiv.org/abs/2501.13928',
   },
   {
     model: 'VGGT', paper: 'VGGT · Table 9', hardware: '1× NVIDIA H100 · FlashAttention v3', input: '20 帧 · 336×518', memory: '5.58 GB', time: '0.31 s',
+    memoryValue: 5.58, seconds: .31, fps: null,
     scope: '只测特征骨干；每个 DPT 头平均另需 0.03 s 与 0.2 GB/帧，不能当成完整多头重建总成本。', source: 'https://arxiv.org/abs/2503.11651',
   },
   {
     model: 'CUT3R', paper: 'CUT3R · Table 2', hardware: '1× NVIDIA A100', input: 'KITTI 视频深度 · 512×144', memory: '未报告', time: '16.58 FPS',
+    memoryValue: null, seconds: null, fps: 16.58,
     scope: '在线逐帧视频深度吞吐，不是固定视图批量重建墙钟时间。', source: 'https://arxiv.org/abs/2501.12387',
   },
   {
     model: 'π³', paper: 'π³ · Table 4', hardware: '1× NVIDIA A800', input: 'KITTI 视频深度 · 表中未单列分辨率', memory: '未报告', time: '57.4 FPS',
+    memoryValue: null, seconds: null, fps: 57.4,
     scope: '视频深度 FPS；论文表格未提供同协议峰值显存，不能补写或换算为批量耗时。', source: 'https://arxiv.org/abs/2507.13347',
   },
 ];
@@ -209,16 +214,32 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
 
       <div className="performance-boundary"><strong>严格零基线比例</strong><span>柱高 = 原始数值 / 当前指标最大已报告值。AUC、PSNR、SSIM 等越高越好；AbsRel、LPIPS、显存、时间越低越好，因此后者的短柱才更优。不同指标不能相加、平均或构造综合分数。</span></div>
       {groupId === 'efficiency' ? <section className="cross-paper-efficiency">
-        <header><div><span>跨论文调研</span><strong>显存与时间工程记录</strong></div><p>这些记录的硬件、分辨率、输入规模和测量范围不同，因此不画成同一比例柱；它们用于回答“各论文在什么条件下报告了多少资源”，不是生成速度排行榜。</p></header>
-        <div className="cross-paper-efficiency-table" role="table" aria-label="跨论文显存与时间工程记录">
-          <div className="cross-paper-efficiency-head" role="row"><span>模型 / 来源</span><span>硬件与输入</span><span>显存</span><span>时间</span><span>测量边界</span></div>
-          {crossPaperEfficiency.map((record) => <article key={record.model} role="row">
-            <span><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a></span>
-            <span><b>{record.hardware}</b><small>{record.input}</small></span>
-            <span className={record.memory === '未报告' ? 'missing' : ''}><b>{record.memory}</b></span>
-            <span><b>{record.time}</b></span>
-            <span><small>{record.scope}</small></span>
-          </article>)}
+        <header><div><span>跨论文调研</span><strong>三组工程记录条形图</strong></div><p>每组柱长严格与该组公开数值成比例，但硬件、输入和测量范围不同；它们回答“各论文报告了什么”，不构成无条件资源排行榜。</p></header>
+        <div className="cross-paper-bar-groups">
+          <section>
+            <header><span>峰值显存</span><strong>GB / GiB 保留原单位</strong><small>柱长按原文打印数值 ÷ 15.10；单位与协议差异见每条说明。</small></header>
+            {crossPaperEfficiency.map((record) => <article key={`memory-${record.model}`} className={record.memoryValue === null ? 'missing' : ''}>
+              <div><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a><small>{record.hardware} · {record.input}</small></div>
+              <div className="reported-bar"><i style={{ width: record.memoryValue === null ? '0%' : `${record.memoryValue / 15.10 * 100}%` }} /><b>{record.memory}</b></div>
+              <p>{record.scope}</p>
+            </article>)}
+          </section>
+          <section>
+            <header><span>秒级墙钟记录</span><strong>仅绘制原论文直接报告的秒数</strong><small>柱长按秒数 ÷ 2.11；VGGT 条目只覆盖骨干。</small></header>
+            {crossPaperEfficiency.filter((record) => record.seconds !== null).map((record) => <article key={`seconds-${record.model}`}>
+              <div><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a><small>{record.hardware} · {record.input}</small></div>
+              <div className="reported-bar seconds"><i style={{ width: `${(record.seconds ?? 0) / 2.11 * 100}%` }} /><b>{record.time}</b></div>
+              <p>{record.scope}</p>
+            </article>)}
+          </section>
+          <section>
+            <header><span>视频吞吐记录</span><strong>FPS 单独成组，不倒数换算</strong><small>柱长按 FPS ÷ 57.4；只比较原文报告数值的视觉比例。</small></header>
+            {crossPaperEfficiency.filter((record) => record.fps !== null).map((record) => <article key={`fps-${record.model}`}>
+              <div><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a><small>{record.hardware} · {record.input}</small></div>
+              <div className="reported-bar fps"><i style={{ width: `${(record.fps ?? 0) / 57.4 * 100}%` }} /><b>{record.time}</b></div>
+              <p>{record.scope}</p>
+            </article>)}
+          </section>
         </div>
         <footer><strong>阅读规则</strong><span>GB 与 GiB 保留原论文单位；FPS 不倒数成“单场景秒数”；骨干成本不冒充完整多头模型；未报告显存保持未报告。</span></footer>
       </section> : null}

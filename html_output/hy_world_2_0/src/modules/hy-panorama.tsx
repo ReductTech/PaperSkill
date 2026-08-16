@@ -103,7 +103,7 @@ function PanoramaCanvas({ mode, reveal }: { mode: CaseId; reveal: number }) {
 
 export const HyPanorama: React.FC<WidgetProps> = () => {
   const [mode, setMode] = useState<CaseId>('projection');
-  const [reveal, setReveal] = useState(50);
+  const [reveal, setReveal] = useState(0);
   const active = cases[mode];
   return <div className="panorama-rebuild">
     <div className="learning-contract">

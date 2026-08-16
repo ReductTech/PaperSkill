@@ -13,7 +13,7 @@ export const ExampleSlider: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef({ value: 0.5 });
   const rafRef = useRef<number | null>(null);
-  const [value, setValue] = useState(0.5);
+  const [value, setValue] = useState(0);
   const [feedback, setFeedback] = useState({ text: '拖动滑块，观察数值如何改变画面。', cls: '' });
 
   useEffect(() => {
