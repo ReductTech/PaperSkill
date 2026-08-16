@@ -59,6 +59,13 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 }
 
+function titleSizeClass(title) {
+  const length = Array.from(String(title)).length;
+  if (length > 110) return 'title-compact';
+  if (length > 70) return 'title-long';
+  return '';
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const topic = topicFilter.value;
@@ -72,7 +79,7 @@ function render() {
   grid.innerHTML = visible.map((paper) => `
     <article class="paper-card">
       <div class="card-meta"><span>${escapeHtml([paper.venue, paper.year].filter(Boolean).join(' · ') || '论文教程')}</span><span class="status">${paper.status === 'published' ? '已发布' : '审核中'}</span></div>
-      <h2>${escapeHtml(paper.title)}</h2>
+      <h2 class="${titleSizeClass(paper.title)}">${escapeHtml(paper.title)}</h2>
       <div class="topics">${(paper.topics || []).map((item) => `<span class="topic">${escapeHtml(item)}</span>`).join('')}</div>
       <p class="participants">分支：paper/${escapeHtml(paper.paperName)}<br />参与者：${escapeHtml((paper.participants || []).map((item) => item.name).join('、'))}</p>
       <div class="actions"><a class="open-link" href="./${escapeHtml(paper.tutorialUrl)}">打开教程 →</a><a class="paper-link" href="${escapeHtml(paper.paperUrl)}" target="_blank" rel="noopener">查看原论文</a></div>
