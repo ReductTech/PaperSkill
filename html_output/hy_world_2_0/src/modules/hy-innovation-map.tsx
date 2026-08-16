@@ -4,6 +4,7 @@ import type { WidgetProps } from './registry';
 type Chain = {
   id: string;
   subsystem: string;
+  contribution: string;
   problem: string;
   mechanism: string;
   effect: string;
@@ -16,6 +17,7 @@ type Chain = {
 const chains: Chain[] = [
   {
     id: 'coverage', subsystem: 'HY-Pano + WorldNav',
+    contribution: '系统方法与场景规划',
     problem: '单张透视图既看不到背面，也不知道下一步应该把相机预算投向哪里。',
     mechanism: '先用 HY-Pano 2.0 建立 360 度世界种子，再由 WorldNav 结合点云、语义、NavMesh 与五类轨迹主动补盲区。',
     effect: '生成器获得全局上下文，后续关键帧不再只围绕初始视点重复采样。',
@@ -25,6 +27,7 @@ const chains: Chain[] = [
   },
   {
     id: 'consistency', subsystem: 'WorldStereo 2.0',
+    contribution: '生成模型、记忆机制与少步蒸馏',
     problem: '多条轨迹独立生成时，同一面墙可能在不同路径中改变位置、颜色或纹理。',
     mechanism: 'Keyframe-VAE 保存跨视角细节，GGM 守住全局骨架，SSM++ 检索局部参考，再用相机条件约束目标视角。',
     effect: '全局结构与局部对应由两种记忆分工处理，回访同一区域时更稳定。',
@@ -34,6 +37,7 @@ const chains: Chain[] = [
   },
   {
     id: 'scale', subsystem: 'WorldMirror 2.0',
+    contribution: '前馈重建架构与规模化工程',
     problem: '整数位置编码在训练外分辨率上需要外推，大视图输入还会迅速推高显存和时间。',
     mechanism: 'Normalized RoPE 将 patch 位置归一化到固定区间，Any-Modal 共享骨干联合多头输出，并用 SP、BF16、FSDP 扩展视图规模。',
     effect: '新分辨率更接近区间内插值；单次前向可同时恢复相机、点图、深度、法线与 3DGS 属性。',
@@ -43,6 +47,7 @@ const chains: Chain[] = [
   },
   {
     id: 'asset', subsystem: '3DGS + WorldLens',
+    contribution: '显式资产优化与运行时集成',
     problem: '直接保留全部高斯会产生冗余与漂浮物；只得到静态资产也还不能支持碰撞、光照和角色漫游。',
     mechanism: '深度线性对齐后，以非天空增密和 MaskGaussian 做概率稀疏化；生成完成后由 WorldLens 接入 IBL、碰撞代理与角色控制。',
     effect: '同一世界可保存为紧凑显式资产，并在运行时被重新照明和交互探索。',
@@ -69,6 +74,16 @@ export const HyInnovationMap: React.FC<WidgetProps> = () => {
 
   return (
     <div className="innovation-workbench">
+      <section className="innovation-contribution-summary">
+        <header><span>作者的工作不是一个孤立技巧</span><strong>四类贡献共同组成“生成辅助重建”系统</strong></header>
+        <div>
+          <article><b>系统设计</b><p>按输入丰富度分流：稀疏线索先生成观察，丰富观察直接重建。</p></article>
+          <article><b>生成方法</b><p>升级全景、视角规划、关键帧表示、双记忆和四步蒸馏。</p></article>
+          <article><b>重建方法</b><p>以 Any-Modal、Normalized RoPE 和共享多头恢复相机与几何。</p></article>
+          <article><b>资产工程</b><p>完成深度对齐、高斯压缩，并把资产接入 WorldLens 运行时。</p></article>
+        </div>
+      </section>
+
       <div className="innovation-problem-switch" role="tablist" aria-label="选择论文要解决的旧问题">
         {chains.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={problemId === item.id} className={problemId === item.id ? 'selected' : ''} onClick={() => chooseProblem(item.id)}>
           <span>问题 0{index + 1}</span><strong>{item.subsystem}</strong><small>{item.problem}</small>
@@ -79,8 +94,8 @@ export const HyInnovationMap: React.FC<WidgetProps> = () => {
         <article className="innovation-chain-node problem"><span>旧问题</span><p>{selected.problem}</p></article>
         <i aria-hidden="true">-&gt;</i>
         <article className={`innovation-chain-node mechanism ${matched ? 'matched' : 'mismatch'}`}>
-          <span>连接机制</span><strong>{selectedMechanism.subsystem}</strong><p>{selectedMechanism.text}</p>
-          <label>切换一条机制<select value={mechanismId} onChange={(event) => setMechanismId(event.target.value)}>
+          <span>作者提出 / 升级的工作</span><strong>{selectedMechanism.subsystem}</strong><p>{selectedMechanism.text}</p>
+          <label>切换一项工作<select value={mechanismId} onChange={(event) => setMechanismId(event.target.value)}>
             <option value={mechanismId}>{selectedMechanism.subsystem}</option>
             {alternatives.map((item) => <option key={item.id} value={item.id}>{item.subsystem}</option>)}
           </select></label>
@@ -98,6 +113,7 @@ export const HyInnovationMap: React.FC<WidgetProps> = () => {
       </div>
 
       {matched ? <div className="innovation-proof-grid">
+        <article><span>贡献类型</span><p>{selected.contribution}</p></article>
         <article><span>论文支持到哪里</span><p>{selected.evidence}</p></article>
         <article><span>不能外推到哪里</span><p>{selected.boundary}</p></article>
         {selected.media ? <figure><img src={selected.media} alt={`${selected.subsystem} 相关论文或官方素材`} /><figcaption>补充视觉材料；图片或 GIF 只帮助理解对应模块，不替代论文实验。</figcaption></figure> : null}

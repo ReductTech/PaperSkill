@@ -8,21 +8,21 @@ export const tutorial: TutorialData = {
     authors: 'Team HY-World',
     affiliation: 'Tencent Hunyuan',
     domain: '三维世界模型 · 视频扩散 · 前馈三维重建 · 3D Gaussian Splatting',
-    coreProblem: '视频生成善于补出未观测区域，却缺少显式几何；3DGS 重建能稳定保存空间，却只能恢复已经拍到的地方。',
-    coreInsight: 'HY-World 2.0 用<b>生成辅助重建</b>把两类能力串联起来：稀疏输入先扩展观察，丰富输入直接恢复几何，最终都落到可保存、可渲染、可交互的显式三维资产。',
+    coreProblem: '开放域视频生成会“想象”未见区域，却不稳定保存几何；多视图重建会“测量”真实空间，却无法补齐从未拍到的世界。',
+    coreInsight: 'HY-World 2.0 的核心答卷是<b>生成辅助重建</b>：按输入丰富度分流，用四阶段生成链补观察，再用共享前馈重建恢复几何，最终交付可保存、可渲染、可运行的显式三维资产。',
     keywords: ['生成辅助重建', '四阶段管线', '双记忆世界扩展', '前馈 3DGS'],
   },
   hero: {
-    oldMethod: { desc: '视频生成可以想象，却容易发生视角漂移；传统重建忠于观察，却不会补全未见空间。', componentId: 'hy-hero' },
-    newMethod: { desc: '先生成缺失观察，再以前馈重建和 3DGS 把多视图拉回统一几何，并保留纯重建支路。', componentId: 'hy-hero' },
+    oldMethod: { desc: '视频生成与三维重建各自解决一半问题：前者缺持久几何，后者缺开放域补全。', componentId: 'hy-hero' },
+    newMethod: { desc: '作者搭建两条输入路线、四阶段生成链与 WorldMirror 共享重建核心，把想象、测量和资产运行接成一套系统。', componentId: 'hy-hero' },
   },
   chapters: [
     {
-      kind: 'chapter', id: 'chap-1', title: '为什么需要“生成辅助重建”', badge: 'inf', badgeLabel: '概念与总览',
-      bridge: '先分清生成与重建，再看四阶段系统如何按输入条件分流。',
+      kind: 'chapter', id: 'chap-1', title: '背景、重要性与论文总答卷', badge: 'inf', badgeLabel: '问题与贡献',
+      bridge: '先回答世界模型是什么、为什么需要持久三维、作者完成了哪些工作，以及这些工作取得了什么结果。',
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '1.1', title: '世界模型概念实验室', desc: '切换四种范式，观察它们能否补全、回访和保存空间。', componentId: 'hy-world-model-basics' },
+        { kind: 'module', id: '1.1', title: '论文阅读罗盘：背景、价值、工作与结果', desc: '先切换四个阅读问题，再用范式压力测试分清画面生成、真实重建与持久三维。', componentId: 'hy-world-model-basics' },
         { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '逐步播放全景、规划、扩展和重建四个阶段。', componentId: 'hy-creation-pipeline' },
         { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击输入卡，查看四种输入如何汇入同一 WorldMirror 2.0。', componentId: 'hy-mission-planner' },
       ],
@@ -34,8 +34,8 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-2', title: 'A+B：先造世界种子，再规划观察路线', badge: 'inf', badgeLabel: '生成阶段',
-      bridge: 'HY-Pano 先补全 360° 上下文，WorldNav 再把镜头投向盲区。',
+      kind: 'chapter', id: 'chap-2', title: '工作 A+B：建立世界种子并主动规划视角', badge: 'inf', badgeLabel: '全景与规划',
+      bridge: '作者先解决“世界看不全”，再解决“下一张图该拍哪里”：HY-Pano 补 360° 上下文，WorldNav 把镜头预算投向盲区。',
       analogy: { title: '先转一圈看全，再绕开障碍补盲区', text: '全景负责建立地图感，路线负责决定下一张真正有价值的照片。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '2.1', title: '全景故障擦除实验', desc: '拖动扫描线，对比投影、潜空间和像素层修复。', componentId: 'hy-panorama' },
@@ -50,8 +50,8 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-3', title: 'C：关键帧与双记忆扩展世界', badge: 'both', badgeLabel: '训练与推理',
-      bridge: 'WorldStereo 沿路线生成关键帧，并用两种记忆保持跨路线一致。',
+      kind: 'chapter', id: 'chap-3', title: '工作 C：用关键帧与双记忆扩展世界', badge: 'both', badgeLabel: '一致性生成',
+      bridge: '路线确定后，作者用 Keyframe-VAE、GGM 与 SSM++ 同时处理关键帧细节、全局骨架和局部对应。',
       analogy: { title: '少拍关键照片，并随时对照地图与相册', text: '关键帧保细节，GGM 看全局骨架，SSM++ 找局部参考。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '3.1', title: '关键帧取景沙盘', desc: '自由选择 8 个候选视角中的 3 帧，比较重复度、视角跨度和覆盖结构，理解 Keyframe-VAE 的取舍。', componentId: 'hy-keyframes' },
@@ -74,8 +74,8 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-4', title: '如何训练：先控制、再记忆、后蒸馏', badge: 'trn', badgeLabel: '训练课程',
-      bridge: '训练按“控制 → 记忆 → 蒸馏”推进，成熟教师最后再压缩为四步学生。',
+      kind: 'chapter', id: 'chap-4', title: 'WorldStereo 如何训练：先控制、再记忆、后蒸馏', badge: 'trn', badgeLabel: '训练课程',
+      bridge: '作者没有一次加入全部能力，而是先建立相机控制，再训练跨路线记忆，最后把成熟教师蒸馏为四步学生。',
       analogy: { title: '先学走路线，再记住场景，最后加快步频', text: '训练顺序一旦颠倒，后面的模块就没有可靠能力可继承。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '4.1', title: '训练课程编排器', desc: '排列三个训练阶段，观察错误顺序造成的失败。', componentId: 'hy-training-stages' },
@@ -98,8 +98,8 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-5', title: 'D1：WorldMirror 把多视图拉回几何', badge: 'trn', badgeLabel: '前馈重建',
-      bridge: 'WorldMirror 用一次共享前向恢复相机、几何和 3DGS 属性。',
+      kind: 'chapter', id: 'chap-5', title: '工作 D1：WorldMirror 把多视图拉回统一几何', badge: 'trn', badgeLabel: '前馈重建',
+      bridge: '生成得到的新观察和真实多视图最终都需要被测量：WorldMirror 用一次共享前向恢复相机、几何和 3DGS 属性。',
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '切换分辨率，比较整数索引与归一化坐标。', componentId: 'hy-resolution' },
@@ -122,8 +122,8 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-6', title: 'D2：对齐、压缩并运行三维资产', badge: 'both', badgeLabel: '资产与运行时',
-      bridge: '先对齐深度，再压缩 3DGS，最后把资产交给 WorldLens。',
+      kind: 'chapter', id: 'chap-6', title: '工作 D2：对齐、压缩并运行三维资产', badge: 'both', badgeLabel: '资产与运行时',
+      bridge: '恢复几何不是终点：作者继续对齐深度、压缩高斯，再把可交付资产接入 WorldLens 光照、碰撞与漫游。',
       analogy: { title: '先把照片标尺对齐，再删掉重复测量点', text: '几何先统一坐标，之后才有资格在画质、数量和漂浮物之间做资产压缩。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '6.1', title: '3DGS 配方逐步重建实验', desc: '切换五个真实配置，同时检查细节、漂浮物和高斯数量。', componentId: 'hy-composition' },
@@ -146,11 +146,11 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-7', title: '创新、代际与实验：把比较放回协议', badge: 'both', badgeLabel: '贡献与结果',
-      bridge: '把创新接回旧问题，再在明确协议内比较能力与指标。',
+      kind: 'chapter', id: 'chap-7', title: '创新证据与实验结果：这些工作真的解决了什么', badge: 'both', badgeLabel: '贡献与验证',
+      bridge: '先把每项作者工作接回它要解决的旧问题，再用消融、协议内指标和代际对比检查效果。',
       analogy: { title: '比较相机前，先统一拍摄条件', text: '模型、指标、数据集和硬件必须一起选择；不同任务不能揉成一个总分。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择旧问题，匹配真正解决它的系统机制。', componentId: 'hy-innovation-map' },
+        { kind: 'module', id: '7.1', title: '作者工作与创新证据链', desc: '选择旧问题，匹配作者提出或升级的工作，并查看贡献类型、结果与证据边界。', componentId: 'hy-innovation-map' },
         { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '用统一矩阵比较 HY 谱系与其它模型的已报告能力。', componentId: 'hy-model-evolution' },
         { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '选择模型与指标；跨论文记录始终保留硬件和输入条件。', componentId: 'hy-performance-compare' },
       ],
@@ -162,18 +162,18 @@ export const tutorial: TutorialData = {
       ],
     },
     {
-      kind: 'chapter', id: 'chap-8', title: '最终判断、观点汇总与资料星图', badge: 'both', badgeLabel: '阅读收束',
-      bridge: '用证据边界收束结论，并把论文、代码与延伸阅读收入资料库。',
-      analogy: { title: '交付世界时附上测量条件、来源标签与继续阅读地图', text: '数字看论文，产品能力看官方资料，体验看署名观点，未报告就保持未知。', componentId: 'hy-analogy' },
+      kind: 'chapter', id: 'chap-8', title: '最终判断、官方功能与逐篇第三方评论', badge: 'both', badgeLabel: '结论与阅读',
+      bridge: '最后分别回答论文报告了什么、官方当前展示了什么功能，以及两篇中文文章如何评价这项工作的意义。',
+      analogy: { title: '交付世界时附上测量条件、功能说明与评论索引', text: '实验数字回到论文，规划与重建功能看官方展示，行业意义阅读署名文章自己的观点。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '8.1', title: '结论地图与继续阅读资料库', desc: '核对四个结论，并按需展开论文、代码和相关文章。', componentId: 'hy-evidence-court' },
+        { kind: 'module', id: '8.1', title: '结论地图、官方功能与逐篇评论', desc: '切换论文证据与官方功能展示，并分别展开两篇第三方文章的独立观点。', componentId: 'hy-evidence-court' },
         { kind: 'module', id: '8.2', title: '版本星轨与完整更新日志', desc: '切换最近三个大型版本，快速展示每轮调整的重点模块与审查目标；完整 TUTORIAL_CHANGELOG.md 默认折叠，现场需要追溯时再展开。', componentId: 'hy-update-log' },
       ],
-      insight: '最稳妥的结论是：HY-World 2.0 把稀疏输入生成、丰富输入重建、显式资产和运行时接到同一工程框架；它仍是分钟级离线世界生产系统，外部闭源模型也缺少统一定量协议。',
+      insight: '最稳妥的结论是：HY-World 2.0 的贡献不在一个万能总分，而在把开放域观察生成、前馈几何恢复、紧凑显式资产和运行时接成完整链路；它仍是分钟级离线世界生产系统。',
       takeaways: [
         { icon: '📖', title: '论文事实', desc: '核心结构、公式、数字与消融回到原文定位。' },
-        { icon: '🌐', title: '官方状态', desc: '开放模块、演示能力和许可证看当前官方资料。' },
-        { icon: '🌫️', title: '未知保持未知', desc: '未报告不等于不支持，也不等于已经证明。' },
+        { icon: '🌐', title: '官方功能', desc: '规划、重建、Mesh 与 WorldLens 展示回到项目页和仓库。' },
+        { icon: '💬', title: '逐篇评论', desc: '技术拆解与应用评价保留各自作者、观点和边界。' },
       ],
     },
   ],

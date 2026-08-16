@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v052',
+    version: 'V0.52',
+    alias: '起源星图·论证导航姬',
+    focus: '背景前置、贡献证据与逐篇评论',
+    modules: ['1.1 四问阅读罗盘', '八章论证顺序', '7.1 作者工作证据链', '8.1 官方功能展示', '8.1 逐篇第三方评论'],
+    note: '把教程从模块百科重排为论文论证：先讲为何重要和作者做了什么，再用方法、实验、官方功能与署名评论逐层验证。',
+  },
+  {
     id: 'v051',
     version: 'V0.51',
     alias: '轻装星卷·花火终端姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['全教程静态图片路径', '5.2 随机五头巡检', '7.2 谱系矩阵统一', '7.3 同款效率分簇图', '8.2 版本星轨'],
     note: '把部署路径、共享重建结构和两类模型比较统一到可复查、可重复操作的最终形态。',
   },
-  {
-    id: 'v049',
-    version: 'V0.49',
-    alias: '镜界巡检·星图映写姬',
-    focus: '结构图、资产放大镜与演示收束',
-    modules: ['1.2/1.3 标签与任务卡', '2.1/2.2/2.3 空间表达', '5.2 多头巡检结构图', '6.1 3DGS 双放大镜', '7.2/7.3 比较视图', '8.2 更新日志'],
-    note: '把难以读懂的交互改成能沿着一条视觉路径讲完的演示版本。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v051');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v052');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
