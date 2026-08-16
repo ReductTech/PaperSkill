@@ -91,6 +91,21 @@ function routePoint(t: number) {
   const points = [{ x: 118, y: 292 }, { x: 208, y: 240 }, { x: 316, y: 294 }, { x: 420, y: 208 }, { x: 534, y: 254 }, { x: 650, y: 154 }]; const scaled = clamp(t, 0, .9999) * (points.length - 1); const index = Math.floor(scaled); const local = scaled - index; const a = points[index], b = points[index + 1]; return { x: a.x + (b.x - a.x) * local, y: a.y + (b.y - a.y) * local, angle: Math.atan2(b.y - a.y, b.x - a.x) };
 }
 
+function cubicBezierPoint(t: number, p0: { x: number; y: number }, p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }) {
+  const u = 1 - t;
+  return {
+    x: u ** 3 * p0.x + 3 * u ** 2 * t * p1.x + 3 * u * t ** 2 * p2.x + t ** 3 * p3.x,
+    y: u ** 3 * p0.y + 3 * u ** 2 * t * p1.y + 3 * u * t ** 2 * p2.y + t ** 3 * p3.y,
+  };
+}
+
+function cubicBezierPose(t: number, p0: { x: number; y: number }, p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }) {
+  const point = cubicBezierPoint(t, p0, p1, p2, p3); const u = 1 - t;
+  const dx = 3 * u ** 2 * (p1.x - p0.x) + 6 * u * t * (p2.x - p1.x) + 3 * t ** 2 * (p3.x - p2.x);
+  const dy = 3 * u ** 2 * (p1.y - p0.y) + 6 * u * t * (p2.y - p1.y) + 3 * t ** 2 * (p3.y - p2.y);
+  return { ...point, angle: Math.atan2(dy, dx) };
+}
+
 function drawNav(ctx: CanvasRenderingContext2D, progress: number) {
   const p = easeInOutQuad(progress); panel(ctx, 38, 42, 684, 306, C.line, '#eef3e8', 14); label(ctx, '俯视场景 · NavMesh 与盲区', 58, 67, C.ink, 12);
   [{ x: 78, y: 92, w: 126, h: 88 }, { x: 256, y: 72, w: 120, h: 118 }, { x: 470, y: 86, w: 110, h: 90 }, { x: 544, y: 246, w: 120, h: 64 }].forEach((o, index) => { ctx.fillStyle = index % 2 ? '#9eb48d' : '#7f9a78'; ctx.strokeStyle = '#668160'; ctx.lineWidth = 2; roundedRect(ctx, o.x, o.y, o.w, o.h, 7); ctx.fill(); ctx.stroke(); }); ctx.fillStyle = '#d7c8a9'; ctx.fillRect(92, 111, 42, 32); ctx.fillRect(292, 105, 46, 62); ctx.fillRect(504, 108, 38, 44);
@@ -109,9 +124,12 @@ function drawStereo(ctx: CanvasRenderingContext2D, progress: number) {
   panel(ctx,48,208,114,72,C.orange,C.white,6);ctx.fillStyle='#dce8d2';ctx.fillRect(57,218,96,52);ctx.fillStyle=C.orange;ctx.fillRect(112,235,18,26);label(ctx,'SSM++ 相关帧',105,300,C.orange,9,'center');
   arrow(ctx, 188, 196, 224, 196, C.blue, 3);
   panel(ctx, 228, 58, 502, 282, C.purple, '#fbf8ff'); label(ctx, '四步去噪 + 四个目标相机', 479, 84, C.purple, 11, 'center');
-  const positions=[.18,.39,.63,.82];
+  const positions=[.18,.39,.63,.82]; const frameCenters=positions.map((_,i)=>296+i*116);
   for(let i=0;i<4;i+=1){const x=246+i*116;const reveal=clamp(p*4-i,0,1);panel(ctx,x,104,100,142,i<activeStep?C.purple:C.line,C.white,7);ctx.fillStyle='#d9e8f2';ctx.fillRect(x+7,111,86,62);ctx.fillStyle='#9eb48d';ctx.fillRect(x+7,160,86,73);ctx.fillStyle='#d7b986';ctx.fillRect(x+42-i*4,139,22,94);ctx.fillStyle=C.orange;const subjectX=x+12+positions[i]*74;ctx.beginPath();ctx.arc(subjectX,196,8,0,Math.PI*2);ctx.fill();ctx.fillStyle=C.white;ctx.fillRect(subjectX-4,193,8,3);if(reveal<.9){ctx.fillStyle='rgba(255,255,255,'+(.78*(1-reveal))+')';for(let row=0;row<5;row+=1)for(let col=0;col<4;col+=1)if((row+col+i)%2===0)ctx.fillRect(x+7+col*22,111+row*25,23,26);}label(ctx,'目标帧 '+(i+1),x+50,252,i<activeStep?C.purple:C.muted,9,'center');label(ctx,'主体 x='+Math.round(positions[i]*100)+'%',x+50,270,C.orange,8,'center');if(i<3)arrow(ctx,x+102,176,x+112,176,C.orange,2);}
-  const trackY=310;ctx.strokeStyle=C.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(260,trackY);ctx.bezierCurveTo(350,274,500,338,690,286);ctx.stroke();drawCamera(ctx,260+p*430,trackY-20*Math.sin(p*Math.PI),0,C.blue,.72);label(ctx,p>.95?'四个视角都能辨认主体位移':'相机推进时，主体产生明显视差',479,329,p>.95?C.green:C.orange,9,'center');
+  const p0={x:260,y:310},p1={x:350,y:274},p2={x:500,y:338},p3={x:690,y:286}; const keyTs=[.08,.36,.64,.91];
+  ctx.strokeStyle=C.orange;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.bezierCurveTo(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y);ctx.stroke();
+  keyTs.forEach((t,index)=>{const point=cubicBezierPoint(t,p0,p1,p2,p3);const selected=p>=t-.035;ctx.strokeStyle=selected?C.purple:'#aab4c3';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(point.x,point.y-5);ctx.lineTo(frameCenters[index],280);ctx.lineTo(frameCenters[index],276);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=selected?C.purple:C.white;ctx.strokeStyle=selected?C.purple:'#8f9caf';ctx.lineWidth=2;ctx.beginPath();ctx.arc(point.x,point.y,6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=selected?C.purple:'#8f9caf';ctx.beginPath();ctx.moveTo(frameCenters[index],274);ctx.lineTo(frameCenters[index]-4,281);ctx.lineTo(frameCenters[index]+4,281);ctx.closePath();ctx.fill();label(ctx,'K'+(index+1),point.x,point.y+18,selected?C.purple:C.muted,8,'center');});
+  const camera=cubicBezierPose(p,p0,p1,p2,p3);drawCamera(ctx,camera.x,camera.y,camera.angle,C.blue,.72);label(ctx,p>.95?'四个曲线取景点分别生成目标关键帧':'相机位置与朝向都由曲线切线驱动',479,356,p>.95?C.green:C.orange,9,'center');
 }
 
 function drawFrustum(ctx: CanvasRenderingContext2D, x: number, y: number, targetX: number, targetY: number, color: string, alpha: number) {

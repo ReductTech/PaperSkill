@@ -86,6 +86,29 @@ const efficiencyConfigs = [
 ];
 const viewCounts = [32, 64, 128, 256] as const;
 
+const crossPaperEfficiency = [
+  {
+    model: 'WorldMirror 2.0', paper: 'HY-World 2.0 · Table 14', hardware: '1× NVIDIA H20', input: '32 视图 · 518×378 · BF16', memory: '15.10 GB/卡', time: '2.11 s',
+    scope: 'WorldMirror 2.0 单卡 BF16 推理；与本模块同论文，可继续在上方切换视图数。', source: 'https://arxiv.org/abs/2604.14268',
+  },
+  {
+    model: 'Fast3R', paper: 'Fast3R · Table 2', hardware: '1× NVIDIA A100', input: '32 视图 · 512×384', memory: '13.25 GiB', time: '0.509 s',
+    scope: '单次多视图前向；论文另报 DUSt3R 在 48 视图全局对齐阶段 OOM。', source: 'https://arxiv.org/abs/2501.13928',
+  },
+  {
+    model: 'VGGT', paper: 'VGGT · Table 9', hardware: '1× NVIDIA H100 · FlashAttention v3', input: '20 帧 · 336×518', memory: '5.58 GB', time: '0.31 s',
+    scope: '只测特征骨干；每个 DPT 头平均另需 0.03 s 与 0.2 GB/帧，不能当成完整多头重建总成本。', source: 'https://arxiv.org/abs/2503.11651',
+  },
+  {
+    model: 'CUT3R', paper: 'CUT3R · Table 2', hardware: '1× NVIDIA A100', input: 'KITTI 视频深度 · 512×144', memory: '未报告', time: '16.58 FPS',
+    scope: '在线逐帧视频深度吞吐，不是固定视图批量重建墙钟时间。', source: 'https://arxiv.org/abs/2501.12387',
+  },
+  {
+    model: 'π³', paper: 'π³ · Table 4', hardware: '1× NVIDIA A800', input: 'KITTI 视频深度 · 表中未单列分辨率', memory: '未报告', time: '57.4 FPS',
+    scope: '视频深度 FPS；论文表格未提供同协议峰值显存，不能补写或换算为批量耗时。', source: 'https://arxiv.org/abs/2507.13347',
+  },
+];
+
 function efficiencyGroup(viewIndex: number): GroupDef {
   return {
     id: 'efficiency', label: '显存与时间', source: 'Table 14 · H20',
@@ -114,7 +137,9 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(staticGroups.panorama.metrics.map((metric) => metric.id));
 
   const changeGroup = (next: GroupId) => {
-    const nextGroup = next === 'efficiency' ? efficiencyGroup(viewIndex) : staticGroups[next];
+    const nextViewIndex = next === 'efficiency' ? 0 : viewIndex;
+    const nextGroup = next === 'efficiency' ? efficiencyGroup(nextViewIndex) : staticGroups[next];
+    if (next === 'efficiency') setViewIndex(nextViewIndex);
     setGroupId(next);
     setSelectedModels(nextGroup.models.map((model) => model.id));
     setSelectedMetrics(nextGroup.metrics.map((metric) => metric.id));
@@ -183,6 +208,20 @@ export const HyPerformanceCompare: React.FC<WidgetProps> = () => {
       </section>
 
       <div className="performance-boundary"><strong>严格零基线比例</strong><span>柱高 = 原始数值 / 当前指标最大已报告值。AUC、PSNR、SSIM 等越高越好；AbsRel、LPIPS、显存、时间越低越好，因此后者的短柱才更优。不同指标不能相加、平均或构造综合分数。</span></div>
+      {groupId === 'efficiency' ? <section className="cross-paper-efficiency">
+        <header><div><span>跨论文调研</span><strong>显存与时间工程记录</strong></div><p>这些记录的硬件、分辨率、输入规模和测量范围不同，因此不画成同一比例柱；它们用于回答“各论文在什么条件下报告了多少资源”，不是生成速度排行榜。</p></header>
+        <div className="cross-paper-efficiency-table" role="table" aria-label="跨论文显存与时间工程记录">
+          <div className="cross-paper-efficiency-head" role="row"><span>模型 / 来源</span><span>硬件与输入</span><span>显存</span><span>时间</span><span>测量边界</span></div>
+          {crossPaperEfficiency.map((record) => <article key={record.model} role="row">
+            <span><strong>{record.model}</strong><a href={record.source} target="_blank" rel="noreferrer">{record.paper} ↗</a></span>
+            <span><b>{record.hardware}</b><small>{record.input}</small></span>
+            <span className={record.memory === '未报告' ? 'missing' : ''}><b>{record.memory}</b></span>
+            <span><b>{record.time}</b></span>
+            <span><small>{record.scope}</small></span>
+          </article>)}
+        </div>
+        <footer><strong>阅读规则</strong><span>GB 与 GiB 保留原论文单位；FPS 不倒数成“单场景秒数”；骨干成本不冒充完整多头模型；未报告显存保持未报告。</span></footer>
+      </section> : null}
       <PaperTable tableId={tableId} />
     </div>
   );

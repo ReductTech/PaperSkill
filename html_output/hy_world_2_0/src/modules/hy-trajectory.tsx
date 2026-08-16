@@ -235,18 +235,21 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
 
           if (stage >= 1) {
             const candidates: Point[][] = [routeInfo.path, [[62,226],[178,190],[252,126],[382,80],[506,88]], [[62,226],[118,112],[248,116],[372,174],[506,88]]];
-            candidates.forEach((candidate, index) => route(ctx,candidate,index === 0 ? routeInfo.color : stage >= 2 ? C.red : '#91a4bd',index === 0 ? 4 : 2, index > 0 ? [7,5] : []));
-            if (stage === 1) label(ctx,'均匀铺开候选',310,280,C.blue,12,'center');
+            candidates.forEach((candidate, index) => {
+              const rejectProgress = stage === 2 && index > 0 ? clamp(p * 1.4 - (index - 1) * .38, 0, 1) : stage > 2 && index > 0 ? 1 : 0;
+              ctx.save(); ctx.globalAlpha = index === 0 ? 1 : 1 - rejectProgress * .58;
+              route(ctx,candidate,index === 0 ? (stage >= 3 ? routeInfo.color : '#6f86a3') : rejectProgress > 0 ? C.red : '#91a4bd',index === 0 ? 3.5 : 2.5,[8,6]); ctx.restore();
+            });
+            if (stage === 1) label(ctx,'所有候选先保持虚线，不提前宣布赢家',310,280,C.blue,12,'center');
           }
           if (stage >= 2) {
-            ctx.strokeStyle = C.red; ctx.lineWidth = 3;
-            [[252,126],[372,174]].forEach(([x,y]) => { ctx.beginPath(); ctx.moveTo(x-8,y-8); ctx.lineTo(x+8,y+8); ctx.moveTo(x+8,y-8); ctx.lineTo(x-8,y+8); ctx.stroke(); });
-            label(ctx,'Ray hit：淘汰',348,218,C.red,11);
+            const rejects = [{point:[252,126], threshold:.2,label:'穿过障碍'},{point:[372,174],threshold:.58,label:'碰撞边界'}] as const;
+            rejects.forEach(({point,threshold,label:reason}) => { const visible=stage>2?1:clamp((p-threshold)/.22,0,1); if(visible<=0)return; const [x,y]=point;ctx.save();ctx.globalAlpha=visible;ctx.strokeStyle=C.red;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x-8,y-8);ctx.lineTo(x+8,y+8);ctx.moveTo(x+8,y-8);ctx.lineTo(x-8,y+8);ctx.stroke();label(ctx,reason,x,y+22,C.red,8,'center');ctx.restore(); });
+            label(ctx,stage===2?(p<.5?'Ray-casting：先淘汰候选 B':'继续淘汰候选 C'):'两条碰撞路线已移除',348,218,C.red,11);
           }
           if (stage >= 3) {
             const split = Math.max(2, Math.floor(routeInfo.path.length / 2));
-            route(ctx,routeInfo.path.slice(0,split + 1),C.blue,6);
-            route(ctx,routeInfo.path.slice(split),C.green,6);
+            if(stage===3){route(ctx,routeInfo.path.slice(0,split + 1),C.blue,4,[8,6]);route(ctx,routeInfo.path.slice(split),C.green,4,[8,6]);}
             label(ctx,'起点 →',74,251,C.blue,11); label(ctx,'← 目标',488,34,C.green,11,'right');
           }
           if (stage === 4) {

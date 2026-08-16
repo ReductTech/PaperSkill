@@ -32,7 +32,7 @@ function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number
   ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
-function drawPanorama(ctx: CanvasRenderingContext2D, mode: CaseId, fixed: boolean) {
+function drawPanoramaBase(ctx: CanvasRenderingContext2D) {
   const x = 30, y = 48, w = 560, h = 216;
   ctx.fillStyle = '#d9e8f2'; ctx.fillRect(x, y, w, h * .52);
   ctx.fillStyle = '#9eb48d'; ctx.beginPath(); ctx.moveTo(x, y + 150); ctx.lineTo(x + 82, y + 92); ctx.lineTo(x + 170, y + 145); ctx.lineTo(x + 270, y + 76); ctx.lineTo(x + 360, y + 146); ctx.lineTo(x + 470, y + 94); ctx.lineTo(x + w, y + 142); ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fill();
@@ -40,32 +40,48 @@ function drawPanorama(ctx: CanvasRenderingContext2D, mode: CaseId, fixed: boolea
   ctx.fillStyle = '#6f8c6a'; ctx.fillRect(x + 58, y + 142, 68, 74); ctx.fillRect(x + 448, y + 132, 72, 84);
   ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(x + 414, y + 112, 14, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = C.white; ctx.fillRect(x + 405, y + 107, 18, 4);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+}
 
-  if (!fixed && mode === 'projection') {
-    ctx.strokeStyle = C.red; ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.arc(x + 32, y + 108, 106, -.68, .68); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x + w - 32, y + 108, 106, Math.PI - .68, Math.PI + .68); ctx.stroke();
-    ctx.fillStyle = 'rgba(196,63,82,.16)'; ctx.fillRect(x, y, 122, h); ctx.fillRect(x + w - 122, y, 122, h);
+function drawFailureOverlay(ctx: CanvasRenderingContext2D, mode: CaseId) {
+  const x = 30, y = 48, w = 560, h = 216;
+  if (mode === 'projection') {
+    ctx.fillStyle = '#d9e8f2'; ctx.fillRect(x, y, 126, h); ctx.fillRect(x + w - 126, y, 126, h);
+    ctx.fillStyle = '#839d78'; ctx.beginPath(); ctx.moveTo(x, y + 176); ctx.quadraticCurveTo(x + 72, y + 42, x + 126, y + 154); ctx.lineTo(x + 126, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + w - 126, y + 160); ctx.quadraticCurveTo(x + w - 58, y + 22, x + w, y + 182); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - 126, y + h); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = C.red; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x + 18, y + 108, 112, -.72, .72); ctx.stroke(); ctx.beginPath(); ctx.arc(x + w - 18, y + 108, 112, Math.PI - .72, Math.PI + .72); ctx.stroke();
+    label(ctx, '焦距误差放大', x + 76, y + 29, C.red, 10, 'center'); label(ctx, '边缘拉伸', x + w - 70, y + 29, C.red, 10, 'center');
+    ctx.strokeStyle = C.red; ctx.lineWidth = 2; [[x+84,y+98,x+38,y+78],[x+w-84,y+98,x+w-38,y+72]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
   }
-  if (!fixed && mode === 'latent') {
-    ctx.fillStyle = 'rgba(196,63,82,.28)'; ctx.fillRect(x, y, 32, h); ctx.fillRect(x + w - 32, y, 32, h);
-    ctx.strokeStyle = C.red; ctx.lineWidth = 8; ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(x + 16, y); ctx.lineTo(x + 16, y + h); ctx.moveTo(x + w - 16, y); ctx.lineTo(x + w - 16, y + h); ctx.stroke(); ctx.setLineDash([]);
+  if (mode === 'latent') {
+    ctx.fillStyle = 'rgba(41,85,143,.42)'; ctx.fillRect(x, y, 46, h); ctx.fillStyle = 'rgba(217,119,6,.46)'; ctx.fillRect(x + w - 46, y, 46, h);
+    ctx.fillStyle = '#567360'; ctx.fillRect(x, y + 122, 46, 94); ctx.fillStyle = '#c49c68'; ctx.fillRect(x + w - 46, y + 70, 46, 146);
+    ctx.strokeStyle = C.red; ctx.lineWidth = 7; ctx.setLineDash([10, 7]); ctx.beginPath(); ctx.moveTo(x + 23, y); ctx.lineTo(x + 23, y + h); ctx.moveTo(x + w - 23, y); ctx.lineTo(x + w - 23, y + h); ctx.stroke(); ctx.setLineDash([]);
+    label(ctx, '左边界特征', x + 58, y + 28, C.blue, 9, 'center'); label(ctx, '右边界特征', x + w - 60, y + 28, C.orange, 9, 'center'); label(ctx, '本应相邻，却各自去噪', x + w / 2, y + 202, C.red, 10, 'center');
+    ctx.strokeStyle=C.red;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+42,y+184);ctx.quadraticCurveTo(x+w/2,y+232,x+w-42,y+184);ctx.stroke();
   }
-  if (!fixed && mode === 'pixel') {
-    const gradient = ctx.createLinearGradient(x, 0, x + w, 0); gradient.addColorStop(0, 'rgba(76,120,180,.48)'); gradient.addColorStop(.1, 'rgba(76,120,180,0)'); gradient.addColorStop(.9, 'rgba(217,119,6,0)'); gradient.addColorStop(1, 'rgba(217,119,6,.55)'); ctx.fillStyle = gradient; ctx.fillRect(x, y, w, h);
-    ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x + 3, y); ctx.lineTo(x + 3, y + h); ctx.moveTo(x + w - 3, y); ctx.lineTo(x + w - 3, y + h); ctx.stroke();
+  if (mode === 'pixel') {
+    const left = ctx.createLinearGradient(x, 0, x + 104, 0); left.addColorStop(0, 'rgba(39,68,110,.72)'); left.addColorStop(1, 'rgba(39,68,110,0)'); ctx.fillStyle = left; ctx.fillRect(x, y, 110, h);
+    const right = ctx.createLinearGradient(x + w - 110, 0, x + w, 0); right.addColorStop(0, 'rgba(217,119,6,0)'); right.addColorStop(1, 'rgba(217,119,6,.78)'); ctx.fillStyle = right; ctx.fillRect(x + w - 110, y, 110, h);
+    ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x + 4, y); ctx.lineTo(x + 4, y + h); ctx.moveTo(x + w - 4, y); ctx.lineTo(x + w - 4, y + h); ctx.stroke();
+    ctx.fillStyle=C.blue;ctx.fillRect(x+16,y+18,34,18);ctx.fillStyle=C.orange;ctx.fillRect(x+w-50,y+18,34,18);label(ctx,'冷暗',x+33,y+32,C.white,8,'center');label(ctx,'暖亮',x+w-33,y+32,C.white,8,'center');label(ctx,'同一球面方向出现颜色跳变',x+w/2,y+202,C.red,10,'center');
   }
-  if (fixed) {
-    ctx.strokeStyle = C.green; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x + 3, y + 4); ctx.lineTo(x + 3, y + h - 4); ctx.moveTo(x + w - 3, y + 4); ctx.lineTo(x + w - 3, y + h - 4); ctx.stroke();
-  }
-  ctx.strokeStyle = fixed ? C.green : C.red; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+}
+
+function drawRepairCue(ctx: CanvasRenderingContext2D, mode: CaseId) {
+  const x = 30, y = 48, w = 560, h = 216;
+  ctx.strokeStyle=C.green;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x+3,y+4);ctx.lineTo(x+3,y+h-4);ctx.moveTo(x+w-3,y+4);ctx.lineTo(x+w-3,y+h-4);ctx.stroke();
+  if(mode==='projection'){ctx.strokeStyle='rgba(34,141,92,.42)';ctx.lineWidth=1.5;for(let i=1;i<7;i+=1){ctx.beginPath();ctx.moveTo(x+i*w/7,y);ctx.lineTo(x+i*w/7,y+h);ctx.stroke();}label(ctx,'隐式映射保持 ERP 结构',x+w/2,y+202,C.green,10,'center');}
+  if(mode==='latent'){ctx.strokeStyle=C.green;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+w/2,y+190,52,.08,Math.PI*1.92);ctx.stroke();label(ctx,'Circle Padding：左右互为邻居',x+w/2,y+202,C.green,10,'center');}
+  if(mode==='pixel'){const blend=ctx.createLinearGradient(x,0,x+80,0);blend.addColorStop(0,'rgba(34,141,92,.18)');blend.addColorStop(1,'rgba(34,141,92,0)');ctx.fillStyle=blend;ctx.fillRect(x,y,80,h);const blendR=ctx.createLinearGradient(x+w-80,0,x+w,0);blendR.addColorStop(0,'rgba(34,141,92,0)');blendR.addColorStop(1,'rgba(34,141,92,.18)');ctx.fillStyle=blendR;ctx.fillRect(x+w-80,y,80,h);label(ctx,'Pixel Blending 平滑重叠带',x+w/2,y+202,C.green,10,'center');}
 }
 
 function paintCanvas(canvas: HTMLCanvasElement, mode: CaseId, reveal: number) {
   const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.clearRect(0, 0, 620, 320); ctx.fillStyle = C.bg; ctx.fillRect(0, 0, 620, 320); drawPanorama(ctx, mode, false);
+  ctx.clearRect(0, 0, 620, 320); ctx.fillStyle = C.bg; ctx.fillRect(0, 0, 620, 320); drawPanoramaBase(ctx);
   const cut = 30 + reveal / 100 * 560;
-  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, cut, 320); ctx.clip(); drawPanorama(ctx, mode, true); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(cut, 48, Math.max(0, 590 - cut), 216); ctx.clip(); drawFailureOverlay(ctx, mode); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(30, 48, Math.max(0, cut - 30), 216); ctx.clip(); drawRepairCue(ctx, mode); ctx.restore();
   ctx.strokeStyle = C.orange; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cut, 36); ctx.lineTo(cut, 278); ctx.stroke();
   ctx.fillStyle = C.orange; ctx.beginPath(); ctx.arc(cut, 36, 8, 0, Math.PI * 2); ctx.fill();
   label(ctx, reveal === 0 ? '全部为修复前' : reveal === 100 ? '全部为修复后' : '左：修复后｜右：修复前', 310, 304, reveal === 100 ? C.green : reveal === 0 ? C.red : C.orange, 12, 'center');

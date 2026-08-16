@@ -49,14 +49,15 @@ function MemoryCanvas({ mode }: { mode: Mode }) {
       ctx.fillStyle = hasGgm ? '#f2edff' : C.white; ctx.strokeStyle = hasGgm ? C.purple : C.line; ctx.lineWidth = hasGgm ? 3 : 2; ctx.fillRect(28, 55, 142, 92); ctx.strokeRect(28, 55, 142, 92);
       for (let i = 0; i < 26; i += 1) { ctx.fillStyle = hasGgm ? C.purple : '#cfd6df'; ctx.globalAlpha = hasGgm ? .75 : .28; ctx.beginPath(); ctx.arc(48 + (i * 37) % 105, 72 + (i * 29) % 56, 2.5, 0, Math.PI * 2); ctx.fill(); } ctx.globalAlpha = 1;
       label(ctx, 'GGM', 99, 119, hasGgm ? C.purple : C.muted, 13, 'center'); label(ctx, '360° 粗点云渲染', 99, 166, C.muted, 10, 'center');
-      ctx.fillStyle = hasSsm ? '#fff7e9' : C.white; ctx.strokeStyle = hasSsm ? C.orange : C.line; ctx.lineWidth = hasSsm ? 3 : 2; ctx.fillRect(28, 202, 142, 82); ctx.strokeRect(28, 202, 142, 82);
-      ctx.fillStyle = '#dce8d2'; ctx.fillRect(42, 214, 114, 55); if (hasSsm) { ctx.strokeStyle = C.orange; for (let i = 0; i < 5; i += 1) ctx.strokeRect(48 + i * 20, 220, 16, 35); }
-      label(ctx, 'SSM++', 99, 300, hasSsm ? C.orange : C.muted, 10, 'center');
-      ctx.strokeStyle = hasGgm ? C.purple : C.line; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(170, 100); ctx.lineTo(244, 130); ctx.stroke();
-      ctx.strokeStyle = hasSsm ? C.orange : C.line; ctx.beginPath(); ctx.moveTo(170, 242); ctx.lineTo(244, 194); ctx.stroke();
-      drawRoom(ctx, 326, 70, mode);
-      ctx.fillStyle = mode === 'both' ? C.green : mode === 'none' ? C.red : C.orange; ctx.fillRect(244, 122, 62, 82); label(ctx, 'DiT', 275, 169, C.white, 14, 'center');
-      label(ctx, modes[mode].title, 451, 292, mode === 'both' ? C.green : mode === 'none' ? C.red : C.orange, 12, 'center');
+      ctx.fillStyle = hasSsm ? '#fff7e9' : C.white; ctx.strokeStyle = hasSsm ? C.orange : C.line; ctx.lineWidth = hasSsm ? 3 : 2; ctx.fillRect(28, 198, 142, 88); ctx.strokeRect(28, 198, 142, 88);
+      [0.31,0.82,0.18].forEach((score,index)=>{const bx=38+index*42;ctx.fillStyle=index===1&&hasSsm?'#f5c77d':'#dce8d2';ctx.fillRect(bx,214,34,42);ctx.strokeStyle=index===1&&hasSsm?C.orange:C.line;ctx.strokeRect(bx,214,34,42);label(ctx,Math.round(score*100)+'%',bx+17,273,index===1&&hasSsm?C.orange:C.muted,7,'center');});
+      label(ctx, 'SSM++ · 3D FoV 检索', 99, 303, hasSsm ? C.orange : C.muted, 10, 'center');
+      ctx.strokeStyle = hasGgm ? C.purple : C.line; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(170, 100); ctx.lineTo(270, 126); ctx.stroke();
+      ctx.fillStyle=hasSsm?'#fff7e9':C.white;ctx.strokeStyle=hasSsm?C.orange:C.line;ctx.lineWidth=2;ctx.fillRect(190,214,112,58);ctx.strokeRect(190,214,112,58);ctx.fillStyle='#dce8d2';ctx.fillRect(198,222,45,40);ctx.fillStyle='#d9e8f2';ctx.fillRect(243,222,51,40);ctx.strokeStyle=hasSsm?C.orange:C.line;ctx.beginPath();ctx.moveTo(243,222);ctx.lineTo(243,262);ctx.stroke();label(ctx,'检索帧',220,237,C.ink,7,'center');label(ctx,'目标帧',269,237,C.ink,7,'center');label(ctx,'2W · 同一 t',246,285,hasSsm?C.orange:C.muted,8,'center');
+      ctx.strokeStyle = hasSsm ? C.orange : C.line; ctx.lineWidth=3;ctx.beginPath(); ctx.moveTo(170,242); ctx.lineTo(190,242);ctx.moveTo(302,242);ctx.lineTo(318,196);ctx.stroke();
+      drawRoom(ctx, 348, 70, mode);
+      ctx.fillStyle = mode === 'both' ? C.green : mode === 'none' ? C.red : C.orange; ctx.fillRect(270, 122, 58, 82); label(ctx, '主 DiT', 299, 169, C.white, 11, 'center');
+      label(ctx, modes[mode].title, 473, 292, mode === 'both' ? C.green : mode === 'none' ? C.red : C.orange, 12, 'center');
       canvas.classList.add('is-ready');
     };
     const disconnect = observeCanvas(canvas, paint, () => undefined); paint(); return disconnect;
@@ -73,7 +74,16 @@ export const HyMemory: React.FC<WidgetProps> = () => {
       <div><span>本次操作</span><p>依次切换无记忆、仅 GGM、仅 SSM++ 和双记忆，观察结构位置与局部纹理分别由谁负责。</p></div>
       <div><span>应得判断</span><p>GGM 是全局几何锚点，SSM++ 是局部相关视角检索；它们不是两个同类缓存。</p></div>
     </div>
-    <section className="ggm-definition"><span>先定义术语</span><strong>GGM = Global-Geometric Memory</strong><p>它把 360° 全景点云从目标相机渲染成粗几何条件，用来固定墙、门、转角等全局结构。它不是保存全部历史 token 的通用缓存。</p></section>
+    <div className="memory-definition-grid">
+      <section className="ggm-definition"><span>全局几何记忆</span><strong>GGM = Global-Geometric Memory</strong><p>把 360° 全景点云从目标相机渲染成粗几何条件，用来固定墙、门、转角等全局结构。它不是保存全部历史 token 的通用缓存。</p></section>
+      <section className="ssm-definition"><span>改进空间立体记忆</span><strong>SSM++ = Improved Spatial-Stereo Memory</strong><p>按目标相机的 3D FoV 从记忆库选择最相关关键帧，直接送入主 DiT；检索帧与目标帧沿宽度横向拼接成 2W，并共享同一时间索引。</p></section>
+    </div>
+    <section className="ssm-process-strip">
+      <article><b>1</b><span><strong>目标相机查询</strong><small>当前目标视角定义需要补哪一块细节。</small></span></article><i>→</i>
+      <article><b>2</b><span><strong>3D FoV 评分</strong><small>比较历史关键帧与目标视场的空间相关性。</small></span></article><i>→</i>
+      <article><b>3</b><span><strong>选择性检索</strong><small>只取最相关关键帧，避免每帧都检索的冗余。</small></span></article><i>→</i>
+      <article><b>4</b><span><strong>空间配对</strong><small>检索帧 + 目标帧 = 2W，共享时间索引 t。</small></span></article>
+    </section>
     <div className="memory-mode-tabs" role="tablist" aria-label="选择记忆组合">
       {(Object.keys(modes) as Mode[]).map((id) => <button key={id} type="button" role="tab" aria-selected={mode === id} className={mode === id ? 'selected' : ''} onClick={() => setMode(id)}><strong>{modes[id].title}</strong><small>{id === 'ggm' ? '只守骨架' : id === 'ssm' ? '只补细节' : id === 'both' ? '论文组合' : '失败基线'}</small></button>)}
     </div>

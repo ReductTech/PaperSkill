@@ -5,27 +5,31 @@ type RecipeId = 'real' | 'synthetic' | 'mixed-clean' | 'mixed-dirty';
 
 const recipes: Record<RecipeId, {
   title: string; source: string; coverage: number; realism: number; labels: number; contamination: number;
-  lesson: string; conclusion: string;
+  lesson: string; conclusion: string; sourceGate: string; qualityGate: string; learnedPrior: string; generationEffect: string;
 }> = {
   real: {
     title: '只用真实全景', source: '自然光照与真实纹理', coverage: 52, realism: 94, labels: 38, contamination: 14,
     lesson: '真实数据贴近现实分布，但难以覆盖浮空遗迹、极端视角等想象场景，几何标签也不总是完整。',
     conclusion: '真实数据负责“像现实”，却不能独自解决语义覆盖与精确标签。',
+    sourceGate: '保留真实 360° 拍摄，缺少 UE 可控资产。', qualityGate: '仍需剔除明显接缝与拍摄设备。', learnedPrior: '材质、光照和自然噪声更接近真实相机。', generationEffect: '常见场景更自然，稀有语义与极端视角容易缺席。',
   },
   synthetic: {
     title: '只用 UE 合成', source: '可控场景与精确几何', coverage: 82, realism: 58, labels: 96, contamination: 4,
     lesson: '合成数据可自由设计场景并输出精确标签，但渲染规律与真实拍摄之间存在 domain gap。',
     conclusion: '合成数据负责“可控与可标注”，却不能独自替代真实世界外观。',
+    sourceGate: '只接收 UE 资产与渲染轨迹，语义可主动扩展。', qualityGate: '几何标签干净，但仍需检查渲染异常。', learnedPrior: '覆盖范围和相机标签强，真实成像统计偏弱。', generationEffect: '构图与结构丰富，但材质、光照可能呈现引擎感。',
   },
   'mixed-clean': {
     title: '双源混合 + 质量过滤', source: '真实质感 + 合成多样性', coverage: 91, realism: 88, labels: 84, contamination: 5,
     lesson: '混合两类来源扩展分布，再过滤明显接缝和拍摄设备入镜，避免模型学习错误视觉模式。',
     conclusion: '论文的关键不是简单拼接两堆数据，而是让双源互补并对污染做质量门控。',
+    sourceGate: '真实拍摄与 UE 资产同时进入候选池。', qualityGate: '显式拒绝 stitching artifacts 与相机设备入镜。', learnedPrior: '真实外观、稀有语义和几何标签形成互补。', generationEffect: '既覆盖多样世界，又降低接缝与设备反复出现的概率。',
   },
   'mixed-dirty': {
     title: '双源混合但不过滤', source: '覆盖广，但错误模式也被保留', coverage: 94, realism: 76, labels: 83, contamination: 62,
     lesson: '接缝、支架和拍摄设备会成为高频捷径；模型可能把它们当成全景世界应有的结构。',
     conclusion: '数据越多不等于训练信号越好，污染会把“全景边界”和“相机设备”写进生成先验。',
+    sourceGate: '双源样本全部进入，表面覆盖率最高。', qualityGate: '接缝、支架和设备轮廓没有被拦截。', learnedPrior: '模型同时学习场景规律和采集流程的错误捷径。', generationEffect: '边界竖线、底部设备或固定支架可能被重复生成。',
   },
 };
 
@@ -74,6 +78,16 @@ export const HyPanoramaCuration: React.FC<WidgetProps> = () => {
       </section>
     </div>
     <section className="curation-cause-effect"><span>当前会发生什么</span><strong>{active.lesson}</strong><p>{active.conclusion}</p></section>
+    <section className="curation-causal-pipeline" aria-live="polite">
+      <header><span>从样本到生成结果</span><strong>把“数据配方”拆成四个可追踪因果环节</strong></header>
+      <div>
+        <article><b>1</b><span><strong>来源门</strong><small>{active.sourceGate}</small></span></article><i>→</i>
+        <article className={recipe === 'mixed-dirty' ? 'danger' : ''}><b>2</b><span><strong>质量门</strong><small>{active.qualityGate}</small></span></article><i>→</i>
+        <article><b>3</b><span><strong>学到的先验</strong><small>{active.learnedPrior}</small></span></article><i>→</i>
+        <article className={recipe === 'mixed-clean' ? 'success' : recipe === 'mixed-dirty' ? 'danger' : ''}><b>4</b><span><strong>生成时表现</strong><small>{active.generationEffect}</small></span></article>
+      </div>
+      <p>这里解释的是因果方向，不是论文公开的数据配比。论文明确报告双源策展和质量过滤，但没有给出四项教学百分比的测量值。</p>
+    </section>
     <div className={`feedback ${recipe === 'mixed-clean' ? 'good' : recipe === 'mixed-dirty' ? 'bad' : ''}`}>{recipe === 'mixed-clean' ? '双源互补与质量过滤同时成立：分布更广，污染捷径没有被一起收入。' : recipe === 'mixed-dirty' ? '覆盖率看似最高，但错误模式也最强；这正说明“更多样本”不能代替清洗。' : '单源能贡献一部分能力，但会留下另一侧缺口。'}</div>
     <section className="curation-paper-boundary"><span>论文事实与教学抽象</span><p>Section 3.1 明确描述高分辨率真实全景、UE 合成资产，以及对明显 stitching artifacts 和相机设备入镜样本的过滤。上方分布点和百分比是教学抽象，不是论文样本截图或固定配比。</p></section>
     <div className="curation-glossary-grid"><details><summary>什么是 domain gap？</summary><p>真实拍摄与引擎渲染在材质、光照、噪声和纹理统计上存在分布差异。</p></details><details><summary>为什么设备入镜危险？</summary><p>若支架或相机反复出现，模型可能把它学成全景场景的一部分，而不是采集过程的偶然污染。</p></details></div>

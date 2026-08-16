@@ -23,7 +23,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '1.1', title: '世界模型概念实验室', desc: '切换像素视频、动作条件世界、显式三维资产与混合系统，用遮挡、回访和动作压力测试理解不同范式。', componentId: 'hy-world-model-basics' },
-        { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '每次清空画布演示一个子系统：WorldNav 显示候选淘汰与盲区覆盖，WorldStereo 用运动主体和视差区分连续目标帧。', componentId: 'hy-creation-pipeline' },
+        { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '每次清空画布演示一个子系统：WorldStereo 的相机沿真实贝塞尔曲线移动并随切线转向，四个曲线取景点分别连接到对应目标关键帧。', componentId: 'hy-creation-pipeline' },
         { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击显式标注的输入任务卡，在紧凑路径图中切换文本、单图、多视图和视频；两条路线共享同一个 WorldMirror 2.0 落点。', componentId: 'hy-mission-planner' },
       ],
       insight: '核心不是“一个网络做完所有事”，而是让生成负责扩展观察，让重建负责恢复几何，并根据输入丰富度选择路径。',
@@ -38,9 +38,9 @@ export const tutorial: TutorialData = {
       bridge: '论文生成路线的前两段先解决“世界大致是什么样”和“还应该去哪里看”。HY-Pano 建立 360 度上下文，WorldNav 把相机预算主动投向盲区。',
       analogy: { title: '先转一圈看全，再绕开障碍补盲区', text: '全景负责建立地图感，路线负责决定下一张真正有价值的照片。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '2.1', title: '全景故障擦除实验', desc: '选择投影失真、潜空间断边或像素接缝，把扫描线完整拖到 0% / 100%，在同一 ERP 场景上比较三种机制各自修复什么。', componentId: 'hy-panorama' },
-        { kind: 'module', id: '2.2', title: '全景数据配方显微镜', desc: '切换真实单源、合成单源、清洗双源和未清洗双源，比较覆盖、真实感、标签能力与污染风险，不再用虚构图片卡冒充论文样本。', componentId: 'hy-panorama-curation' },
-        { kind: 'module', id: '2.3', title: 'WorldNav 五层规划回放', desc: '五类任务现在具有明显不同的覆盖目标：放射、对象环绕、空洞回访、远端漫游与俯视覆盖；最终相机仍按折线逐段转向。', componentId: 'hy-trajectory' },
+        { kind: 'module', id: '2.1', title: '全景故障擦除实验', desc: '同一 ERP 场景只绘制一次，扫描线右侧局部叠加焦距拉伸、周期断边或颜色跳变；拖到 0% / 100% 可明确对应三种修复层级。', componentId: 'hy-panorama' },
+        { kind: 'module', id: '2.2', title: '全景数据配方显微镜', desc: '切换四种数据配方，同时追踪来源门、质量门、学到的先验与生成表现，理解双源互补为什么必须和污染过滤一起成立。', componentId: 'hy-panorama-curation' },
+        { kind: 'module', id: '2.3', title: 'WorldNav 五层规划回放', desc: '所有路线先以虚线候选出现，再由 Ray-casting 逐条淘汰；幸存路线保持虚线直到最终连接完成，只有执行回放时变成实线。', componentId: 'hy-trajectory' },
       ],
       insight: '全景不是最终三维世界，而是后续场景解析和路线规划的世界种子；五类轨迹用不同观察方式补足背面、远端、空洞与顶部盲区。',
       takeaways: [
@@ -55,7 +55,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '少拍关键照片，并随时对照地图与相册', text: '关键帧保细节，GGM 看全局骨架，SSM++ 找局部参考。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '3.1', title: '关键帧取景沙盘', desc: '自由选择 8 个候选视角中的 3 帧，比较重复度、视角跨度和覆盖结构，理解 Keyframe-VAE 的取舍。', componentId: 'hy-keyframes' },
-        { kind: 'module', id: '3.2', title: 'GGM × SSM++ 双记忆实验', desc: '先定义 GGM 是什么，再切换无记忆、仅全局几何、仅局部检索与双记忆，观察门框位置和墙面纹理分别由谁稳定。', componentId: 'hy-memory' },
+        { kind: 'module', id: '3.2', title: 'GGM × SSM++ 双记忆实验', desc: '分别定义 GGM 与 SSM++，并把后者拆成目标查询、3D FoV 评分、选择性检索、横向 2W 拼接和共享时间索引，再观察结构与纹理如何分工。', componentId: 'hy-memory' },
       ],
       insight: 'GGM 管“大尺度结构不能自相矛盾”，SSM++ 管“局部纹理和对应关系能对上”；两种记忆解决的尺度不同。',
       formula: {
@@ -103,7 +103,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '固定同一相对位置并切换 L/M/H，直接比较整数索引进入训练外范围与归一化坐标保持可比的因果差异。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: '任务驱动的 Any-Modal 重建台', desc: '从相机估计、表面恢复或 3DGS 交付任务出发，按需接入位姿、内参和深度，观察共享骨干与专用任务头为何同时需要。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '为固定的三图资产交付委托接入现有 Pose、K、Depth，执行一次共享前向，再逐个检查 Camera、Pointmap、Depth、Normal 与 3DGS 输出头的职责。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {
@@ -152,9 +152,9 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '7.1', title: '创新证据链工作台', desc: '选择一个旧问题并切换连接机制，观察规划、记忆、重建与运行时为何不能互相替代；匹配后展开论文证据与外推边界。', componentId: 'hy-innovation-map' },
         { kind: 'module', id: '7.2', title: '模型能力进化图鉴', desc: '先看 HY-World 2.0，再看历代模型与外部谱系；只对资料已报告的能力开放详情，并标注发表时间。', componentId: 'hy-model-evolution' },
-        { kind: 'module', id: '7.3', title: '严格零基线模型分簇图', desc: '自由选择模型与指标；每根柱从零开始并严格按“原值 / 当前指标最大已报告值”绘制，低优指标不再反转，OOM 不虚构数值。', componentId: 'hy-performance-compare' },
+        { kind: 'module', id: '7.3', title: '协议内分簇图与跨论文工程记录', desc: '论文内指标继续严格按零基线比例绘制；效率页另列 Fast3R、VGGT、CUT3R 与 π³ 的显存或时间记录，并保留硬件、输入规模、测量范围与未报告项。', componentId: 'hy-performance-compare' },
       ],
-      insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；性能图只允许在表 4、表 12 或表 14 各自兼容的协议内比较。',
+      insight: 'HY-World 2.0 的创新来自完整链路分工，而不是单项指标通吃；表 4、表 12、表 14 可以在各自协议内画比例图，跨论文资源记录只能带完整条件并列阅读。',
       takeaways: [
         { icon: 'P', title: '问题对应机制', desc: '规划、记忆、重建和运行时各修复不同瓶颈。' },
         { icon: 'C', title: '能力不等于总榜', desc: '谱系图说明覆盖范围，不产生跨任务排名。' },
