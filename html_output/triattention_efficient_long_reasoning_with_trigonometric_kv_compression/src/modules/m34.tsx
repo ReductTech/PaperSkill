@@ -5,7 +5,7 @@ import type { WidgetProps } from './registry';
 export const M34: React.FC<WidgetProps> = () => (
   <div>
     <video
-      src="/images/video1.mp4"
+      src="images/video1.mp4"
       controls
       autoPlay
       loop
