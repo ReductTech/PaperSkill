@@ -114,9 +114,6 @@ export const ImageViewpointDemo: React.FC<WidgetProps> = () => {
           <button type="button" onClick={generate} disabled={status === 'generating'}>
             {status === 'generating' ? '生成中…' : status === 'done' ? '重新生成' : '生成目标视角'}
           </button>
-          {status === 'done' ? (
-            <span aria-live="polite">已从正面参考图像生成{formatAngle(angle)}目标视角。</span>
-          ) : null}
         </div>
       </div>
     </div>

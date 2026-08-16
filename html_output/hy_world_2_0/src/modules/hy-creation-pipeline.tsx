@@ -19,7 +19,7 @@ const stages = [
     result: '得到带全局上下文的连续全景，后续规划器能够从中心向四周判断盲区。',
     why: '普通透视图只有有限视场；全景先补齐方向上下文，才能规划环绕、远端或俯视路线。',
     evidence: '论文 Section 3.1-3.2、Figure 3；全景质量按表 4 的 I2P / T2P 子协议阅读。',
-    media: { src: '/images/official-stage-pano.webp', alt: 'HY-Pano 2.0 官方架构图，展示隐式映射、循环填充和像素融合', title: '官方图：全景生成与双层接缝修复', caption: '图中同时展示真实全景案例、潜空间 Circle Padding 与像素空间 Pixel Blending，对应动画里的“展开 + 闭环”两件事。' },
+    media: { src: './images/official-stage-pano.webp', alt: 'HY-Pano 2.0 官方架构图，展示隐式映射、循环填充和像素融合', title: '官方图：全景生成与双层接缝修复', caption: '图中同时展示真实全景案例、潜空间 Circle Padding 与像素空间 Pixel Blending，对应动画里的“展开 + 闭环”两件事。' },
   },
   {
     id: 'nav', name: 'WorldNav', short: '场景感知规划',
@@ -29,7 +29,7 @@ const stages = [
     result: '相机沿可行路径依次照亮盲区，而不是重复经过已经充分观察的区域。',
     why: '轨迹决定扩散模型会生成哪些新视角；错误路线会造成重复观察、穿墙或遗漏远端结构。',
     evidence: '论文 Section 3.3、Figure 4-5 与 Table 1；五类轨迹是互补启发式，不是学习得到的全局最优解。',
-    media: { src: '/images/official-stage-nav.webp', alt: 'WorldNav 官方图，展示五类轨迹和完整轨迹在真实三维场景中的分布', title: '官方图：五类互补相机轨迹', caption: '真实三维场景上叠加了常规、环绕、重建感知、漫游和航拍轨迹；动画将它们抽象为 NavMesh、盲区和一条可观察路线。' },
+    media: { src: './images/official-stage-nav.webp', alt: 'WorldNav 官方图，展示五类轨迹和完整轨迹在真实三维场景中的分布', title: '官方图：五类互补相机轨迹', caption: '真实三维场景上叠加了常规、环绕、重建感知、漫游和航拍轨迹；动画将它们抽象为 NavMesh、盲区和一条可观察路线。' },
   },
   {
     id: 'stereo', name: 'WorldStereo 2.0', short: '关键帧世界扩展',
@@ -39,7 +39,7 @@ const stages = [
     result: '噪声目标逐步变清晰，并与其它路线上的参考视角保持几何和纹理一致。',
     why: '连续视频帧容易重复和模糊；关键帧表示与选择性记忆更适合扩展长轨迹上的高质量观察。',
     evidence: '论文 Section 4、Figure 6-8；四步仅指蒸馏后的 WorldStereo 采样，不代表端到端世界生成实时。',
-    media: { src: '/images/official-stage-stereo.webp', alt: 'WorldStereo 2.0 官方架构图，展示记忆库、目标视角、全景点云和相机控制分支', title: '官方图：关键帧扩散、记忆库与相机控制', caption: '左侧是检索视角与记忆库，右侧从全景深度得到点云和轨迹，再以 Plucker Ray Embedding 控制目标相机。' },
+    media: { src: './images/official-stage-stereo.webp', alt: 'WorldStereo 2.0 官方架构图，展示记忆库、目标视角、全景点云和相机控制分支', title: '官方图：关键帧扩散、记忆库与相机控制', caption: '左侧是检索视角与记忆库，右侧从全景深度得到点云和轨迹，再以 Plucker Ray Embedding 控制目标相机。' },
   },
   {
     id: 'mirror', name: 'WorldMirror 2.0', short: '几何恢复与合成',
@@ -49,12 +49,12 @@ const stages = [
     result: '一次前馈恢复相机与几何，再形成可保存、可重渲染并交给 WorldLens 的显式三维资产。',
     why: '共享几何核心把生成观察和真实观察落到同一种持久世界表示，避免只得到无法编辑的像素视频。',
     evidence: '论文 Section 5-6、Figure 2 与 Figure 12；生成路径和重建路径共享的是该重建核心，不是前面全部组件。',
-    media: { src: '/images/official-stage-mirror.webp', alt: 'WorldMirror 2.0 官方图，展示多模态先验、共享几何预测和五类输出', title: '官方图：Any-Modal 输入与统一几何预测', caption: '图中多视图图像与可选先验合并为 token，经共享聚合器同时输出点图、相机、深度、法线、3D Gaussians 与新视角。' },
+    media: { src: './images/official-stage-mirror.webp', alt: 'WorldMirror 2.0 官方图，展示多模态先验、共享几何预测和五类输出', title: '官方图：Any-Modal 输入与统一几何预测', caption: '图中多视图图像与可选先验合并为 token，经共享聚合器同时输出点图、相机、深度、法线、3D Gaussians 与新视角。' },
   },
 ] as const;
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left', weight = 700) {
-  ctx.fillStyle = color; ctx.font = `${weight} ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `${weight} ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 10) {
@@ -158,7 +158,7 @@ export const HyCreationPipeline: React.FC<WidgetProps> = () => {
   const selectStage = (next: number) => { if (next === stageIndex && animating) return; setStageIndex(next); setAnimationKey((value) => value + 1); };
   const next = () => selectStage(stageIndex === stages.length - 1 ? 0 : stageIndex + 1);
   return <div className={`creation-pipeline ${animating ? 'is-animating' : ''}`}>
-    <div className="learning-contract"><div><span>为什么学</span><p>四个子系统各自修复一个不同瓶颈，不能只记住系统名称。</p></div><div><span>本次操作</span><p>逐步点击四个阶段；每次清空画布，只演示该阶段新增的能力。</p></div><div><span>应得判断</span><p>生成路径先补观察，再规划、扩展关键帧，最后由共享 WorldMirror 恢复显式三维资产。</p></div></div>
+    <div className="learning-contract"><div><span>为什么学</span><p>四阶段各解决一个瓶颈。</p></div><div><span>本次操作</span><p>逐步播放四段独立动画。</p></div><div><span>应得判断</span><p>补观察后再恢复显式三维。</p></div></div>
     <div className="creation-stage-tabs" role="tablist" aria-label="选择四阶段造物管线步骤">{stages.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={stageIndex === index} className={stageIndex === index ? 'selected' : index < stageIndex ? 'complete' : ''} onClick={() => selectStage(index)}><b>{index + 1}</b><span>{item.name}</span><small>{item.short}</small></button>)}</div>
     <div className="creation-stage-main">
       <div className="creation-canvas-shell"><PipelineCanvas stageIndex={stageIndex} animationKey={animationKey} onAnimationChange={setAnimating} /><div className="creation-canvas-caption"><span>独立场景 {stageIndex + 1} / 4</span><strong>{stage.short}</strong></div><div className="creation-animation-state" aria-live="polite"><i aria-hidden="true" /><span>{animating ? '功能动画演示中' : '动画完成，可继续探索'}</span></div></div>

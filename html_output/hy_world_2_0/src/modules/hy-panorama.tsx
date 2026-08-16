@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { EvidenceMediaDrawer, PaperTable } from './hy-paper-evidence';
+import { EvidenceMediaDrawer, PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -29,7 +29,7 @@ const cases: Record<CaseId, { title: string; problem: string; fix: string; layer
 };
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function drawPanoramaBase(ctx: CanvasRenderingContext2D) {
@@ -115,9 +115,9 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
   const active = cases[mode];
   return <div className="panorama-rebuild">
     <div className="learning-contract">
-      <div><span>为什么学</span><p>HY-Pano 必须把有限视场变成首尾相接的 360° 世界种子，错误会传给后续规划与生成。</p></div>
-      <div><span>本次操作</span><p>选择一种故障，再把扫描线从 0% 拖到 100%，直接比较同一场景修复前后。</p></div>
-      <div><span>应得判断</span><p>隐式映射、Circle Padding、Pixel Blending 分别解决不同层级的问题，不能只留其中一个。</p></div>
+      <div><span>为什么学</span><p>全景错误会传给后续阶段。</p></div>
+      <div><span>本次操作</span><p>选择故障并拖动修复扫描线。</p></div>
+      <div><span>应得判断</span><p>三层机制分别修复三类错误。</p></div>
     </div>
     <div className="panorama-rebuild-tabs" role="tablist" aria-label="选择 HY-Pano 故障层级">
       {(Object.keys(cases) as CaseId[]).map((id) => <button key={id} type="button" role="tab" aria-selected={mode === id} className={mode === id ? 'selected' : ''} onClick={() => setMode(id)}><strong>{cases[id].title}</strong><small>{cases[id].layer}</small></button>)}
@@ -126,10 +126,12 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
     <label className="panorama-full-range"><span>修复后覆盖范围</span><strong>{reveal}%</strong><input type="range" min={0} max={100} value={reveal} onChange={(event) => setReveal(Number(event.target.value))} /></label>
     <section className="panorama-cause-effect"><div><span>修复前为什么错</span><strong>{active.problem}</strong></div><i aria-hidden="true">→</i><div><span>论文怎么修</span><strong>{active.fix}</strong></div></section>
     <div className={`feedback ${reveal === 100 ? 'good' : reveal === 0 ? 'bad' : ''}`}>{active.conclusion} {reveal === 100 ? '当前已完整显示修复后状态。' : reveal === 0 ? '当前完整保留故障状态。' : '继续拖动可检查边界与主体是否同时恢复。'}</div>
-    <section className="panorama-evidence-boundary"><header><span>论文证据</span><strong>Table 4 报告完整系统，不是三个开关的独立消融</strong></header><div><p>Section 3.2 明确描述三层机制；I2P 中 CLIP-I 从 HY-World 1.0 的 0.831 提升到 HY-Pano 2.0 的 0.844。</p><strong>0.831 → 0.844</strong><small>CLIP-I，越高越好</small></div></section>
-    <div className="panorama-glossary-grid"><details><summary>ERP 为什么首尾相接？</summary><p>ERP 将球面展开为矩形，因此最左列与最右列在球面上是相邻方向。</p></details><details><summary>补全是否等于测量？</summary><p>不是。输入视角外的区域来自生成先验，不能当成真实观测或确定几何。</p></details></div>
-    <EvidenceMediaDrawer mediaType="官方架构图" src="/images/official-stage-pano.webp" title="HY-Pano 2.0：隐式映射与双层接缝修复" caption="官方图用于核对透视条件、ERP 输出、Circle Padding 与 Pixel Blending 的真实位置。" alt="HY-Pano 2.0 官方架构图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
-    <PaperTable tableId="table-4" />
+    <SectionExtras>
+      <section className="panorama-evidence-boundary"><header><span>论文证据</span><strong>Table 4 报告完整系统，不是三个开关的独立消融</strong></header><div><p>Section 3.2 明确描述三层机制；I2P 中 CLIP-I 从 HY-World 1.0 的 0.831 提升到 HY-Pano 2.0 的 0.844。</p><strong>0.831 → 0.844</strong><small>CLIP-I，越高越好</small></div></section>
+      <div className="panorama-glossary-grid"><details><summary>ERP 为什么首尾相接？</summary><p>ERP 将球面展开为矩形，因此最左列与最右列在球面上是相邻方向。</p></details><details><summary>补全是否等于测量？</summary><p>不是。输入视角外的区域来自生成先验，不能当成真实观测或确定几何。</p></details></div>
+      <EvidenceMediaDrawer mediaType="官方架构图" src="./images/official-stage-pano.webp" title="HY-Pano 2.0：隐式映射与双层接缝修复" caption="官方图用于核对透视条件、ERP 输出、Circle Padding 与 Pixel Blending 的真实位置。" alt="HY-Pano 2.0 官方架构图" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗" />
+      <PaperTable tableId="table-4" />
+    </SectionExtras>
   </div>;
 };
 

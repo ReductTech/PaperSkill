@@ -1,0 +1,375 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --ui-bg-page: #eaf2fb;
+  --ui-bg-page-top: #f8fbff;
+  --ui-bg-soft: #edf5ff;
+  --ui-bg-muted: #f5f9fe;
+  --ui-text-main: #183451;
+  --ui-text-muted: #5d7088;
+  --ui-text-light: #7f91a7;
+  --ui-border: #c8d9ec;
+  --ui-border-strong: #8eb2d8;
+  --ui-accent: #0b4f9f;
+  --ui-success: #14825f;
+  --paper-scene-bg: #f4f9ff;
+  --paper-water-light: #bfeeff;
+  --paper-water-mid: #35c6f4;
+  --paper-water-deep: #0754a6;
+  --paper-guide: #0b4f9f;
+  --paper-success: #14825f;
+  --paper-failure: #c43f52;
+  --paper-control: #e17318;
+  --paper-aux: #6b55c5;
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(63, 177, 231, 0.14), transparent 32rem),
+    linear-gradient(180deg, var(--ui-bg-page-top), var(--ui-bg-page));
+}
+
+section.hero {
+  border-top: 6px solid var(--blue);
+  background:
+    linear-gradient(180deg, rgba(232, 245, 255, 0.78), rgba(255, 255, 255, 0) 210px),
+    var(--paper);
+}
+
+.hero-venue {
+  color: var(--blue);
+  border-color: var(--line-2);
+  background: #edf5ff;
+}
+
+section.chap {
+  border-top: 4px solid var(--blue);
+}
+
+.chap-title {
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--blue);
+  color: var(--blue);
+}
+
+.chap-badge,
+.flow-step.current {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.chap-bridge {
+  background: linear-gradient(100deg, #eef6ff 0%, #f8fbff 70%, #e5f7ff 100%);
+  border-color: #b7d1eb;
+}
+
+.analogy-card {
+  background: linear-gradient(115deg, #eef8ff 0%, #ffffff 52%, #e9f6ff 100%);
+  border-color: #aed5ec;
+}
+
+.module-head {
+  border-left: 7px solid var(--blue);
+  background: linear-gradient(90deg, #e9f3ff, #f8fbff);
+}
+
+canvas {
+  background: var(--paper-scene-bg);
+  border-color: #b9d1e8;
+}
+
+/* Four-minute presentation widgets. Keep these controls large enough to operate
+   while speaking and use one stable color per PBF concept. */
+.talk-chip-row,
+.talk-stage-switch,
+.talk-recap-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+}
+
+.talk-formula-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 10px;
+}
+
+.constraint-formula-steps {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.talk-formula-steps button,
+.talk-stage-switch button,
+.talk-recap-buttons button,
+.talk-tabs button {
+  border: 1px solid var(--ui-border-strong);
+  background: #ffffff;
+  color: var(--ui-text-main);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.talk-formula-steps button {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+}
+
+.talk-formula-steps button strong {
+  font-size: 1.28rem;
+}
+
+.talk-formula-steps button.active,
+.talk-stage-switch button.active,
+.talk-recap-buttons button.active,
+.talk-tabs button.active {
+  border-color: var(--ui-accent);
+  background: #e9f3ff;
+  box-shadow: inset 0 0 0 1px var(--ui-accent);
+}
+
+.talk-equation {
+  margin: 10px 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 2px solid var(--ui-border-strong);
+  border-radius: 10px;
+  background: #f8fbff;
+  color: #102d4d;
+  font-family: Cambria, "Times New Roman", serif;
+  font-size: clamp(1rem, 2.3vw, 1.28rem);
+  font-weight: 650;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.constraint-equation {
+  display: flex;
+  min-height: 104px;
+  align-items: center;
+}
+
+.constraint-equation > span:not(.lambda-equation-arrow) {
+  min-width: 0;
+}
+
+.constraint-equation .katex-display {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.constraint-story-canvas {
+  width: 100%;
+  max-width: 700px;
+  margin: 8px auto;
+  overflow: hidden;
+  border-radius: var(--ui-radius-sm);
+}
+
+.constraint-story-canvas canvas {
+  width: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+  margin: 0;
+}
+
+.lambda-equation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: clamp(.78rem, 1.65vw, 1.05rem);
+}
+
+.lambda-equation-item {
+  flex: 0 0 auto;
+}
+
+.lambda-equation-item .katex-display {
+  margin: 0;
+}
+
+.lambda-equation-item .katex {
+  line-height: 1.25;
+}
+
+.lambda-equation-arrow {
+  flex: 0 0 auto;
+  color: var(--ui-text-muted);
+  font-family: Cambria, "Times New Roman", serif;
+  font-size: 1.45em;
+  font-weight: 500;
+}
+
+.talk-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 9px;
+  margin: 13px 0 10px;
+}
+
+.talk-tabs .auto {
+  color: var(--ui-accent);
+  background: #f3f8fe;
+}
+
+.talk-stage-switch {
+  margin: 4px 0 12px;
+}
+
+.talk-stage-switch button {
+  flex: 1 1 170px;
+}
+
+.talk-video-slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  width: min(100%, 720px);
+  aspect-ratio: 16 / 9;
+  margin-top: 18px;
+  padding: clamp(20px, 5vw, 54px);
+  overflow: hidden;
+  border: 2px dashed #6fa8d7;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255,255,255,.33), transparent 24%),
+    linear-gradient(145deg, #061a35, #0754a6 58%, #31c5ef);
+  color: #ffffff;
+}
+
+.talk-video-slot::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 34%;
+  background: linear-gradient(180deg, transparent, rgba(0, 10, 30, .46));
+  pointer-events: none;
+}
+
+.talk-video-slot strong,
+.talk-video-slot span,
+.talk-video-play {
+  position: relative;
+  z-index: 1;
+}
+
+.talk-video-slot strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: clamp(1.05rem, 2.4vw, 1.42rem);
+}
+
+.talk-video-slot span {
+  display: block;
+  color: rgba(255,255,255,.82);
+  line-height: 1.55;
+}
+
+.talk-video-play {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 2px solid rgba(255,255,255,.78);
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  font-size: 1.3rem;
+}
+
+.talk-video-slot .talk-video-badge {
+  align-self: start;
+  padding: 5px 8px;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: .72rem;
+  letter-spacing: .12em;
+}
+
+.talk-recap-buttons {
+  margin: 13px 0 10px;
+}
+
+.talk-recap-buttons button {
+  flex: 1 1 120px;
+}
+
+.talk-reflections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.talk-reflections article {
+  display: grid;
+  gap: 7px;
+  min-height: 108px;
+  padding: 16px;
+  border: 1px solid var(--ui-border);
+  border-top: 4px solid var(--ui-accent);
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.talk-reflections strong {
+  color: var(--ui-accent);
+  font-size: 1.04rem;
+}
+
+.talk-reflections span {
+  color: var(--ui-text-muted);
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .talk-formula-steps,
+  .talk-tabs,
+  .talk-reflections {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .talk-tabs .auto {
+    grid-column: 1 / -1;
+  }
+
+  .talk-video-slot {
+    grid-template-columns: auto 1fr;
+    padding: 22px;
+  }
+
+  .talk-video-slot .talk-video-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 460px) {
+  .talk-formula-steps,
+  .talk-tabs,
+  .talk-reflections {
+    grid-template-columns: 1fr;
+  }
+
+  .talk-video-slot {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .talk-video-play {
+    width: 44px;
+    height: 44px;
+  }
+}

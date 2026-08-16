@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 type ModelLensId = 'video' | 'action-video' | 'reconstruction' | 'hy-world';
@@ -206,6 +207,17 @@ export const HyWorldModelBasics: React.FC<WidgetProps> = () => {
 
   return (
     <div className="world-model-lab">
+      <section id="quick-context" className="world-model-story-bridge">
+        <header><span>故事起点</span><strong>好看的下一帧，为什么还不是一个可用世界？</strong></header>
+        <p>视频生成能补出没有拍到的画面，却未必把墙、门和物体位置长期保存；三维重建能守住已观察几何，却不能凭空测量盲区。游戏、具身仿真与空间内容真正需要的是一个能够保存、回访、换视角渲染并接入碰撞的显式世界。</p>
+        <div>
+          <article><span>生成补观察</span><strong>解决“没有看见”</strong><small>新内容来自生成先验，不能写成真实测量。</small></article>
+          <article><span>重建守几何</span><strong>解决“看见后如何对齐”</strong><small>多视图约束把相机和空间拉回同一坐标。</small></article>
+          <article><span>本文的系统选择</span><strong>先扩展观察，再交付资产</strong><small>后续章节沿这条因果链逐项展开作者工作与实验。</small></article>
+        </div>
+      </section>
+
+      <div className="world-model-section-lead"><span>范式对照实验</span><strong>四种“世界”到底保存了什么状态？</strong><p>切换模型与压力测试，区分生成画面、动作反馈、真实重建和持久显式三维。</p></div>
       <div className="world-model-lenses" role="tablist" aria-label="切换世界模型观察镜头">
         {lenses.map((item) => (
           <button key={item.id} type="button" role="tab" aria-selected={lensId === item.id} className={lensId === item.id ? 'selected' : ''} onClick={() => setLensId(item.id)}>
@@ -294,23 +306,25 @@ export const HyWorldModelBasics: React.FC<WidgetProps> = () => {
         </div>
       </section>
 
-      <div className="concept-drawers">
-        <section>
-          <header><strong>术语抽屉</strong><span>灰色提示：点击词条展开；这些解释用于建立阅读基础。</span></header>
-          {terms.map((term) => <details key={term.title}><summary>{term.title}</summary><p>{term.body}</p></details>)}
-        </section>
-        <section>
-          <header><strong>发展史暗格</strong><span>灰色提示：点击年代展开；时间线是教学概览，不是穷尽式综述。</span></header>
-          {history.map((item) => <details key={item.era}><summary><time>{item.era}</time>{item.title}</summary><p>{item.body}</p></details>)}
-        </section>
-      </div>
+      <SectionExtras hint="世界模型术语、发展史与概念延伸">
+        <div className="concept-drawers">
+          <section>
+            <header><strong>术语抽屉</strong><span>灰色提示：点击词条展开；这些解释用于建立阅读基础。</span></header>
+            {terms.map((term) => <details key={term.title}><summary>{term.title}</summary><p>{term.body}</p></details>)}
+          </section>
+          <section>
+            <header><strong>发展史暗格</strong><span>灰色提示：点击年代展开；时间线是教学概览，不是穷尽式综述。</span></header>
+            {history.map((item) => <details key={item.era}><summary><time>{item.era}</time>{item.title}</summary><p>{item.body}</p></details>)}
+          </section>
+        </div>
 
-      <div className="world-model-sources">
-        <span>概念延伸：</span>
-        <a href="https://arxiv.org/abs/1803.10122" target="_blank" rel="noreferrer">World Models (2018) ↗</a>
-        <a href="https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/" target="_blank" rel="noreferrer">Genie 2 官方介绍 ↗</a>
-        <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0#why-3d-world-models" target="_blank" rel="noreferrer">HY-World 2.0：Why 3D ↗</a>
-      </div>
+        <div className="world-model-sources">
+          <span>概念延伸：</span>
+          <a href="https://arxiv.org/abs/1803.10122" target="_blank" rel="noreferrer">World Models (2018) ↗</a>
+          <a href="https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/" target="_blank" rel="noreferrer">Genie 2 官方介绍 ↗</a>
+          <a href="https://github.com/Tencent-Hunyuan/HY-World-2.0#why-3d-world-models" target="_blank" rel="noreferrer">HY-World 2.0：Why 3D ↗</a>
+        </div>
+      </SectionExtras>
     </div>
   );
 };

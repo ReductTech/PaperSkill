@@ -10,20 +10,18 @@ import { M11 } from './m11';
 import { M12 } from './m12';
 import { M22Img } from './m22img';
 import { M21 } from './m21';
-import { M31 } from './m31';
-import { M41B } from './m41b';
-import { M41 } from './m41';
+import { M43Predict } from './m43predict';
 import { M42 } from './m42';
 import { M43 } from './m43';
-import { M51 } from './m51';
-import { M52 } from './m52';
-import { M61 } from './m61';
-import { M62 } from './m62';
-import { M72 } from './m72';
 import { M1A } from './m1a';
-import { M63Mask } from './m63mask';
-import { M7A } from './m7a';
-import { M44Sys } from './m44sys';
+import { M44Text } from './m44sys';
+import { M42View } from './m42view';
+import { M51Flow } from './m51flow';
+import { M52Loss } from './m52loss';
+import { M61Abl } from './m61abl';
+import { M62Feat } from './m62feat';
+import { M63Depth } from './m63depth';
+import { M64Wh } from './m64wh';
 
 // Widget registry: maps a `componentId` (referenced from src/data/tutorial.ts) to a
 // React component.
@@ -51,16 +49,14 @@ widgetRegistry['m-1-1'] = M1A;   // 识别 vs 空间感知
 widgetRegistry['m-2-1'] = M11;   // DINO/iBOT 蒸馏
 widgetRegistry['m-2-2'] = M22Img; // 完整算法闭环总览（架构图）
 widgetRegistry['m-3-1'] = M21;   // 签名① 掩码对比
-widgetRegistry['m-4-1'] = M44Sys; // 系统三件套
-widgetRegistry['m-4-2'] = M31;   // 完整算法流程（12 步闭环）
-widgetRegistry['m-5-1'] = M41B;  // 边界场预测与分类化（目标生成五步）
-widgetRegistry['m-5-2'] = M42;   // 签名② 角点投票
-widgetRegistry['m-5-3'] = M43;   // 签名③ NFA
-widgetRegistry['m-6-1'] = M63Mask; // 边界强制掩码 M⁺ = M ∪ B
-widgetRegistry['m-6-2'] = M41;   // 三路监督
-widgetRegistry['m-6-3'] = M52;   // 双重作业
-widgetRegistry['m-6-4'] = M7A;   // 三个关键设计依据
-widgetRegistry['m-7-1'] = M51;   // 因果消融
-widgetRegistry['m-7-2'] = M62;   // 特征对比
-widgetRegistry['m-7-3'] = M72;   // LingBot-Depth 2.0
-widgetRegistry['m-7-4'] = M61;   // WHERE/WHAT/HOW 复盘
+widgetRegistry['m-4-1'] = M44Text; // 系统三件套（表格）
+widgetRegistry['m-4-2'] = M42View; // 一张图的旅程：multi-view 增强
+widgetRegistry['m-4-3'] = M43Predict; // ① Predict：边界场表示 + 分类化（静态展开）
+widgetRegistry['m-4-4'] = M42;   // ② Decode+Vote：角点投票
+widgetRegistry['m-4-5'] = M43;   // ③ Validate+Re-render：NFA
+widgetRegistry['m-5-1'] = M51Flow; // 完整算法闭环（总流程梳理）
+widgetRegistry['m-5-2'] = M52Loss; // 训练总损失 L
+widgetRegistry['m-6-1'] = M61Abl;  // 因果消融（表格）
+widgetRegistry['m-6-2'] = M62Feat; // 特征对比（静态）
+widgetRegistry['m-6-3'] = M63Depth; // LingBot-Depth 2.0（静态）
+widgetRegistry['m-6-4'] = M64Wh;   // WHERE/WHAT/HOW 复盘（静态）

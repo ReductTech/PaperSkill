@@ -1,0 +1,110 @@
+/* Paper-specific overrides — 编辑式论文精读风。
+   单一强调色（深蓝）用于按钮/链接/选中态；
+   语义色（红=旧/失败，绿=成功/本文，蓝=引导/当前，橙=强调，紫=辅助/BiViM）保持稳定。 */
+
+:root {
+  /* 场景色：暖纸 + 书架 */
+  --paper-scene-bg: #f6f5f1;
+  --paper-shelf: #d9d3c3;
+  --paper-shelf-dark: #b8b0a0;
+  --paper-hand: #b8b0a0;
+  --paper-wood: #8a5a33;
+}
+
+/* 9.1 网络结构图：直接内联 drawio 导出的 net-struct.svg（不再手写 SVG 组件）。
+   页面为浅色主题，强制 SVG 用浅色渲染，避免跟随系统深色造成反差。 */
+.net-struct-fig svg {
+  width: 100%;
+  height: auto;
+  max-width: 720px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color-scheme: light !important;
+}
+
+/* 10.3 真实推理体验：chip 按钮 + 双栏对比 */
+.chip-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.chip-btn:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.chip-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.chip-btn-acc {
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 600;
+}
+.web-infer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 6px 0 4px;
+}
+@media (max-width: 720px) {
+  .web-infer-grid { grid-template-columns: 1fr; }
+}
+.web-infer-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.web-infer-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.web-infer-card-head b {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.web-infer-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+.web-infer-time {
+  margin-left: 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.web-infer-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #101418;
+}
+.web-infer-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  font-size: 13px;
+  color: var(--muted);
+  background: #101418;
+}

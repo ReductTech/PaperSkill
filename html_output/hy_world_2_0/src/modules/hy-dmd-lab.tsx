@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
-import { PaperTable } from './hy-paper-evidence';
+import { PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
 const C = {
@@ -77,7 +77,7 @@ function CanvasView({
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
   ctx.fillStyle = color;
-  ctx.font = `700 ${size}px Segoe UI, sans-serif`;
+  ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`;
   ctx.textAlign = align;
   ctx.fillText(text, x, y);
   ctx.textAlign = 'left';
@@ -141,7 +141,7 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
   const duration = transition.kind === 'update' ? 720 : transition.kind === 'reset' ? 480 : 560;
 
   return <div className={`dmd-lab ${animating ? 'is-transitioning' : ''}`}>
-    <div className="learning-contract"><div><span>为什么学</span><p>成熟扩散教师需要多步去噪，沿多条轨迹生成关键帧时成本会被重复放大。</p></div><div><span>本次操作</span><p>先选噪声层级，再执行 DMD 更新，观察少步学生如何沿真实 score 与伪 score 的差靠近教师分布。</p></div><div><span>应得判断</span><p>蒸馏压缩的是 WorldStereo 关键帧生成器；四步不等于完整世界系统只需四步或实时完成。</p></div></div>
+    <div className="learning-contract"><div><span>为什么学</span><p>多步教师生成关键帧较慢。</p></div><div><span>本次操作</span><p>选择噪声并执行 DMD 更新。</p></div><div><span>应得判断</span><p>四步只属于关键帧生成器。</p></div></div>
     <section className="dmd-primer">
       <header><span>先回答：为什么要蒸馏？</span><strong>把成熟教师的多步生成能力压缩给四步学生</strong></header>
       <div><article><b>1</b><span><strong>教师先学会</strong><small>领域适配和记忆中训先形成可控、跨轨迹一致的目标分布。</small></span></article><i>→</i><article><b>2</b><span><strong>学生少步采样</strong><small>学生用更少扩散步生成带偏差的关键帧样本。</small></span></article><i>→</i><article><b>3</b><span><strong>分数差纠偏</strong><small>s_real - s_fake 把学生分布推向教师，而不是逐像素复制某一帧。</small></span></article></div>
@@ -223,16 +223,16 @@ export const HyDmdLab: React.FC<WidgetProps> = () => {
 
     <div className={`feedback ${converged ? 'good' : ''}`} aria-live="polite">{converged ? '学生分布已在示意图中靠近教师分布。真实 DMD 在高维潜空间中优化，教程不会把点击次数解释为论文训练步数。' : `当前选择${noise.label}。继续执行更新，观察 s_real - s_fake 如何缩小学生与教师之间的分布差距。`}</div>
 
-    <section className="dmd-boundary-grid">
-      <div><span>论文明确报告</span><strong>WorldStereo 2.0 被蒸馏为四步 DiT</strong><p>四步描述的是关键帧生成器的扩散推理，不是 HY-Pano、轨迹规划、重建、对齐和 3DGS 的总步数。</p></div>
-      <div><span>不能外推</span><strong>四步 ≠ 完整世界实时生成</strong><p>论文 Table 10 的完整世界生成总计为 712 秒；WorldLens 的实时交互发生在资产生成之后。</p></div>
-    </section>
-
-    <div className="dmd-glossary-grid">
-      <details><summary>为什么要比较两个 score？</summary><p>真实 score 描述教师分布在带噪样本附近的方向，伪 score 描述学生当前分布的方向。DMD 用二者差异更新学生，使少步生成结果逐渐贴近教师分布。</p></details>
-      <details><summary>J_θ 在公式里做什么？</summary><p>J_θ 表示样本对学生参数的雅可比项。它把潜空间中的分数差传回学生参数；上方一维曲线只画方向，不尝试还原真实网络张量。</p></details>
-    </div>
-
-    <PaperTable tableId="table-8" />
+    <SectionExtras>
+      <section className="dmd-boundary-grid">
+        <div><span>论文明确报告</span><strong>WorldStereo 2.0 被蒸馏为四步 DiT</strong><p>四步描述的是关键帧生成器的扩散推理，不是 HY-Pano、轨迹规划、重建、对齐和 3DGS 的总步数。</p></div>
+        <div><span>不能外推</span><strong>四步 ≠ 完整世界实时生成</strong><p>论文 Table 10 的完整世界生成总计为 712 秒；WorldLens 的实时交互发生在资产生成之后。</p></div>
+      </section>
+      <div className="dmd-glossary-grid">
+        <details><summary>为什么要比较两个 score？</summary><p>真实 score 描述教师分布在带噪样本附近的方向，伪 score 描述学生当前分布的方向。DMD 用二者差异更新学生，使少步生成结果逐渐贴近教师分布。</p></details>
+        <details><summary>J_θ 在公式里做什么？</summary><p>J_θ 表示样本对学生参数的雅可比项。它把潜空间中的分数差传回学生参数；上方一维曲线只画方向，不尝试还原真实网络张量。</p></details>
+      </div>
+      <PaperTable tableId="table-8" />
+    </SectionExtras>
   </div>;
 };

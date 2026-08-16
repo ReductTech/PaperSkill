@@ -26,8 +26,23 @@ function draw(c:CanvasRenderingContext2D,id:string,s:S){base(c,`交互状态 · 
  else if(id==='4.1'){const on=(n:number)=>s.step>=n?[C.blue,C.purple,C.orange,C.green][n]:C.line;panel(c,22,65,106,65,'vₜ',on(0));text(c,'+',145,105,s.step>=2?C.ink:C.line,24);panel(c,178,65,90,65,'(r−t)',on(2));text(c,'×',284,105,s.step>=2?C.ink:C.line,22);panel(c,318,65,118,65,'Jθ',on(1));text(c,'=',456,105,s.step>=3?C.ink:C.line,22);panel(c,488,65,110,65,'sg[目标]',on(3));panel(c,113,160,394,62,'JVP[uθ; (vₜ,0,1)]',on(1));text(c,'primals = (zₜ, r, t)',145,193,s.step>=1?C.purple:C.muted);text(c,'tangents = (vₜ, 0, 1)',320,193,s.step>=1?C.purple:C.muted);text(c,['① 基础项：当前瞬时速度 vₜ','② 沿 (vₜ,0,1) 方向计算 JVP','③ (r−t) × Jθ，再与 vₜ 相加','④ u_target = sg[vₜ + (r−t) × Jθ]'][s.step],118,263,on(s.step),14,750)}
  else if(id==='4.2'){const j=s.mode==='jvp';panel(c,42,48,536,185,j?'连续 MF 训练：前向 + 切向传播 + 目标构造':'普通网络前向',j?C.purple:C.blue);const nodes=j?['输入 (zₜ,r,t)','uθ 前向','切向量 (vₜ,0,1)','JVP Jθ','恒等式目标','损失']:['输入 (zₜ,r,t)','uθ 前向','输出 uθ'];nodes.forEach((n,i)=>{const x=65+i*(480/(nodes.length-1||1));dot(c,x,132,11,j&&i>=2?C.purple:C.blue);text(c,n,x-38,i%2?174:97,j&&i>=2?C.purple:C.blue,10);if(i<nodes.length-1)arrow(c,x+12,132,x+480/(nodes.length-1)-12,132,j&&i>=1?C.purple:C.blue,3)});metric(c,'可见节点',String(nodes.length),120,250,j?C.purple:C.blue);metric(c,'路径性质',j?'含切向传播':'单次前向',260,250,j?C.purple:C.blue);metric(c,'耗时结论',j?'仅定性更复杂':'基准路径',430,250,C.ink)}
  else if(id==='5.1'){const titles=['① Euler 回退','② 前后两次预测','③ 构造有限差商','④ 代回、移项、stop-gradient'];for(let i=0;i<4;i++){panel(c,18+i*150,54,135,60,titles[i],s.step>=i?[C.blue,C.orange,C.purple,C.green][i]:C.line);if(i<3)arrow(c,153+i*150,84,166+i*150,84,s.step>i?C.ink:C.line,2)}const body=['z_back = zₜ − vₜΔ\n这是沿轨迹的一阶 Euler 回退','u_now = uθ(zₜ,r,t)\nu_earlier = uθ(z_back,r,t−Δ)','DΔu = (u_now − u_earlier) / Δ\n用差商近似 du/dt','u_target = [vₜΔ + (t−r)sg(u_earlier)]\n                    / (Δ+t−r)'][s.step];body.split('\n').forEach((q,i)=>text(c,q,85,170+i*30,s.step===3?C.green:C.ink,15,i===0?750:600));metric(c,'当前步骤',`${s.step+1}/4`,85,250,C.orange);metric(c,'JVP',s.step<3?'未计算':'中间阶段无需',245,250,C.purple);metric(c,'梯度目标',s.step===3?'仅当前 uθ 分支':'尚未完成',410,250,s.step===3?C.green:C.muted)}
- else if(id==='6.1'){const d=s.a,wv=d/(1+d),wu=1/(1+d),x=530-390*d;line(c,80,85,530,85,C.line,6);line(c,x,85,530,85,C.orange,8);dot(c,x,85,9,C.orange);dot(c,530,85,9,C.blue);text(c,'t−Δ',x-18,65,C.orange);text(c,'t',526,65,C.blue);bar(c,'vₜΔ 权重',wv,1,75,145,190,C.blue,wv.toFixed(2));bar(c,'sg(u_earlier)(t−r) 权重',wu,1,350,145,190,C.purple,wu.toFixed(2));text(c,'FM',55,225,C.blue);arrow(c,90,220,167,220,C.line,2);text(c,'粗 DMF',177,225,C.orange);arrow(c,239,220,300,220,C.line,2);text(c,'细 DMF',310,225,C.orange);arrow(c,370,220,447,220,C.line,2);text(c,'MF/JVP',457,225,C.green);metric(c,'Δ/(t−r)',d.toFixed(2),95,255,C.orange);metric(c,'自一致性占比',`${(wu*100).toFixed(0)}%`,270,255,C.purple);metric(c,'难度解释',d>.6?'较依赖 vₜ 锚点':d>.2?'过渡区间':'更接近连续极限',435,255,d<.2?C.red:C.ink)}
- else if(id==='7.1'){const t=s.a,data=1-t,noise=t,ratio=noise/data;panel(c,30,42,560,88,'线性路径中的两种系数',C.blue);text(c,'数据系数 1−t',54,84,C.green,12,700);text(c,'噪声系数 t',426,84,C.purple,12,700);c.fillStyle=C.line;c.fillRect(54,98,512,18);c.fillStyle=C.green;c.fillRect(54,98,512*data,18);c.fillStyle=C.purple;c.fillRect(54+512*data,98,512*noise,18);text(c,`${(data*100).toFixed(0)}%`,64,112,'#fff',10,750);text(c,`${(noise*100).toFixed(0)}%`,526,112,'#fff',10,750);panel(c,30,151,560,87,'VE 坐标就是“噪声系数 ÷ 数据系数”',C.purple);text(c,'Φ(t)  =',66,207,C.ink,22,750);text(c,`${noise.toFixed(2)}  ÷  ${data.toFixed(2)}  =  ${ratio.toFixed(2)}`,181,207,ratio>8?C.red:C.purple,23,800);metric(c,'当前 t',t.toFixed(2),65,251,C.blue);metric(c,'数据占比',data.toFixed(2),215,251,C.green);metric(c,'噪声占比',noise.toFixed(2),365,251,C.purple);metric(c,'噪声/数据',ratio.toFixed(2),495,251,ratio>8?C.red:C.orange)}
+ else if(id==='6.1'){const d=clamp(s.a,.02,1),wv=d/(1+d),wu=1/(1+d),xr=105,xt=535,xBack=xt-(xt-xr)*d;line(c,xr,75,xt,75,C.line,6);line(c,xBack,75,xt,75,C.orange,8);dot(c,xr,75,7,C.green);dot(c,xBack,75,10,C.orange);dot(c,xt,75,9,C.blue);text(c,'r',xr-4,53,C.green);text(c,'t−Δ',xBack-18,53,C.orange);text(c,'t',xt-4,53,C.blue);arrow(c,xt-12,97,xBack+12,97,C.orange,3);text(c,`相对间隔 d=Δ/(t−r)=${d.toFixed(2)}`,201,122,C.orange,13,750);bar(c,'固定锚点 vₜ 的权重',wv,1,58,151,175,C.blue,wv.toFixed(2));bar(c,'较早自预测的权重',wu,1,345,151,175,C.purple,wu.toFixed(2));panel(c,35,195,260,78,'大 Δ 端：靠近 FM',d>.67?C.blue:C.line);text(c,'d=1 时较早分支落到 r：',52,231,C.ink,11,650);text(c,'u(zᵣ,r,r)=vᵣ=vₜ，目标化成 vₜ',52,253,C.blue,11,700);panel(c,325,195,260,78,'小 Δ 端：靠近 MF',d<.33?C.purple:C.line);text(c,'d→0 时固定锚点权重→0，',342,231,C.ink,11,650);text(c,'相邻差商→du/dt，自一致性更难训',342,253,d<.33?C.red:C.purple,11,700)}
+ else if(id==='7.1'){
+  const t=s.a,dt=.1,t2=t+dt,ph=(x:number)=>x/(1-x),p1=ph(t),p2=ph(t2),dp=p2-p1,x0=62,tw=510,phiMax=9;
+  panel(c,24,39,572,96,'原始时间轴 t：窗口长度始终相同',C.blue);
+  text(c,`当前区间 [${t.toFixed(2)}, ${t2.toFixed(2)}]`,386,75,C.blue,10,700);
+  line(c,x0,89,x0+tw,89,C.line,5);
+  for(const v of [0,.2,.4,.6,.8,1]){const x=x0+tw*v;line(c,x,83,x,96,C.muted,1);text(c,v.toFixed(1),x-9,112,C.muted,9,500)}
+  const xa=x0+tw*t,xb=x0+tw*t2;
+  line(c,xa,89,xb,89,C.blue,10);dot(c,xa,89,7,C.blue);dot(c,xb,89,7,C.blue);
+  panel(c,24,146,572,96,'VE 噪声比轴 Φ(t)=t/(1−t)',C.purple);
+  text(c,`映射区间 [${p1.toFixed(2)}, ${p2.toFixed(2)}]`,386,182,p2>5?C.red:C.purple,10,700);
+  line(c,x0,196,x0+tw,196,C.line,5);
+  for(const v of [0,1,2,4,6,9]){const x=x0+tw*v/phiMax;line(c,x,190,x,203,C.muted,1);text(c,String(v),x-4,219,C.muted,9,500)}
+  const pa=x0+tw*Math.min(phiMax,p1)/phiMax,pb=x0+tw*Math.min(phiMax,p2)/phiMax;
+  line(c,pa,196,pb,196,p2>5?C.red:C.purple,10);dot(c,pa,196,7,C.purple);dot(c,pb,196,7,p2>5?C.red:C.purple);
+  metric(c,'固定 Δt',dt.toFixed(2),45,255,C.blue);metric(c,'起点噪声/数据',p1.toFixed(2),173,255,C.purple);metric(c,'终点噪声/数据',p2.toFixed(2),335,255,p2>5?C.red:C.purple);metric(c,'对应 ΔΦ',dp.toFixed(2),500,255,dp>2?C.red:C.orange)
+ }
  else if(id==='7.2'){const ve=s.mode==='ve',r=.2,t=.8,q=2,i=2,lin=(t-r)/q**i,ph=(x:number)=>x/(1-x),inv=(x:number)=>x/(1+x),tp=inv(ph(t)-(ph(t)-ph(r))/q**i),d=ve?t-tp:lin,back=t-d;line(c,80,94,540,94,C.line,6);dot(c,80+460*r,94,9,C.green);dot(c,80+460*t,94,9,C.blue);dot(c,80+460*back,94,10,ve?C.purple:C.orange);text(c,'r=.20',80+460*r-20,72,C.green);text(c,'t=.80',80+460*t-18,72,C.blue);text(c,ve?'VE 映回 t′':'线性 t′',80+460*back-31,123,ve?C.purple:C.orange);panel(c,65,153,490,73,ve?'DMF† · VE 坐标缩短':'普通 DMF · 线性时间缩短',ve?C.purple:C.orange);metric(c,'q, i','2, 2',92,181,C.ink);metric(c,'t′',back.toFixed(4),210,181,ve?C.purple:C.orange);metric(c,ve?'Δᵢ†':'Δᵢ',d.toFixed(4),335,181,ve?C.purple:C.orange);metric(c,'CIFAR FID↓',ve?'3.36':'3.58',445,181,ve?C.green:C.orange);text(c,'经验结果：DMF† 更好；这不是 VE 理论最优性的证明。',124,270,C.red,12,700)}
 }
 function miniCurve(t:number){return{x:55+215*t,y:205-125*t+33*Math.sin(t*Math.PI)}}
@@ -128,99 +143,168 @@ function DmfDerivationWalkthrough({step}:{step:number}) {
   </section>;
 }
 
-const curriculumSlides = [
-  {
-    label:'初始化与预算', eyebrow:'训练开始前', title:'从预训练 Flow Model 热启动，并把总预算平均分给 K 个阶段',
-    mathml:'<math display="block"><mrow><msub><mi>u</mi><mi>θ</mi></msub><mo>←</mo><msub><mi>v</mi><mi>φ</mi></msub><mo>,</mo><mspace width="1.2em"/><mtext>每阶段预算</mtext><mo>=</mo><mfrac><mtext>总微调预算</mtext><mi>K</mi></mfrac></mrow></math>',
-    note:'预训练速度网络已经会做 Flow Matching；课程不是从随机网络同时学习所有难题。',
-  },
-  {
-    label:'阶段 0 · FM', eyebrow:'i = 0', title:'第一阶段直接拟合瞬时速度，建立可靠锚点',
-    mathml:'<math display="block"><mrow><msubsup><mi>u</mi><mtext>target</mtext><mn>0</mn></msubsup><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mo>,</mo><mspace width="1.2em"/><msub><mi>Δ</mi><mn>0</mn></msub><mo>=</mo><mi>t</mi><mo>−</mo><mi>r</mi></mrow></math>',
-    note:'当区间回退覆盖整个 [r,t]，结合边界 u(zᵣ,r,r)=vᵣ，课程起点退化为 Flow Matching；本阶段无需 JVP。',
-  },
-  {
-    label:'中间 · DMF', eyebrow:'1 ≤ i ≤ K−2', title:'逐阶段缩小 Δ，用较早预测构造 stop-gradient 目标',
-    mathml:'<math display="block"><mrow><msubsup><mi>u</mi><mtext>target</mtext><mi>i</mi></msubsup><mo>=</mo><mfrac><mrow><msub><mi>v</mi><mi>t</mi></msub><msub><mi>Δ</mi><mi>i</mi></msub><mo>+</mo><mo>(</mo><mi>t</mi><mo>−</mo><mi>r</mi><mo>)</mo><mi>sg</mi><mo>[</mo><msub><mi>u</mi><mi>θ</mi></msub><mo>(</mo><msub><mi>z</mi><mi>t</mi></msub><mo>−</mo><msub><mi>v</mi><mi>t</mi></msub><msub><mi>Δ</mi><mi>i</mi></msub><mo>,</mo><mi>r</mi><mo>,</mo><mi>t</mi><mo>−</mo><msub><mi>Δ</mi><mi>i</mi></msub><mo>)</mo><mo>]</mo></mrow><mrow><msub><mi>Δ</mi><mi>i</mi></msub><mo>+</mo><mi>t</mi><mo>−</mo><mi>r</mi></mrow></mfrac></mrow></math>',
-    note:'这些阶段使用普通 Δᵢ 或 VE 调度 Δᵢ†，均不计算 JVP；这是训练计算节省的主要来源。',
-  },
-  {
-    label:'最终 · MF', eyebrow:'i = K−1', title:'最后切回连续 MeanFlow，重新启用 JVP',
-    mathml:'<math display="block"><mrow><msubsup><mi>u</mi><mtext>target</mtext><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mo>+</mo><mo>(</mo><mi>r</mi><mo>−</mo><mi>t</mi><mo>)</mo><mi>sg</mi><mo>[</mo><mfrac><mrow><mi>d</mi><msub><mi>u</mi><mi>θ</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>]</mo></mrow></math>',
-    note:'因此准确结论是“中间阶段避免 JVP”，而不是“DMF 全程没有 JVP”。',
-  },
-] as const;
-
-function TrainingCurriculumWalkthrough({step}:{step:number}) {
-  const slide=curriculumSlides[step]??curriculumSlides[0];
-  return <section className="jvp-walkthrough curriculum-walkthrough" aria-live="polite">
-    <div className="training-loop-strip"><span>采样 z₀、ε、r、t</span><b>→</b><span>构造 zₜ、vₜ</span><b>→</b><span>按阶段生成目标</span><b>→</b><span>损失与参数更新</span></div>
-    <ol className="jvp-stage-list" aria-label="K 阶段完整训练课程">
-      {curriculumSlides.map((item,index)=><li key={item.label} className={index===step?'selected':index<step?'done':''}><span>{index+1}</span>{item.label}</li>)}
-    </ol>
-    <div className="jvp-slide"><div className="jvp-eyebrow">{slide.eyebrow}</div><h5>{slide.title}</h5><div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:slide.mathml}}/><p>{slide.note}</p></div>
+function DeltaLimitWalkthrough({d}:{d:number}) {
+  const bounded=clamp(d,.02,1),wV=bounded/(1+bounded),wEarlier=1/(1+bounded),atMax=bounded>.995,atSmall=bounded<.15;
+  const mathml=atMax
+    ? '<math display="block"><mtable rowspacing=".65em" columnalign="left"><mtr><mtd><mi>Δ</mi><mo>=</mo><mi>t</mi><mo>−</mo><mi>r</mi></mtd></mtr><mtr><mtd><msub><mi>u</mi><mtext>target</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>v</mi><mi>t</mi></msub><mo>(</mo><mi>t</mi><mo>−</mo><mi>r</mi><mo>)</mo><mo>+</mo><mo>(</mo><mi>t</mi><mo>−</mo><mi>r</mi><mo>)</mo><mi>u</mi><mo>(</mo><msub><mi>z</mi><mi>r</mi></msub><mo>,</mo><mi>r</mi><mo>,</mo><mi>r</mi><mo>)</mo></mrow><mrow><mn>2</mn><mo>(</mo><mi>t</mi><mo>−</mo><mi>r</mi><mo>)</mo></mrow></mfrac></mtd></mtr><mtr><mtd><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>[</mo><msub><mi>v</mi><mi>t</mi></msub><mo>+</mo><mi>u</mi><mo>(</mo><msub><mi>z</mi><mi>r</mi></msub><mo>,</mo><mi>r</mi><mo>,</mo><mi>r</mi><mo>)</mo><mo>]</mo></mtd></mtr><mtr><mtd><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>(</mo><msub><mi>v</mi><mi>t</mi></msub><mo>+</mo><msub><mi>v</mi><mi>r</mi></msub><mo>)</mo><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mo>=</mo><msub><mi>v</mi><mi>r</mi></msub></mtd></mtr></mtable></math>'
+    : `<math display="block"><mtable rowspacing=".65em" columnalign="left"><mtr><mtd><mi>d</mi><mo>=</mo><mfrac><mi>Δ</mi><mrow><mi>t</mi><mo>−</mo><mi>r</mi></mrow></mfrac><mo>=</mo><mn>${bounded.toFixed(2)}</mn></mtd></mtr><mtr><mtd><msub><mi>u</mi><mtext>target</mtext></msub><mo>=</mo><mn>${wV.toFixed(2)}</mn><msub><mi>v</mi><mi>t</mi></msub><mo>+</mo><mn>${wEarlier.toFixed(2)}</mn><mi>sg</mi><mo>[</mo><msub><mi>u</mi><mtext>earlier</mtext></msub><mo>]</mo></mtd></mtr>${atSmall?'<mtr><mtd><mi>Δ</mi><mo>→</mo><mn>0</mn><mo>:</mo><mspace width=".6em"/><mfrac><mrow><msub><mi>u</mi><mtext>now</mtext></msub><mo>−</mo><msub><mi>u</mi><mtext>earlier</mtext></msub></mrow><mi>Δ</mi></mfrac><mo>→</mo><mfrac><mrow><mi>d</mi><mi>u</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></mtd></mtr>':''}</mtable></math>`;
+  return <section className="jvp-walkthrough delta-limit-walkthrough" aria-live="polite">
+    <div className="jvp-slide">
+      <div className="jvp-eyebrow">{atMax?'最大间隔：逐行代入':'有限间隔：观察目标权重'}</div>
+      <h5>{atMax?'为什么 Δ=t−r 时，DMF 目标就是 FM 目标':atSmall?'为什么 Δ 很小时更接近连续 MeanFlow':'从 FM 到 MF 的过渡目标'}</h5>
+      <div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:mathml}}/>
+      <p>{atMax?'第一步用边界条件 u(zᵣ,r,r)=vᵣ；第二步用论文的线性条件路径，其配对瞬时速度沿 t 不变，因此 vₜ=vᵣ。最终监督量就是瞬时速度，与 Flow Matching 完全相同。':atSmall?'固定瞬时速度锚点几乎消失，目标主要依赖相邻位置的模型预测；同时有限差商逼近 du/dt，所以更接近连续 MF，也更难稳定训练。':`当前瞬时速度权重为 ${wV.toFixed(2)}，较早自预测权重为 ${wEarlier.toFixed(2)}；缩小 Δ 会逐步把训练责任从可靠的 FM 锚点转向模型自一致性。`}</p>
+    </div>
   </section>;
 }
 
-function VeDeltaCalculator({r,t,q}:{r:number;t:number;q:number}){
-  const phi=(x:number)=>x/(1-x),inv=(x:number)=>x/(1+x);
-  const sr=phi(r),st=phi(t),dLinear=(t-r)/q,tLinear=t-dLinear;
-  const sPrime=st-(st-sr)/q,tVe=inv(sPrime),dVe=t-tVe;
-  const ratio=dVe/dLinear;
-  const linearMath=`<math display="block"><mrow><mi>Δ</mi><mo>=</mo><mfrac><mrow><mn>${t.toFixed(2)}</mn><mo>−</mo><mn>${r.toFixed(2)}</mn></mrow><mn>${q.toFixed(2)}</mn></mfrac><mo>=</mo><mn>${dLinear.toFixed(4)}</mn><mo>,</mo><mspace width="1em"/><msup><mi>t</mi><mo>′</mo></msup><mo>=</mo><mn>${tLinear.toFixed(4)}</mn></mrow></math>`;
-  const veMath=`<math display="block"><mtable columnalign="left"><mtr><mtd><mi>Φ</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mn>${st.toFixed(4)}</mn><mo>,</mo><mspace width=".8em"/><mi>Φ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mn>${sr.toFixed(4)}</mn></mtd></mtr><mtr><mtd><msup><mi>s</mi><mo>′</mo></msup><mo>=</mo><mn>${st.toFixed(4)}</mn><mo>−</mo><mfrac><mrow><mn>${st.toFixed(4)}</mn><mo>−</mo><mn>${sr.toFixed(4)}</mn></mrow><mn>${q.toFixed(2)}</mn></mfrac><mo>=</mo><mn>${sPrime.toFixed(4)}</mn></mtd></mtr><mtr><mtd><msup><mi>t</mi><mo>′</mo></msup><mo>=</mo><msup><mi>Φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>=</mo><mn>${tVe.toFixed(4)}</mn><mo>,</mo><mspace width=".8em"/><msup><mi>Δ</mi><mo>†</mo></msup><mo>=</mo><mn>${dVe.toFixed(4)}</mn></mtd></mtr></mtable></math>`;
-  return <section className="ve-calculator" aria-live="polite">
-    <div className="ve-input-summary"><span>r = {r.toFixed(2)}</span><span>t = {t.toFixed(2)}</span><span>q = {q.toFixed(2)}</span><b>{t>=.7?'高噪声起点':'中低噪声起点'}</b></div>
-    <div className="ve-track" aria-label="两种调度在原始时间轴上的回退位置"><i/><mark className="r" style={{left:`${r*100}%`}}>r</mark><mark className="linear" style={{left:`${tLinear*100}%`}}>普通 t′</mark><mark className="ve" style={{left:`${tVe*100}%`}}>VE t′</mark><mark className="t" style={{left:`${t*100}%`}}>t</mark></div>
+const trainingStages = [
+  {
+    label:'阶段 0 · FM', range:'i = 0', title:'先直接拟合瞬时速度，建立容易且可靠的监督锚点', jvp:'不使用 JVP', difficulty:'容易',
+    mathml:'<math display="block"><mrow><msubsup><mi>u</mi><mtext>target</mtext><mn>0</mn></msubsup><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mo>,</mo><mspace width="1.2em"/><msub><mi>Δ</mi><mn>0</mn></msub><mo>=</mo><mi>t</mi><mo>−</mo><mi>r</mi></mrow></math>',
+    note:'这就是 Flow Matching 的瞬时速度监督。上一组件已经逐行证明：把最大间隔 Δ=t−r 代入 DMF 目标，也会得到同一个 vₜ。',
+  },
+  {
+    label:'中间 · DMF', range:'1 ≤ i ≤ K−2', title:'逐阶段缩小 Δᵢ，用较早预测构造有限差分目标', jvp:'不使用 JVP', difficulty:'逐渐变难',
+    mathml:'<math display="block"><mtable rowspacing=".7em" columnalign="left"><mtr><mtd><msub><mi>Δ</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mi>t</mi><mo>−</mo><mi>r</mi></mrow><msup><mi>q</mi><mi>i</mi></msup></mtd></mtr><mtr><mtd><msubsup><mi>u</mi><mtext>target</mtext><mi>i</mi></msubsup><mo>=</mo><mfrac><mrow><msub><mi>v</mi><mi>t</mi></msub><msub><mi>Δ</mi><mi>i</mi></msub><mo>+</mo><mo>(</mo><mi>t</mi><mo>−</mo><mi>r</mi><mo>)</mo><mi>sg</mi><mo>[</mo><msub><mi>u</mi><mi>θ</mi></msub><mo>(</mo><msub><mi>z</mi><mi>t</mi></msub><mo>−</mo><msub><mi>v</mi><mi>t</mi></msub><msub><mi>Δ</mi><mi>i</mi></msub><mo>,</mo><mi>r</mi><mo>,</mo><mi>t</mi><mo>−</mo><msub><mi>Δ</mi><mi>i</mi></msub><mo>)</mo><mo>]</mo></mrow><mrow><msub><mi>Δ</mi><mi>i</mi></msub><mo>+</mo><mi>t</mi><mo>−</mo><mi>r</mi></mrow></mfrac></mtd></mtr></mtable></math>',
+    note:'每升一个阶段就缩小一次 Δᵢ：瞬时速度锚点逐渐减弱，自预测一致性逐渐增强。这里用前后预测的有限差分替代 JVP。第七章再把普通 Δᵢ 调度改成 VE 调度。',
+  },
+  {
+    label:'最终 · MF', range:'i = K−1', title:'最后切回连续 MeanFlow 恒等式，重新启用 JVP', jvp:'重新启用 JVP', difficulty:'最难',
+    mathml:'<math display="block"><mrow><msubsup><mi>u</mi><mtext>target</mtext><mrow><mi>K</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mo>+</mo><mo>(</mo><mi>r</mi><mo>−</mo><mi>t</mi><mo>)</mo><mi>sg</mi><mo>[</mo><mfrac><mrow><mi>d</mi><msub><mi>u</mi><mi>θ</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>]</mo></mrow></math>',
+    note:'这一阶段不再用有限差分，而是直接计算连续全导数 duθ/dt，所以训练重新需要 JVP。准确结论是“中间阶段避免 JVP”，不是“整个课程没有 JVP”。',
+  },
+] as const;
+
+function ThreeStageTrainingFunction({stage}:{stage:number}) {
+  const current=trainingStages[stage]??trainingStages[0];
+  return <section className="jvp-walkthrough curriculum-walkthrough" aria-live="polite">
+    <ol className="jvp-stage-list" aria-label="论文式 (5) 的三阶段训练函数">
+      {trainingStages.map((item,index)=><li key={item.label} className={index===stage?'selected':index<stage?'done':''}><span>{index+1}</span>{item.label}</li>)}
+    </ol>
+    <div className="jvp-slide">
+      <div className="jvp-eyebrow">{current.range}</div>
+      <h5>{current.title}</h5>
+      <div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:current.mathml}}/>
+      <div className="protocol-strip"><span><small>当前阶段</small><b>{current.label}</b></span><span><small>训练难度</small><b>{current.difficulty}</b></span><span><small>导数实现</small><b>{current.jvp}</b></span></div>
+      <p>{current.note}</p>
+    </div>
+  </section>;
+}
+
+const noiseRegions={
+  low:{label:'低噪声区',r:.1,t:.3},
+  mid:{label:'中噪声区',r:.4,t:.6},
+  high:{label:'高噪声区',r:.7,t:.9},
+} as const;
+
+function VeRegionComparator({mode}:{mode:string}){
+  const key=(mode in noiseRegions?mode:'low') as keyof typeof noiseRegions,region=noiseRegions[key],{r,t}=region;
+  const phi=(x:number)=>x/(1-x),inv=(x:number)=>x/(1+x),denom=2;
+  const sr=phi(r),st=phi(t),sPrime=st-(st-sr)/denom,dLinear=(t-r)/denom,tLinear=t-dLinear,tVe=inv(sPrime),dVe=t-tVe,ratio=dVe/dLinear;
+  const linearMath=`<math display="block"><mrow><msub><mi>Δ</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mn>${t.toFixed(2)}</mn><mo>−</mo><mn>${r.toFixed(2)}</mn></mrow><mn>2</mn></mfrac><mo>=</mo><mn>${dLinear.toFixed(4)}</mn></mrow></math>`;
+  const veMath=`<math display="block"><mtable columnalign="left" rowspacing=".55em"><mtr><mtd><msup><mi>s</mi><mo>′</mo></msup><mo>=</mo><mi>Φ</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>−</mo><mfrac><mrow><mi>Φ</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>−</mo><mi>Φ</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mn>2</mn></mfrac><mo>=</mo><mn>${sPrime.toFixed(4)}</mn></mtd></mtr><mtr><mtd><msup><mi>t</mi><mo>′</mo></msup><mo>=</mo><msup><mi>Φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>(</mo><msup><mi>s</mi><mo>′</mo></msup><mo>)</mo><mo>=</mo><mn>${tVe.toFixed(4)}</mn><mo>,</mo><mspace width=".8em"/><msubsup><mi>Δ</mi><mi>i</mi><mo>†</mo></msubsup><mo>=</mo><mn>${dVe.toFixed(4)}</mn></mtd></mtr></mtable></math>`;
+  return <section className="ve-calculator region-comparator" aria-live="polite">
+    <div className="ve-input-summary"><b>{region.label}</b><span>r = {r.toFixed(2)}</span><span>t = {t.toFixed(2)}</span><span>t−r = 0.20</span><span>qⁱ = 2</span></div>
+    <div className="region-tracks" aria-label={`${region.label}中普通调度与 VE 调度的回退位置`}>
+      <TrackRow label="普通 · 原始 t 轴" r={r} back={tLinear} t={t} backLabel={`t′=${tLinear.toFixed(2)}`} tone="linear"/>
+      <TrackRow label="VE 映回 · 原始 t 轴" r={r} back={tVe} t={t} backLabel={`t′=${tVe.toFixed(2)}`} tone="ve"/>
+      <div className="local-ve-track"><b>VE 区间局部视图</b><div><i/><mark style={{left:'0%'}}>Φ(r)={sr.toFixed(2)}</mark><mark className="middle" style={{left:'50%'}}>s′={sPrime.toFixed(2)}</mark><mark style={{left:'100%'}}>Φ(t)={st.toFixed(2)}</mark></div><span>在 VE 坐标中始终回退整个区间的一半</span></div>
+    </div>
     <div className="ve-calc-grid">
-      <article><div className="ve-card-head"><b>普通 DMF</b><strong>Δ = {dLinear.toFixed(4)}</strong></div><div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:linearMath}}/><p>直接在原始 t 轴回退区间长度的 1/q。</p></article>
-      <article className="ve-card"><div className="ve-card-head"><b>DMF† · VE 坐标</b><strong>Δ† = {dVe.toFixed(4)}</strong></div><div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:veMath}}/><p>先在噪声/数据比值坐标中缩短，再映回原始 t 轴。</p></article>
+      <article><div className="ve-card-head"><b>普通 DMF</b><strong>Δᵢ = {dLinear.toFixed(4)}</strong></div><div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:linearMath}}/><p>三个区域的原始长度都为 0.2，所以普通调度始终回退 0.1。</p></article>
+      <article className="ve-card"><div className="ve-card-head"><b>DMF† · VE 调度</b><strong>Δᵢ† = {dVe.toFixed(4)}</strong></div><div className="jvp-math" role="math" dangerouslySetInnerHTML={{__html:veMath}}/><p>先在噪声/数据比坐标回退一半，再用 Φ⁻¹ 映回原始时间。</p></article>
     </div>
-    <div className={`ve-comparison ${ratio<1?'finer':''}`}><b>跨度比较</b><span>VE 跨度是普通跨度的 {(ratio*100).toFixed(1)}%</span><strong>{ratio<.8?'在当前高噪声区域，VE 回退明显更细。':'两种坐标下的回退跨度较接近。'}</strong></div>
-    <p className="ve-q-note">这里的 q 表示当前这一次缩短的分母；若课程写成 q₀ⁱ，请把当前阶段的 q₀ⁱ 代入本计算器。</p>
+    <div className={`ve-comparison ${ratio<.8?'finer':''}`}><b>跨度比例</b><span>Δᵢ† / Δᵢ = {(ratio*100).toFixed(1)}%</span><strong>{key==='high'?'同样缩短 VE 区间的一半，映回后只回退 0.05，比普通 0.10 更细。':key==='mid'?'进入中噪声区后，VE 映回跨度已经缩小到 0.08。':'低噪声区中，两种跨度仍较接近。'}</strong></div>
   </section>
 }
 
-const cifarResults={
-  scratch:{label:'MF scratch',fid:3.85,epochs:'4000',init:'随机初始化',color:'var(--blue)'},
-  fine:{label:'MF fine-tune',fid:3.93,epochs:'2000 + 2000',init:'预训练 FM',color:'var(--purple)'},
-  dmf:{label:'DMF',fid:3.58,epochs:'2000 + 2000',init:'预训练 FM',color:'var(--orange)'},
-  dagger:{label:'DMF†',fid:3.36,epochs:'2000 + 2000',init:'预训练 FM',color:'var(--green)'},
-} as const;
-function CifarResultsPanel({mode}:{mode:string}){
-  const key=(mode in cifarResults?mode:'scratch') as keyof typeof cifarResults,cur=cifarResults[key];
-  return <section className="experiment-panel cifar-panel" aria-live="polite">
-    <div className="experiment-question"><b>实验问题</b><span>在一步采样、相同 CIFAR-10 评估口径下，课程训练能否改善最终 FID，并降低训练计算？</span></div>
-    <div className="protocol-strip"><span><small>当前方法</small><b>{cur.label}</b></span><span><small>初始化</small><b>{cur.init}</b></span><span><small>总训练预算</small><b>{cur.epochs} epoch</b></span><span><small>采样</small><b>1 步</b></span><span><small>FID ↓</small><b style={{color:cur.color}}>{cur.fid.toFixed(2)}</b></span></div>
-    <div className="cifar-result-layout">
-      <div className="result-bars" aria-label="CIFAR-10 一步 FID 对比">{Object.entries(cifarResults).map(([k,v])=><div key={k} className={k===key?'selected':''}><span>{v.label}</span><i><em style={{width:`${v.fid/4.1*100}%`,background:v.color}}/></i><b style={{color:v.color}}>{v.fid.toFixed(2)}</b></div>)}</div>
-      <div className="efficiency-stack"><article><small>单批训练时间</small><b>0.38 → 0.32 秒/批</b><span>MF → DMF，越低越快</span></article><article><small>端到端训练计算</small><b>85.33 → 66.6 H100 GPU-hours</b><span>MF scratch → DMF curriculum</span></article></div>
+function TrackRow({label,r,back,t,backLabel,tone}:{label:string;r:number;back:number;t:number;backLabel:string;tone:'linear'|'ve'}){
+  return <div className={`region-track ${tone}`}><b>{label}</b><div><i/><mark className="r" style={{left:`${r*100}%`}}>r={r.toFixed(1)}</mark><mark className="back" style={{left:`${back*100}%`}}>{backLabel}</mark><mark className="t" style={{left:`${t*100}%`}}>t={t.toFixed(1)}</mark></div></div>
+}
+
+function ExperimentTable({caption,children,className=''}:{caption:string;children:React.ReactNode;className?:string}){
+  return <div className="experiment-table-scroll" tabIndex={0} aria-label={`${caption}，窄屏可横向滚动`}><table className={`experiment-table ${className}`}><caption>{caption}</caption>{children}</table></div>;
+}
+
+function EvidenceReading({supports,limits}:{supports:string;limits:string}){
+  return <div className="evidence-reading"><article><b>数据支持什么</b><p>{supports}</p></article><article className="limit"><b>不能推出什么</b><p>{limits}</p></article></div>;
+}
+
+const cifarRows=[
+  {group:'从头训练',method:'iCT',init:'随机初始化',budget:'8k',fid:'2.83',tone:'external'},
+  {group:'从头训练',method:'MF（论文复现）',init:'随机初始化',budget:'4k',fid:'3.85',tone:'baseline'},
+  {group:'从头训练',method:'MF（Geng et al.）',init:'随机初始化',budget:'16k',fid:'2.90',tone:'external'},
+  {group:'DM / FM 初始化',method:'sCT',init:'预训练 DM',budget:'4k + 4k',fid:'2.85',tone:'external'},
+  {group:'DM / FM 初始化',method:'ECT',init:'预训练 DM',budget:'4k + 1k',fid:'3.60',tone:'external'},
+  {group:'DM / FM 初始化',method:'MF（论文复现）',init:'预训练 FM',budget:'2k + 2k',fid:'3.93',tone:'baseline'},
+  {group:'DM / FM 初始化',method:'DMF Curriculum',init:'预训练 FM',budget:'2k + 2k',fid:'3.58',tone:'dmf'},
+  {group:'DM / FM 初始化',method:'DMF† Curriculum',init:'预训练 FM',budget:'2k + 2k',fid:'3.36',tone:'dmf best'},
+] as const;
+
+function CifarResultsTable(){
+  return <section className="experiment-panel">
+    <div className="experiment-question"><b>论文问题</b><span>在一步采样下，DMF 课程与论文自己的 MF 对照及既有方法相比处在什么位置？</span></div>
+    <div className="table-legend" aria-label="表格分组图例"><span className="external">外部方法</span><span className="baseline">论文 MF 对照</span><span className="dmf">DMF 系列</span></div>
+    <ExperimentTable caption="Table 1 · CIFAR-10 comprehensive 1-step FID comparison">
+      <thead><tr><th scope="col">类别</th><th scope="col">方法</th><th scope="col">初始化</th><th scope="col">预算（epoch）</th><th scope="col" className="numeric">FID ↓</th></tr></thead>
+      <tbody>{cifarRows.map((row,index)=><tr key={`${row.method}-${index}`} className={row.tone}><td>{row.group}</td><th scope="row">{row.method}</th><td>{row.init}</td><td>{row.budget}</td><td className="numeric"><b>{row.fid}</b></td></tr>)}</tbody>
+    </ExperimentTable>
+    <p className="table-source">† 表示使用 VE-transformed scheduler 的 DMF Curriculum。预算沿用论文的“预训练 + 微调”记法。</p>
+    <EvidenceReading supports="在论文自己的 4k 总预算对照中，DMF† 3.36 低于 MF scratch 3.85 和 MF fine-tune 3.93。" limits="不能把 DMF† 写成整张表最优：iCT 2.83、sCT 2.85 和原论文 MF 2.90 都更低，且训练预算与初始化不同。"/>
+  </section>;
+}
+
+function EfficiencyTables(){
+  return <section className="experiment-panel efficiency-panel">
+    <div className="efficiency-table-grid">
+      <ExperimentTable caption="Table 2 · Per-batch training cost（batch 1024，4×H100）">
+        <thead><tr><th scope="col">数据集</th><th scope="col">方法</th><th scope="col" className="numeric">秒 / batch ↓</th></tr></thead>
+        <tbody><tr><th scope="row" rowSpan={2}>CIFAR-10</th><td>MF</td><td className="numeric">0.38</td></tr><tr className="dmf"><td>DMF</td><td className="numeric"><b>0.32</b></td></tr><tr><th scope="row" rowSpan={2}>ImageNet 256×256</th><td>MF</td><td className="numeric">3.08</td></tr><tr className="dmf"><td>DMF</td><td className="numeric"><b>1.71</b></td></tr></tbody>
+      </ExperimentTable>
+      <ExperimentTable caption="Table 3 · CIFAR-10 end-to-end training cost">
+        <thead><tr><th scope="col">方法</th><th scope="col">训练构成（epoch）</th><th scope="col" className="numeric">总 epoch</th><th scope="col" className="numeric">H100 GPU-hours ↓</th><th scope="col" className="numeric">FID ↓</th></tr></thead>
+        <tbody><tr><th scope="row">MF</th><td>从头训练 4000</td><td className="numeric">4000</td><td className="numeric">85.33</td><td className="numeric">3.85</td></tr><tr className="dmf"><th scope="row">DMF Curriculum</th><td>FM 预训练 2000 + DMF 微调 2000</td><td className="numeric">4000</td><td className="numeric"><b>66.6</b></td><td className="numeric"><b>3.36</b></td></tr></tbody>
+      </ExperimentTable>
     </div>
-    <p className="experiment-boundary">FID 条形图比较四种一步生成方法；右侧效率数字对应论文报告的 MF 与 DMF 训练成本，不能逐项归因于当前选中的每一种方法。</p>
-  </section>
+    <div className="derived-metrics"><article><small>CIFAR 每批</small><b>减少 15.8%</b><span>0.38 → 0.32，约 1.19×</span></article><article><small>ImageNet 每批</small><b>减少 44.5%</b><span>3.08 → 1.71，约 1.80×</span></article><article><small>CIFAR 端到端</small><b>减少 22.0%</b><span>85.33 → 66.6，约 1.28×</span></article></div>
+    <EvidenceReading supports="在论文报告的硬件和 batch 设置下，DMF 每批更快；Table 3 的两种方案都使用 4000 epoch 数据预算，其中 DMF 为 2000 epoch FM 预训练加 2000 epoch DMF 微调，并同时降低 GPU-hours、改善 FID。" limits="论文没有给出 ImageNet 端到端 GPU-hours，不能由每批时间替代或外推；每批耗时也不能逐项归因给 Table 1 的每种方法。"/>
+  </section>;
 }
 
-const imageNetBudgets={
-  6:{fid:21.18,budget:'+0.42%',status:'稳定',stage:'低预算课程起点'},
-  12:{fid:18.03,budget:'+0.85%',status:'稳定',stage:'继续课程微调'},
-  24:{fid:16.95,budget:'+1.71%',status:'稳定',stage:'继续课程微调'},
-  48:{fid:14.53,budget:'+3.42%',status:'稳定最佳',stage:'报告中最佳稳定设置'},
-  96:{fid:294.13,budget:'论文表仍写 +3.42%*',status:'发散',stage:'第 5 个课程阶段失稳'},
-} as const;
-function ImageNetBudgetPanel({epochs}:{epochs:number}){
-  const key=(epochs in imageNetBudgets?epochs:6) as keyof typeof imageNetBudgets,cur=imageNetBudgets[key],bad=key===96;
-  return <section className={`experiment-panel imagenet-panel ${bad?'unstable':''}`} aria-live="polite">
-    <div className="experiment-question"><b>实验问题</b><span>能否用很少的额外微调，把预训练 1400 epoch、50 步采样的 SiT-XL/2 改造成一步 DMF†？额外预算继续增加是否始终更好？</span></div>
-    <div className="conversion-flow"><article><small>固定起点</small><b>SiT-XL/2</b><span>预训练 1400 epoch<br/>50 步 FID 11.52</span></article><i>+</i><article className="selected-budget"><small>选择的额外微调</small><b>+{key} epoch</b><span>{cur.stage}<br/>{cur.budget}</span></article><i>→</i><article className={bad?'bad-output':''}><small>得到的一步模型</small><b>FID {cur.fid.toFixed(2)}</b><span>DMF† · 无 CFG<br/>{cur.status}</span></article></div>
-    <div className="budget-table" role="table" aria-label="ImageNet 额外微调预算与一步 FID"><div className="budget-row header" role="row"><span>额外微调</span><span>一步 FID ↓</span><span>训练状态</span></div>{Object.entries(imageNetBudgets).map(([ep,v])=><div key={ep} className={`budget-row ${Number(ep)===key?'selected':''} ${ep==='96'?'bad':''}`} role="row"><span>+{ep} epoch</span><span>{v.fid.toFixed(2)}</span><span>{v.status}</span></div>)}</div>
-    <div className={`budget-reading ${bad?'bad':''}`}><b>{bad?'为什么 96 epoch 不是“训练得更充分”？':'这组数字应该怎样读？'}</b><p>{bad?'96 epoch 运行进入差分间隔过细的第 5 个课程阶段后发散，FID 跃升到 294.13；它说明存在稳定性上限。':`论文中 6→48 epoch 的一步 FID 随额外微调增加而改善；当前选择 +${key} epoch，对应 FID ${cur.fid.toFixed(2)}。固定参照的 50 步 SiT FID 11.52 仍更低；这里换来的是 1 步采样，不是质量胜出。`}</p></div>
-    <p className="experiment-boundary">按钮表示五种“总额外微调预算”的实验设置，不是让同一模型在页面中继续累加训练。* 论文表把 96 epoch 的相对预算也写成 +3.42%，与 48 epoch 重复，因此页面保留原表并标记疑点。</p>
-  </section>
+const imageNetRows=[
+  {key:'baseline',method:'SiT-XL/2 (Baseline)',epochs:'1400 (Pretrain)',budget:'100.0%',steps:'50',fid:11.52,status:'基线'},
+  {key:'6',method:'DMF†',epochs:'1400 + 6',budget:'+0.42%',steps:'1',fid:21.18,status:'稳定'},
+  {key:'12',method:'DMF†',epochs:'1400 + 12',budget:'+0.85%',steps:'1',fid:18.03,status:'稳定'},
+  {key:'24',method:'DMF†',epochs:'1400 + 24',budget:'+1.71%',steps:'1',fid:16.95,status:'稳定'},
+  {key:'48',method:'DMF†',epochs:'1400 + 48',budget:'+3.42%',steps:'1',fid:14.53,status:'最佳稳定一步'},
+  {key:'96',method:'DMF†',epochs:'1400 + 96',budget:'+3.42%*',steps:'1',fid:294.13,status:'发散'},
+] as const;
+
+const imageNetPlotHeights:Record<string,number>={6:52,12:39,24:34,48:24,96:80};
+
+function ImageNetResultsTable({selected,onSelect}:{selected:string;onSelect:(value:string)=>void}){
+  const active=imageNetRows.find(row=>row.key===selected)??imageNetRows[0];
+  return <section className="experiment-panel imagenet-results" aria-live="polite">
+    <div className="protocol-strip"><span><small>数据</small><b>ImageNet 256×256</b></span><span><small>表示</small><b>SD-VAE latent</b></span><span><small>骨干</small><b>SiT-XL/2</b></span><span><small>采样协议</small><b>无 CFG</b></span><span><small>指标</small><b>FID ↓</b></span></div>
+    <div className="imagenet-result-layout">
+      <ExperimentTable caption="Table 4 · ImageNet curriculum budget w.r.t. FID">
+        <thead><tr><th scope="col">方法</th><th scope="col">训练 epoch</th><th scope="col">相对预算</th><th scope="col" className="numeric">步数</th><th scope="col" className="numeric">FID ↓</th><th scope="col">状态</th></tr></thead>
+        <tbody>{imageNetRows.map(row=><tr key={row.key} className={`${row.key===selected?'selected':''} ${row.key==='96'?'unstable':''}`}><th scope="row"><button type="button" aria-pressed={row.key===selected} onClick={()=>onSelect(row.key)}>{row.method}</button></th><td>{row.epochs}</td><td>{row.budget}</td><td className="numeric">{row.steps}</td><td className="numeric"><b>{row.fid.toFixed(2)}</b></td><td>{row.status}</td></tr>)}</tbody>
+      </ExperimentTable>
+      <div className="budget-plot" aria-label="50 步基线位于底部；6 到 48 epoch 的一步 FID 逐渐下降但始终高于基线；96 epoch 突然发散"><div className="baseline-line"><span>50 步基线 · FID 11.52</span></div>{imageNetRows.slice(1).map(row=><button key={row.key} type="button" className={`${row.key===selected?'selected':''} ${row.key==='96'?'unstable':''}`} aria-pressed={row.key===selected} onClick={()=>onSelect(row.key)}><span>+{row.key} ep</span><i style={{height:`${imageNetPlotHeights[row.key]}%`}}/><b>{row.fid.toFixed(2)}</b>{row.key==='96'?<em>+96 ep · 断轴发散</em>:null}</button>)}</div>
+    </div>
+    <div className={`budget-reading ${active.key==='96'?'bad':''}`}><b>{active.key==='baseline'?'固定的质量参照':active.key==='96'?'稳定性上限':'当前一步设置'}</b><p>{active.key==='baseline'?'SiT-XL/2 使用 50 步得到 FID 11.52；后续所有一步结果都必须与它同时保留。':active.key==='96'?'96 epoch 在第 5 个课程阶段发散，FID 达到 294.13；更长训练不是自动更好。':`额外 ${active.key} epoch 得到一步 FID ${active.fid.toFixed(2)}。它减少采样步数，但质量仍未超过 50 步基线 11.52。`}</p></div>
+    <p className="experiment-boundary">* Table 4 把 +48 与 +96 epoch 的相对预算都写为 +3.42%。页面保留论文原值并标为疑点，不自行改成推测值。</p>
+  </section>;
 }
 
-const feedback=(id:string,s:S)=>{switch(id){case'1.1':return`t=${s.a.toFixed(2)}：数据占 ${(1-s.a).toFixed(2)}，噪声占 ${s.a.toFixed(2)}；固定配对的 ε−z₀ 箭头没有随 t 改变。`;case'2.1':return s.step===8?'已用 8 次局部查询到达玩具终点；这说明步进机制，不是论文模型误差。':`已执行 ${s.step} 次反向 Euler 更新；当前位置改变后，下一次局部速度也会改变。`;case'2.2':return s.playing?'同步运行中：两侧共享起点和轨迹。':'一次切线大跳留下弯曲残差；多步侧用更多 NFE 追随轨迹。';case'3.1':return`当前区间 [${Math.min(s.a,s.b-.05).toFixed(2)}, ${Math.max(s.b,s.a+.05).toFixed(2)}]：绿色弦由两个端点真实决定，蓝色切线只属于 t 端点。`;case'3.2':return s.playing?'同步比较中：Flow 沿曲线查询，MeanFlow 沿端点弦更新。':'MeanFlow 的一步残差取决于平均速度预测质量，不保证真实模型一定为零。';case'4.1':return['先读恒等式：连续 MeanFlow 的难点集中在沿轨迹全导数 du/dt。','链式法则表明 du/dt 同时包含状态变化项和显式时间变化项。','PyTorch 用 torch.func.jvp 沿 (vₜ,0,1) 方向直接计算这个全导数。','JVP 增加贯穿网络的切向传播计算；DMF 中间阶段用有限差分暂时避开它。'][s.step];case'4.2':return s.mode==='jvp'?'JVP 模式增加切向传播和目标构造；这里只比较路径结构，不虚构独立耗时。':'普通前向只显示输入、网络和输出三节点基准路径。';case'5.1':return['zₜ−vₜΔ 是一阶 Euler 回退，不是生成新样本。','同一个 uθ 在当前与较早位置各预测一次。','两个预测的差商近似沿轨迹全导数。','移项后，较早预测进入 stop-gradient 加权目标。'][s.step];case'6.1':return['训练前：从预训练 Flow Model 初始化 uθ，并把总微调预算平均分给 K 个阶段。','阶段 0：目标就是 vₜ，先巩固 Flow Matching 锚点，不使用 JVP。','中间阶段：逐步缩小 Δ，用 stop-gradient 的较早预测构造目标，不使用 JVP。','最终阶段：切回连续 MeanFlow 恒等式，重新启用 JVP。'][s.step];case'7.1':return`当前 t=${s.a.toFixed(2)}：数据系数 1−t=${(1-s.a).toFixed(2)}，噪声系数 t=${s.a.toFixed(2)}，Φ(t)=噪声/数据=${(s.a/(1-s.a)).toFixed(2)}${s.a>.85?'；接近 1 时比例快速增大。':'。'}`;case'7.2':{const ph=(x:number)=>x/(1-x),iv=(x:number)=>x/(1+x),dl=(s.b-s.a)/s.q,tv=iv(ph(s.b)-(ph(s.b)-ph(s.a))/s.q),dv=s.b-tv;return`普通 Δ=${dl.toFixed(4)}，VE Δ†=${dv.toFixed(4)}；VE 跨度是普通跨度的 ${(dv/dl*100).toFixed(1)}%。`;}case'8.1':return`当前选中 ${cifarResults[(s.mode in cifarResults?s.mode:'scratch') as keyof typeof cifarResults].label}；FID 图、协议与选择状态同步更新，效率卡保持独立布局。`;case'8.2':return s.step===96?'96 epoch 不是更优结果：运行在第 5 个课程阶段发散，FID 升至 294.13。':`选择的是总额外微调预算 +${s.step} epoch；页面同时保留 50 步 SiT FID 11.52，提醒一步结果换取的是采样步数。`;default:return''}}
+const feedback=(id:string,s:S)=>{switch(id){case'1.1':return`t=${s.a.toFixed(2)}：数据占 ${(1-s.a).toFixed(2)}，噪声占 ${s.a.toFixed(2)}；固定配对的 ε−z₀ 箭头没有随 t 改变。`;case'2.1':return s.step===8?'已用 8 次局部查询到达玩具终点；这说明步进机制，不是论文模型误差。':`已执行 ${s.step} 次反向 Euler 更新；当前位置改变后，下一次局部速度也会改变。`;case'2.2':return s.playing?'同步运行中：两侧共享起点和轨迹。':'一次切线大跳留下弯曲残差；多步侧用更多 NFE 追随轨迹。';case'3.1':return`当前区间 [${Math.min(s.a,s.b-.05).toFixed(2)}, ${Math.max(s.b,s.a+.05).toFixed(2)}]：绿色弦由两个端点真实决定，蓝色切线只属于 t 端点。`;case'3.2':return s.playing?'同步比较中：Flow 沿曲线查询，MeanFlow 沿端点弦更新。':'MeanFlow 的一步残差取决于平均速度预测质量，不保证真实模型一定为零。';case'4.1':return['先读恒等式：连续 MeanFlow 的难点集中在沿轨迹全导数 du/dt。','链式法则表明 du/dt 同时包含状态变化项和显式时间变化项。','PyTorch 用 torch.func.jvp 沿 (vₜ,0,1) 方向直接计算这个全导数。','JVP 增加贯穿网络的切向传播计算；DMF 中间阶段用有限差分暂时避开它。'][s.step];case'4.2':return s.mode==='jvp'?'JVP 模式增加切向传播和目标构造；这里只比较路径结构，不虚构独立耗时。':'普通前向只显示输入、网络和输出三节点基准路径。';case'5.1':return['zₜ−vₜΔ 是一阶 Euler 回退，不是生成新样本。','同一个 uθ 在当前与较早位置各预测一次。','两个预测的差商近似沿轨迹全导数。','移项后，较早预测进入 stop-gradient 加权目标。'][s.step];case'6.1':{const d=Math.max(.02,Math.min(1,s.a)),wv=d/(1+d),wu=1/(1+d);return d>.995?'Δ=t−r：DMF 目标 = ½[vₜ+u(zᵣ,r,r)] = ½(vₜ+vᵣ) = vₜ=vᵣ，因此训练监督严格退化为 Flow Matching。':d<.2?`d=${d.toFixed(2)}：固定 vₜ 锚点权重仅 ${wv.toFixed(2)}，较早自预测权重 ${wu.toFixed(2)}；差商逼近 du/dt，目标趋向连续 MF。`:`d=${d.toFixed(2)}：固定锚点权重 ${wv.toFixed(2)}，较早自预测权重 ${wu.toFixed(2)}；这是 FM 与连续 MF 之间的过渡目标。`;}case'7.1':return`当前 t=${s.a.toFixed(2)}：数据系数 1−t=${(1-s.a).toFixed(2)}，噪声系数 t=${s.a.toFixed(2)}，Φ(t)=噪声/数据=${(s.a/(1-s.a)).toFixed(2)}${s.a>.85?'；接近 1 时比例快速增大。':'。'}`;case'7.2':{const ph=(x:number)=>x/(1-x),iv=(x:number)=>x/(1+x),dl=(s.b-s.a)/s.q,tv=iv(ph(s.b)-(ph(s.b)-ph(s.a))/s.q),dv=s.b-tv;return`普通 Δ=${dl.toFixed(4)}，VE Δ†=${dv.toFixed(4)}；VE 跨度是普通跨度的 ${(dv/dl*100).toFixed(1)}%。`;}case'8.1':return'Table 1 的八种方法始终完整显示；请把 FID 与初始化、预算一起比较。';case'8.2':return'Table 3 明确比较相同的 4000 epoch 总数据预算：MF 从头训练 4000，DMF 为 FM 预训练 2000 加 DMF 微调 2000。';case'9.1':{const row=imageNetRows.find(item=>item.key===s.mode)??imageNetRows[0];return row.key==='96'?'96 epoch 在第 5 个课程阶段发散，FID 294.13；红柱使用断轴显示突然增高。':`${row.steps} 步 ${row.method} 的 FID 为 ${row.fid.toFixed(2)}；它仍在底部的 50 步基线 11.52 之上。`;}default:return''}}
 
-export const DmfModule:React.FC<WidgetProps>=({moduleId,chapterId})=>{const ref=useRef<HTMLCanvasElement>(null);const[a,setA]=useState(moduleId==='1.1'?.45:moduleId==='3.1'?.25:moduleId==='7.2'?.2:moduleId==='7.1'?.65:.55);const[b,setB]=useState(moduleId==='7.2'?.8:.82);const[q,setQ]=useState(2);const[step,setStep]=useState(moduleId==='8.2'?6:0);const[mode,setMode]=useState(moduleId==='4.2'?'forward':moduleId==='8.1'?'scratch':'default');const[progress,setProgress]=useState(0);const[playing,setPlaying]=useState(false);const raf=useRef<number|null>(null);const s={a,b,q,step,mode,progress,playing};
+function veWindowFeedback(t:number){const phi=(x:number)=>x/(1-x),t2=t+.1,p1=phi(t),p2=phi(t2),dp=p2-p1;return`窗口 [${t.toFixed(2)}, ${t2.toFixed(2)}] 的原始长度始终是 0.10，但噪声/数据比从 ${p1.toFixed(2)} 变到 ${p2.toFixed(2)}，对应 ΔΦ=${dp.toFixed(2)}。原始时间等距不保证 VE 噪声比等距。`}
+function veRegionFeedback(mode:string){const key=(mode in noiseRegions?mode:'low') as keyof typeof noiseRegions,{r,t,label}=noiseRegions[key],phi=(x:number)=>x/(1-x),inv=(x:number)=>x/(1+x),dLinear=(t-r)/2,tVe=inv(phi(t)-(phi(t)-phi(r))/2),dVe=t-tVe;return`${label} [${r.toFixed(1)}, ${t.toFixed(1)}]：普通 Δ=${dLinear.toFixed(4)}，VE Δ†=${dVe.toFixed(4)}，VE 跨度是普通跨度的 ${(dVe/dLinear*100).toFixed(1)}%。`}
+
+export const DmfModule:React.FC<WidgetProps>=({moduleId,chapterId})=>{const ref=useRef<HTMLCanvasElement>(null);const[a,setA]=useState(moduleId==='1.1'?.45:moduleId==='3.1'?.25:moduleId==='6.1'?1:moduleId==='7.1'?.1:.55);const[b,setB]=useState(.82);const[q]=useState(2);const[step,setStep]=useState(0);const[mode,setMode]=useState(moduleId==='4.2'?'forward':moduleId==='7.2'?'low':moduleId==='9.1'?'baseline':'default');const[progress,setProgress]=useState(0);const[playing,setPlaying]=useState(false);const raf=useRef<number|null>(null);const s={a,b,q,step,mode,progress,playing};
  const play=useCallback(()=>{if(raf.current)cancelAnimationFrame(raf.current);setProgress(0);setPlaying(true);const st=performance.now();const tick=(now:number)=>{const p=Math.min(1,(now-st)/2300);setProgress(p);if(p<1)raf.current=requestAnimationFrame(tick);else{raf.current=null;setPlaying(false)}};raf.current=requestAnimationFrame(tick)},[]);
  useEffect(()=>()=>{if(raf.current)cancelAnimationFrame(raf.current)},[]);useEffect(()=>{const canvas=ref.current;if(!canvas)return;let c:CanvasRenderingContext2D;try{c=setupCanvas(canvas,W,H)}catch{return}draw(c,moduleId,s);canvas.classList.add('is-ready')},[moduleId,a,b,q,step,mode,progress,playing]);
  const chip=(items:[string,string][],selected=mode,on=(v:string)=>setMode(v))=><div className="chip-row" role="group">{items.map(([v,l])=><button key={v} className={`chip ${selected===v?'selected':''}`} aria-pressed={selected===v} onClick={()=>on(v)}>{l}</button>)}</div>;
@@ -230,13 +314,16 @@ export const DmfModule:React.FC<WidgetProps>=({moduleId,chapterId})=>{const ref=
  else if(moduleId==='2.1')controls=<div className="step-ctrl"><button className="tiny ghost" disabled={step===0} onClick={()=>setStep(0)}>回到噪声</button><span className="step-label">NFE <b>{step}</b>/8</span><button className="tiny" disabled={step===8} onClick={()=>setStep(step+1)}>走一步</button></div>;
  else if(['2.2','3.2'].includes(moduleId))controls=<div className="step-ctrl"><button className={`tiny ${playing?'selected':''}`} aria-pressed={playing} onClick={play}>{playing?'同步运行中…':'开始 / 再次比较'}</button></div>;
  else if(moduleId==='3.1')controls=<div className="dual-range"><Range label="端点 r" value={a} min={0} max={.72} step={.01} on={setA}/><Range label="端点 t" value={b} min={.28} max={1} step={.01} on={setB}/></div>;
- else if(['4.1','5.1','6.1'].includes(moduleId))controls=next(3);
+ else if(['4.1','5.1'].includes(moduleId))controls=next(3);
+ else if(moduleId==='6.1')controls=<Range label="相对间隔 Δ/(t−r)" value={a} min={.02} max={1} step={.01} on={setA}/>;
+ else if(moduleId==='6.2')controls=chip([['0','阶段 0 · FM'],['1','中间 · DMF'],['2','最终 · MF']],String(step),v=>setStep(Number(v)));
  else if(moduleId==='4.2')controls=chip([['forward','普通前向'],['jvp','连续 MF / JVP']]);
- else if(moduleId==='7.1')controls=<Range label="同一个时间 t" value={a} min={.05} max={.96} step={.01} on={setA}/>;
- else if(moduleId==='7.2')controls=<div className="ve-calc-controls"><Range label="区间终点 r" value={a} min={.02} max={Math.max(.07,b-.05)} step={.01} on={setA}/><Range label="高噪声起点 t" value={b} min={Math.min(.91,a+.05)} max={.96} step={.01} on={setB}/><Range label="缩小分母 q" value={q} min={1.5} max={8} step={.5} on={setQ}/></div>;
- else if(moduleId==='8.1')controls=chip([['scratch','MF scratch'],['fine','MF fine-tune'],['dmf','DMF'],['dagger','DMF†']]);
- else if(moduleId==='8.2')controls=chip([[6,'+6 ep'],[12,'+12 ep'],[24,'+24 ep'],[48,'+48 ep'],[96,'+96 ep']].map(([v,l])=>[String(v),String(l)]),String(step),v=>setStep(Number(v)));
- const expected=moduleId.startsWith(chapterId.replace('chap-','')+'.');const technicalWalkthrough=moduleId==='4.1'?<JvpIdentityWalkthrough step={step}/>:moduleId==='5.1'?<DmfDerivationWalkthrough step={step}/>:moduleId==='6.1'?<TrainingCurriculumWalkthrough step={step}/>:moduleId==='7.2'?<VeDeltaCalculator r={a} t={b} q={q}/>:moduleId==='8.1'?<CifarResultsPanel mode={mode}/>:moduleId==='8.2'?<ImageNetBudgetPanel epochs={step}/>:null;return <div className="dmf-widget">{technicalWalkthrough??<canvas ref={ref} aria-hidden="true"/>}{controls}<div className={`feedback ${moduleId==='8.2'&&step===96?'bad':moduleId==='8.1'&&mode==='dagger'?'good':''}`} aria-live="polite">{expected?feedback(moduleId,s):'组件编号与章节不一致。'}</div></div>};
+ else if(moduleId==='7.1')controls=<Range label="等长窗口起点 t" value={a} min={.05} max={.8} step={.01} on={setA}/>;
+ else if(moduleId==='7.2')controls=chip([['low','低噪声 [0.1, 0.3]'],['mid','中噪声 [0.4, 0.6]'],['high','高噪声 [0.7, 0.9]']]);
+ const expected=moduleId.startsWith(chapterId.replace('chap-','')+'.');
+ const technicalWalkthrough=moduleId==='4.1'?<JvpIdentityWalkthrough step={step}/>:moduleId==='5.1'?<DmfDerivationWalkthrough step={step}/>:moduleId==='6.1'?<DeltaLimitWalkthrough d={a}/>:moduleId==='6.2'?<ThreeStageTrainingFunction stage={step}/>:moduleId==='7.2'?<VeRegionComparator mode={mode}/>:moduleId==='8.1'?<CifarResultsTable/>:moduleId==='8.2'?<EfficiencyTables/>:moduleId==='9.1'?<ImageNetResultsTable selected={mode} onSelect={setMode}/>:null;
+ const currentFeedback=moduleId==='6.2'?trainingStages[Math.min(2,step)].note:moduleId==='7.1'?veWindowFeedback(a):moduleId==='7.2'?veRegionFeedback(mode):feedback(moduleId,s);
+ return <div className="dmf-widget">{technicalWalkthrough??<canvas ref={ref} aria-hidden="true"/>}{controls}<div className={`feedback ${moduleId==='9.1'&&mode==='96'?'bad':''}`} aria-live="polite">{expected?currentFeedback:'组件编号与章节不一致。'}</div></div>};
 
 function Range({label,value,min,max,step,on}:{label:string;value:number;min:number;max:number;step:number;on:(v:number)=>void}){return <div className="ctrl"><label>{label} <span className="val">{value.toFixed(2)}</span></label><input aria-label={label} type="range" min={min} max={max} step={step} value={value} onChange={e=>on(Number(e.target.value))}/></div>}
 export default DmfModule;

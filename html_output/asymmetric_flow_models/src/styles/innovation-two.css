@@ -1,0 +1,562 @@
+/* §7 · Innovation II. Reuses the frozen PaperSkill shell and semantic tokens. */
+#chap-7 .part-goal { margin-bottom: 22px; }
+.af-innovation-two-entry {
+  display: grid;
+  grid-template-columns: auto auto 28px auto 28px auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 0 36px;
+  padding: 15px 18px;
+  background: #fff;
+  border-block: 1px solid var(--af-line);
+  color: #697582;
+  font-size: 16px;
+  text-align: center;
+}
+.af-innovation-two-entry > span,
+.af-innovation-two-entry > strong,
+.af-innovation-two-entry > b { white-space: nowrap; }
+.af-innovation-two-entry i { color: #9aa4ad; font-style: normal; }
+.af-innovation-two-entry strong { color: var(--af-lowrank-strong); }
+.af-innovation-two-entry b { padding: 5px 10px; background: var(--af-latent-soft); border-radius: 7px; color: var(--af-latent-strong); }
+
+.af-deep-dive { margin-top: 16px; background: #fff; border: 1px solid var(--af-line); border-radius: 10px; }
+.af-deep-dive summary { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 16px; cursor: pointer; color: var(--af-ink); font-size: 18px; font-weight: 760; }
+.af-deep-dive summary span { color: #818b95; font-size: 14px; font-weight: 500; }
+.af-deep-dive[open] summary { border-bottom: 1px solid #e6eaed; }
+.af-mechanism-continuation { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 25px 0; color: #6d7883; font-size: 16px; }
+.af-mechanism-continuation i { color: var(--af-lowrank); font-size: 21px; font-style: normal; }
+
+/* 7.1 · Direction, scale and SNR alignment. */
+.af-dual-space-canvas { padding: 17px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-dual-space-canvas svg { display: block; width: 100%; overflow: visible; }
+.af-dual-space-canvas .latent-surface { fill: var(--af-latent-soft); stroke: rgba(117,111,140,.28); }
+.af-dual-space-canvas .pixel-surface { fill: #f8fafb; stroke: #dce3e8; }
+.af-dual-space-canvas .space-title { font-size: 18px; font-weight: 780; }
+.af-dual-space-canvas .latent-title { fill: var(--af-latent-strong); }
+.af-dual-space-canvas .pixel-title { fill: var(--af-data-strong); }
+.af-dual-space-canvas .latent-points circle { fill: var(--af-latent); opacity: .76; }
+.af-dual-space-canvas .latent-points text { fill: var(--af-latent-strong); font-family: "Cambria Math", Georgia, serif; font-size: 20px; }
+.af-dual-space-canvas .latent-directions line { stroke: var(--af-latent); stroke-width: 4; stroke-linecap: round; }
+.af-dual-space-canvas .lift-arrow { stroke: #aab4bd; stroke-width: 3; stroke-dasharray: 8 6; transition: stroke 220ms ease, stroke-width 220ms ease; }
+.af-dual-space-canvas .lift-node { fill: #fff; stroke: var(--af-lowrank); stroke-width: 3; }
+.af-dual-space-canvas .lift-label { fill: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 25px; font-weight: 800; }
+.af-dual-space-canvas .target-directions line { stroke: var(--af-lowrank); stroke-width: 7; stroke-linecap: round; opacity: .36; }
+.af-dual-space-canvas .mapped-directions line { stroke: var(--af-latent); stroke-width: 4; stroke-linecap: round; transition: x2 170ms linear, y2 170ms linear, stroke 220ms ease; }
+.af-dual-space-canvas.is-aligned .mapped-directions line { stroke: var(--af-lowrank-strong); }
+.af-dual-space-canvas.focus-lift .lift-arrow { stroke: var(--af-lowrank); stroke-width: 5; }
+.af-dual-space-canvas .distribution-label { font-family: var(--ui-font-mono); font-size: 18px; font-weight: 800; }
+.af-dual-space-canvas .distribution-label.target { fill: var(--af-lowrank-strong); }
+.af-dual-space-canvas .distribution-label.mapped { fill: var(--af-latent-strong); }
+.af-dual-mobile { display: none; }
+.af-alignment-rail,
+.af-scale-handle,
+.af-coupled-time-rails,
+.af-handoff-rail { touch-action: none; cursor: ew-resize; outline: none; }
+.af-alignment-rail { position: relative; display: flex; justify-content: space-between; gap: 18px; margin: 6px 7px 2px; padding-top: 26px; color: #727e89; font-size: 16px; }
+.af-alignment-rail::before { content: ''; position: absolute; top: 10px; right: 0; left: 0; height: 5px; background: linear-gradient(90deg, var(--af-latent), var(--af-lowrank)); border-radius: 999px; opacity: .72; }
+.af-alignment-rail i { position: absolute; top: 0; left: var(--alignment); width: 24px; height: 24px; background: #fff; border: 3px solid var(--af-lowrank-strong); border-radius: 50%; box-shadow: 0 2px 8px rgba(39,60,78,.16); transform: translateX(-50%); }
+.af-alignment-rail:focus-visible i { box-shadow: 0 0 0 5px rgba(79,136,121,.14); }
+.af-lift-notation { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 14px 0; border-block: 1px solid var(--af-line); }
+.af-lift-notation span { display: flex; align-items: baseline; justify-content: center; gap: 8px; min-width: 0; padding: 13px 16px; color: #6b7681; font-size: 16px; text-align: center; }
+.af-lift-notation span + span { border-left: 1px solid var(--af-line); }
+.af-lift-notation b { color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: 19px; font-weight: 700; white-space: nowrap; }
+.af-alignment-status { display: grid; grid-template-columns: auto 1fr auto 1fr; align-items: center; gap: 10px; margin: 14px 0; padding: 12px 15px; background: #f7f8f9; border-radius: 9px; font-size: 16px; }
+.af-alignment-status span { color: #77828d; }
+.af-alignment-status b { color: var(--af-data-strong); }
+.af-alignment-status b.pending { color: #9a6c5b; }
+.af-alignment-status b.ok { color: var(--af-lowrank-strong); }
+.af-procrustes-formula {
+  display: grid;
+  justify-items: center;
+  min-height: 98px;
+  padding: 15px;
+  background: #f7f8f9;
+  border: 1px solid var(--af-line);
+  border-radius: 10px;
+  transition: background 260ms ease, border-color 260ms ease;
+}
+.af-procrustes-formula:not(.revealed)::before { content: '沿 rail 完成 Direction Alignment 后 reveal Procrustes objective'; align-self: center; color: #858f98; font-size: 16px; text-align: center; }
+.af-procrustes-formula:not(.revealed) > * { display: none; }
+.af-procrustes-formula.revealed { background: var(--af-lowrank-soft); border-color: rgba(79,136,121,.25); }
+.af-procrustes-formula > div { color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: clamp(24px, 3vw, 34px); text-align: center; }
+.af-procrustes-formula > span { margin-top: 6px; color: #63716d; font-size: 16px; text-align: center; }
+.af-alignment-step:not(.is-aligned) > .af-deep-dive { opacity: .42; pointer-events: none; }
+.af-compact-equations { display: flex; align-items: baseline; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 16px; color: #5c6875; font-family: "Cambria Math", Georgia, serif; font-size: 20px; }
+.af-compact-equations i { color: #9ba4ad; font-style: normal; }
+.af-compact-equations strong { color: var(--af-lowrank-strong); }
+
+.af-scale-overlay { padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-scale-shapes { position: relative; display: grid; min-height: 200px; place-items: center; overflow: hidden; background: #f7f8f9; border-radius: 10px; }
+.af-scale-shapes > div { position: absolute; display: grid; width: 68%; height: 86px; place-items: center; border-radius: 10px; transition: transform 180ms linear, border-color 180ms ease; }
+.af-scale-shapes span { font-size: 17px; font-weight: 760; }
+.af-scale-shapes .real-shape { border: 3px solid var(--af-data); color: var(--af-data-strong); }
+.af-scale-shapes .lifted-shape { background: rgba(117,111,140,.13); border: 3px dashed var(--af-latent); color: var(--af-latent-strong); transform: scaleX(var(--lift-scale)); }
+.af-scale-shapes .real-shape span { position: absolute; top: 8px; }
+.af-scale-shapes .lifted-shape span { position: absolute; bottom: 8px; }
+.af-scale-overlay.is-calibrated .lifted-shape { border-color: var(--af-lowrank); }
+.af-scale-handle { position: relative; display: flex; justify-content: center; min-height: 56px; margin-top: 13px; padding-top: 32px; color: var(--af-latent-strong); font-family: "Cambria Math", Georgia, serif; font-size: 18px; }
+.af-scale-handle::before { content: ''; position: absolute; top: 12px; right: 7px; left: 7px; height: 5px; background: #dfe4e8; border-radius: 999px; }
+.af-scale-handle i { position: absolute; top: 2px; left: var(--scale-position); width: 25px; height: 25px; background: #fff; border: 3px solid var(--af-latent); border-radius: 50%; box-shadow: 0 2px 8px rgba(39,60,78,.14); transform: translateX(-50%); }
+.af-scale-handle span { padding: 1px 8px; background: var(--af-latent-soft); border-radius: 6px; }
+.af-scale-formula { display: flex; align-items: baseline; justify-content: center; gap: 12px; min-height: 52px; margin-top: 11px; color: #77818b; font-family: "Cambria Math", Georgia, serif; font-size: 25px; }
+.af-scale-formula:not(.revealed)::before { content: '拖动 Scale Handle，使两个 magnitude 重合'; align-self: center; color: #858f98; font-family: var(--ui-font-sans); font-size: 16px; }
+.af-scale-formula:not(.revealed) > * { display: none; }
+.af-scale-formula i { color: #9da6ae; font-style: normal; }
+.af-scale-formula strong { color: var(--af-lowrank-strong); }
+
+.af-snr-step { padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-coupled-time-rails { display: grid; gap: 19px; padding: 18px 18px 12px; background: #f7f8f9; border-radius: 10px; }
+.af-coupled-time-rails > div { display: grid; grid-template-columns: 122px 1fr; align-items: center; gap: 15px; }
+.af-coupled-time-rails b { color: #64717e; font-size: 16px; }
+.af-coupled-time-rails .rail { position: relative; display: block; height: 6px; background: #dce2e7; border-radius: 999px; }
+.af-coupled-time-rails .rail i { position: absolute; top: 50%; display: grid; width: 27px; height: 27px; place-items: center; background: #fff; border-radius: 50%; box-shadow: 0 2px 8px rgba(39,60,78,.14); font-family: "Cambria Math", Georgia, serif; font-size: 16px; font-style: normal; transform: translate(-50%,-50%); }
+.af-coupled-time-rails .pixel-handle { left: var(--pixel-time); border: 3px solid var(--af-data); color: var(--af-data-strong); }
+.af-coupled-time-rails .latent-handle { left: var(--latent-time); border: 3px solid var(--af-latent); color: var(--af-latent-strong); transition: left 160ms linear; }
+.af-coupled-time-rails footer { display: flex; justify-content: space-between; margin-left: 137px; color: #838d96; font-size: 16px; }
+.af-calibration-readout { display: flex; align-items: center; justify-content: center; gap: 11px; margin-top: 12px; padding: 12px 15px; background: var(--af-latent-soft); border-radius: 9px; outline: none; color: var(--af-latent-strong); font-family: "Cambria Math", Georgia, serif; font-size: 21px; }
+.af-calibration-readout i { color: #9a93aa; font-style: normal; }
+.af-calibration-readout b { margin-left: 10px; font-family: var(--ui-font-sans); font-size: 16px; font-weight: 700; }
+.af-snr-step.focus-calibration .af-coupled-time-rails { box-shadow: inset 4px 0 var(--af-latent); }
+.af-calibration-equations { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; padding: 15px; }
+.af-calibration-equations span { padding: 10px; background: #f7f8f9; border-radius: 7px; color: #556372; font-family: "Cambria Math", Georgia, serif; font-size: 18px; text-align: center; }
+.af-alignment-complete { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-top: 25px; color: #697681; font-size: 17px; text-align: center; }
+.af-alignment-complete span { color: var(--af-latent-strong); font-weight: 800; }
+.af-alignment-complete i { color: #9aa4ad; font-style: normal; }
+.af-alignment-complete strong { color: var(--af-lowrank-strong); }
+
+/* 7.2 · Paired trajectory manipulation. */
+.af-trajectory-stage { padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-paired-trajectories { display: block; width: 100%; overflow: visible; touch-action: none; cursor: ew-resize; outline: none; }
+.af-paired-trajectories .trajectory-surface.latent { fill: var(--af-latent-soft); stroke: rgba(117,111,140,.25); }
+.af-paired-trajectories .trajectory-surface.pixel { fill: #f8fafb; stroke: #dce3e8; }
+.af-paired-trajectories .trajectory-title { font-size: 17px; font-weight: 800; }
+.af-paired-trajectories .trajectory-title.latent { fill: var(--af-latent-strong); }
+.af-paired-trajectories .trajectory-title.pixel { fill: var(--af-data-strong); }
+.af-paired-trajectories .trajectory-rail { fill: none; stroke-width: 5; stroke-linecap: round; }
+.af-paired-trajectories .trajectory-rail.latent { stroke: var(--af-latent); }
+.af-paired-trajectories .trajectory-rail.pixel { stroke: var(--af-lowrank); }
+.af-paired-trajectories .endpoint { fill: #727d88; font-family: "Cambria Math", Georgia, serif; font-size: 18px; }
+.af-paired-trajectories .mapping-ribbon { fill: none; stroke: rgba(79,136,121,.48); stroke-width: 13; stroke-linecap: round; cursor: pointer; outline: none; transition: stroke 180ms ease, stroke-width 180ms ease; }
+.af-paired-trajectories .mapping-ribbon:hover,
+.af-paired-trajectories .mapping-ribbon:focus { stroke: var(--af-lowrank); stroke-width: 17; }
+.af-paired-trajectories .trajectory-node { fill: #fff; stroke-width: 5; }
+.af-paired-trajectories .trajectory-node.latent { stroke: var(--af-latent-strong); }
+.af-paired-trajectories .trajectory-node.pixel { stroke: var(--af-lowrank-strong); }
+.af-paired-trajectories .moving-label { font-family: "Cambria Math", Georgia, serif; font-size: 21px; font-weight: 800; }
+.af-paired-trajectories .moving-label.latent { fill: var(--af-latent-strong); }
+.af-paired-trajectories .moving-label.pixel { fill: var(--af-lowrank-strong); }
+.af-paired-trajectories .ribbon-label { fill: #66776f; font-size: 16px; font-weight: 750; }
+.af-identity-slot { position: relative; display: grid; min-height: 76px; margin-top: 4px; place-items: center; }
+.af-ribbon-cue { color: #858f98; font-size: 16px; text-align: center; transition: opacity 160ms ease; }
+.af-ribbon-cue.hidden { opacity: 0; }
+.af-identity-popover { position: absolute; inset: 0; display: grid; justify-items: center; padding: 12px; background: var(--af-latent-soft); border-radius: 9px; opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity 220ms ease, transform 220ms var(--ease-out); }
+.af-identity-popover.revealed { opacity: 1; visibility: visible; transform: none; }
+.af-identity-popover strong { color: var(--af-latent-strong); font-family: "Cambria Math", Georgia, serif; font-size: 26px; }
+.af-identity-popover span { margin-top: 4px; color: #696579; font-size: 16px; text-align: center; }
+.af-output-identity { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 10px; margin-top: 11px; padding: 13px 15px; background: #f7f8f9; border: 1px solid #e1e6e9; border-radius: 9px; opacity: .16; transition: opacity 260ms ease, border-color 260ms ease; }
+.af-output-identity.revealed { opacity: 1; }
+.af-output-identity.active { border-color: rgba(79,136,121,.48); }
+.af-output-identity span { color: #697582; font-size: 16px; }
+.af-output-identity i { color: var(--af-lowrank); font-style: normal; }
+.af-output-identity strong { color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 24px; text-align: center; }
+.af-output-identity small { color: #747f89; font-size: 16px; }
+.af-coupled-components { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 12px; margin-top: 18px; }
+.af-coupled-components > b { align-self: center; color: #8f99a2; font-size: 22px; }
+.af-coupled-components > div { position: relative; display: grid; align-content: center; justify-items: center; min-height: 138px; overflow: hidden; padding: 16px; border-radius: 10px; }
+.af-coupled-components > div > * { position: relative; z-index: 1; }
+.af-coupled-components .latent-structure { background: var(--af-latent-soft); color: var(--af-latent-strong); }
+.af-coupled-components .orthogonal-residual { background: var(--af-noise-soft); color: var(--af-noise-strong); outline: none; transition: opacity 180ms linear, box-shadow 180ms ease; }
+.af-coupled-components .orthogonal-residual::before { content: ''; position: absolute; inset: 0; background: rgba(85,123,159,.14); transform: scaleX(var(--residual-strength)); transform-origin: left; transition: transform 180ms linear; }
+.af-coupled-components .orthogonal-residual.active { box-shadow: inset 0 0 0 3px rgba(85,123,159,.28); }
+.af-coupled-components span { font-size: 16px; font-weight: 760; }
+.af-coupled-components strong { margin: 5px 0; font-family: "Cambria Math", Georgia, serif; font-size: 26px; }
+.af-coupled-components i { font-size: 16px; font-style: normal; }
+.af-trajectory-relation { display: flex; align-items: center; justify-content: center; gap: 15px; min-height: 82px; margin-top: 12px; padding: 12px 15px; background: #f7f8f9; border: 1px solid transparent; border-radius: 9px; transition: border-color 220ms ease; }
+.af-trajectory-relation:not(.revealed)::before { content: '沿 trajectory 向 Data 端移动，reveal 整轨耦合关系'; color: #858f98; font-size: 16px; text-align: center; }
+.af-trajectory-relation:not(.revealed) > * { display: none; }
+.af-trajectory-relation.revealed { border-color: rgba(79,136,121,.3); }
+.af-trajectory-relation > span { color: #77818b; font-size: 16px; }
+.af-trajectory-relation > div { color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: clamp(23px, 3vw, 32px); }
+.af-trajectory-relation b { color: var(--af-noise-strong); font-weight: 500; }
+.af-trajectory-relation.focus-residual b { padding: 2px 7px; background: var(--af-noise-soft); border-radius: 6px; }
+.af-trajectory-endpoint { width: fit-content; margin: 11px auto 0; padding: 7px 12px; background: var(--af-lowrank-soft); border-radius: 7px; color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 22px; opacity: 0; visibility: hidden; }
+.af-trajectory-endpoint.revealed { opacity: 1; visibility: visible; }
+.af-proof-skeleton { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 16px; color: #63707c; font-size: 16px; }
+.af-proof-skeleton i { color: #9da6ae; font-style: normal; }
+.af-proof-skeleton strong { padding: 7px 10px; background: var(--af-lowrank-soft); border-radius: 6px; color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 19px; }
+.af-initialization-property { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 13px; margin-top: 18px; }
+.af-initialization-property > div { display: grid; gap: 6px; padding: 17px; background: #fff; border: 1px solid var(--af-line); border-radius: 9px; text-align: center; }
+.af-initialization-property > i { align-self: center; color: #9aa4ad; font-style: normal; }
+.af-initialization-property span { color: #6d7883; font-size: 16px; }
+.af-initialization-property strong { color: var(--af-lowrank-strong); font-size: 18px; }
+.af-initialization-property > div:last-child strong { color: var(--af-data-strong); font-family: "Cambria Math", Georgia, serif; }
+.af-implementation-note { display: flex; gap: 12px; margin-top: 12px; padding: 11px 14px; background: #f7f8f9; border-left: 3px solid var(--af-latent); color: #66727e; font-size: 16px; line-height: 1.5; }
+.af-implementation-note b { flex: 0 0 auto; color: var(--af-latent-strong); }
+.af-preserve-correct-bridge { display: grid; justify-items: center; gap: 4px; margin-top: 24px; color: #687581; font-size: 16px; text-align: center; }
+.af-preserve-correct-bridge i { color: #9aa4ad; font-style: normal; }
+.af-preserve-correct-bridge b { color: var(--af-lowrank-strong); }
+.af-preserve-correct-bridge strong { color: var(--af-data-strong); }
+
+/* 7.3 · Residual geometry and time-dependent loss handoff. */
+.af-finetuning-gap { display: grid; grid-template-columns: 1fr auto 1.15fr auto 1fr; align-items: stretch; gap: 12px; }
+.af-finetuning-gap > div { display: grid; justify-items: center; gap: 7px; padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 10px; text-align: center; }
+.af-finetuning-gap > i { align-self: center; color: #9ba4ad; font-style: normal; }
+.af-finetuning-gap span { color: #6c7783; font-size: 16px; }
+.af-finetuning-gap strong { color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 25px; }
+.af-finetuning-gap .gap-center { background: var(--af-data-soft); border-color: rgba(184,116,89,.24); }
+.af-finetuning-gap .gap-center strong,
+.af-finetuning-gap > div:last-child strong { color: var(--af-data-strong); }
+.af-gap-context { margin: 11px 2px 20px !important; color: #65727e !important; font-size: 17px; text-align: center; }
+.af-residual-geometry { padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-residual-geometry svg { display: block; width: min(720px, 100%); margin: 0 auto; overflow: visible; touch-action: none; cursor: ew-resize; outline: none; }
+.af-residual-geometry .geometry-axis { stroke: #dde3e7; stroke-width: 2; }
+.af-residual-geometry .vector-dl { stroke: var(--af-lowrank); stroke-width: 6; }
+.af-residual-geometry #af-geometry-arrow-lowrank path { fill: var(--af-lowrank); }
+.af-residual-geometry .vector-d { stroke: var(--af-data); stroke-width: 6; }
+.af-residual-geometry #af-geometry-arrow-data path { fill: var(--af-data); }
+.af-residual-geometry .vector-residual { stroke: var(--af-noise); stroke-width: 5; stroke-dasharray: 9 6; }
+.af-residual-geometry .projection-guide { stroke: #aab3bc; stroke-width: 2; stroke-dasharray: 5 5; }
+.af-residual-geometry .lambda-marker { fill: #fff; stroke: var(--af-noise-strong); stroke-width: 5; transition: cx 100ms linear, r 160ms ease; }
+.af-residual-geometry .lambda-marker.snapped { fill: var(--af-lowrank-soft); stroke: var(--af-lowrank-strong); r: 17px; }
+.af-residual-geometry.focus-lambda .lambda-marker { filter: drop-shadow(0 0 5px rgba(79,136,121,.35)); }
+.af-residual-geometry .geometry-origin { fill: #fff; stroke: #6f7b86; stroke-width: 3; }
+.af-residual-geometry .geometry-label { font-family: "Cambria Math", Georgia, serif; font-size: 21px; font-weight: 800; }
+.af-residual-geometry .geometry-label.data { fill: var(--af-data-strong); }
+.af-residual-geometry .geometry-label.lowrank { fill: var(--af-lowrank-strong); }
+.af-residual-geometry .geometry-label.residual { fill: var(--af-noise-strong); font-size: 18px; }
+.af-residual-geometry .lambda-label { fill: var(--af-noise-strong); font-family: "Cambria Math", Georgia, serif; font-size: 19px; }
+.af-residual-meter { display: grid; grid-template-columns: auto minmax(120px, 1fr) auto; align-items: center; gap: 12px; margin-top: -7px; padding: 11px 13px; background: #f7f8f9; border-radius: 8px; color: #6d7883; font-size: 16px; }
+.af-residual-meter > i { height: 9px; overflow: hidden; background: #e3e8eb; border-radius: 999px; }
+.af-residual-meter > i b { display: block; height: 100%; background: var(--af-noise); border-radius: inherit; transition: width 100ms linear; }
+.af-residual-meter strong { color: var(--af-lowrank-strong); font-size: 16px; }
+.af-lambda-solution { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 66px; margin-top: 12px; padding: 9px 14px; background: #f7f8f9; border: 1px solid var(--af-line); border-radius: 9px; color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 30px; transition: background 220ms ease, border-color 220ms ease; }
+.af-lambda-solution:not(.revealed)::before { content: 'snap 到最短 residual 后 reveal λ★'; color: #858f98; font-family: var(--ui-font-sans); font-size: 16px; }
+.af-lambda-solution:not(.revealed) > * { display: none; }
+.af-lambda-solution.revealed { background: var(--af-lowrank-soft); border-color: rgba(79,136,121,.24); }
+.af-effective-residual { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; margin-top: 12px; color: #697581; font-size: 16px; }
+.af-effective-residual i { color: #9ba4ad; font-style: normal; }
+.af-effective-residual strong { color: var(--af-lowrank-strong); }
+.af-variance-equations { display: grid; justify-items: center; gap: 8px; padding: 16px; color: #566574; }
+.af-variance-equations > span { font-family: "Cambria Math", Georgia, serif; font-size: 20px; text-align: center; }
+.af-variance-equations > i { color: #9aa4ad; font-style: normal; }
+.af-variance-equations > strong { padding: 7px 10px; background: var(--af-lowrank-soft); border-radius: 6px; color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; font-size: 20px; }
+.af-variance-equations > small { color: #707b85; font-size: 16px; text-align: center; }
+.af-loss-handoff { padding: 18px; background: #fff; border: 1px solid var(--af-line); border-radius: 12px; }
+.af-handoff-rail header { display: flex; justify-content: space-between; color: #6c7782; font-size: 16px; font-weight: 720; }
+.af-handoff-rail .rail { position: relative; display: block; height: 7px; margin: 13px 7px; background: linear-gradient(90deg, var(--af-noise), #b8bec4 50%, var(--af-data)); border-radius: 999px; }
+.af-handoff-rail .rail i { position: absolute; top: 50%; left: var(--phase); width: 25px; height: 25px; background: #fff; border: 3px solid var(--af-noise-strong); border-radius: 50%; box-shadow: 0 2px 8px rgba(39,60,78,.15); transform: translate(-50%,-50%); }
+.af-loss-weights { display: grid; gap: 10px; margin-top: 18px; }
+.af-loss-weights > div { display: grid; grid-template-columns: 180px 1fr; align-items: center; gap: 12px; }
+.af-loss-weights span { color: #66727e; font-size: 16px; font-weight: 750; }
+.af-loss-weights i { height: 28px; overflow: hidden; background: #edf1f3; border-radius: 6px; }
+.af-loss-weights b { display: block; height: 100%; border-radius: inherit; transition: width 170ms linear; }
+.af-loss-weights .variance b { width: var(--vr); background: var(--af-lowrank); }
+.af-loss-weights .lpips b { width: var(--lpips); background: var(--af-data); }
+.af-handoff-status { margin-top: 15px; padding: 12px 14px; background: #f7f8f9; border-left: 3px solid var(--af-noise); border-radius: 0 8px 8px 0; color: #65727e; font-size: 16px; line-height: 1.5; }
+.af-omega-token { width: fit-content; margin: 12px auto 0; padding: 6px 11px; background: var(--af-noise-soft); border-radius: 7px; outline: none; color: var(--af-noise-strong); font-family: "Cambria Math", Georgia, serif; font-size: 18px; }
+.af-loss-handoff.focus-omega .af-loss-weights { box-shadow: inset 4px 0 var(--af-noise); padding-left: 12px; }
+.af-weight-equation { padding: 15px; color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: 24px; text-align: center; }
+.af-innovation-two-closure { display: grid; justify-items: center; gap: 3px; width: fit-content; max-width: 100%; margin: 30px auto 0; color: #66737e; font-size: 16px; text-align: center; }
+.af-innovation-two-closure i { color: #99a3ac; font-style: normal; }
+.af-innovation-two-closure strong { color: var(--af-lowrank-strong); }
+.af-innovation-two-closure b { padding: 6px 11px; background: var(--af-data-soft); border-radius: 7px; color: var(--af-data-strong); }
+
+@media (max-width: 1080px) {
+  .af-calibration-equations { grid-template-columns: 1fr; }
+  .af-output-identity { grid-template-columns: auto auto 1fr; }
+  .af-output-identity small { grid-column: 3; }
+}
+
+@media (max-width: 780px) {
+  .af-innovation-two-entry { grid-template-columns: 1fr; gap: 4px; }
+  .af-innovation-two-entry i { transform: rotate(0deg); }
+  .af-dual-space-canvas > svg { display: none; }
+  .af-dual-mobile { display: grid; justify-items: center; gap: 9px; }
+  .af-dual-mobile > b { color: var(--af-lowrank-strong); font-family: "Cambria Math", Georgia, serif; }
+  .af-dual-mobile .mobile-space { position: relative; width: 100%; min-height: 150px; overflow: hidden; border-radius: 10px; }
+  .af-dual-mobile .mobile-space > span { position: absolute; top: 13px; left: 14px; z-index: 3; font-size: 16px; font-weight: 760; }
+  .af-dual-mobile .mobile-space.latent { background: var(--af-latent-soft); color: var(--af-latent-strong); }
+  .af-dual-mobile .mobile-space.pixel { background: #f7f8f9; color: var(--af-data-strong); }
+  .af-dual-mobile .mobile-directions,
+  .af-dual-mobile .mobile-target,
+  .af-dual-mobile .mobile-mapped { position: absolute; top: 58%; left: 50%; width: 0; height: 0; transition: transform 170ms linear; }
+  .af-dual-mobile i { position: absolute; width: 86px; height: 4px; border-radius: 999px; transform-origin: left center; }
+  .af-dual-mobile i:nth-child(1) { transform: rotate(-30deg); }
+  .af-dual-mobile i:nth-child(2) { transform: rotate(0); }
+  .af-dual-mobile i:nth-child(3) { transform: rotate(30deg); }
+  .af-dual-mobile .mobile-directions i { background: var(--af-latent); }
+  .af-dual-mobile .mobile-target i { height: 7px; background: var(--af-lowrank); opacity: .28; }
+  .af-dual-mobile .mobile-mapped i { background: var(--af-latent); }
+  .af-lift-notation { grid-template-columns: 1fr; }
+  .af-lift-notation span + span { border-top: 1px solid var(--af-line); border-left: 0; }
+  .af-alignment-status { grid-template-columns: 1fr 1fr; }
+  .af-procrustes-formula > div { font-size: 23px; }
+  .af-compact-equations { flex-direction: column; }
+  .af-scale-shapes > div { width: 76%; }
+  .af-scale-formula { flex-wrap: wrap; font-size: 22px; }
+  .af-coupled-time-rails { padding-inline: 12px; }
+  .af-coupled-time-rails > div { grid-template-columns: 1fr; gap: 8px; }
+  .af-coupled-time-rails footer { margin-left: 0; }
+  .af-calibration-readout { flex-wrap: wrap; font-size: 19px; }
+  .af-calibration-readout b { width: 100%; margin-left: 0; text-align: center; }
+  .af-alignment-complete { align-items: center; flex-direction: column; }
+  .af-output-identity { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .af-output-identity small { grid-column: 1; }
+  .af-coupled-components { grid-template-columns: 1fr; }
+  .af-coupled-components > b { justify-self: center; }
+  .af-trajectory-relation { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .af-trajectory-relation > div { font-size: 23px; }
+  .af-proof-skeleton { flex-direction: column; }
+  .af-initialization-property { grid-template-columns: 1fr; }
+  .af-initialization-property > i { justify-self: center; transform: rotate(90deg); }
+  .af-implementation-note { flex-direction: column; gap: 4px; }
+  .af-finetuning-gap { grid-template-columns: 1fr; }
+  .af-finetuning-gap > i { justify-self: center; transform: rotate(90deg); }
+  .af-residual-meter { grid-template-columns: 1fr; }
+  .af-residual-meter strong { text-align: center; }
+  .af-effective-residual { align-items: flex-start; flex-direction: column; }
+  .af-loss-weights > div { grid-template-columns: 1fr; gap: 6px; }
+  .af-deep-dive summary { align-items: flex-start; flex-direction: column; gap: 3px; }
+}
+
+@media (max-width: 440px) {
+  .af-dual-space-canvas,
+  .af-trajectory-stage,
+  .af-residual-geometry,
+  .af-loss-handoff,
+  .af-snr-step { padding: 13px; }
+  .af-procrustes-formula > div { font-size: 20px; }
+  .af-scale-shapes > div { width: 82%; }
+  .af-paired-trajectories .trajectory-title { font-size: 19px; }
+  .af-paired-trajectories .endpoint { font-size: 20px; }
+  .af-trajectory-relation > div { font-size: 20px; }
+  .af-lambda-solution { font-size: 25px; }
+  .af-weight-equation { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .af-dual-space-canvas .lift-arrow,
+  .af-dual-space-canvas .mapped-directions line,
+  .af-procrustes-formula,
+  .af-scale-shapes > div,
+  .af-scale-formula,
+  .af-coupled-time-rails .latent-handle,
+  .af-identity-popover,
+  .af-output-identity,
+  .af-coupled-components .orthogonal-residual,
+  .af-coupled-components .orthogonal-residual::before,
+  .af-trajectory-relation,
+  .af-residual-geometry .lambda-marker,
+  .af-residual-meter > i b,
+  .af-lambda-solution,
+  .af-loss-weights b { transition: none; animation: none; }
+}
+
+/* ---------- Innovation II refinement: three steps, two correction blocks ---------- */
+.af-innovation-two-entry {
+  display: flex;
+  grid-template-columns: none;
+  gap: 12px;
+  margin-bottom: 30px;
+  padding: 12px 0;
+  background: transparent;
+}
+.af-innovation-two-entry b { background: transparent; }
+
+.af-alignment-steps > section + section {
+  margin-top: 38px;
+  padding-top: 36px;
+  border-top: 1px solid var(--af-line);
+}
+.af-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+}
+.af-step-heading > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  background: #edf2f5;
+  border-radius: 50%;
+  color: var(--af-noise-strong);
+  font-size: 16px;
+  font-weight: 800;
+}
+.af-step-heading h3 { margin: 0; color: var(--af-ink); font-size: 27px; line-height: 1.25; }
+.af-step-formula {
+  display: grid;
+  justify-items: center;
+  min-height: 76px;
+  margin-top: 12px;
+  padding: 13px 16px;
+  border-block: 1px solid var(--af-line);
+  color: #7a858f;
+  place-content: center;
+}
+.af-step-formula.revealed { background: var(--af-lowrank-soft); border-color: rgba(79,136,121,.22); }
+.af-step-formula > div { color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: clamp(23px, 3vw, 33px); text-align: center; }
+.af-step-formula p { margin: 5px 0 0 !important; color: var(--af-lowrank-strong) !important; font-size: 17px; font-weight: 680; }
+.af-scale-result {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 22px;
+  min-height: 48px;
+  margin-top: 10px;
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 24px;
+}
+.af-scale-result span { color: #6d7883; }
+.af-scale-result strong { color: var(--af-lowrank-strong); }
+.af-snr-step { padding: 0; background: transparent; border: 0; }
+.af-step-note { margin: 11px 0 0 !important; color: #66737d !important; font-size: 17px; text-align: center; }
+.af-alignment-math { margin-top: 26px; }
+.af-alignment-equations {
+  display: grid;
+  gap: 9px;
+  padding: 16px 18px;
+  color: #53616e;
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 19px;
+  text-align: center;
+}
+
+.af-trajectory-stage { padding: 16px; }
+.af-trajectory-core-formula {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-block: 1px solid var(--af-line);
+  color: var(--af-ink);
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: clamp(23px, 3vw, 31px);
+  text-align: center;
+}
+.af-trajectory-core-formula b { color: var(--af-noise-strong); font-weight: 500; }
+.af-trajectory-result { margin: 11px 0 0 !important; color: var(--af-lowrank-strong) !important; font-size: 17px; font-weight: 680; text-align: center; }
+.af-implementation-footnote { margin: 11px 2px 0 !important; color: #87919a !important; font-size: 14px; text-align: center; }
+.af-pixel-gap-bridge {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--af-line);
+  color: #697580;
+  font-size: 18px;
+  text-align: center;
+}
+.af-pixel-gap-bridge strong { color: var(--af-data-strong); font-family: "Cambria Math", Georgia, serif; font-size: 22px; }
+
+.af-finetuning-step + .af-finetuning-step { margin-top: 0; }
+.af-step-divider { height: 1px; margin: 40px 0 36px; background: var(--af-line); }
+.af-residual-geometry,
+.af-loss-handoff { padding: 16px; }
+.af-residual-meter { margin-top: 7px; }
+.af-residual-meter strong { min-width: 40px; color: var(--af-lowrank-strong); }
+.af-lambda-solution.revealed { min-height: 56px; margin-top: 8px; }
+.af-finetuning-math { margin-top: 28px; }
+.af-finetuning-math .af-variance-equations { gap: 9px; padding: 16px 18px; }
+
+@media (max-width: 780px) {
+  .af-alignment-steps > section + section { margin-top: 30px; padding-top: 28px; }
+  .af-step-heading h3 { font-size: 24px; }
+  .af-scale-result { align-items: center; flex-direction: column; gap: 3px; }
+  .af-trajectory-core-formula { font-size: 22px; }
+}
+
+@media (max-width: 520px) {
+  .af-step-heading { align-items: flex-start; }
+  .af-step-heading > span { flex: 0 0 30px; width: 30px; height: 30px; }
+  .af-alignment-equations { font-size: 17px; text-align: left; }
+}
+
+/* ---------- Final Innovation II formula/animation pass ---------- */
+.af-deep-dive summary { font-size: 19px; }
+.af-deep-dive summary span { font-size: 16px; }
+.af-alignment-equations { font-size: 23px; line-height: 1.55; }
+.af-proof-skeleton { font-size: 21px; }
+.af-proof-skeleton strong { font-size: 23px; }
+.af-variance-equations > span,
+.af-variance-equations > strong { font-size: 23px; line-height: 1.5; }
+.af-deep-dive-note { margin: 8px 0 0 !important; color: #77838d !important; font-size: 16px; text-align: center; }
+
+/* Trajectory coupling: visualize the exact decomposition x_t^L = A z_t + σ_t(I-P)ε. */
+.af-paired-trajectories .trajectory-node.lifted {
+  fill: #fff;
+  stroke: var(--af-lowrank-strong);
+  stroke-width: 3;
+}
+.af-paired-trajectories .moving-label.lifted { fill: var(--af-lowrank-strong); font-size: 17px; font-weight: 750; }
+.af-paired-trajectories .orthogonal-residual-vector {
+  stroke: var(--af-noise);
+  stroke-width: 4;
+  stroke-dasharray: 5 4;
+}
+.af-paired-trajectories #af-residual-arrow path { fill: var(--af-noise); }
+.af-paired-trajectories .residual-vector-label {
+  fill: var(--af-noise-strong);
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.af-paired-trajectories .trajectory-node.pixel { fill: #fff; }
+.af-trajectory-core-formula { font-size: clamp(27px, 3vw, 35px); }
+.af-trajectory-result { font-size: 18px; }
+
+@media (max-width: 780px) {
+  .af-alignment-equations { font-size: 21px; }
+  .af-proof-skeleton { font-size: 19px; }
+  .af-proof-skeleton strong { font-size: 21px; }
+  .af-variance-equations > span,
+  .af-variance-equations > strong { font-size: 21px; }
+  .af-trajectory-core-formula { font-size: 25px; }
+}
+
+/* ---------- Final interaction clarity: §7.3 residual variables ---------- */
+.af-residual-legend {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.af-residual-legend span {
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: #f4f7f8;
+  color: #687581;
+  font-size: 16px;
+}
+.af-residual-legend b { color: var(--af-ink); font-family: "Cambria Math", Georgia, serif; font-size: 19px; }
+
+
+/* ---------- Final projected-screen readability ---------- */
+.af-residual-legend { gap: 12px; margin-bottom: 12px; }
+.af-residual-legend span {
+  padding: 7px 11px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+.af-residual-legend b { font-size: 22px; }
+.af-residual-geometry .geometry-label { font-size: 25px; }
+.af-residual-geometry .geometry-label.residual { font-size: 22px; }
+.af-residual-meter { font-size: 18px; }
+.af-residual-meter strong { font-size: 18px; }
+.af-step-note { font-size: 18px; line-height: 1.5; }
+.af-handoff-rail header,
+.af-loss-weights span { font-size: 18px; }
+.af-coupled-components span,
+.af-coupled-components i { font-size: 18px; }
+.af-paired-trajectories .residual-vector-label { font-size: 18px; }
+
+@media (max-width: 780px) {
+  .af-residual-legend span { font-size: 17px; }
+  .af-residual-legend b { font-size: 20px; }
+  .af-residual-geometry .geometry-label { font-size: 22px; }
+  .af-residual-geometry .geometry-label.residual { font-size: 20px; }
+  .af-step-note,
+  .af-handoff-rail header,
+  .af-loss-weights span { font-size: 17px; }
+}
