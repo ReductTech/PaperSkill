@@ -103,7 +103,7 @@ export const tutorial: TutorialData = {
       analogy: { title: '不同尺寸照片共用一把归一化坐标尺', text: '输入可以换分辨率、换视图数、增加几何先验，但共享骨干仍在统一坐标范围内处理 token。', componentId: 'hy-analogy' },
       modules: [
         { kind: 'module', id: '5.1', title: '同一物体的跨分辨率坐标实验', desc: '切换分辨率，比较整数索引与归一化坐标。', componentId: 'hy-resolution' },
-        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '选择先验并运行共享骨干；五个输出头会生成可检查的小示意图。', componentId: 'hy-architecture' },
+        { kind: 'module', id: '5.2', title: '一次重建，五类几何产物', desc: '执行一次共享前向，逐项巡检五类输出候选。', componentId: 'hy-architecture' },
       ],
       insight: '跨分辨率稳定性不是单靠位置编码：Normalized RoPE、深度-法线耦合、Depth Mask Head、token budget 和并行策略共同作用。',
       formula: {

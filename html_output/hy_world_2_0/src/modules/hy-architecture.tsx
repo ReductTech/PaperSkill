@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { EvidenceMediaDrawer, PaperTable, SectionExtras } from './hy-paper-evidence';
 import type { WidgetProps } from './registry';
 
-type PriorId = 'pose' | 'intrinsics' | 'depth';
 type OutputId = 'camera' | 'pointmap' | 'depth' | 'normal' | 'gaussian';
-type StepId = 'idle' | 'rgb' | PriorId | 'shared' | 'heads' | `inspect-${OutputId}` | 'done';
+type StepId = 'idle' | 'rgb' | 'shared' | 'heads' | `inspect-${OutputId}` | 'done';
 type InspectionSample = { verdict: 'pass' | 'reject'; issue: string; detail: string; variant: number };
 type OutputDef = {
   id: OutputId;
@@ -15,7 +14,7 @@ type OutputDef = {
   samples: InspectionSample[];
 };
 
-const priors: Array<{ id: PriorId; label: string; short: string; effect: string }> = [
+const priors = [
   { id: 'pose', label: '相机位姿', short: 'Pose', effect: '告诉模型每张照片从哪里拍，减少跨视图坐标歧义。' },
   { id: 'intrinsics', label: '相机内参', short: 'K', effect: '提供焦距与主点，约束像素射线如何进入三维空间。' },
   { id: 'depth', label: '深度先验', short: 'Depth', effect: '提供局部距离线索，帮助表面更快落到合理位置。' },
@@ -71,9 +70,6 @@ const outputs: OutputDef[] = [
 
 const stepCopy: Record<string, string> = {
   rgb: '先把三张 RGB 观察编码为必需 token。',
-  pose: 'Pose token 接入：为每张图补充拍摄位置与朝向。',
-  intrinsics: 'K token 接入：补充焦距、主点与像素射线约束。',
-  depth: 'Depth token 接入：补充局部距离先验。',
   shared: '全部可用 token 进入同一个 Global-local Transformer，共享跨视图空间理解。',
   heads: '共享特征同时分流到五个专用输出头；它们不是五次独立重建。',
   done: '五类产物验收完成。点击任一输出，可复查它的职责与常见坏候选。',
@@ -222,7 +218,6 @@ const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSampl
 };
 
 export const HyArchitecture: React.FC<WidgetProps> = () => {
-  const [activePriors, setActivePriors] = useState<PriorId[]>([]);
   const [runSteps, setRunSteps] = useState<StepId[]>(['idle']);
   const [cursor, setCursor] = useState(0);
   const [running, setRunning] = useState(false);
@@ -250,14 +245,6 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
     if (activeInspection) setFocusOutput(activeInspection as OutputId);
   }, [activeInspection]);
 
-  const toggle = (id: PriorId) => {
-    if (running) return;
-    setActivePriors((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
-    setRunSteps(['idle']);
-    setCursor(0);
-    setFocusOutput('camera');
-  };
-
   const run = (forceAllPass = false) => {
     setCelebrationVisible(false);
     const fireworks = fireworksRef.current;
@@ -266,23 +253,16 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       fireworksContext.setTransform(1, 0, 0, 1, 0, 0);
       fireworksContext.clearRect(0, 0, fireworks.width, fireworks.height);
     }
-    const selected = priors.filter((prior) => activePriors.includes(prior.id)).map((prior) => prior.id);
     setInspectionResults(forceAllPass
       ? Object.fromEntries(outputs.map((output) => [output.id, chooseSample(output, 'pass')])) as Record<OutputId, InspectionSample>
       : createInspectionResults());
-    setRunSteps(['rgb', ...selected, 'shared', 'heads', ...outputs.map((output) => `inspect-${output.id}` as StepId), 'done']);
+    setRunSteps(['rgb', 'shared', 'heads', ...outputs.map((output) => `inspect-${output.id}` as StepId), 'done']);
     setCursor(0);
     setFocusOutput('camera');
     setRunning(true);
   };
 
-  const selectedPriorDetails = priors.filter((prior) => activePriors.includes(prior.id));
   const hasRun = stage !== 'idle';
-  const resultBoundary = activePriors.length === 0
-    ? '仅 RGB 也是合法输入：模型必须自己估计相机与几何。'
-    : activePriors.length === 3
-      ? '全部先验已接入，对应 Table 11 可核对的另一端点。'
-      : '部分先验会约束歧义，但论文没有在 Table 11 为这个组合报告可插值数值。';
   const currentOutput = outputs.find((output) => output.id === focusOutput) ?? outputs[0];
   const currentSample = inspectionResults[currentOutput.id];
   const allPassed = stage === 'done' && outputs.every((output) => inspectionResults[output.id].verdict === 'pass');
@@ -290,7 +270,7 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
     ? currentSample.verdict === 'reject'
       ? `正在验收 ${currentOutput.label}：${currentOutput.check}；发现“${currentSample.issue}”，退回这个教学坏候选。`
       : `正在验收 ${currentOutput.label}：${currentOutput.check}；当前教学候选通过，不执行丢弃。`
-    : stepCopy[stage] ?? '先选择手头已有的先验，再播放一次完整重建。';
+    : stepCopy[stage] ?? '执行一次共享前向，再逐项巡检五类输出。';
 
   useEffect(() => {
     if (!allPassed) {
@@ -353,20 +333,18 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
   return <div id="quick-reconstruction" className="architecture-rebuild">
     <div className="learning-contract">
       <div><span>为什么学</span><p>五类输出共享同一份跨视图空间理解。</p></div>
-      <div><span>本次操作</span><p>选择先验，运行并检查五个输出头。</p></div>
-      <div><span>应得判断</span><p>先验可缺省；共享骨干只前向一次。</p></div>
+      <div><span>本次操作</span><p>执行共享前向，检查五个输出头。</p></div>
+      <div><span>应得判断</span><p>可选先验不应被演示成虚构的性能开关。</p></div>
     </div>
 
     <section className="reconstruction-brief">
       <header><span>固定委托</span><strong>把三张室内照片交付为可进入 WorldLens 的几何资产</strong></header>
       <div className="reconstruction-brief-views"><i>V1</i><i>V2</i><i>V3</i><b>多视图 RGB 永远必需</b></div>
       <div className="reconstruction-prior-console">
-        <span>把手头已有的证据接入输入</span>
-        {priors.map((prior) => <button key={prior.id} type="button" disabled={running} className={activePriors.includes(prior.id) ? 'selected' : ''} aria-pressed={activePriors.includes(prior.id)} onClick={() => toggle(prior.id)}><b>{prior.short}</b><small>{prior.label}</small></button>)}
+        <div className="reconstruction-prior-rule"><strong>输入规则</strong><span>RGB 必需；Pose、K、Depth 是可选条件。论文未报告任意组合的统一结果，本演示不设置无效开关。</span></div>
         <button type="button" className="reconstruction-run" disabled={running} onClick={() => run(false)}><span aria-hidden="true">{running ? '●' : '▶'}</span>{running ? '流程播放中' : hasRun ? '重新播放' : '执行重建'}</button>
         <button type="button" className="reconstruction-celebrate" disabled={running} onClick={() => run(true)} title="让五个教学候选全部通过，并预览烟花"><span aria-hidden="true">✦</span>全绿预览</button>
       </div>
-      <p>{selectedPriorDetails.length === 0 ? '当前输入：仅 RGB。' : `当前输入：RGB + ${selectedPriorDetails.map((prior) => prior.short).join(' + ')}。`}</p>
     </section>
 
     <section className={`reconstruction-flowboard reconstruction-vertical ${reached('heads') ? 'heads-ready' : ''} ${celebrationVisible ? 'all-pass' : ''}`} aria-live="polite">
@@ -374,13 +352,10 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       <header><div><span>竖排输入 → 共享空间理解 → 竖排五步检验</span><strong>Any-Modal 共享重建与随机候选巡检</strong></div><p>{stageMessage}</p></header>
       <div className="reconstruction-vertical-system">
         <section className="reconstruction-input-column">
-          <header><span>输入证据</span><strong>按可用性逐项接入</strong><small>RGB 必需，Pose / K / Depth 可缺省</small></header>
+          <header><span>输入证据</span><strong>必需观察与可选条件</strong><small>可选项只说明接口，不驱动随机巡检结果</small></header>
           <div className="reconstruction-input-stack">
             <article className={reached('rgb') ? 'accepted active' : ''}><span>01</span><b>RGB</b><small>三张必需观察</small><i>{reached('rgb') ? '已编码' : '等待接入'}</i></article>
-            {priors.map((prior, index) => {
-              const selected = activePriors.includes(prior.id);
-              return <article key={prior.id} className={`${selected ? 'selected' : 'skipped'} ${reached(prior.id) ? 'accepted active' : ''}`}><span>0{index + 2}</span><b>{prior.short}</b><small>{selected ? prior.label : `${prior.label}缺省`}</small><i>{selected && reached(prior.id) ? '已接入' : selected ? '等待' : '跳过'}</i></article>;
-            })}
+            {priors.map((prior, index) => <article key={prior.id} className="optional"><span>0{index + 2}</span><b>{prior.short}</b><small>{prior.label}</small><i>按任务提供</i></article>)}
           </div>
         </section>
 
@@ -432,10 +407,10 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
       <p>{currentSample.verdict === 'reject' ? `“${currentSample.issue}”被标记并退回：${currentSample.detail}` : `“${currentSample.issue}”通过并保留：${currentSample.detail}`}</p>
     </div>
 
-    <div className={`feedback ${allPassed || stage === 'done' && activePriors.length === 3 ? 'good' : ''}`}>{!hasRun ? '配置可用先验，再执行一次共享重建。' : allPassed ? '五项候选全部通过；烟花将在庆祝后自动消散。' : '坏候选退回，正常候选保留并进入资产优化。'}</div>
+    <div className={`feedback ${allPassed ? 'good' : ''}`}>{!hasRun ? '执行一次共享重建，观察五类输出如何分流验收。' : allPassed ? '五项候选全部通过；烟花将在庆祝后自动消散。' : '坏候选退回，正常候选保留并进入资产优化。'}</div>
     <SectionExtras hint="先验含义、教学边界、论文原图与完整表格">
-      <div className="architecture-glossary-grid"><details><summary>可选先验分别提供什么？</summary><p>{priors.map((prior) => `${prior.short}：${prior.effect}`).join(' ')}</p></details><details><summary>部分先验如何解读？</summary><p>{resultBoundary} 训练时每种先验以 0.5 概率独立丢弃，因此仅 RGB 也是合法输入。</p></details><details><summary>巡检动画是不是论文网络？</summary><p>不是。五步巡检只解释每类产物应检查什么，不代表论文新增了统一自动验收网络；全绿烟花也不表示真实系统必然一次全对。</p></details></div>
-      <section className="architecture-evidence-strip"><header><span>Table 11 · 7-Scenes 高分辨率端点</span><strong>Acc. / Comp. 越低越好</strong></header><div className="architecture-evidence-pair"><div className={hasRun && activePriors.length === 0 ? 'active' : ''}><span>仅图像</span><strong>Acc. 0.037 · Comp. 0.040</strong><small>WorldMirror 2.0，756×1036</small></div><i>→</i><div className={hasRun && activePriors.length === 3 ? 'active' : ''}><span>图像 + 全部先验</span><strong>Acc. 0.012 · Comp. 0.016</strong><small>Pose + K + Depth</small></div></div><p>论文没有在 Table 11 报告所有部分先验组合，不能对中间状态插值出数字。</p></section>
+      <div className="architecture-glossary-grid"><details><summary>可选先验分别提供什么？</summary><p>{priors.map((prior) => `${prior.short}：${prior.effect}`).join(' ')}</p></details><details><summary>为什么删除先验开关？</summary><p>论文 Table 11 只报告“仅图像”和“图像 + 全部先验”两个端点，没有覆盖任意部分组合。旧开关又不改变随机巡检结果，因此会暗示不存在的性能因果关系。</p></details><details><summary>巡检动画是不是论文网络？</summary><p>不是。五步巡检只解释每类产物应检查什么，不代表论文新增了统一自动验收网络；全绿烟花也不表示真实系统必然一次全对。</p></details></div>
+      <section className="architecture-evidence-strip"><header><span>Table 11 · 7-Scenes 高分辨率端点</span><strong>Acc. / Comp. 越低越好</strong></header><div className="architecture-evidence-pair"><div><span>仅图像</span><strong>Acc. 0.037 · Comp. 0.040</strong><small>WorldMirror 2.0，756×1036</small></div><i>→</i><div><span>图像 + 全部先验</span><strong>Acc. 0.012 · Comp. 0.016</strong><small>Pose + K + Depth</small></div></div><p>训练时每种先验以 0.5 概率独立丢弃，但论文没有在 Table 11 报告所有部分组合，不能为中间状态插值出数字。</p></section>
       <div className="architecture-glossary-grid"><details><summary>为什么共享骨干？</summary><p>相机、深度与点图都依赖同一跨视图对应关系，共享特征可避免每个任务重复学习空间匹配。</p></details><details><summary>为什么还要多个头？</summary><p>相机是全局参数，点图、深度、法线是像素级几何，3DGS 是可渲染属性，它们需要不同解码形式和监督。</p></details><details><summary>3DGS 为何第二阶段训练？</summary><p>论文先联合训练几何头，再冻结几何参数单独训练 3DGS 头，以解耦几何学习与外观建模。</p></details></div>
       <div className="evidence-media-stack"><EvidenceMediaDrawer mediaType="论文原图" src="./images/figure-12-worldmirror.png" title="论文 Figure 12：WorldMirror 2.0 架构" caption="用于核对 Any-Modal 输入、共享骨干和多输出头的真实连接。" alt="WorldMirror 2.0 架构原图"/><EvidenceMediaDrawer mediaType="官方 GIF" src="./images/official-reconstruction.gif" title="多图与视频重建演示" caption="官方演示帮助理解最终任务流程，不替代论文指标。" alt="官方多视图重建演示" sourceUrl="https://github.com/Tencent-Hunyuan/HY-World-2.0" sourceLabel="腾讯混元官方仓库素材 ↗"/></div>
       <PaperTable tableId="table-11"/>

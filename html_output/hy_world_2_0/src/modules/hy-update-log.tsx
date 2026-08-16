@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v056',
+    version: 'V0.56',
+    alias: '破幻星钥·诚实接口姬',
+    focus: '删除无结果差异的先验开关',
+    modules: ['5.2 Pose/K/Depth 静态接口', '5.2 单一共享前向', 'Table 11 双端点边界', '无效状态清理', '输入规则响应式布局'],
+    note: '确认旧版 Pose、K、Depth 选择只改变高亮路径，不改变五头随机结果后，删除三个点击开关及其状态；可选先验改为静态接口说明，模块只保留共享前向与输出巡检这一项有意义的主操作。',
+  },
+  {
     id: 'v055',
     version: 'V0.55',
     alias: '星屑退潮·轻卷萤火姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['Quick Read 顶部导览条', '八章无时间索引', '正文居中恢复', '目标滚动安全区', '窄屏折叠导航'],
     note: '删除每章时间和总时长提示，把右侧浮动面板重构为顶部横向导览条；正文恢复完整居中宽度，导航只占纵向空间，不再把章节整体向左推移。',
   },
-  {
-    id: 'v053',
-    version: 'V0.53',
-    alias: '四分钟星门·演示领航姬',
-    focus: 'Quick Read、叙事融入与投屏字号',
-    modules: ['Hero 四分钟入口', '八章关键锚点', '1.1 世界状态压力测试', 'Canvas 标签字号', '全教程演示字体'],
-    note: '新增可分享的四分钟专家展示模式，每章只链接一个关键落点；移除独立四问罗盘，让问题、意义、作者工作与结果沿系统故事自然出现，并系统提高投屏可读性。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v055');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v056');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
