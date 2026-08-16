@@ -1,0 +1,998 @@
+                                                                    See What I Mean: Aligning Vision and Language Representations
+                                                                             for Video Fine-grained Object Understanding
+
+                                                                                                                                                                          Describe the
+                                                                   Boyuan Sun1,2 Bowen Yin1,2 Yuanming Li2 Xihan Wei2 Qibin Hou1,3 *
+                                                          1                             2                           3
+                                                            VCIP, CS, Nankai University   Tongyi Lab, Alibaba Group   NKIARI, Shenzhen Futian
+
+
+                                                                                                                                                                                         Video
+arXiv:2605.18018v1 [cs.CV] 18 May 2026
+
+
+
+
+                                                                                    Abstract
+
+
+
+
+                                                                                                                      Video
+
+
+
+
+                                                                                                                                                                                                  See What I Mean
+                                            We present SWIM (See What I Mean), a novel training
+
+
+
+
+                                                                                                                                                     Fine-grained Model
+                                                                                     Video
+                                            strategy that aligns vision and language         representations to
+                                           Video
+
+
+
+
+                                                                                                                      Visual Prompt
+                                            enable fine-grained object understanding solely from tex-
+                                            tual prompts. Unlike existing approaches that require ex-                                                                             Describe the
+                                                                                                     Model
+
+
+
+
+                                            plicit visual prompts, such as masks or points, SWIM lever-
+                                          Visual Prompt
+
+
+
+
+                                            ages mask supervision only during training to guide cross-
+                                                                            Model
+
+
+
+
+                                                                                                                                                                                   Text Prompt
+                                                                                modelthetoman
+                                            modal attention, allowing the Describe            automatically at-
+                                                                              walk down the street.
+                                                                                                                      Text
+                                            tend to the user-specified object      at inference.      Our cross-                      Describe the
+                                                                                                                                                                               NO Visual Prompt Needed
+                                            attention analysis of pretrained multimodal
+                                                                                  Text Prompt     large language
+                                            models (MLLMs) reveals a systematic discrepancy: At-
+                                                                                                                     (a) Classical Fine-grained model   (b) See What I Mean (SWIM)
+                                          Text
+
+
+
+
+                                                Describewords
+                                            tribute      the
+                                               marked <region>
+                                                               produce sharp,NOlocalized            Needed in the
+                                                                                             activations
+                                                                                 Visual Prompt                      Figure 1. Pattern comparison between classical fine-grained model
+                                            visual modality, whereas object nouns yield diffuse and                 and SWIM. Our SWIM extracts object from pure natural language,
+                                                                             (b) See reference
+                                            scattered patterns due to semantic
+                                         (a) Classical Fine-grained model             What I Mean   bias and dis-
+                                                                                                      (SWIM)        requiring no visual prompt or any extra modules.
+                                            tributed high-level representations. To address this mis-
+                                                                                                                                                        Describe the
+                                            alignment, we construct NL-Refer, an enriched dataset,
+                                            in which each object mask is paired with a precise natu-                grained object understanding abilities.
+                                            ral language referring expression. SWIM extracts multi-                     To enhance fine-grained object perception and under-
+                                            layer cross-attention maps from object nouns and enforces               standing, a typical paradigm [7, 23, 101, 103] is to introduce
+                                            spatial consistency with ground-truth masks. Experimen-                 additional region-level encoders that produce object-level
+                                            tal results demonstrate that SWIM substantially improves                embeddings, thereby explicitly modeling individual object
+                                            text–visual alignment and achieves superior performance                 tokens. In the video field, several approaches [41, 50, 89]
+                                            over visual-prompt-based methods on fine-grained object                 extend this idea by incorporating explicit visual prompts,
+                                            understanding benchmarks. The code and data are avail-                  such as points [50], masks [90], or bounding boxes [85], to
+                                            able at https://github.com/HumanMLLM/SWIM.                              guide the model toward specific object regions, as shown in
+                                                                                                                    Fig. 1(a). While these approaches can successfully identify
+                                                                                                                    target objects through explicit visual cues, their complex
+                                             1. Introduction                                                        designs depend on extra visual inputs, increase complex-
+                                                                                                                    ity, and diverge from the way users most naturally interact
+                                             With the rapid development of large language models [48,               with MLLMs. In fact, specifying objects through pure nat-
+                                             78, 79], multimodal large language models (MLLMs) [1,                  ural language [2, 48, 75] is both more intuitive and far more
+                                             62, 70, 75, 109] that can jointly reason over visual                   common in real-world scenarios.
+                                             and textual modalities have recently achieved remarkable
+                                             progress. Benefiting from large-scale pretraining on mas-                  Our motivation stems from this mismatch. As demon-
+                                             sive multimodal datasets [28, 37, 45, 105], general-purpose            strate in Fig. 1(b), we aim to design a model that can directly
+                                             MLLMs [38, 60, 112] have demonstrated outstanding per-                 locate and attend to the correct object purely from the pure
+                                             formance in holistic scene understanding. However, despite             textual prompt to achieve natural and fine-grained cross-
+                                             these impressive capabilities, they often struggle to con-             modal understanding without any extra visual input in infer-
+                                             sistently focus on user-specific objects, limiting their fine-         ence. To achieve this, we first explore how existing models
+                                                                                                                    attend to objects mentioned in text prompt [66, 92]. Con-
+                                                          * Corresponding author.                                   sidering cross-attention between textual and visual tokens
+      The young man with short, light brown hair and a beard                       The striped shirt and blue baseball cap-wearing man
+
+          man                 brown                beard                               shirt            baseball cap            man
+
+
+
+                                                                  Qwen2.5-VL
+
+
+
+
+                                                                    SWIM
+       Object Nouns              Attribute Words                                           Attribute Words                  Object Nouns
+Figure 2. Visual comparisons of cross-attention maps for object nouns and attribute words between Qwen2.5-VL [2] and SWIM. The
+attribute words tied with low-level texture exhibit sharp and localized attention over correct regions, whereas the object nouns corresponding
+to high-level semantic concepts result in diffuse activations. This discrepancy motivates our explicit supervision strategy in SWIM.
+
+is a direct indicator of multimodal interaction [16, 54, 83],                 Based on the NL-Refer dataset, we propose SWIM
+it can reveal whether a text token successfully grounds in                (See What I Mean), a simple yet effective training strategy
+a relevant visual region [82, 93]. Therefore, by visualizing              that explicitly aligns vision and language representations
+cross-attention maps for object-related words of Qwen2.5-                 to strengthen fine-grained object understanding in MLLMs.
+VL [2] in Fig. 2, we aim to uncover alignment patterns and                Specifically, during supervised fine-tuning, SWIM extracts
+weaknesses not apparent from standard accuracy metrics.                   cross-attention maps for object nouns from multiple inter-
+    Interestingly, our cross-attention analysis reveals a sys-            mediate layers and aligns them with ground-truth object
+tematic discrepancy: Attribute words [27, 36, 56] produce                 masks, enforcing spatial consistency between textual iden-
+sharper and more localized activations in the visual modal-               tity and visual grounding. By providing explicit alignment
+ity, while object nouns [52] result in diffuse and scattered              signal throughout training, SWIM guides the model to pre-
+attention patterns. We attribute this discrepancy to biases               serve and utilize fine-grained object-level information, en-
+in semantic reference. In large-scale multimodal corpora,                 abling more precise visual localization from purely textual
+attribute words, such as colors or textures, correspond to                prompts at inference. Extensive experiments across fine-
+specific and spatially localized visual patterns, while object            grained object understanding benchmarks demonstrate that
+nouns occur in diverse contexts, diluting their spatial associ-           SWIM enhances text–visual alignment and outperforms
+ation. Moreover, attribute words naturally map to low-level               visual-prompt-dependent approaches.
+visual features, while object nouns rely on high-level se-                    We summarize our contributions as follows.
+mantic representations often varied across instances, which               • We point out design limitations in existing fine-grained
+leads to poor alignment without explicit supervision.                        object understanding models and the insufficient vi-
+    This finding suggests that improving fine-grained ob-                    sion–language alignment in general MLLMs. Based on
+ject understanding requires explicitly strengthening cross-                  the observed systematic discrepancy, we introduce NL-
+modal correspondence for object nouns, and thus inspires                     Refer dataset, in which each object is referred with ex-
+us to pursue direct supervision between object words and                     plicit natural language expressions.
+their associated visual regions. To provide such supervi-                 • We propose a novel training strategy, SWIM (See What I
+sion signals, an enriched video understanding dataset that                   Mean), which explicitly enforces alignment between vi-
+pairs object-level visual annotations with natural language                  sual content and object nouns during training, resulting in
+prompts containing clear references is required. Thanks to                   a model that requires no visual prompt inputs at inference.
+earlier visual-prompt-based approaches [50, 89], collecting               • Through experiments on fine-grained object understand-
+training data with mask annotations is not difficult. We start               ing benchmarks, SWIM demonstrates consistent im-
+from VideoRefer [89], a video fine-grained object under-                     provements over visual-prompt-based approaches. Quan-
+standing dataset providing frame-level object masks aligned                  titative and qualitative analyses of text–visual alignment
+with textual prompts via placeholder tokens used for visual                  further corroborate our claim.
+prompting. While these masks are valuable, the associated
+text does not contain clear natural language references to the            2. Related Work
+objects. We therefore design a GPT-4o-powered [49] data
+refinement pipeline and construct the NL-Refer dataset.
+                                                                          2.1. Multimodal Large Language Model
+Specifically, for each placeholder, we automatically replace              Multimodal large language models (MLLMs) [8, 13, 21,
+it with a concise natural language description of the specific            43, 81] integrate visual signals with textual inputs, lever-
+instance, informed by the context.                                        aging the powerful reasoning and generative capabilities of
+                    𝐻'                                     !
+                                                           𝐻'                                                             Attention Matrix
+                                                 ”Can you …                       Large Language Model
+     ”Can you discuss in detail the
+                                                      walking on the
+   important elements of the marked
+                                                 street in the video?”              Transformer Layers
+      area <region> in the video?”
+                                                                                                                  𝐻𝑊
+                                                      Tokenizer
+                                                                                       𝑙 -th Layer
+            Rewrite 𝐻! with
+            natural language
+            according to 𝐺!                         Vision Encoder              …
+      ”The young man with short, light
+     brown hair and a beard is walking
+
+
+
+
+                                                                                           …
+     down the street in a white t-shirt
+       featuring a graphic design ...”                                                                               𝐀!               𝑀!
+                    𝐺'                              Video Frame                 …                    Text Loss               &
+                                                                                                                           ℒ #$%
+ Figure 3. Training pipeline of SWIM. Explicitly supervision is applied on cross-attention between object noun and visual tokens, enable
+ accurate fine-grained object grounding from pure neutral text prompts at inference without any extra visual prompt.
+
+
+  LLMs [11, 18, 22, 42, 46, 61] to tackle a widewalking         range of    which brings extra computational cost and deviates from
+  tasks [30, 69,𝐻107].        Beyond    image-based      𝐻!'
+                                                       approaches    [40,   typical user interaction patterns. Meanwhile,      SWIM adopts
+                                                                                                                       Attention Matrix
+                     '
+  44],   recent   advances                      ”Can you
+                                in spatiotemporal        …the young de-
+                                                      architectures             Large Language
+                                                                            a training           Modelwith explicit supervision for cross-
+                                                                                           paradigm
+   ”Can you  discuss  in detail the
+                                                     walking on the
+important
+  sign [72,elements
+               96, 97] of the  markedMLLMs to extend multimodal
+                           enables                                          modal   alignment,    enabling fine-grained object understand-
+                                               street in the video?”            Transformer    Layers
+    area <region> in the video?”
+  understanding into the video filed [47, 59, 100], achieving               ing from natural language references  𝐻𝑊 without architecture
+                                                     Tokenizer
+  strong performance in real-world applications            [17, 25].                 𝑙 -th Layer
+                                                                            modifications     or any extra visual prompts at inference.
+          Rewrite 𝐻! with
+      However,     despite advances, MLLMs still face challenges
+          natural language
+          according to
+  in fine-grained         𝐺! understanding, especially
+                      object                                 when iden-
+                                                  Vision Encoder
+                                                                            3.…See What I Mean (SWIM)
+  tifying or describing user-specified targets from solely tex-
+                                                                            3.1. NL-Refer: Dataset Construction
+  tual  prompts [71]. One potential reason lies in the issue of
+   ”The young man with short, light
+  vision–language
+  brown hair and a beard alignment    within such models [68, 99]. As
+                             is walking                                     To provide explicit supervision for aligning object nouns in
+                                                                                       …
+
+
+  down theinstreet
+  shown                   white
+                    in athe
+              Fig. 2,           t-shirt
+                             discrepancy   that attribute words tend to     text with their corresponding visual regions, we construct
+     featuring a graphic design ...”                                        NL-Refer from the                     𝐀! which can
+                                                                                                  VideoRefer dataset,          𝑀! be rep-
+  produce    clear attention patterns, while object nouns often
+  result in diffuse𝐺'
+                       and scattered activationsVideo    Frame us to de-
+                                                     motivates
+                                                                             …
+                                                                            resented as
+                                                                                              Text Loss                 &
+                                                                                                                      ℒ #$%
+  sign SWIM, which applies supervision on cross-modal cor-                                   
+                                                                              DVideoRefer = (Vi , Hi , Gi , Mi ) i = 1, . . . , N , (1)
+  respondence of specific textual tokens. Although prior stud-
+  ies [29, 31, 32, 58, 106] examined intermediate feature rep-              where Vi denotes the video, Hi denotes the “human” mes-
+  resentations in MLLMs, and works like Cambrain [65] and                   sage containing the placeholder token <region> , Gi de-
+  VIRAL [84] explores reconstructing visual features from                   notes the paired “gpt” response describing the marked ob-
+  intermediate layers, they generally focus on visual embed-                ject in natural language, and Mi denotes the corresponding
+  dings and ignore the visual-language alignment.                           pixel-level instance masks for the target region.
+                                                                               While such placeholders support visual-prompt-based
+ 2.2. Fine-grained Object Understanding                                     methods, they do not convey the explicit semantic identity
+ To enhance the fine-grained understanding capability of                    of the referenced object, thereby inhibiting a model’s abil-
+ MLLMs, recent approaches [4, 6, 19, 26, 55, 73, 76, 80,                    ity to learn robust and direct text–visual correspondences
+ 91, 95, 98, 102, 110] start to focus on object-centric per-                for object nouns. To mitigate this, we propose a refine-
+ ception and reasoning. The most common paradigm [23,                       ment process leverages GPT-4o to replace each placeholder
+ 24, 64, 85, 86, 88, 101] is to involve explicit visual prompts             <region> in the human message Hi with a concise and
+ (points/boxes/masks) as guidance and additional encoders                   unambiguous natural language referring expression ri that
+ to improve fine-grained comprehension of local regions.                    specifies the object instance, using descriptive details drawn
+ For example, VideoRefer [89] and PixelRefer [103] em-                      from the paired “gpt” response Gi . This generation pro-
+ ploy masks as visual indicators and leverage extra visual                  cess maintains the original conversational structure while
+ encoders to enhance the perception of objects. They also                   embedding explicit semantic content in the prompt. Within
+ contribute valuable video fine-grained datasets with mask                  each ri , GPT-4o identifies the single most representative
+ annotations.                                                               object noun wi , the lexical item that captures the core se-
+    In a word, these methods require additional encoders and                mantic identity of the target, and surrounds it with a spe-
+ extra visual prompt [5, 77, 111] even at inference time,                   cial markup token <ins> to enable deterministic location
+of the corresponding token for further training. This inline     The cross-attention weights from wi to the visual tokens at
+tagging is directly linked to Mi , so that the marked noun       layer l are computed as:
+token is aligned with the ground-truth mask it denotes.
+                                                                                               Ql [ji ] (Kvl )⊤
+                                                                                              t                
+   Formally, let Hi denote the original human message and                     Al,i = softmax         √            ,      (5)
+Gi the corresponding model response in VideoRefer, paired                                                d
+with mask Mi . The refined human message Ĥi is given by
+                                                                 where the softmax is applied over the Lv visual token posi-
+   Ĥi = Mark(Replace(Hi , <region>, ri ) , wi ) ,        (2)    tions. Each element indicates the degree to which the noun
+                                                                 token attends to each visual token at layer index l.
+where Replace(·) substitutes the placeholder with the               To enable spatial supervision, the attention vector Al,i
+GPT-4o-generated referring expression ri , and Mark(·, wi )      is mapped to the original feature grid of resolution (H, W )
+encloses wi in <ins> delimiters. The referring expression        that aligns with Mi . This mapping follows the spatial cor-
+itself is obtained as                                            respondence between visual tokens and encoder patches.
+                                                                 If (H, W ) differs from the token grid resolution, bilinear
+                     ri = NLRef(Gi ),                     (3)    interpolation is applied to match the mask resolution ex-
+                                                                 actly. The resulting attention map for layer l is denoted as
+where NLRef(·) extracts salient object descriptors from Gi
+                                                                 Al,i ∈ [0, 1]H×W . Since attention patterns may vary across
+and composes them into a minimal, discriminative phrase.
+                                                                 layers, we aggregate attention maps from a selected set of
+   The refined dataset is then defined as
+                                                                 layers S by simple averaging:
+                
+  DNL−Refer = (Vi , Ĥi , Gi , Mi ) i = 1, . . . , N , (4)                                    1 X
+                                                                                     Āi =        Al,i .                   (6)
+with Ĥi containing the linguistically explicit object refer-                                |S|
+                                                                                                l∈S
+ence, Gi providing the unchanged descriptive context, and
+Mi denoting the ground-truth mask of the target instance.        The aggregated map Āi captures the stable cross-modal
+By systematically embedding object identity into the text        correspondence between the tagged object noun wi and its
+and marking its precise token span, DNL−Refer establishes        visual region after accounting for multi-layer variability.
+a reliable mapping between lexical items and visual an-             Finally, we supervise Āi with the binary mask Mi using
+notations, laying a solid foundation for subsequent cross-       a pixel-wise binary cross-entropy loss:
+attention supervision of object nouns.                                              H W
+                                                                     (i)        1 XXh
+3.2. Attention Regularization                                      LBCE = −                 Mi (u, v) log Āi (u, v)
+                                                                               HW u=1 v=1                             (7)
+Leveraging DNL−Refer , in which each refined textual prompt                                                       i
+Ĥi contains precisely one object noun wi tagged with                          + 1 − Mi (u, v) log 1 − Āi (u, v) ,
+<ins> delimiters and deterministically linked to the
+ground-truth mask Mi , we design an auxiliary supervision        where Mi (u, v) ∈ {0, 1} indicates whether pixel (u, v) be-
+mechanism to explicitly align the visual grounding of noun       longs to the target object. By providing this explicit align-
+tokens with their annotated object regions. As analyzed in       ment signal at training time, the model learns to consistently
+Section 1, the cross-attention patterns in existing MLLMs        concentrate cross-attention from object nouns onto their
+exhibit an empirical vision–language misalignment: Object        correct visual regions, bridging the alignment gap identi-
+nouns often produce diffuse and scattered activations across     fied in our analysis and enhancing fine-grained understand-
+the visual tokens. This systematic discrepancy motivates us      ing performance without modifying the base architecture.
+to directly guide the model’s cross-modal attention when            Notably, unlike many existing fine-grained object under-
+processing tagged object noun tokens, so that their activa-      standing approaches that require the visual prompt mask Mi
+tion is concentrated on the relevant visual region.              as part of the inference input, in our SWIM, Mi is only used
+   During training, we first tokenize Ĥi into a sequence of     for attention regularization during supervised fine-tuning,
+Lt tokens, yielding text embeddings Xt ∈ RLt ×d , where d        incurring no additional burden in inference.
+denotes the hidden dimension. Let ji ∈ {1, . . . , Lt } be the
+index corresponding to the tagged noun token wi . Within         4. Experiments
+the LLM decoder, these text embeddings interact with a se-       4.1. Experimental Settings
+quence of Lv visual tokens Xv ∈ RLv ×d through cross-
+attention layers. For a given cross-attention module at layer    Implementation details. We implement SWIM on top of
+index l, let Qtl [ji ] ∈ Rd be the query vector of the tagged    the widely used Qwen2.5VL-7B [2] framework, which em-
+noun token at position ji , and let Kvl ∈ RLv ×d denote the      ploys SIGLIP (so400m-patch14-384) [94] as the visual en-
+key vectors of the all visual tokens of one frame from Vi .      coder and Qwen2.5 [63] as the large language model (LLM)
+Table 1. Performance comparisons on fine-grained VideoRefer-Bench-D and VideoRefer-Bench-Q. The best results are bold and the
+second-best results are underlined.
+                                                          VideoRefer-Bench-Q                      VideoRefer-Bench-D
+ Method                      Prompt types        Basic Seq. Rel. Rea.       Fut.   Avg.    SC      AD     TD     HD     Avg.
+                                                      Generalist Models
+ LongVU-7B [57]                    Text          47.2    61.3 57.5 85.3     65.8    61.0   2.33   1.80   2.39   1.68    2.05
+ LongVA-7B [100]                   Text          56.2    62.5 52.0 83.9     65.8    61.8   3.02   2.30   1.92   2.51    2.44
+ LLaVA-OV-7B [33]                  Text          58.7    62.9 64.7 87.4     76.3    67.4   3.09   1.94   2.50   2.41    2.48
+ Qwen2-VL-7B [62]                  Text          62.0    69.6 54.9 87.3     74.6    66.0   3.99   3.05   2.44   2.44    2.97
+ Qwen2.5-Omni-7B [74]              Text          65.0    67.6 54.0 84.3     70.3    68.2   3.92   2.82   1.97   2.34    2.76
+ InternVL2-26B [10]                Text          58.5    63.5 53.4 88.0     78.9    65.0   4.08   3.35   3.08   2.28    3.20
+ Qwen2.5-VL-7B [2]                 Text          78.0    69.7 58.2 79.9     73.2    71.8   4.33   3.19   2.88   2.58    3.24
+ GPT-4o-mini [49]                  Text          57.6    67.1 56.5 85.9     75.4    65.8   3.89   3.18   2.62   2.50    3.05
+ GPT-4o [49]                       Text          62.3    74.5 66.0 88.0     73.7    71.3   4.15   3.31   3.11   2.43    3.25
+                                                      Specialist Models
+ Elysium-7B [67]                  Box             –        –       –    –    –       –     2.35   0.30   0.02   3.59    1.57
+ Artemis-7B [53]                  Box             –        –       –    –    –       –     3.42   1.34   1.39   2.90    2.26
+ Osprey-7B [88]              Point, Mask         45.9    47.1 30.0 48.6     23.7    39.9   3.30   2.66   2.10   1.58    2.41
+ Ferret-7B [85]            Point, Box, Mask      35.2    44.7 41.9 70.4     74.6    48.8   3.20   2.38   1.97   1.38    2.23
+ PAM-3B [41]               Point, Box, Mask       –        –       –    –    –       –     3.92   2.84   2.88   2.94    3.14
+ DAM-8B [39]               Point, Box, Mask       –        –       –    –    –       –     4.69   3.61   3.34   3.03    3.68
+ VideoRefer-7B [89]              Mask            75.4    68.6 59.3 89.4     78.1    71.9   4.44   3.27   3.10   3.04    3.46
+ SWIM                             Text           83.8    75.0 66.7 93.7     80.7    78.3   4.92   3.85   3.43   2.96    3.78
+
+
+Table 2. Performance comparisons on general video benchmarks.     ness of SWIM, we evaluate it from both fine-grained video
+Method                   MVBench VideoMME ActivityNet             object understanding and general video understanding per-
+                                                                  spectives. We adopt VideoRefer-Bench [89], a dedicated
+VideoLLaMA2 [12]            54.6          47.9         50.2
+                                                                  benchmark for object-level video understanding that com-
+VideoChat2-HD [34]          51.1          54.6         49.1
+VideoLLaMA2.1 [12]          57.3          54.9          -         prises two sub-tasks. VideoRefer-Bench-D measures de-
+LLaVA-Next-Video [104]       -            46.5         53.5       scription generation for specified objects, containing 400
+LLaVA-Octopus [108]         51.7          55.7         53.4       curated entries from Panda-70M [9]. Outputs are scored
+INST-IT [50]                 -            54.0         55.2       from 0-5 in four aspects: Subject Correspondence (SC,
+VideoRefer [89]             59.6          55.9          -         subject matches ground truth), Appearance Description
+SWIM                        62.1          55.9         55.6       (AD, accuracy of color/shape/texture), Temporal Descrip-
+                                                                  tion (TD, correctness of motion), and Hallucination De-
+                                                                  tection (HD, absence of invented details). VideoRefer-
+decoder. Our training set is composed of two parts: (1)           Bench-Q evaluates object-level understanding and reason-
+The proposed NL-Refer dataset, converted from the de-             ing, consisting of 198 videos from DAVIS-2017 [51] and
+tailed caption subset of VideoRefer-700K dataset [89], con-       MeViS [14, 15], paired with 1,000 region-linked multiple-
+taining 125K videos with refined textual annotations that         choice questions spanning Basic (simple factual queries),
+explicitly refer to objects in natural language along with        Sequential (temporal order reasoning), Relationship (re-
+their corresponding instance masks; (2) A portion of gen-         lations between objects), Reasoning (context-based infer-
+eral video-based QA data from LLaVA-Video-178K [105]              ence), and Future (predict future states).
+and videorefer-qa-75k. For the LLaVA-Video-178K, we
+                                                                      As for general video understanding, we adopt three rep-
+decompose multi-turn dialogues into single-turn QA pairs
+                                                                  resentative benchmarks: MVBench [35], which offers di-
+(1.3M in total), and sample 100K QA pairs (approximately
+                                                                  verse multi-aspect evaluations of video-language reasoning;
+7.5%) for training. We also sample 10K QA pairs from
+                                                                  Video-MME [20], a comprehensive suite covering spatio-
+videorefer-qa-75k to maintain its ability on multi-choice
+                                                                  temporal reasoning, event localization, and attribute recog-
+question. In total, our training data contains 235K exam-
+                                                                  nition; and ActivityNet-QA [87], a large-scale QA dataset
+ples, which is significantly smaller than that used for most
+                                                                  based on ActivityNet videos targeting a wide range of skills
+generalist MLLMs and is less than 1/3 of the VideoRefer.
+                                                                  from event recognition to temporal reasoning. These bench-
+All experiments are conducted on 8× NVIDIA A100 GPUs.
+                                                                  marks jointly examine SWIM’s generalization ability be-
+Evaluation benchmarks. To demonstrate the effective-              yond fine-grained object grounding.
+                  Table 3. Ablation study of attention layer selection among different layer number and layer index.
+  Layer Number Layer Index VideoRefer-D Layer Number                                   Layer Index                         VideoRefer-D
+          1              [1]           3.43              6                             [1, 3, 5, 7, 9, 11]                     3.73
+          1             [13]           3.48              6                           [1, 6, 11, 16, 21, 26]                    3.78
+          1             [27]           3.52              6                           [2, 7, 12, 17, 22, 27]                    3.78
+          3         [1, 13, 27]        3.72               6                        [17, 19, 21, 23, 25, 27]                    3.76
+          3         [9, 18, 27]        3.70               9                    [1, 4, 7, 10, 13, 16, 19, 22, 25]               3.75
+          3          [1, 7, 13]        3.69              14          [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27]       3.77
+
+
+Table 4. Ablation study of attention layer fusion methods on          Table 5. Ablation study of attention loss function used in SWIM
+VideoRefer-Bench-D. Prod. denotes element-wise product.               on VideoRefer-Bench-D.
+                   Subject           Temporal                                             Subject               Temporal
+  Fusion                                                Avg.             Loss                                                     Avg.
+               Correspondence        Description                                      Correspondence            Description
+  Add                4.62                3.24           3.57             mIoU                4.88                   3.34              3.71
+  Pool               4.56                3.11           3.49             Focal               4.80                   3.24              3.69
+  Prod.              4.81                3.21           3.55             Dice                4.90                   3.38              3.74
+  Mean               4.92                3.43           3.78             BCE                 4.92                   3.43              3.78
+
+                                                                      4.2.2. Results on General Benchmarks
+4.2. Main Results                                                     Other than the fine-grained understanding benchmarks, we
+4.2.1. Results on Fine-grained Benchmarks                             also evaluate SWIM on several representative general video
+In Tab. 1, we summarize the performance of SWIM and                   understanding benchmarks, including MVBench [35],
+a range of generalist and specialist state-of-art approaches          Video-MME [20], and ActivityNet-QA [87], as summa-
+on the fine-grained VideoRefer-bench [89], which evaluates            rized in Tab. 2. The results indicate that while SWIM is pri-
+video fine-grained object understanding in both question-             marily optimized for fine-grained video object understand-
+answering and description settings.                                   ing tasks, its performance on broader video-language un-
+   On VideoRefer-Q, which evaluates fine-grained object               derstanding tasks remains within a competitive range com-
+understanding through five sub-tasks, SWIM attains sub-               pared to existing methods. This suggests that the proposed
+stantial gains in Basic (+5.8% over Qwen2.5-VL-7B [2])                training strategy for cross-attention alignment does not sub-
+and Sequential (+5.3%) cases, which demand precise ob-                stantially compromise general video understanding ability,
+ject identification before answering. SWIM yields an aver-            allowing SWIM to retain acceptable performance in more
+age accuracy of 78.3%, exceeding the VideoRefer-7B [89]               comprehensive scenarios.
+by +6.4%, and surpassing all generalist models such as                4.3. Ablation Analysis
+Qwen2.5-VL-7B (71.8) and GPT-4o (71.3) [49].
+   On VideoRefer-D, which assesses spatial correspon-                 4.3.1. Effect of Attention Layer Selection
+dence (SC), action description (AD), temporal description             We first explore the influence of the number and positions
+(TD), and higher-level human–object description (HD),                 of cross-attention layers used for supervision in SWIM.
+SWIM achieves 4.92, 3.85, 3.43, and 2.96 respectively, for            As shown in Tab. 3, we evaluate VideoRefer-D perfor-
+an average of 3.78, outperforming the best specialist base-           mance under configurations ranging from single-layer su-
+line DAM-8B (3.68) and the strongest generalist system                pervision to selecting up to 14 layers. We find that increas-
+GPT-4o (3.25). The performance gain on SC (+0.23) and                 ing the number of supervised layers yields consistent im-
+AD (+0.24) over DAM-8B [39] highlights the strength of                provements initially. The performance rises from 3.43 at
+SWIM in aligning object nouns to precise instance regions.            a single shallow layer to 3.78 when supervising six lay-
+   Overall, SWIM delivers consistent improvements across              ers. Beyond six layers, results tend to be stable with all
+both QA and description tasks, indicating more precise re-            larger configurations remaining within 0.02 of each other.
+ferring capability between natural language and visual re-            Furthermore, evenly spaced selection of supervision layers
+gions. By integrating explicit attention regularization align-        across the network produces better or comparable results
+ment supervision at training only, SWIM enhances the fine-            than densely clustered layers in a narrow depth range, indi-
+grained grounding capability of MLLMs without incurring               cating that a balanced distribution from early to late stages
+architectural changes or inference-time visual prompting,             fosters more stable cross-modal alignment. This observa-
+making it competitive across diverse evaluation scenarios             tion suggests that SWIM achieves the best trade-off with
+that demand high-resolution text–visual alignment.                    moderately deep and uniformly spaced supervision layers.
+                                        SWIM Performance Trend with different data scale     Table 6. GamePoint@P between Qwen2.5-VL and SWIM. This
+                                    3.8     SWIM (VideoRefer-D)                     3.78     metric measures the visual region with the highest cross-attention
+ Performance Score (VideoRefer-D)
+
+                                            Qwen2.5VL-7B                                     score falls within the specified object mask.
+                                                 VideoRefer-7B
+                                    3.7          DAM-8B                      3.69     3.68     Method               G.P.@P-1      G.P.@P-5      G.P.@P-10
+                                                                    3.60                       Qwen2.5-VL-7B          0.329         0.293          0.270
+                                    3.6
+                                                                                               SWIM                   0.392         0.348          0.317
+                                    3.5                                               3.46
+                                    3.4               3.39                                   4.4. Scalability with Mask-Annotated Data Volume
+                                                                                             Beyond the intrinsic performance of the model, scalability
+                                    3.3
+                                          3.23                                        3.24   is also a critical property for multimodal models. In the field
+                                    3.2 30K           50K           80K      100K   125K
+                                                                                             of fine-grained object understanding, scalability determines
+                                                         Amount of Data with Mask            whether stronger alignment can be achieved simply by ex-
+                                                                                             panding high-quality annotated datasets, making it essential
+Figure 4. Scalablity of SWIM. The performance of SWIM scales
+consistently with the increase in data scale.
+                                                                                             for long-term advancement. Therefore, to examine SWIM’s
+                                                                                             scalability, we vary the number of mask-annotated training
+                                                                                             videos from NL-Refer dataset. The dataset size is gradu-
+4.3.2. Effect of Attention Layer Fusion                                                      ally expanded from a 30K subset to the maximum available
+We further study how attention maps extracted from multi-                                    125K samples. Fig. 4 shows the overall alignment score at
+ple layers should be fused to provide the alignment signal                                   each scale, revealing a clear and monotonic upward trend.
+in SWIM. Several fusion strategies are considered, includ-                                       The results demonstrate that SWIM can effectively lever-
+ing addition, pooling, mean, and element-wise product. As                                    age additional fine-grained supervision. Each increase in
+shown in Tab. 4, simple mean aggregation yields the highest                                  mask-annotated data yields measurable gains, and the im-
+average score (3.81), exceeding addition (3.57) and pooling                                  provement persists up to the largest scale tested. This sus-
+(3.49) by a clear margin. This can be attributed to its ability                              tained growth can be attributed to the explicit alignment
+to preserve consistent spatial patterns across layers with-                                  between object nouns and masks in our training pipeline,
+out introducing bias toward any single depth, effectively                                    which enables the model to refine cross-modal attention
+smoothing noise and retaining salient activation peaks. In                                   alignments across diverse examples without overfitting to
+contrast, The element-wise product requires all layers to                                    narrower data distributions.
+highlight the same locations to retain them, thus tends to                                       In addition, the absence of a plateau at 125K data scale
+over-suppress regions with moderate but meaningful atten-                                    indicates that SWIM is inherently capable of benefiting
+tion, reducing overall coverage of the target object.                                        from larger-scale mask supervision. Although our experi-
+                                                                                             ments are bounded by the current data availability, the per-
+4.3.3. Effect of Loss Function                                                               sistent upward trajectory suggests considerable untapped
+We also examine the impact of the loss function used to                                      potential. SWIM may achieve stronger alignment if broader
+supervise cross-attention in SWIM. As demonstrated in                                        and more diverse mask-annotated corpora are provided.
+Tab. 5, compared to alternatives such as mIoU, Focal, and
+Dice losses, binary cross-entropy (BCE) consistently yields                                  4.5. GamePoint-based Attention Localization
+superior overall performance. This advantage can be at-                                      We evaluate spatial grounding using the GamePoint@P
+tributed to the sparsity inherent in attention maps extracted                                metrics, as reported in Tab. 6. GamePoint@P measures the
+from MLLMs. When aligning object nouns to visual re-                                         proportion for the top P % attention pixels highest-attention
+gions, activations are highly localized and occupy only a                                    pixels in Āi that fall within the object mask Mi :
+small fraction of the spatial grid due to the softmax opera-
+                                                                                                                         N
+tion. Loss functions that emphasize overlap ratios or focus                                                          1 X |TopPerc(Āi , P ) ∩ Pi |
+                                                                                               GamePoint@P =                                       , (8)
+disproportionately on hard negatives may under-penalize                                                              N i=1 |TopPerc(Āi , P )|
+diffuse activations, making it harder to enforce precise
+alignment. In contrast, BCE treats each pixel independently                                  where Pi = {(u, v) | Mi (u, v) = 1} denotes object-region
+and applies a uniform probabilistic penalty across all spa-                                  pixels, TopPerc(·) denotes selecting the top P % elements.
+tial locations, encouraging suppression of irrelevant high-                                     From Tab. 6, SWIM consistently outperforms Qwen2.5-
+activation regions while reinforcing confident attention on                                  VL-7B across all P . The improvement is most pronounced
+the target area. This balanced penalization aligns well with                                 at P = 1 (+6.3%) and P = 5% (+5.5%), showing that
+the fine-grained supervision signals in SWIM, leading to                                     SWIM’s most confident attention points and top regions are
+more accurate and stable grounding of object nouns.                                          far more likely to land within the correct object area. This
+                               D                                                                                                                                   C
+                                      Qwen2.5-VL                                                                                                                            Qwen2.5-VL
+                                                     GT: The wooden cutting board is rectangular and placed on a
+                                                     table with a checkered tablecloth. It is brown and has a rustic
+                               B                     appearance. The cutting board is stationary and not in motion                                                 B
+                                        SWIM                                                                                                                                  SWIM
+
+
+
+
+             What activity might the person                                                                                                What is the distinguishing
+                                                               Please describe the
+             in the red jacket and black                       rectangular wooden                                                          feature of the goldfish on the
+             helmet be engaged in?                             cutting board on the                                                        right side near the plants?
+                                                               table in the video.
+
+
+
+                                                    The biscuit is a round, flat piece of bread with a light, soft
+                                                    texture. It is placed on a wooden tray and appears to be
+                                                    freshly baked, as it has a golden-brown crust and a lighter,
+                                                    soft interior. The biscuit is being moved around by a             Qwen2.5-VL
+             (A) Protecting another one             person's hands, which are seen picking up and placing it
+                                                    back down on the tray.                                                                (A) It has a white stripe
+             (B) Taking a selfie or                                                     v
+                 recording a video                                                                                                        (B) It is the largest goldfish
+
+             (C) Paragliding                                                                                                              (C) It is the smallest goldfish
+                                                    The wooden cutting board is rectangular and placed on a
+             (D) Flying                             table. It is used to hold the biscuits. The board is                                  (D) It has a pink hue
+                                                    stationary and not in motion.                                         SWIM
+
+                    C                                                                                                                                              D
+    Qwen2.5-VL                                                                                                                                                              Qwen2.5-VL
+                                                     GT: The wooden cutting board is rectangular and placed on a table
+                                                     with a checkered tablecloth. It is brown and has a rustic appearance.
+                   B                                 The cutting board is stationary and not in motion                                                             B
+     SWIM                                                                                                                                                                     SWIM
+
+
+                                           Figure 5. Qualitative comparisons between SWIM and Qwen2.5-VL [2].
+
+suggests SWIM achieves sharper and more focused atten-                                                 0.7      Qwen2.5-VL vs SWIM Metric Comparison
+tion peaks on the target object, raising coverage across all                                                                              0.66                               Qwen2.5-VL
+                                                                                                                                   0.62                                      SWIM
+top-P settings, and overcoming the diffuse attention pat-
+terns observed in the baseline Qwen2.5-VL model.                                                       0.6
+
+4.6. Fine-Grained Text-Visual Alignment Metrics                                                                                                                0.49
+                                                                                                       0.5
+                                                                                               Score
+
+
+To quantify visual–language alignment at a finer granular-
+ity, we further compare the attention maps Āi for object
+                                                                                                       0.4                                              0.39                        0.40
+nouns against the corresponding masks Mi using four com-
+mon metrics: Average Precision (AP), Area Under Curve
+                                                                                                       0.3            0.30
+(AUC), Normalized Scanpath Saliency (NSS), and Preci-                                                                                                                        0.28
+                                                                                                              0.26
+sion. For each metric, we derive binary predictions from
+Āi using a fixed threshold of 0.75 if confusion matrix com-                                           0.2
+ponents are required.                                                                                                AP             AUC                    NSS              Precision
+    As shown in Fig. 6, SWIM consistently outperforms                                         Figure 6. Quantitative comparison of fine-grained text–visual
+the Qwen2.5-VL baseline across all four metrics (AUC:                                         alignment metrics. Evaluation includes AP, AUC, NSS, and Pre-
+0.62 → 0.67, NSS: 0.39 → 0.50, Precision: 0.28 → 0.39,                                        cision. SWIM consistently outperforms the Qwen2.5-VL baseline
+AP: 0.26 → 0.30). These improvements indicate that                                            on all four metrics, indicating more accurate attention on target,
+SWIM generates attention maps with more precise and con-                                      fewer false activations, and stronger alignment stability.
+centrated coverage of target regions, reduces false activa-
+tions, and achieves stronger discriminability across thresh-                                  5. Conclusions
+olds, thereby enhancing fine-grained text–visual grounding.
+                                                                                              In this paper, we propose SWIM, a training paradigm that
+4.7. Qualitative Comparisons                                                                  applies explicit supervision to improve cross-modal align-
+As demonstrated in Fig. 5, we conduct qualitative com-                                        ment between object nouns and visual regions, thereby en-
+parisons between SWIM and Qwen2.5-VL [2] on exam-                                             hancing fine-grained object understanding in MLLMs. To
+ples that require precisely object reference through natural                                  enable such supervision, we construct NL-Refer, a refined
+language. For example, in the caption case, Qwen2.5-VL                                        video dataset with natural language object references paired
+disregards the prompt’s explicit reference and instead de-                                    with mask annotations. SWIM requires no architectural
+scribes the most visually salient object in the scene while                                   changes and does not need any visual prompts during in-
+SWIM adheres to the prompt and focus on the specified                                         ference. Experiments show that it achieves state-of-the-
+object. The other two examples also show cases where                                          art results on fine-grained understanding benchmarks while
+SWIM’s outputs match the prompt’s described referent.                                         maintaining competitive performance on general bench-
+Fig. 5 indicates that SWIM’s outputs align more closely                                       marks. Extensive quantitative analysis further verifies that
+with the objects mentioned in the prompts.                                                    SWIM can achieve better fine-grained video understanding.
+6. Acknowledgments                                                      Zhu, Lewei Lu, et al. Internvl: Scaling up vision founda-
+                                                                        tion models and aligning for generic visual-linguistic tasks.
+This work was supported by NSFC (62522607, 62495061,                    arXiv preprint arXiv:2312.14238, 2023. 5
+and 62276145), and the Fundamental Research Funds for              [11] Zhe Chen, Weiyun Wang, Hao Tian, Shenglong Ye, Zhang-
+the Central Universities (Nankai University).                           wei Gao, Erfei Cui, Wenwen Tong, Kongzhi Hu, Jiapeng
+                                                                        Luo, Zheng Ma, et al. How far are we to gpt-4v? clos-
+References                                                              ing the gap to commercial multimodal models with open-
+                                                                        source suites. arXiv preprint arXiv:2404.16821, 2024. 3
+  [1] Jinze Bai, Shuai Bai, Shusheng Yang, Shijie Wang, Sinan
+                                                                   [12] Zesen Cheng, Sicong Leng, Hang Zhang, Yifei Xin, Xin
+      Tan, Peng Wang, Junyang Lin, Chang Zhou, and Jingren
+                                                                        Li, Guanzheng Chen, Yongxin Zhu, Wenqi Zhang, Ziyang
+      Zhou. Qwen-vl: A versatile vision-language model for un-
+                                                                        Luo, Deli Zhao, and Lidong Bing. Videollama 2: Advanc-
+      derstanding, localization, text reading, and beyond. arXiv
+                                                                        ing spatial-temporal modeling and audio understanding in
+      preprint arXiv:2308.12966, 2023. 1
+                                                                        video-llms. arXiv preprint arXiv:2406.07476, 2024. 5
+  [2] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin
+      Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun         [13] Gheorghe Comanici, Eric Bieber, Mike Schaekermann, Ice
+      Tang, Humen Zhong, Yuanzhi Zhu, Mingkun Yang, Zhao-               Pasupat, Noveen Sachdeva, Inderjit Dhillon, Marcel Blis-
+      hai Li, Jianqiang Wan, Pengfei Wang, Wei Ding, Zheren             tein, Ori Ram, Dan Zhang, Evan Rosen, et al. Gemini 2.5:
+      Fu, Yiheng Xu, Jiabo Ye, Xi Zhang, Tianbao Xie, Zesen             Pushing the frontier with advanced reasoning, multimodal-
+      Cheng, Hang Zhang, Zhibo Yang, Haiyang Xu, and Jun-               ity, long context, and next generation agentic capabilities.
+      yang Lin. Qwen2.5-vl technical report. arXiv preprint             arXiv preprint arXiv:2507.06261, 2025. 2
+      arXiv:2502.13923, 2025. 1, 2, 4, 5, 6, 8, 14                 [14] Henghui Ding, Chang Liu, Shuting He, Xudong Jiang, and
+  [3] Fabian Caba Heilbron, Victor Escorcia, Bernard Ghanem,            Chen Change Loy. Mevis: A large-scale benchmark for
+      and Juan Carlos Niebles. Activitynet: A large-scale video         video segmentation with motion expressions. In Proceed-
+      benchmark for human activity understanding. In Proceed-           ings of the IEEE/CVF international conference on com-
+      ings of the ieee conference on computer vision and pattern        puter vision, pages 2694–2703, 2023. 5
+      recognition, pages 961–970, 2015. 14                         [15] Henghui Ding, Chang Liu, Shuting He, Kaining Ying,
+  [4] Mu Cai, Haotian Liu, Siva Karthik Mustikovela, Gregory P          Xudong Jiang, Chen Change Loy, and Yu-Gang Jiang.
+      Meyer, Yuning Chai, Dennis Park, and Yong Jae Lee. Mak-           Mevis: A multi-modal dataset for referring motion expres-
+      ing large multimodal models understand arbitrary visual           sion video segmentation. IEEE Transactions on Pattern
+      prompts. In CVPR, pages 12914–12923, 2024. 3                      Analysis and Machine Intelligence, 2025. 5
+  [5] Mu Cai, Haotian Liu, Siva Karthik Mustikovela, Gregory P     [16] Liwei Ding, Kowei Shih, Hairu Wen, Xinshi Li, and Qin
+      Meyer, Yuning Chai, Dennis Park, and Yong Jae Lee. Vip-           Yang. Cross-attention transformer-based visual-language
+      llava: Making large multimodal models understand arbi-            fusion for multimodal image analysis. International Jour-
+      trary visual prompts. In Proceedings of the IEEE/CVF Con-         nal of Applied Science, 8(1):p27–p27, 2025. 2
+      ference on Computer Vision and Pattern Recognition, pages    [17] Yuchen Duan, Zhe Chen, Yusong Hu, Weiyun Wang, Shen-
+      12914–12923, 2024. 3                                              glong Ye, Botian Shi, Lewei Lu, Qibin Hou, Tong Lu,
+  [6] Chi Chen, Ruoyu Qin, Fuwen Luo, Xiaoyue Mi, Peng Li,              Hongsheng Li, et al. Docopilot: Improving multimodal
+      Maosong Sun, and Yang Liu. Position-enhanced visual               models for document-level understanding. In Proceedings
+      instruction tuning for multimodal large language models.          of the Computer Vision and Pattern Recognition Confer-
+      arXiv preprint arXiv:2308.13437, 2023. 3                          ence, pages 4026–4037, 2025. 3
+  [7] Keqin Chen, Zhao Zhang, Weili Zeng, Richong Zhang,           [18] Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Ab-
+      Feng Zhu, and Rui Zhao. Shikra: Unleashing multi-                 hishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil
+      modal llm’s referential dialogue magic. arXiv preprint            Mathur, Alan Schelten, Amy Yang, Angela Fan, et al. The
+      arXiv:2306.15195, 2023. 1                                         llama 3 herd of models. arXiv e-prints, pages arXiv–2407,
+  [8] Lin Chen, Xilin Wei, Jinsong Li, Xiaoyi Dong, Pan Zhang,          2024. 3
+      Yuhang Zang, Zehui Chen, Haodong Duan, Bin Lin,              [19] Hao Fei, Shengqiong Wu, Hanwang Zhang, Tat-Seng Chua,
+      Zhenyu Tang, et al. Sharegpt4video: Improving video               and Shuicheng Yan. Vitron: A unified pixel-level vision
+      understanding and generation with better captions. arXiv          llm for understanding, generating, segmenting, editing. In
+      preprint arXiv:2406.04325, 2024. 2                                NeurIPS, 2024. 3
+  [9] Tsai-Shien Chen, Aliaksandr Siarohin, Willi Menapace,        [20] Chaoyou Fu, Yuhan Dai, Yondong Luo, Lei Li, Shuhuai
+      Ekaterina Deyneka, Hsiang-wei Chao, Byung Eun Jeon,               Ren, Renrui Zhang, Zihan Wang, Chenyu Zhou, Yunhang
+      Yuwei Fang, Hsin-Ying Lee, Jian Ren, Ming-Hsuan Yang,             Shen, Mengdan Zhang, et al. Video-mme: The first-ever
+      et al. Panda-70m: Captioning 70m videos with multiple             comprehensive evaluation benchmark of multi-modal llms
+      cross-modality teachers. In Proceedings of the IEEE/CVF           in video analysis. arXiv preprint arXiv:2405.21075, 2024.
+      Conference on Computer Vision and Pattern Recognition,            5, 6, 14
+      pages 13320–13331, 2024. 5                                   [21] Chaoyou Fu, Yi-Fan Zhang, Shukang Yin, Bo Li, Xinyu
+ [10] Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo                 Fang, Sirui Zhao, Haodong Duan, Xing Sun, Ziwei Liu,
+      Chen, Sen Xing, Zhong Muyan, Qinglong Zhang, Xizhou               Liang Wang, et al. Mme-survey: A comprehensive sur-
+     vey on evaluation of multimodal llms. arXiv preprint                Chunyuan Li. Llava-onevision: Easy visual task transfer.
+     arXiv:2411.15296, 2024. 2                                           arXiv preprint arXiv:2408.03326, 2024. 5
+[22] Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song,             [34] KunChang Li, Yinan He, Yi Wang, Yizhuo Li, Wen-
+     Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi                hai Wang, Ping Luo, Yali Wang, Limin Wang, and Yu
+     Wang, Xiao Bi, et al. Deepseek-r1: Incentivizing reason-            Qiao. Videochat: Chat-centric video understanding. arXiv
+     ing capability in llms via reinforcement learning. arXiv            preprint arXiv:2305.06355, 2023. 5
+     preprint arXiv:2501.12948, 2025. 3                             [35] Kunchang Li, Yali Wang, Yinan He, Yizhuo Li, Yi Wang,
+[23] Qiushan Guo, Shalini De Mello, Hongxu Yin, Wonmin                   Yi Liu, Zun Wang, Jilan Xu, Guo Chen, Ping Luo, et al.
+     Byeon, Ka Chun Cheung, Yizhou Yu, Ping Luo, and Sifei               Mvbench: A comprehensive multi-modal video under-
+     Liu. Regiongpt: Towards region understanding vision lan-            standing benchmark. In Proceedings of the IEEE/CVF Con-
+     guage model. In Proceedings of the IEEE/CVF Conference              ference on Computer Vision and Pattern Recognition, pages
+     on Computer Vision and Pattern Recognition, pages 13796–            22195–22206, 2024. 5, 6, 14
+     13806, 2024. 1, 3                                              [36] Peize Li, Qingyi Si, Peng Fu, Zheng Lin, and Yan Wang.
+[24] Miran Heo, Min-Hung Chen, De-An Huang, Sifei Liu, Sub-              Object attribute matters in visual question answering. In
+     hashree Radhakrishnan, Seon Joo Kim, Yu-Chiang Frank                Proceedings of the AAAI Conference on Artificial Intelli-
+     Wang, and Ryo Hachiuma. Omni-rgpt: Unifying image and               gence, pages 18545–18553, 2024. 2
+     video region-level understanding via token marks. arXiv        [37] Yuncheng Li, Yale Song, Liangliang Cao, Joel Tetreault,
+     preprint arXiv:2501.08326, 2025. 3                                  Larry Goldberg, Alejandro Jaimes, and Jiebo Luo. Tgif: A
+[25] Yusong Hu, Runmin Ma, Yue Fan, Jinxin Shi, Zongsheng                new dataset and benchmark on animated gif description. In
+     Cao, Yuhao Zhou, Jiakang Yuan, Xiangchao Yan, Wenlong               Proceedings of the IEEE Conference on Computer Vision
+     Zhang, Lei Bai, et al. Flowsearch: Advancing deep research          and Pattern Recognition, pages 4641–4650, 2016. 1
+     with dynamic structured knowledge flow. arXiv preprint         [38] Yunheng Li, Jing Cheng, Shaoyong Jia, Hangyi Kuang,
+     arXiv:2510.08521, 2025. 3                                           Shaohui Jiao, Qibin Hou, and Ming-Ming Cheng.
+[26] Xiaoke Huang, Jianfeng Wang, Yansong Tang, Zheng                    Tempsamp-r1: Effective temporal sampling with rein-
+     Zhang, Han Hu, Jiwen Lu, Lijuan Wang, and Zicheng Liu.              forcement fine-tuning for video llms. arXiv preprint
+     Segment and caption anything. In CVPR, pages 13405–                 arXiv:2509.18056, 2025. 1
+     13417, 2024. 3
+                                                                    [39] Long Lian, Yifan Ding, Yunhao Ge, Sifei Liu, Hanzi
+[27] Nikolai Ilinykh and Simon Dobnik. Attention as grounding:
+                                                                         Mao, Boyi Li, Marco Pavone, Ming-Yu Liu, Trevor Dar-
+     Exploring textual and cross-modal attention on entities and
+                                                                         rell, Adam Yala, et al. Describe anything: Detailed
+     relations in language-and-vision transformer. In Findings
+                                                                         localized image and video captioning. arXiv preprint
+     of the association for computational linguistics: ACL 2022,
+                                                                         arXiv:2504.16072, 2025. 5, 6
+     pages 4062–4073, 2022. 2
+                                                                    [40] Ji Lin, Hongxu Yin, Wei Ping, Pavlo Molchanov, Moham-
+[28] Qing Jiang, Lin Wu, Zhaoyang Zeng, Tianhe Ren, Yuda
+                                                                         mad Shoeybi, and Song Han. Vila: On pre-training for vi-
+     Xiong, Yihao Chen, Liu Qin, and Lei Zhang. Referring
+                                                                         sual language models. In CVPR, pages 26689–26699, 2024.
+     to any person. In Proceedings of the IEEE/CVF Inter-
+                                                                         3
+     national Conference on Computer Vision, pages 21667–
+     21678, 2025. 1                                                 [41] Weifeng Lin, Xinyu Wei, Ruichuan An, Tianhe Ren,
+[29] Zhangqi Jiang, Junkai Chen, Beier Zhu, Tingjin Luo,                 Tingwei Chen, Renrui Zhang, Ziyu Guo, Wentao Zhang,
+     Yankun Shen, and Xu Yang. Devils in middle layers of                Lei Zhang, and Hongsheng Li. Perceive anything: Recog-
+     large vision-language models: Interpreting, detecting and           nize, explain, caption, and segment anything in images and
+     mitigating object hallucinations via attention lens. In Pro-        videos. arXiv preprint arXiv:2506.05302, 2025. 1, 5
+     ceedings of the Computer Vision and Pattern Recognition        [42] Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao
+     Conference, pages 25004–25014, 2025. 3                              Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng,
+[30] Modi Jin, Yiming Zhang, Boyuan Sun, Dingwen Zhang,                  Chenyu Zhang, Chong Ruan, et al. Deepseek-v3 technical
+     Ming-Ming Cheng, and Qibin Hou. Geoagent: Learning                  report. arXiv preprint arXiv:2412.19437, 2024. 3
+     to geolocate everywhere with reinforced geographic char-       [43] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae
+     acteristics. arXiv preprint arXiv:2602.12617, 2026. 3               Lee. Visual instruction tuning. 2023. 2
+[31] Omri Kaduri, Shai Bagon, and Tali Dekel. What’s in the         [44] Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae
+     image? a deep-dive into the vision of vision language mod-          Lee. Improved baselines with visual instruction tuning. In
+     els. In Proceedings of the Computer Vision and Pattern              CVPR, pages 26296–26306, 2024. 3
+     Recognition Conference, pages 14549–14558, 2025. 3             [45] Zuyan Liu, Yuhao Dong, Ziwei Liu, Winston Hu, Jiwen
+[32] Seil Kang, Jinyeong Kim, Junhyeok Kim, and Seong Jae                Lu, and Yongming Rao. Oryx mllm: On-demand spatial-
+     Hwang. Your large vision-language model only needs a                temporal understanding at arbitrary resolution. arXiv
+     few attention heads for visual grounding. In Proceedings of         preprint arXiv:2409.12961, 2024. 1
+     the Computer Vision and Pattern Recognition Conference,        [46] Shervin Minaee, Tomas Mikolov, Narjes Nikzad, Meysam
+     pages 9339–9350, 2025. 3                                            Chenaghlu, Richard Socher, Xavier Amatriain, and Jian-
+[33] Bo Li, Yuanhan Zhang, Dong Guo, Renrui Zhang, Feng                  feng Gao. Large language models: A survey. arXiv preprint
+     Li, Hao Zhang, Kaichen Zhang, Yanwei Li, Ziwei Liu, and             arXiv:2402.06196, 2024. 3
+[47] Munan Ning, Bin Zhu, Yujia Xie, Bin Lin, Jiaxi Cui, Lu              Rongyi Zhu, Ali Vosoughi, Chao Huang, Zeliang Zhang,
+     Yuan, Dongdong Chen, and Li Yuan. Video-bench: A                    Pinxin Liu, Mingqian Feng, Feng Zheng, Jianguo Zhang,
+     comprehensive benchmark and toolkit for evaluating video-           Ping Luo, Jiebo Luo, and Chenliang Xu. Video understand-
+     based large language models. Computational Visual Media,            ing with large language models: A survey. IEEE Transac-
+     2025. 3                                                             tions on Circuits and Systems for Video Technology, 2025.
+[48] OpenAI. ChatGPT, 2023. 1                                            1
+[49] OpenAI. Gpt-4o system card, 2024. 2, 5, 6                      [61] Kimi Team, Yifan Bai, Yiping Bao, Guanduo Chen, Jiahao
+[50] Wujian Peng, Lingchen Meng, Yitong Chen, Yiweng Xie,                Chen, Ningxin Chen, Ruijue Chen, Yanru Chen, Yuankun
+     Yang Liu, Tao Gui, Hang Xu, Xipeng Qiu, Zuxuan Wu,                  Chen, Yutian Chen, et al. Kimi k2: Open agentic intelli-
+     and Yu-Gang Jiang. Inst-it: Boosting multimodal instance            gence. arXiv preprint arXiv:2507.20534, 2025. 3
+     understanding via explicit visual prompt instruction tuning.   [62] Qwen team. Qwen2-vl. 2024. 1, 5
+     arXiv preprint arXiv:2412.03565, 2024. 1, 2, 5                 [63] Qwen Team. Qwen2.5: A party of foundation models,
+[51] Jordi Pont-Tuset, Federico Perazzi, Sergi Caelles, Pablo Ar-        2024. 4
+     beláez, Alex Sorkine-Hornung, and Luc Van Gool. The           [64] Yunjie Tian, Tianren Ma, Lingxi Xie, Jihao Qiu, Xi Tang,
+     2017 davis challenge on video object segmentation. arXiv            Yuan Zhang, Jianbin Jiao, Qi Tian, and Qixiang Ye. Chat-
+     preprint arXiv:1704.00675, 2017. 5                                  terbox: Multi-round multimodal referring and grounding.
+                                                                         arXiv preprint arXiv:2401.13307, 2024. 3
+[52] Jianing Qi, Jiawei Liu, Hao Tang, and Zhigang Zhu. Be-
+     yond semantics: Rediscovering spatial awareness in vision-     [65] Peter Tong, Ellis Brown, Penghao Wu, Sanghyun Woo,
+     language models. arXiv preprint arXiv:2503.17349, 2025.             Adithya Jairam Vedagiri IYER, Sai Charitha Akula,
+     2                                                                   Shusheng Yang, Jihan Yang, Manoj Middepogu, Ziteng
+                                                                         Wang, et al. Cambrian-1: A fully open, vision-centric ex-
+[53] Jihao Qiu, Yuan Zhang, Xi Tang, Lingxi Xie, Tianren Ma,
+                                                                         ploration of multimodal llms. Advances in Neural Informa-
+     Pengyu Yan, David Doermann, Qixiang Ye, and Yunjie
+                                                                         tion Processing Systems, 37:87310–87356, 2024. 3
+     Tian. Artemis: Towards referential understanding in com-
+                                                                    [66] Shengbang Tong, Zhuang Liu, Yuexiang Zhai, Yi Ma, Yann
+     plex videos. Advances in Neural Information Processing
+                                                                         LeCun, and Saining Xie. Eyes wide shut? exploring the
+     Systems, 37:114321–114347, 2024. 5
+                                                                         visual shortcomings of multimodal llms. In Proceedings of
+[54] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya
+                                                                         the IEEE/CVF Conference on Computer Vision and Pattern
+     Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry,
+                                                                         Recognition, pages 9568–9578, 2024. 1
+     Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-
+                                                                    [67] Han Wang, Yongjie Ye, Yanjie Wang, Yuxiang Nie, and
+     ing transferable visual models from natural language super-
+                                                                         Can Huang. Elysium: Exploring object-level perception
+     vision. In International conference on machine learning,
+                                                                         in videos via mllm. In European Conference on Computer
+     pages 8748–8763. PMLR, 2021. 2
+                                                                         Vision, pages 166–185. Springer, 2024. 5
+[55] Hanoona Rasheed, Muhammad Maaz, Sahal Shaji, Abdel-            [68] Haochen Wang, Anlin Zheng, Yucheng Zhao, Tiancai
+     rahman Shaker, Salman Khan, Hisham Cholakkal, Rao M                 Wang, Zheng Ge, Xiangyu Zhang, and Zhaoxiang Zhang.
+     Anwer, Eric Xing, Ming-Hsuan Yang, and Fahad S Khan.                Reconstructive visual instruction tuning. arXiv preprint
+     Glamm: Pixel grounding large multimodal model. In                   arXiv:2410.09575, 2024. 3
+     CVPR, pages 13009–13018, 2024. 3                               [69] Hao Wang, Limeng Qiao, Zequn Jie, Zhijian Huang,
+[56] Royi Rassin, Eran Hirsch, Daniel Glickman, Shauli Ravfo-            Chengjian Feng, Qingfang Zheng, Lin Ma, Xiangyuan Lan,
+     gel, Yoav Goldberg, and Gal Chechik. Linguistic binding             and Xiaodan Liang. X-sam: From segment anything to any
+     in diffusion models: Enhancing attribute correspondence             segmentation. arXiv preprint arXiv:2508.04655, 2025. 3
+     through attention map alignment. Advances in Neural In-        [70] Weiyun Wang, Zhangwei Gao, Lixin Gu, Hengjun Pu,
+     formation Processing Systems, 36:3536–3559, 2023. 2                 Long Cui, Xingguang Wei, Zhaoyang Liu, Linglin Jing,
+[57] Xiaoqian Shen, Yunyang Xiong, Changsheng Zhao,                      Shenglong Ye, Jie Shao, et al. Internvl3.5: Advancing open-
+     Lemeng Wu, Jun Chen, Chenchen Zhu, Zechun Liu, Fanyi                source multimodal models in versatility, reasoning, and ef-
+     Xiao, Balakrishnan Varadarajan, Florian Bordes, Zhuang              ficiency. arXiv preprint arXiv:2508.18265, 2025. 1
+     Liu, Hu Xu, Hyunwoo J. Kim, Bilge Soran, Raghuraman            [71] Yufei Wang, Wanjun Zhong, Liangyou Li, Fei Mi, Xing-
+     Krishnamoorthi, Mohamed Elhoseiny, and Vikas Chandra.               shan Zeng, Wenyong Huang, Lifeng Shang, Xin Jiang, and
+     Longvu: Spatiotemporal adaptive compression for long                Qun Liu. Aligning large language models with human: A
+     video-language understanding. arXiv:2410.17434, 2024. 5             survey. arXiv preprint arXiv:2307.12966, 2023. 3
+[58] Boyuan Sun, Modi Jin, Bowen Yin, and Qibin Hou.                [72] Yuxuan Wang, Cihang Xie, Yang Liu, and Zilong Zheng.
+     Depth anything at any condition.            arXiv preprint          Videollamb: Long video understanding with recurrent
+     arXiv:2507.01634, 2025. 3                                           memory bridges. arxiv, 2024. 3
+[59] Boyuan Sun, Jiaxing Zhao, Xihan Wei, and Qibin Hou.            [73] Diankun Wu, Fangfu Liu, Yi-Hsin Hung, and Yueqi Duan.
+     Llava-scissor: Token compression with semantic con-                 Spatial-mllm: Boosting mllm capabilities in visual-based
+     nected components for video llms.           arXiv preprint          spatial intelligence. arXiv preprint arXiv:2505.23747,
+     arXiv:2506.21862, 2025. 3                                           2025. 3
+[60] Yunlong Tang, Jing Bi, Siting Xu, Luchuan Song, Susan          [74] Jin Xu, Zhifang Guo, Jinzheng He, Hangrui Hu, Ting He,
+     Liang, Teng Wang, Daoan Zhang, Jie An, Jingyang Lin,                Shuai Bai, Keqin Chen, Jialin Wang, Yang Fan, Kai Dang,
+     et al. Qwen2. 5-omni technical report. arXiv preprint        [85] Haoxuan You, Haotian Zhang, Zhe Gan, Xianzhi Du,
+     arXiv:2503.20215, 2025. 5                                         Bowen Zhang, Zirui Wang, Liangliang Cao, Shih-Fu
+[75] Jin Xu, Zhifang Guo, Hangrui Hu, Yunfei Chu, Xiong                Chang, and Yinfei Yang. Ferret: Refer and ground
+     Wang, Jinzheng He, Yuxuan Wang, Xian Shi, Ting He,                anything anywhere at any granularity. arXiv preprint
+     Xinfa Zhu, et al. Qwen3-omni technical report. arXiv              arXiv:2310.07704, 2023. 1, 3, 5
+     preprint arXiv:2509.17765, 2025. 1                           [86] En Yu, Liang Zhao, Yana Wei, Jinrong Yang, Dongming
+[76] Shiyu Xuan, Qingpei Guo, Ming Yang, and Shiliang Zhang.           Wu, Lingyu Kong, Haoran Wei, Tiancai Wang, Zheng Ge,
+     Pink: Unveiling the power of referential comprehension for        Xiangyu Zhang, et al. Merlin: Empowering multimodal
+     multi-modal llms. In CVPR, pages 13838–13848, 2024. 3             llms with foresight minds. In ECCV, pages 425–443.
+[77] An Yan, Zhengyuan Yang, Junda Wu, Wanrong Zhu, Jian-              Springer, 2025. 3
+     wei Yang, Linjie Li, Kevin Lin, Jianfeng Wang, Julian        [87] Zhou Yu, Dejing Xu, Jun Yu, Ting Yu, Zhou Zhao, Yueting
+     McAuley, Jianfeng Gao, et al. List items one by one:              Zhuang, and Dacheng Tao. Activitynet-qa: A dataset for
+     A new data source and learning paradigm for multimodal            understanding complex web videos via question answering.
+     llms. arXiv preprint arXiv:2404.16375, 2024. 3                    In AAAI, pages 9127–9134, 2019. 5, 6
+                                                                  [88] Yuqian Yuan, Wentong Li, Jian Liu, Dongqi Tang, Xinjie
+[78] An Yang, Baosong Yang, Binyuan Hui, Bo Zheng, Bowen
+                                                                       Luo, Chi Qin, Lei Zhang, and Jianke Zhu. Osprey: Pixel
+     Yu, Chang Zhou, Chengpeng Li, Chengyuan Li, Dayiheng
+                                                                       understanding with visual instruction tuning. In Proceed-
+     Liu, Fei Huang, Guanting Dong, Haoran Wei, Huan Lin,
+                                                                       ings of the IEEE/CVF Conference on Computer Vision and
+     Jialong Tang, Jialin Wang, Jian Yang, Jianhong Tu, Jian-
+                                                                       Pattern Recognition, pages 28202–28211, 2024. 3, 5
+     wei Zhang, Jianxin Ma, Jin Xu, Jingren Zhou, Jinze Bai,
+                                                                  [89] Yuqian Yuan, Hang Zhang, Wentong Li, Zesen Cheng, Bo-
+     Jinzheng He, Junyang Lin, Kai Dang, Keming Lu, Keqin
+                                                                       qiang Zhang, Long Li, Xin Li, Deli Zhao, Wenqiao Zhang,
+     Chen, Kexin Yang, Mei Li, Mingfeng Xue, Na Ni, Pei
+                                                                       Yueting Zhuang, et al. Videorefer suite: Advancing spatial-
+     Zhang, Peng Wang, Ru Peng, Rui Men, Ruize Gao, Runji
+                                                                       temporal object understanding with video llm. In Proceed-
+     Lin, Shijie Wang, Shuai Bai, Sinan Tan, Tianhang Zhu,
+                                                                       ings of the Computer Vision and Pattern Recognition Con-
+     Tianhao Li, Tianyu Liu, Wenbin Ge, Xiaodong Deng, Xi-
+                                                                       ference, pages 18970–18980, 2025. 1, 2, 3, 5, 6
+     aohuan Zhou, Xingzhang Ren, Xinyu Zhang, Xipin Wei,
+     Xuancheng Ren, Yang Fan, Yang Yao, Yichang Zhang, Yu         [90] Yuqian Yuan, Wenqiao Zhang, Xin Li, Shihao Wang, Kehan
+     Wan, Yunfei Chu, Yuqiong Liu, Zeyu Cui, Zhenru Zhang,             Li, Wentong Li, Jun Xiao, Lei Zhang, and Beng Chin Ooi.
+     and Zhihao Fan. Qwen2 technical report. arXiv preprint            Pixelrefer: A unified framework for spatio-temporal object
+     arXiv:2407.10671, 2024. 1                                         referring with arbitrary granularity. arXiv, 2025. 1
+                                                                  [91] Tongtian Yue, Jie Cheng, Longteng Guo, Xingyuan Dai,
+[79] An Yang, Anfeng Li, Baosong Yang, Beichen Zhang,
+                                                                       Zijia Zhao, Xingjian He, Gang Xiong, Yisheng Lv, and
+     Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen
+                                                                       Jing Liu. Sc-tune: Unleashing self-consistent referential
+     Huang, Chenxu Lv, et al. Qwen3 technical report. arXiv
+                                                                       comprehension in large vision language models. In CVPR,
+     preprint arXiv:2505.09388, 2025. 1
+                                                                       pages 13073–13083, 2024. 3
+[80] Jianwei Yang, Hao Zhang, Feng Li, Xueyan Zou, Chunyuan
+                                                                  [92] Mert Yuksekgonul, Federico Bianchi, Pratyusha Kalluri,
+     Li, and Jianfeng Gao. Set-of-mark prompting unleashes
+                                                                       Dan Jurafsky, and James Zou. When and why vision-
+     extraordinary visual grounding in gpt-4v. arXiv preprint
+                                                                       language models behave like bags-of-words, and what to
+     arXiv:2310.11441, 2023. 3
+                                                                       do about it? arXiv preprint arXiv:2210.01936, 2022. 1
+[81] Qize Yang, Shimin Yao, Weixuan Chen, Shenghao Fu, De-        [93] Quan-Sheng Zeng, Yunheng Li, Qilong Wang, Peng-Tao
+     tao Bai, Jiaxing Zhao, Boyuan Sun, Bowen Yin, Xihan               Jiang, Zuxuan Wu, Ming-Ming Cheng, and Qibin Hou.
+     Wei, and Jingren Zhou. Humanomniv2: From understand-              A glimpse to compress: Dynamic visual token prun-
+     ing to omni-modal reasoning with context. arXiv preprint          ing for large vision-language models. arXiv preprint
+     arXiv:2506.21277, 2025. 2                                         arXiv:2508.01548, 2025. 2
+[82] Zhao Yang, Jiaqi Wang, Yansong Tang, Kai Chen, Heng-         [94] Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and
+     shuang Zhao, and Philip HS Torr. Lavt: Language-aware             Lucas Beyer. Sigmoid loss for language image pre-training.
+     vision transformer for referring image segmentation. In           In Proceedings of the IEEE/CVF International Conference
+     Proceedings of the IEEE/CVF conference on computer vi-            on Computer Vision, pages 11975–11986, 2023. 4
+     sion and pattern recognition, pages 18155–18165, 2022. 2     [95] Yufei Zhan, Yousong Zhu, Hongyin Zhao, Fan Yang, Ming
+[83] Lewei Yao, Runhui Huang, Lu Hou, Guansong Lu, Minzhe              Tang, and Jinqiao Wang. Griffon v2: Advancing multi-
+     Niu, Hang Xu, Xiaodan Liang, Zhenguo Li, Xin Jiang, and           modal perception with high-resolution scaling and visual-
+     Chunjing Xu. Filip: Fine-grained interactive language-            language co-referring. arXiv preprint arXiv:2403.09333,
+     image pre-training. arXiv preprint arXiv:2111.07783,              2024. 3
+     2021. 2                                                      [96] Boqiang Zhang, Kehan Li, Zesen Cheng, Zhiqiang Hu,
+[84] Heeji Yoon, Jaewoo Jung, Junwan Kim, Hyungyu Choi,                Yuqian Yuan, Guanzheng Chen, Sicong Leng, Yuming
+     Heeseong Shin, Sangbeom Lim, Honggyu An, Chaehyun                 Jiang, Hang Zhang, Xin Li, Peng Jin, Wenqi Zhang, Fan
+     Kim, Jisang Han, Donghyun Kim, et al. Visual repre-               Wang, Lidong Bing, and Deli Zhao. Videollama 3: Frontier
+     sentation alignment for multimodal large language models.         multimodal foundation models for image and video under-
+     arXiv preprint arXiv:2509.07979, 2025. 3                          standing. arXiv preprint arXiv:2501.13106, 2025. 3
+ [97] Hang Zhang, Xin Li, and Lidong Bing. Video-llama: An                Liefeng Bo, et al. Humanomni: A large vision-speech lan-
+      instruction-tuned audio-visual language model for video             guage model for human-centric video understanding. arXiv
+      understanding. arXiv preprint arXiv:2306.02858, 2023. 3             preprint arXiv:2501.15111, 2025. 1
+ [98] Haotian Zhang, Haoxuan You, Philipp Dufter, Bowen             [110] Liang Zhao, En Yu, Zheng Ge, Jinrong Yang, Haoran Wei,
+      Zhang, Chen Chen, Hong-You Chen, Tsu-Jui Fu,                        Hongyu Zhou, Jianjian Sun, Yuang Peng, Runpei Dong,
+      William Yang Wang, Shih-Fu Chang, Zhe Gan, et al. Ferret-           Chunrui Han, et al. Chatspot: Bootstrapping multimodal
+      v2: An improved baseline for referring and grounding with           llms via precise referring instruction tuning. arXiv preprint
+      large language models. arXiv preprint arXiv:2404.07973,             arXiv:2307.09474, 2023. 3
+      2024. 3                                                       [111] Xiangyu Zhao, Xiangtai Li, Haodong Duan, Haian Huang,
+ [99] Junyi Zhang, Charles Herrmann, Junhwa Hur, Luisa Pola-              Yining Li, Kai Chen, and Hua Yang. Mg-llava: Towards
+      nia Cabrera, Varun Jampani, Deqing Sun, and Ming-Hsuan              multi-granularity visual instruction tuning. arXiv preprint
+      Yang. A tale of two features: Stable diffusion complements          arXiv:2406.17770, 2024. 3
+      dino for zero-shot semantic correspondence. Advances in       [112] Jinguo Zhu, Weiyun Wang, Zhe Chen, Zhaoyang Liu, Shen-
+      Neural Information Processing Systems, 36:45533–45547,              glong Ye, Lixin Gu, Hao Tian, Yuchen Duan, Weijie Su,
+      2023. 3                                                             Jie Shao, et al. Internvl3: Exploring advanced training and
+[100] Peiyuan Zhang, Kaichen Zhang, Bo Li, Guangtao Zeng,                 test-time recipes for open-source multimodal models. arXiv
+      Jingkang Yang, Yuanhan Zhang, Ziyue Wang, Haoran Tan,               preprint arXiv:2504.10479, 2025. 1
+      Chunyuan Li, and Ziwei Liu. Long context transfer from
+      language to vision. arXiv preprint arXiv:2406.16852, 2024.
+      3, 5
+[101] Shilong Zhang, Peize Sun, Shoufa Chen, Min Xiao,
+      Wenqi Shao, Wenwei Zhang, Yu Liu, Kai Chen, and Ping
+      Luo. Gpt4roi: Instruction tuning large language model on
+      region-of-interest. In European conference on computer vi-
+      sion, pages 52–70. Springer, 2024. 1, 3
+[102] Tao Zhang, Xiangtai Li, Hao Fei, Haobo Yuan, Shengqiong
+      Wu, Shunping Ji, Chen Change Loy, and Shuicheng Yan.
+      Omg-llava: Bridging image-level, object-level, pixel-level
+      reasoning and understanding. Advances in neural informa-
+      tion processing systems, 37:71737–71767, 2024. 3
+[103] Tao Zhang, Xiangtai Li, Zilong Huang, Yanwei Li, Weixian
+      Lei, Xueqing Deng, Shihao Chen, Shunping Ji, and Jiashi
+      Feng. Pixel-sail: Single transformer for pixel-grounded un-
+      derstanding. arXiv preprint arXiv:2504.10465, 2025. 1,
+      3
+[104] Yuanhan Zhang, Bo Li, haotian Liu, Yong jae Lee, Liangke
+      Gui, Di Fu, Jiashi Feng, Ziwei Liu, and Chunyuan Li.
+      Llava-next: A strong zero-shot video understanding model,
+      2024. 5
+[105] Yuanhan Zhang, Jinming Wu, Wei Li, Bo Li, Zejun
+      Ma, Ziwei Liu, and Chunyuan Li. Llava-video: Video
+      instruction tuning with synthetic data. arXiv preprint
+      arXiv:2410.02713, 2024. 1, 5
+[106] Zhi Zhang, Srishti Yadav, Fengze Han, and Ekaterina
+      Shutova. Cross-modal information flow in multimodal large
+      language models. In Proceedings of the Computer Vision
+      and Pattern Recognition Conference, pages 19781–19791,
+      2025. 3
+[107] Jiaxing Zhao, Boyuan Sun, Xiang Chen, and Xihan Wei.
+      Facial dynamics in video: Instruction tuning for improved
+      facial expression perception and contextual awareness.
+      arXiv preprint arXiv:2501.07978, 2025. 3
+[108] Jiaxing Zhao, Boyuan Sun, Xiang Chen, Xihan Wei, and
+      Qibin Hou. Llava-octopus: Unlocking instruction-driven
+      adaptive projector fusion for video understanding. arXiv
+      preprint arXiv:2501.05067, 2025. 5
+[109] Jiaxing Zhao, Qize Yang, Yixing Peng, Detao Bai, Shimin
+      Yao, Boyuan Sun, Xiang Chen, Shenghao Fu, Xihan Wei,
+                                             Table 7. GamePoint@K comparison.
+ Method             GamePoint@K-1 GamePoint@K-5 GamePoint@K-10 GamePoint@K-50 GamePoint@K-100
+ Qwen2.5-VL-7B            0.330               0.328              0.331                0.330                   0.329
+ SWIM                     0.373               0.375              0.374                0.373                   0.374
+
+Appendix                                                       tions. Higher GamePoint@K scores indicate that relevant
+                                                               visual targets are ranked closer to the top, reflecting better
+A. Benchmarks                                                  alignment between textual references and visual regions.
+For completeness, we provide detailed descriptions of the         As shown in Table 7, SWIM consistently outperforms
+general benchmarks used in the main paper.                     Qwen2.5-VL across all K values. At K = 1, SWIM
+   ActivityNet-QA [3] is a large-scale video question          achieves 0.373 compared to 0.330 for Qwen2.5-VL, indi-
+answering benchmark constructed from the ActivityNet           cating stronger ability to position the correct target at the
+dataset. It contains human-annotated question–answer pairs     top rank. This advantage is maintained at broader retrieval
+focusing on action-related content, with an average video      depths, with SWIM reaching 0.375 at K = 5 (+4.7% over
+duration of about 2 minutes. The questions are designed        baseline) and retaining stable gains for K = 10, K = 50,
+to require understanding of dynamic scenes and temporal        and K = 100. The consistent margins across different K
+sequences rather than static visual cues.                      suggest that SWIM produces reliable ranking distributions,
+   VideoMME [20] collects videos from a wide range             keeping relevant objects prominent even as the retrieval list
+of domains, including sports, documentaries, instructional     expands.
+content, and entertainment. Video durations vary from min-     B.2. Robustness to Synonym-based Linguistic Noise
+utes to hours, making it one of the most comprehensive and
+challenging benchmarks for holistic video understanding.       To assess the robustness of SWIM to variations in refer-
+The diversity in topic, style, and duration tests a model’s    ring expressions, we conduct an evaluation in which words
+ability to handle long-context reasoning and adapt to varied   enclosed in <ins> tags within the VideoRefer-Bench-D
+visual–text scenarios.                                         prompts are replaced by semantically equivalent synonyms.
+   MVBench [35] is a multi-choice video understand-            This modification leaves the overall meaning unchanged
+ing benchmark comprising 20 distinct tasks. Each task          but alters the surface form of the text, introducing lexi-
+presents a multiple-choice question targeting temporal com-    cal noise that may challenge models relying on exact to-
+prehension, covering scenarios such as event ordering,         ken matches. Such a setting reflects real-world scenar-
+cause–effect reasoning, motion tracking, and activity pre-     ios where object references may vary due to differences in
+diction. These tasks require sophisticated temporal reason-    speaker style, domain-specific terminology, or translation
+ing and understanding of dynamic content that cannot be        artifacts, and tests whether a model can preserve ground-
+solved by analyzing a single frame, thereby evaluating a       ing accuracy under these conditions. As shown in Ta-
+model’s capability to integrate information across time.       ble 8, the original SWIM achieves an average score of
+   Together, these benchmarks provide a diverse evalua-        3.78, while SWIM∗ obtains 3.74 under synonym perturba-
+tion landscape: ActivityNet-QA and VideoMME empha-             tions—a marginal drop of 0.04. Compared to Qwen2.5-
+size broad video understanding with varying domain cover-      VL, SWIM maintains strong performance under synonym
+age and length, whereas MVBench focuses on fine-grained        substitutions, achieving an average accuracy of 3.74 against
+temporal reasoning across multiple types of challenges.        3.43. These results indicate that SWIM’s alignment mech-
+                                                               anism is resilient to changes in word choice, preserving its
+B. More Experimental Analysis                                  ability to ground natural language object references to the
+                                                               correct visual regions even under lexical variation.
+B.1. GamePoint@K
+                                                               Table 8. Performance comparisons on VideoRefer-Bench-D. ∗ de-
+We further evaluate retrieval accuracy using Game-             notes incorporating synonym-based noise.
+Point@K, which measures the fraction of relevant elements
+among the top-K highest-scoring positions in the attention                                        VideoRefer-Bench-D
+map:                                                             Method                  SC     AD     TD      HD     Avg.
+                          N                                      Qwen2.5-VL-7B [2]      3.99   3.05    2.44   2.44    2.97
+                       1  X |TopK(Āi , K) ∩ Pi |
+   GamePoint@K =                                  ,      (9)     Qwen2.5-VL-7B∗ [2]     4.78   3.49    3.27   2.18    3.43
+                       N i=1 |TopK(Āi , K)|
+                                                                 SWIM                   4.92   3.85    3.43   2.96    3.78
+where TopK(Āi , K) selects the K highest-scoring ele-           SWIM∗                  4.86   3.78    3.36   2.96    3.74
+ments for sample i, and Pi denotes its ground-truth posi-
+

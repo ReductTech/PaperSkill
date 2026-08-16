@@ -1,0 +1,495 @@
+/* Cosmos 3 paper-specific presentation layer. Semantic roles stay fixed. */
+:root {
+  --ui-bg-page: #f5f8f0;
+  --ui-bg-page-top: #f9fbf6;
+  --ui-accent: #27446e;
+  --ui-success: #228d5c;
+  --ui-danger: #c43f52;
+  --ui-accent-alt: #d97706;
+  --ui-warning: #d97706;
+  --paper-scene-bg: #f5f8f0;
+  --paper-env-light: #b8c9a7;
+  --paper-env-dark: #76906a;
+  --paper-route: #92400e;
+  --paper-control: #d97706;
+  --paper-aux: #7c3aed;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(184, 201, 167, 0.34), transparent 28%),
+    linear-gradient(180deg, #f9fbf6 0%, #f5f8f0 100%);
+}
+
+/* The glossary is a preface chapter, so visible numbering starts at §0. */
+main {
+  counter-reset: paper-chapter -1 next-chapter 0;
+}
+
+main .chap {
+  counter-increment: paper-chapter next-chapter;
+}
+
+main .chap-title .num {
+  font-size: 0;
+}
+
+main .chap-title .num::after {
+  content: "§" counter(paper-chapter) ".";
+  font-size: 26px;
+}
+
+.flow-mini {
+  counter-reset: paper-step -1;
+}
+
+.flow-step {
+  counter-increment: paper-step;
+  font-size: 0;
+}
+
+.flow-step::after {
+  content: "§" counter(paper-step);
+  font-size: 14px;
+}
+
+.chap-loader-btn {
+  font-size: 0;
+}
+
+.hero .chap-loader-btn::before {
+  content: "进入第 0 章";
+  font-size: 17px;
+}
+
+main .chap .chap-loader-btn::before {
+  content: "继续学习 §" counter(next-chapter);
+  font-size: 17px;
+}
+
+.hero-venue::before {
+  content: "●";
+  margin-right: 7px;
+  color: #228d5c;
+}
+
+.hero-venue::after {
+  content: " · 4 分钟演示";
+  color: #27446e;
+  font-weight: 800;
+}
+
+.hero h1 {
+  max-width: 790px;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: clamp(36px, 5.5vw, 54px);
+}
+
+.paper-widget-shell {
+  padding: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8f0 100%);
+  border: 1px solid #d7deea;
+  border-radius: 14px;
+}
+
+.paper-widget-shell canvas {
+  width: 100%;
+  height: auto;
+  background: #f5f8f0;
+}
+
+.paper-glossary-groups {
+  margin-top: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d7deea;
+}
+
+.paper-glossary-terms {
+  min-height: 46px;
+}
+
+.paper-glossary-terms .paper-chip {
+  min-height: 36px;
+  padding: 5px 11px;
+  font-size: 13px;
+}
+
+.paper-backup-gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fafbfd;
+}
+
+.paper-backup-gate .feedback {
+  flex: 1;
+  margin: 0;
+}
+
+.paper-backup-toggle {
+  flex: 0 0 auto;
+}
+
+.paper-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.paper-control-row.paper-subcontrols {
+  margin-top: -4px;
+}
+
+.paper-chip,
+.paper-action {
+  min-height: 40px;
+  padding: 7px 14px;
+  border: 1px solid #9fb0c8;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #21324a;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.paper-chip:hover:not(:disabled) {
+  border-color: #27446e;
+  background: #eef3fb;
+}
+
+.paper-chip[aria-pressed="true"] {
+  border-color: #27446e;
+  background: #27446e;
+  color: #ffffff;
+  box-shadow: 0 5px 16px rgba(39, 68, 110, 0.18);
+}
+
+.paper-action {
+  border-color: #d97706;
+  background: #d97706;
+  color: #ffffff;
+}
+
+.paper-action:hover:not(:disabled) {
+  background: #b85f04;
+}
+
+.paper-chip:disabled,
+.paper-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.paper-step-count {
+  min-width: 60px;
+  color: #68778f;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.paper-range {
+  max-width: 620px;
+  margin: 14px auto;
+}
+
+.paper-range label {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.paper-range input[type="range"] {
+  width: 100%;
+  accent-color: #d97706;
+}
+
+.paper-range small {
+  display: block;
+  color: #68778f;
+  font-size: 12px;
+  text-align: right;
+}
+
+.paper-boundary-note {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #68778f;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.paper-boundary-note b {
+  color: #92400e;
+}
+
+.figure {
+  margin: 16px auto;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.figure img {
+  max-height: 560px;
+  object-fit: contain;
+}
+
+/* Academic content hierarchy: research question first, intuition note second. */
+.chap-bridge {
+  background: #f7f9fc;
+  border-color: #cdd7e5;
+  box-shadow: none;
+}
+
+.chap-bridge::before {
+  background: #27446e;
+}
+
+.cb-icon {
+  width: 46px;
+  background: #eef3f9;
+  color: #27446e;
+  font-size: 20px;
+}
+
+.cb-title {
+  color: #27446e;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+.cb-text,
+.module-desc {
+  color: #32445f;
+}
+
+.module-desc {
+  font-size: 16.5px;
+  line-height: 1.76;
+}
+
+.chap-title .badge-tag {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The first module is the live demo; a consecutive second module is Q&A evidence. */
+.analogy-card + .module .module-head::after,
+.module + .module .module-head::after {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.analogy-card + .module .module-head::after {
+  content: "核心内容";
+  background: #eaf7ef;
+  color: #228d5c;
+}
+
+.module + .module {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.module + .module .module-head {
+  background: #fafbfd;
+}
+
+.module + .module .module-head::after {
+  content: "扩展材料";
+  background: #eef3f9;
+  color: #68778f;
+}
+
+.analogy-card {
+  min-height: 0;
+  margin: 8px 0 22px;
+  background: #fafbfd;
+  border-color: #d7deea;
+  box-shadow: none;
+}
+
+/* Chapter 0 is a compact glossary without analogy or recap blocks. */
+#chap-0 > .analogy-card,
+#chap-0 > .embed-takeaway {
+  display: none;
+}
+
+.analogy-visual {
+  display: none;
+}
+
+.analogy-visual canvas {
+  width: 150px;
+  height: auto;
+  filter: saturate(.72);
+}
+
+.analogy-body {
+  padding: 12px 16px;
+}
+
+.analogy-title {
+  margin-bottom: 5px;
+  color: #68778f;
+  font-size: 13px;
+  letter-spacing: .02em;
+}
+
+.analogy-title::before {
+  width: 5px;
+  height: 5px;
+  background: #9fb0c8;
+}
+
+.analogy-text {
+  color: #52637b;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.feedback {
+  color: #44566f;
+  font-style: normal;
+  line-height: 1.65;
+}
+
+.insight-bar::before {
+  content: "";
+}
+
+.chap-loader-hint {
+  display: none;
+}
+
+/* Paper equations use HTML sub/sup so they remain self-contained and reliable. */
+.formula-explain {
+  margin: 18px 0;
+  padding: 20px 22px;
+  background: #ffffff;
+  border: 1px solid #cdd7e5;
+  border-left: 5px solid #27446e;
+  box-shadow: 0 8px 24px rgba(33, 50, 74, .06);
+  text-align: left;
+}
+
+.fe-hint {
+  position: static;
+  display: block;
+  margin: 0 0 8px;
+  color: #68778f;
+  font-size: 12px;
+  text-align: right;
+}
+
+.fe-lead {
+  color: #32445f;
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+.eq-ref {
+  display: inline-block;
+  margin-right: 7px;
+  padding: 2px 8px;
+  background: #eef3f9;
+  border: 1px solid #d7deea;
+  border-radius: 999px;
+  color: #27446e;
+  font-size: 12px;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+
+.fe-formula {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 13px 0;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: #fbfcfe;
+  border: 1px solid #d7deea;
+  color: #172a45;
+  font-family: "Cambria Math", "STIX Two Math", Georgia, serif;
+  font-size: clamp(19px, 2.2vw, 24px);
+  font-weight: 500;
+  line-height: 1.65;
+  text-align: left;
+  -webkit-overflow-scrolling: touch;
+}
+
+.eq-line {
+  display: block;
+  min-width: max-content;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.eq-line + .eq-line {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid #e8edf4;
+}
+
+.fe-formula sub {
+  font-size: .67em;
+  vertical-align: -.35em;
+}
+
+.fe-formula sup {
+  font-size: .67em;
+  vertical-align: .55em;
+}
+
+.fe-explain {
+  margin: 8px 0 0;
+  box-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .paper-widget-shell { padding: 7px; }
+  .paper-backup-gate { align-items: stretch; flex-direction: column; }
+  .paper-chip, .paper-action {
+    min-height: 38px;
+    padding: 6px 11px;
+    font-size: 13px;
+  }
+  .paper-control-row { gap: 6px; }
+  .paper-range small { text-align: left; }
+  .analogy-card { display: block; }
+  .analogy-visual { display: none; }
+  .analogy-body { padding: 11px 13px; }
+  .formula-explain { padding: 14px 12px; }
+  .fe-formula {
+    padding: 12px;
+    font-size: 17px;
+  }
+  .fe-hint { text-align: left; }
+  main .chap-title .num::after { font-size: 22px; }
+  .flow-step::after { font-size: 13px; }
+  .hero .chap-loader-btn::before,
+  main .chap .chap-loader-btn::before { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper-widget-shell *,
+  .paper-widget-shell canvas {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

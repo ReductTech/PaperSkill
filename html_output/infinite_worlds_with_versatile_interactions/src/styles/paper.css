@@ -1,0 +1,51 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Semantic color roles from tokens.css stay stable:
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only the knitting scene colors are
+   appended here. tokens.css / components.css are untouched. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-env-light: #b8c9a7;
+  --paper-env-dark: #76906a;
+  --paper-support: #92400e;
+  --paper-inset-line: #d7deea;
+  --paper-canvas-ink: #21324a;
+  --paper-canvas-muted: #68778f;
+}
+
+/* ---- Layout: reclaim the side gutters -------------------------------------
+   The bundled shell caps `main` at 1120px while every module canvas is drawn
+   at a fixed intrinsic width, so each module left a wide empty margin and the
+   in-canvas labels (mask cells, six-D readouts) rendered smaller than they
+   needed to. Widening the column and letting the canvas scale up to the module
+   width fixes both at once: same drawing code, more pixels on screen.
+   Only spacing changes here — typography, radii, borders and the component
+   hierarchy from components.css are untouched. */
+
+main {
+  max-width: 1360px;
+}
+
+section.hero {
+  max-width: 1400px;
+}
+
+/* Module canvases size themselves via setupCrispCanvas (backing store matches
+   the rendered width, so text stays sharp). No CSS stretch needed here. */
+
+/* Side-by-side comparison panels keep their own sizing. */
+.compare-row canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* The 244x130 analogy card art stays at its intrinsic size. */
+.analogy-visual canvas {
+  width: 244px !important;
+  height: 130px !important;
+}
+
+@media (max-width: 1400px) {
+  main { max-width: 100%; }
+}
