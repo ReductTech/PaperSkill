@@ -1,0 +1,23 @@
+import React from 'react';
+import * as G from './gceWidgets';
+import * as S from './supportScenes';
+import * as A from './advancedScenes';
+import * as V from './advancedScenesV2';
+export interface WidgetProps { chapterId:string; moduleId:string; }
+export const widgetRegistry:Record<string,React.FC<WidgetProps>>={};
+widgetRegistry['hero-modeling']=G.HeroModeling;
+widgetRegistry['hero-constituting']=G.HeroConstituting;
+widgetRegistry['road-analogy']=S.CoDrivingLoop;
+widgetRegistry['system-modes']=S.ToolBoundaryLab;
+widgetRegistry['manifold-explorer']=G.ManifoldExplorer;
+widgetRegistry['nbir-domains']=G.NbirDomains;
+widgetRegistry['foundation-steps']=V.FunctionalBoundarySceneV2;
+widgetRegistry['adaptation-decouple']=V.MutualAdaptationSceneV2;
+widgetRegistry['equivalence-gates']=G.EquivalenceGates;
+widgetRegistry['novel-input']=G.NovelInput;
+widgetRegistry['causal-intervention']=G.CausalIntervention;
+widgetRegistry['externalization-ratio']=G.ExternalizationRatio;
+widgetRegistry['integration-levels']=G.IntegrationLevels;
+widgetRegistry['challenge-cards']=V.EvidenceBoundarySceneV2;
+widgetRegistry['prediction-threshold']=G.PredictionThreshold;
+widgetRegistry['falsify-gce']=G.FalsifyGce;

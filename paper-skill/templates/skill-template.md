@@ -335,7 +335,7 @@ global CSS.
    purple=auxiliary).
 6. **Problem first**: every interaction module first exposes the old method's limit, then
    introduces this paper's fix; intuition before formula.
-7. **Interaction density**: at least 10 active modules (≥1 per chapter, a second where it
+7. **Interaction density**: at least 4 active modules (a second where it
    sharpens contrast); at least 6 distinct patterns (P1–P8); P1 slider chapters ≤ 4; at least 4
    math/technical or hybrid modules, at least 4 life-metaphor or hybrid modules.
 8. **Architecture must be interactive**: any non-trivial network/structure must be taught through
