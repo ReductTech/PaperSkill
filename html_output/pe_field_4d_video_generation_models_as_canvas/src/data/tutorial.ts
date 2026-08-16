@@ -154,7 +154,7 @@ export const tutorial: TutorialData = {
           title: "总体评估",
           desc: "",
           componentId: "metric-race",
-          figure: "/images/pe-field-comparison.png",
+          figure: "./images/pe-field-comparison.png",
         },
         {
           kind: "module",
@@ -162,7 +162,7 @@ export const tutorial: TutorialData = {
           title: "消融实验",
           desc: "分别移除深度消歧和时间消歧，在同一DAVIS评测协议下观察几何一致性与相机精度的变化。",
           componentId: "ablation-lab",
-          figure: "/images/pe-field-ablation.png",
+          figure: "./images/pe-field-ablation.png",
         },
       ],
       insight: "",
