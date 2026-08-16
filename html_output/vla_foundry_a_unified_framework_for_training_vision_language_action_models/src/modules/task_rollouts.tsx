@@ -13,20 +13,20 @@ const tasks: Record<TaskKey, {
   place_cup: {
     title: '将杯子放到杯垫旁',
     category: '精细放置',
-    success: '/videos/vla_foundry/place_cup_success.mp4',
-    failure: '/videos/vla_foundry/place_cup_failure.mp4'
+    success: 'videos/vla_foundry/place_cup_success.mp4',
+    failure: 'videos/vla_foundry/place_cup_failure.mp4'
   },
   push_coaster: {
     title: '把杯垫推到桌面中心',
     category: '非抓取推送',
-    success: '/videos/vla_foundry/push_coaster_success.mp4',
-    failure: '/videos/vla_foundry/push_coaster_failure.mp4'
+    success: 'videos/vla_foundry/push_coaster_success.mp4',
+    failure: 'videos/vla_foundry/push_coaster_failure.mp4'
   },
   turn_cup: {
     title: '把杯子翻转',
     category: '姿态变化',
-    success: '/videos/vla_foundry/turn_cup_success.mp4',
-    failure: '/videos/vla_foundry/turn_cup_failure.mp4'
+    success: 'videos/vla_foundry/turn_cup_success.mp4',
+    failure: 'videos/vla_foundry/turn_cup_failure.mp4'
   }
 };
 
