@@ -1,0 +1,373 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-light: #b8c9a7;
+  --paper-scene-dark: #76906a;
+  --paper-route: #92400e;
+}
+
+section.chap { scroll-margin-top: 118px; }
+
+.chapter-nav {
+  position: sticky;
+  top: 8px;
+  z-index: 80;
+  margin: 0 0 18px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: 0 4px 16px rgba(25, 42, 70, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.chapter-nav-inner {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.chapter-nav-step {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 7px;
+  padding: 7px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  scroll-snap-align: center;
+  text-align: left;
+}
+
+.chapter-nav-step.unlocked { border-color: var(--line); }
+.chapter-nav-step.unlocked:hover { border-color: var(--blue); transform: translateY(-1px); }
+.chapter-nav-step.active {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  box-shadow: inset 0 -3px 0 var(--blue);
+  color: var(--blue);
+}
+.chapter-nav-step.locked { background: var(--paper-2); cursor: not-allowed; opacity: 0.42; }
+.chapter-nav-index { flex: 0 0 auto; font-family: Georgia, serif; font-weight: 800; }
+.chapter-nav-copy { display: flex; min-width: 0; flex-direction: column; line-height: 1.2; }
+.chapter-nav-copy strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+.supplementary-modules {
+  margin: 24px 0 20px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-md);
+}
+
+.supplementary-modules > summary {
+  padding: 14px 16px;
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.supplementary-modules > summary:focus-visible {
+  outline: 3px solid rgba(39, 68, 110, 0.4);
+  outline-offset: -3px;
+}
+
+.supplementary-modules[open] > summary { border-bottom: 1px solid var(--line); }
+.supplementary-modules-body { padding: 0 12px 4px; }
+.supplementary-modules-body .module { margin: 14px 0; }
+
+.evidence-note {
+  margin-top: 10px;
+  color: var(--slate-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Clarity pass: keep every content block, but give each one a single visual role. */
+section.chap {
+  margin-top: 36px;
+  padding: clamp(24px, 3vw, 34px);
+  border-color: #dfe5ee;
+  box-shadow: 0 7px 24px rgba(25, 42, 70, 0.055);
+}
+
+.chap-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.chap-bridge {
+  margin: 16px 0 22px;
+  background: #f7f9fc;
+  border: 0;
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--ui-radius-md) var(--ui-radius-md) 0;
+}
+
+.chap-bridge::before { display: none; }
+.chap-bridge .cb-icon { width: 48px; background: transparent; font-size: 22px; }
+.chap-bridge .cb-body { padding: 13px 16px 14px 4px; }
+.chap-bridge .cb-title { margin-bottom: 2px; }
+.chap-bridge .cb-text { max-width: 82ch; }
+
+.analogy-card {
+  margin: 18px 0 26px;
+  background: var(--paper);
+  border-color: var(--line);
+  box-shadow: 0 4px 14px rgba(25, 42, 70, 0.05);
+}
+
+.analogy-visual {
+  background: var(--paper-scene-bg);
+  border-right: 1px solid var(--line);
+}
+
+.analogy-body { padding: 18px 22px; }
+.analogy-title { margin-bottom: 10px; font-size: 17px; }
+
+.module {
+  margin: 22px 0 29px;
+  border-color: #dfe5ee;
+  border-radius: var(--ui-radius-md);
+  box-shadow: none;
+}
+
+section.chap > .module { border-top: 3px solid var(--blue); }
+
+.module-head {
+  padding: 14px 18px;
+  background: #f8fafc;
+}
+
+.module-head h4 { font-size: 19px; }
+.module-body { padding: 19px 22px 23px; }
+.module-desc {
+  max-width: 82ch;
+  margin: 0 auto 16px;
+}
+
+.module-evidence-label {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 4px 9px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-pill);
+  color: var(--slate);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+}
+
+section.chap > .module .module-evidence-label {
+  background: var(--blue-soft);
+  border-color: #cad8e8;
+  color: var(--blue);
+}
+
+.content-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  color: var(--slate-2);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+}
+
+.content-eyebrow::before {
+  width: 20px;
+  height: 2px;
+  flex: 0 0 20px;
+  background: var(--line-2);
+  content: '';
+}
+
+.interactive-eyebrow { color: var(--blue); }
+.interactive-eyebrow::before { background: var(--blue); }
+.figure-eyebrow { margin-inline: 2px; }
+.formula-eyebrow { color: var(--purple); text-align: left; }
+.formula-eyebrow::before { background: var(--purple); }
+
+.module-interactive {
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.module-body .canvas-viewport { margin: 12px auto 10px; }
+
+.paper-figure {
+  width: min(100%, 820px);
+  max-width: 820px;
+  margin: 16px auto 22px;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-md);
+}
+
+.paper-figure img { border: 0; }
+.paper-figure figcaption { padding: 0 6px 2px; }
+.paper-figure + .module-interactive { margin-top: 20px; }
+.module-interactive + .paper-figure { margin-top: 24px; }
+
+.insight-bar {
+  margin: 22px 0 16px;
+  padding: 13px 16px;
+  background: #f4f7fb;
+  border: 1px solid #dce5f0;
+  border-left: 4px solid var(--blue);
+}
+
+.formula-explain {
+  width: min(100%, 820px);
+  margin: 18px auto;
+  padding: 18px 20px 20px;
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+.formula-explain .fe-hint {
+  position: static;
+  margin: 0 0 9px;
+  text-align: left;
+}
+
+.formula-explain .fe-lead {
+  max-width: 82ch;
+  margin: 0 auto 11px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.embed-takeaway {
+  margin-top: 22px;
+  background: linear-gradient(
+    135deg,
+    var(--green-soft) 0%,
+    var(--blue-soft) 50%,
+    var(--orange-soft) 100%
+  );
+}
+
+.embed-takeaway .et-item {
+  align-items: flex-start;
+  padding: 18px;
+  text-align: left;
+}
+
+.embed-takeaway .et-icon { font-size: 23px; }
+.embed-takeaway .et-arrow { width: 20px; background: transparent; color: var(--line-2); }
+
+/* Compact value readout used by the complexity lab. It is deliberately a
+   light information strip rather than another nested card hierarchy. */
+.complexity-readout {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 820px);
+  margin: 10px auto;
+}
+
+.complexity-readout-item {
+  min-width: 0;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-left: 3px solid var(--line-2);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  color: var(--slate);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.complexity-readout-item b,
+.complexity-readout-item strong {
+  display: block;
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.complexity-range-scale {
+  display: flex;
+  flex: 1 0 100%;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 820px);
+  color: var(--slate-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.complexity-range-scale span { min-width: 0; }
+.complexity-range-scale span:last-child { margin-left: auto; text-align: right; }
+
+.complexity-example-note {
+  width: min(100%, 820px);
+  margin: 6px auto 10px;
+  color: var(--slate-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .chapter-nav-inner { display: flex; overflow-x: auto; padding-bottom: 2px; }
+  .chapter-nav-step { flex: 0 0 142px; }
+  .analogy-visual { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+
+@media (max-width: 720px) {
+  section.chap { scroll-margin-top: 102px; }
+  section.chap { margin-top: 28px; padding: 20px 16px; }
+  .chapter-nav { top: 4px; margin-inline: 2px; }
+  .chapter-nav-step { flex-basis: 126px; }
+  .supplementary-modules-body { padding-inline: 8px; }
+  .module-head { padding: 13px 14px; }
+  .module-head h4 { min-width: min(180px, 100%); }
+  .module-evidence-label { margin-left: 0; }
+  .module-body { padding: 17px 14px 20px; }
+  .analogy-body { padding: 17px 16px 19px; }
+  .embed-takeaway .et-item { align-items: center; text-align: center; }
+  .embed-takeaway .et-arrow { width: 100%; height: 18px; }
+
+  /* Button selectors stay compact in two columns. Range controls retain their
+     own full-width label and slider rows. */
+  .ctrl[role='group'] {
+    align-items: stretch;
+    flex-direction: row;
+  }
+
+  .ctrl[role='group'] > label,
+  .ctrl[role='group'] > input[type='range'],
+  .ctrl[role='group'] > b {
+    flex: 1 0 100%;
+  }
+
+  .ctrl[role='group'] > .chip,
+  .ctrl[role='group'] > .cmd {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .complexity-readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
