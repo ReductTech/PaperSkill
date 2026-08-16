@@ -87,10 +87,10 @@ const cards: BoundaryCard[] = [
 ];
 
 const synthesis = [
-  { icon: '🌍', title: '研究背景', body: '视频生成能想象未见区域，三维重建能恢复真实几何，但两条路线过去难以共同交付持久世界。' },
-  { icon: '🧭', title: '论文答卷', body: '作者用两条输入路径、四阶段生成链和 WorldMirror 共享重建核心，把生成辅助重建落成完整系统。' },
-  { icon: '📊', title: '取得效果', body: '全景、跨轨迹一致性、重建、资产规模和效率均有协议内结果；不存在可以代表全系统的单一总分。' },
-  { icon: '⏱️', title: '现实边界', body: '完整世界生产仍是分钟级离线流程；生成完成后的实时漫游不能改写为端到端实时生成。' },
+  { icon: '🧭', title: '按输入丰富度分流', body: '文本与单图需要生成补观察；多图与视频已有几何证据，可以直接进入 WorldMirror 2.0。' },
+  { icon: '🌐', title: '主动扩展缺失观察', body: '全景、规划、关键帧与双记忆逐步补足盲区，同时控制跨路线结构和局部纹理漂移。' },
+  { icon: '🏗️', title: '把新视图凝结成资产', body: '共享前馈重建、深度对齐与 3DGS 压缩把观察转换为可保存、可渲染和可运行的显式世界。' },
+  { icon: '📊', title: '每一环都回到对应证据', body: '全景、记忆、重建、规模与效率分别使用各自协议验证，不能拼接成一个跨任务总分。' },
 ];
 
 const articleReviews = [
@@ -156,9 +156,9 @@ export const HyEvidenceCourt: React.FC<WidgetProps> = () => {
     if (first) setSelectedId(first.id);
   };
 
-  return <div className="evidence-dashboard">
+  return <div id="quick-conclusion" className="evidence-dashboard">
     <section className="chapter-synthesis">
-      <header><span>贯穿全文后的最终地图</span><strong>用四句话回答：为何做、做了什么、效果如何、边界在哪</strong></header>
+      <header><span>沿系统数据流回看</span><strong>从输入分流到可运行资产，每一步都对应一个瓶颈与一组证据</strong></header>
       <div>{synthesis.map((item) => <article key={item.title}><i>{item.icon}</i><strong>{item.title}</strong><p>{item.body}</p></article>)}</div>
     </section>
 

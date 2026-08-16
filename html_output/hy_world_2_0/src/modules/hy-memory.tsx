@@ -14,7 +14,7 @@ const modes: Record<Mode, { title: string; geometry: string; texture: string; co
 };
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function drawRoom(ctx: CanvasRenderingContext2D, x: number, y: number, mode: Mode) {
@@ -68,7 +68,7 @@ function MemoryCanvas({ mode }: { mode: Mode }) {
 export const HyMemory: React.FC<WidgetProps> = () => {
   const [mode, setMode] = useState<Mode>('none');
   const active = modes[mode];
-  return <div className="memory-rebuild">
+  return <div id="quick-memory" className="memory-rebuild">
     <div className="learning-contract">
       <div><span>为什么学</span><p>跨路线观察需要保持一致。</p></div>
       <div><span>本次操作</span><p>切换四种记忆组合。</p></div>

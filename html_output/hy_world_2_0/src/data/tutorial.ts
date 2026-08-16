@@ -18,11 +18,11 @@ export const tutorial: TutorialData = {
   },
   chapters: [
     {
-      kind: 'chapter', id: 'chap-1', title: '背景、重要性与论文总答卷', badge: 'inf', badgeLabel: '问题与贡献',
-      bridge: '先回答世界模型是什么、为什么需要持久三维、作者完成了哪些工作，以及这些工作取得了什么结果。',
+      kind: 'chapter', id: 'chap-1', title: '从一张输入到可运行世界：先看系统如何分工', badge: 'inf', badgeLabel: '系统入口',
+      bridge: '一段视频可以展示新视角，却不能直接保存墙、门和物体的空间状态；本章从这个应用缺口出发，看生成与重建如何分工并汇入同一显式三维交付。',
       analogy: { title: '缺照片时补拍，照片够时测量', text: '线索稀少时要<b>想象未见区域</b>，观察充分时要<b>忠实恢复空间</b>；两种目标不能混为同一件事。', componentId: 'hy-analogy' },
       modules: [
-        { kind: 'module', id: '1.1', title: '论文阅读罗盘：背景、价值、工作与结果', desc: '先切换四个阅读问题，再用范式压力测试分清画面生成、真实重建与持久三维。', componentId: 'hy-world-model-basics' },
+        { kind: 'module', id: '1.1', title: '什么样的输出才算一个可用世界？', desc: '用回访、遮挡与动作压力测试，区分生成画面、真实重建、在线像素世界与持久显式三维。', componentId: 'hy-world-model-basics' },
         { kind: 'module', id: '1.2', title: '四阶段造物管线', desc: '逐步播放全景、规划、扩展和重建四个阶段。', componentId: 'hy-creation-pipeline' },
         { kind: 'module', id: '1.3', title: '生成与重建双路线总图', desc: '点击输入卡，查看四种输入如何汇入同一 WorldMirror 2.0。', componentId: 'hy-mission-planner' },
       ],

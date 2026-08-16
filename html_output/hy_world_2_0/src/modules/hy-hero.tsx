@@ -7,6 +7,71 @@ const C = {
   blue: '#27446e', green: '#228d5c', red: '#c43f52', orange: '#d97706', purple: '#7c3aed', brown: '#92400e', white: '#ffffff',
 };
 
+const quickReadStops = [
+  { id: 'quick-context', time: '00:00', chapter: '第 1 章', title: '画面为什么还不是世界', cue: '生成能补盲区，重建能守几何；专家首先需要看到这两个目标为何必须协作。' },
+  { id: 'quick-planning', time: '00:30', chapter: '第 2 章', title: '先看全，再决定拍哪里', cue: 'HY-Pano 建立世界种子，WorldNav 把有限视角预算投向真正缺失的区域。' },
+  { id: 'quick-memory', time: '01:00', chapter: '第 3 章', title: '双记忆守住跨路线一致性', cue: 'GGM 固定全局骨架，SSM++ 检索局部参考，解决长距离扩展时的结构与纹理漂移。' },
+  { id: 'quick-training', time: '01:30', chapter: '第 4 章', title: '能力按依赖顺序训练', cue: '作者先建立相机控制，再加入跨轨迹记忆，最后把成熟教师蒸馏成四步学生。' },
+  { id: 'quick-reconstruction', time: '02:00', chapter: '第 5 章', title: '一次前向恢复五类三维产物', cue: 'WorldMirror 2.0 用共享骨干同时恢复相机、点图、深度、法线与 3DGS。' },
+  { id: 'quick-runtime', time: '02:30', chapter: '第 6 章', title: '资产生成后进入运行时', cue: '深度对齐与高斯压缩负责交付，WorldLens 再提供光照、碰撞和角色漫游。' },
+  { id: 'quick-results', time: '03:00', chapter: '第 7 章', title: '创新必须接回旧问题与证据', cue: '规划、记忆、前馈重建和资产工程各自解决不同瓶颈，实验也必须按协议解读。' },
+  { id: 'quick-conclusion', time: '03:35', chapter: '第 8 章', title: '一句话收束贡献与边界', cue: 'HY-World 2.0 交付的是可保存、可渲染、可运行的显式世界，但完整生成仍是离线分钟级流程。' },
+] as const;
+
+const waitForQuickReadFrame = (delay: number) => new Promise<void>((resolve) => window.setTimeout(resolve, delay));
+
+async function revealQuickReadTarget(targetId: string) {
+  document.documentElement.classList.add('quickread-unlocking');
+  for (let attempt = 0; attempt < 36; attempt += 1) {
+    const target = document.getElementById(targetId);
+    if (target) {
+      await waitForQuickReadFrame(260);
+      document.documentElement.classList.remove('quickread-unlocking');
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      return;
+    }
+    const next = Array.from(document.querySelectorAll<HTMLButtonElement>('.chap-loader-btn')).find((button) => button.offsetParent !== null && !button.disabled);
+    if (next) next.click();
+    await waitForQuickReadFrame(90);
+  }
+  document.documentElement.classList.remove('quickread-unlocking');
+}
+
+function QuickReadNavigator() {
+  const [quickMode] = useState(() => new URLSearchParams(window.location.search).get('quickread') === '1');
+  const [activeId, setActiveId] = useState(() => window.location.hash.replace('#', '') || quickReadStops[0].id);
+  const [collapsed, setCollapsed] = useState(() => window.matchMedia('(max-width: 620px)').matches);
+  const active = quickReadStops.find((item) => item.id === activeId) ?? quickReadStops[0];
+
+  useEffect(() => {
+    if (!quickMode) return undefined;
+    document.documentElement.classList.add('quickread-mode');
+    void revealQuickReadTarget(active.id);
+    return () => document.documentElement.classList.remove('quickread-mode', 'quickread-unlocking');
+  }, [active.id, quickMode]);
+
+  if (!quickMode) {
+    return <a className="quick-read-entry" href="?quickread=1#quick-context"><span>4 分钟</span><strong>Quick Read 专家展示</strong><b>→</b></a>;
+  }
+
+  const goTo = (targetId: string) => {
+    setActiveId(targetId);
+    window.history.replaceState(null, '', `?quickread=1#${targetId}`);
+  };
+
+  return <aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="四分钟 Quick Read 导航">
+    <header>
+      <div><span>4 MIN QUICK READ</span><strong>专家展示导航</strong><small>每章一个关键落点</small></div>
+      <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? '展开 Quick Read 导航' : '收起 Quick Read 导航'} title={collapsed ? '展开导航' : '收起导航'}>{collapsed ? '＋' : '−'}</button>
+    </header>
+    {collapsed ? null : <>
+      <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><time>{item.time}</time><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
+      <section aria-live="polite"><span>当前讲解提示</span><strong>{active.title}</strong><p>{active.cue}</p></section>
+      <footer><a href="./">返回完整教程</a><span>建议总时长 4 分钟</span></footer>
+    </>}
+  </aside>;
+}
+
 function CanvasView({ width = 560, height = 240, animate = false, draw }: { width?: number; height?: number; animate?: boolean; draw: (ctx: CanvasRenderingContext2D, time: number) => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const drawRef = useRef(draw);
@@ -39,7 +104,7 @@ function clearStudio(ctx: CanvasRenderingContext2D, w: number, h: number) {
 }
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 14, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function camera(ctx: CanvasRenderingContext2D, x: number, y: number, color = C.blue, scale = 1) {
@@ -116,7 +181,8 @@ function wireRoom(ctx: CanvasRenderingContext2D, x: number, y: number, color: st
 }
 
 export const HyHero: React.FC<WidgetProps> = ({ moduleId }) => (
-  <CanvasView width={520} height={180} animate draw={(ctx, time) => {
+  <div className="hy-hero-visual">
+    <CanvasView width={520} height={180} animate draw={(ctx, time) => {
     clearStudio(ctx, 520, 180); const cycle = (time % 4200) / 4200; const p = easeInOutQuad(cycle < .72 ? cycle / .72 : 1);
     if (moduleId === 'old') {
       label(ctx, '逐帧想象', 34, 25, C.red, 13); label(ctx, '只恢复已观察区域', 310, 25, C.red, 13);
@@ -139,7 +205,9 @@ export const HyHero: React.FC<WidgetProps> = ({ moduleId }) => (
       wireRoom(ctx, 342, 39, C.green, p, false);
       label(ctx, p > .92 ? '可保存 · 可渲染 · 可交互' : '多视图正在对齐', 406, 160, p > .92 ? C.green : C.blue, 10, 'center');
     }
-  }} />
+    }} />
+    {moduleId === 'new' ? <QuickReadNavigator /> : null}
+  </div>
 );
 
 const analogyNames = ['定任务','转全景','选路线','拍关键帧','查记忆','压步数','换尺度','拨输出','对齐','交付'];

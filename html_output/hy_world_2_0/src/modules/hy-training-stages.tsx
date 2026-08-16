@@ -62,7 +62,7 @@ export const HyTrainingStages: React.FC<WidgetProps> = () => {
   };
 
   return (
-    <div className="training-builder">
+    <div id="quick-training" className="training-builder">
       <div className="training-builder-head">
         <div><span>训练课程编排器</span><strong>让能力按前置关系逐段继承</strong></div>
         <div><b>{sequence.length}/3</b><small>已放入阶段</small></div>

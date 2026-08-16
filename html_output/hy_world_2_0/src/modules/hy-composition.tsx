@@ -12,7 +12,7 @@ const steps:Record<StepId,{code:string;title:string;count:number;psnr:number;ssi
   mask:{code:'M',title:'+ MaskGaussian',count:1.383,psnr:25.017,ssim:.747,lpips:.216,detail:91,floaters:5,lesson:'学习存在掩码并永久剪除低激活高斯，数量显著下降，但天空增密源头仍在。',why:'说明概率稀疏化负责删冗余。',color:C.purple},
   final:{code:'F',title:'完整配置',count:1.381,psnr:25.023,ssim:.747,lpips:.215,detail:92,floaters:1,lesson:'只在非天空区域增密，再用 MaskGaussian 稀疏化：细节保留，天空漂浮物受控。',why:'把“在哪里补点”和“哪些点留下”同时设计。',color:C.green},
 };
-function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color=C.ink,size=12,align:CanvasTextAlign='left'){ctx.fillStyle=color;ctx.font=`700 ${size}px Segoe UI, sans-serif`;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.textAlign='left';}
+function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color=C.ink,size=12,align:CanvasTextAlign='left'){ctx.fillStyle=color;ctx.font=`700 ${Math.max(size,13)}px Segoe UI, sans-serif`;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.textAlign='left';}
 
 function drawWallDetail(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,detail:number,progress:number,color:string){
   const cols=Math.max(2,Math.round(detail/13*progress));

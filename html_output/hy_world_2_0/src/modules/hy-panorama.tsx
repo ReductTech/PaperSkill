@@ -29,7 +29,7 @@ const cases: Record<CaseId, { title: string; problem: string; fix: string; layer
 };
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function drawPanoramaBase(ctx: CanvasRenderingContext2D) {

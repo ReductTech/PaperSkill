@@ -124,7 +124,7 @@ const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSampl
       ctx.strokeRect(38, 22, 104, 34);
       ctx.setLineDash([]);
       ctx.fillStyle = '#68778f';
-      ctx.font = '700 11px Segoe UI, sans-serif';
+      ctx.font = '700 13px Segoe UI, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('等待输出头生成候选', 90, 43);
       ctx.textAlign = 'left';
@@ -212,7 +212,7 @@ const OutputPreviewCanvas: React.FC<{ output: OutputDef; sample: InspectionSampl
     ctx.fillStyle = verdictColor;
     ctx.fillRect(126, 8, 45, 17);
     ctx.fillStyle = '#fff';
-    ctx.font = '800 10px Segoe UI, sans-serif';
+    ctx.font = '800 12px Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(sample.verdict === 'pass' ? '✓ 通过' : '× 错误', 148.5, 20);
     ctx.textAlign = 'left';
@@ -330,7 +330,7 @@ export const HyArchitecture: React.FC<WidgetProps> = () => {
     return () => window.cancelAnimationFrame(frame);
   }, [allPassed]);
 
-  return <div className="architecture-rebuild">
+  return <div id="quick-reconstruction" className="architecture-rebuild">
     <div className="learning-contract">
       <div><span>为什么学</span><p>五类输出共享同一份跨视图空间理解。</p></div>
       <div><span>本次操作</span><p>选择先验，运行并检查五个输出头。</p></div>

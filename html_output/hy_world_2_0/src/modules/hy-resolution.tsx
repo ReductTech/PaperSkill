@@ -10,7 +10,7 @@ const levels = [
   { name:'高 H', px:'756×1036', width:18, old:66.29, now:86.89 },
 ];
 
-function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color=C.ink,size=12,align:CanvasTextAlign='left'){ctx.fillStyle=color;ctx.font=`700 ${size}px Segoe UI, sans-serif`;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.textAlign='left';}
+function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color=C.ink,size=12,align:CanvasTextAlign='left'){ctx.fillStyle=color;ctx.font=`700 ${Math.max(size,13)}px Segoe UI, sans-serif`;ctx.textAlign=align;ctx.fillText(text,x,y);ctx.textAlign='left';}
 
 function ResolutionCanvas({level,ratio}:{level:number;ratio:number}){
   const ref=useRef<HTMLCanvasElement>(null); const state=useRef({level,ratio}); state.current={level,ratio};

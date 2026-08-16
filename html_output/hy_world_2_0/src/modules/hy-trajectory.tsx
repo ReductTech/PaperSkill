@@ -40,7 +40,7 @@ function clearStudio(ctx: CanvasRenderingContext2D, w: number, h: number) {
 }
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 14, align: CanvasTextAlign = 'left') {
-  ctx.fillStyle = color; ctx.font = `700 ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function camera(ctx: CanvasRenderingContext2D, x: number, y: number, color = C.blue, scale = 1) {
@@ -203,7 +203,7 @@ export const HyTrajectory: React.FC<WidgetProps> = () => {
   };
 
   return (
-    <div className="trajectory-lab trajectory-planner">
+    <div id="quick-planning" className="trajectory-lab trajectory-planner">
       <div className="learning-contract"><div><span>为什么学</span><p>轨迹决定系统会看到什么。</p></div><div><span>本次操作</span><p>切换任务并逐层回放规划。</p></div><div><span>应得判断</span><p>五类任务具有不同约束。</p></div></div>
       <div className="trajectory-task-switch" role="tablist" aria-label="选择 WorldNav 轨迹任务">
         {(Object.keys(routeData) as TrajectoryName[]).map((name) => (

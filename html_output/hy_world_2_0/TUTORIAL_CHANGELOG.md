@@ -4,6 +4,61 @@
 
 每个版本必须包含“模块变更明细”：逐项写出模块编号、模块名称、组件文件、新增或调整的具体内容，以及需要审查的状态变化。若没有修改运行模块，也必须明确写“无模块变更”，不能只写笼统的功能概述。
 
+## V0.53「四分钟星门·演示领航姬」
+
+日期：2026-08-16
+
+### 修改目标
+
+- 为约四分钟的专家展示新增可分享 Quick Read 链接模式，每章只选择一个关键交互落点，并提供时间点与一句讲解提示。
+- 删除 1.1 将“背景、价值、工作、结果”拆成四个独立页签的结构；这些问题改为贯穿章节的叙事逻辑，而不是额外的一节问答。
+- 系统提高正文、小字、控件、状态标签和 Canvas 动画标注的字号，使教程更适合电脑投屏与现场讲解。
+- 保持普通完整教程不变：Quick Read 只提供快速导航和自动解锁，不删除论文表格、扩展资料或完整交互。
+
+### 模块变更明细
+
+- 调整 Hero 论文专属组件 `src/modules/hy-hero.tsx`，新增“4 分钟 Quick Read 专家展示”入口；分享链接采用 `?quickread=1#锚点`，不修改通用 `App.tsx` 与模板组件。
+- Quick Read 模式新增八个时间落点：第 1 章 `quick-context`、第 2 章 `quick-planning`、第 3 章 `quick-memory`、第 4 章 `quick-training`、第 5 章 `quick-reconstruction`、第 6 章 `quick-runtime`、第 7 章 `quick-results`、第 8 章 `quick-conclusion`。
+- 右侧专家展示导航为每个落点提供预计时间、章节号、关键标题和一句讲解提示；导航可折叠，并提供返回完整教程的链接。
+- 新增逐章自动解锁逻辑。点击尚未渲染的后续章节时，组件会依次触发原有“继续学习”，等待目标挂载后直接定位；解锁期间隐藏主内容，避免页面快速滚动造成闪烁。
+- Quick Read 桌面布局为右侧导航保留独立安全区，主内容左移但保持原模块宽度层级；900px 以下改为底部浮动导航，620px 以下进一步收紧导航宽度。
+- 重构模块 1.1，组件为 `src/modules/hy-world-model-basics.tsx`，标题改为“什么样的输出才算一个可用世界？”。
+- 完整删除“四问阅读罗盘”、四个问题页签及其切换状态；改为一个连续故事起点：视频生成补未见观察、三维重建恢复已见几何、显式世界承担保存/回访/渲染/碰撞。
+- 保留并强化原有范式压力测试，让读者通过遮挡背面、离开后回访和动作响应判断视频生成、动作视频世界、三维重建与 HY-World 2.0 保存了什么状态。
+- 调整 `src/data/tutorial.ts`：第 1 章改名为“从一张输入到可运行世界：先看系统如何分工”，徽标改为“系统入口”；bridge 从应用缺口自然引出生成与重建分工，不再宣称本章专门回答背景、价值、工作与结果。
+- 调整模块 8.1 `src/modules/hy-evidence-court.tsx`：末章总结从“研究背景 / 论文答卷 / 取得效果 / 现实边界”四问改为“输入分流 / 扩展观察 / 凝结资产 / 对应证据”四段数据流回看，避免在结尾重新制造独立四问节。
+- 为 `hy-trajectory.tsx`、`hy-memory.tsx`、`hy-training-stages.tsx`、`hy-architecture.tsx`、`hy-worldlens-lab.tsx`、`hy-innovation-map.tsx`、`hy-evidence-court.tsx` 的关键根节点增加稳定 Quick Read 锚点。
+- 调整 `src/styles/paper.css`：新增 Quick Read 入口、浮动导航、选中态、当前讲解提示、折叠态、目标高亮、自动解锁遮罩和桌面/窄屏布局。
+- 删除已不再渲染的 `.paper-story-*` 四问罗盘样式，只保留第三方评论卡共用规则，避免旧组件移除后继续携带无效 CSS。
+- 提高 `.module-body` 正文、`small`、按钮、摘要、学习契约、反馈、图注、表格提示、证据抽屉和完整更新日志的最低演示字号；密集技术标签按组件单独提升，避免全局放大导致标题层级和固定格式图表失真。
+- 调整 `hy-hero.tsx`、`hy-analogy.tsx`、`hy-boundary-compare.tsx`、`hy-creation-pipeline.tsx`、`hy-memory.tsx`、`hy-keyframes.tsx`、`hy-panorama.tsx`、`hy-trajectory.tsx`、`hy-dmd-lab.tsx`、`hy-worldlens-lab.tsx`、`hy-composition.tsx`、`hy-resolution.tsx` 的 Canvas 标签函数，将动画内文字下限提升到 13px。
+- 调整 `hy-architecture.tsx` 五个输出头的小画布，把状态文字由 10/11px 提升到 12/13px；同步提高 RGB/Pose/K/Depth 输入序号、接入状态和输出巡检标签。
+- 更新模块 8.2 `src/modules/hy-update-log.tsx`：最近三版改为 V0.53、V0.52、V0.51，默认选中 V0.53，并展示本轮 Quick Read、叙事融入和投屏字号调整。
+
+### 事实与教学边界
+
+- Quick Read 的八个时间点和四分钟总时长是现场演示规划，不是论文报告的推理时延、学习时长或模块执行时间。
+- Quick Read 自动解锁只调用教程原有章节展示逻辑，不会改变模型方法、实验数字、模块初始状态或论文证据边界。
+- “游戏、具身仿真、保存、回访、碰撞”用于解释显式资产的应用价值；具体能力范围仍分别以论文和腾讯官方功能展示为准。
+- Canvas 字号提升只改变教学可读性，不改变几何路径、图表比例、状态变量、公式、实验数值或交互判断。
+
+### 验证结果
+
+- 教程 TypeScript 与 Vite 生产构建通过，共转换 69 个模块；`git diff --check` 通过。
+- 1440×900 桌面视口实测 Quick Read：从第 1 章可直接跳到第 7、8 章，缺失章节会自动解锁；八章全部渲染后 URL、选中导航和目标锚点保持一致。
+- Quick Read 右侧面板与目标模块无重叠，页面 `clientWidth` 与 `scrollWidth` 一致；旧 `.paper-story-tabs` 数量为 0。
+- 可见模块文字审计中，小于 12px 的正文/标签已完成清理；Canvas 标签函数统一保证至少 13px。
+- paper-skill 输出结构校验通过：8 个章节、19 个主动模块、8 个双模块章节、21 个已注册组件 ID；仓库 `npm run validate` 通过，15 篇教程全部合规。
+- `npm run catalog` 与 `npm run catalog:check` 通过，总目录保持 15 篇；PR 范围检查通过，相对上游主分支共 27 个文件，全部归属于 `hy_world_2_0`。
+- `npm run build:paper -- hy_world_2_0` 通过，正式子路径产物已重新构建到 `site/papers`；构建期间短暂停止预览以释放 Windows 下被 Vite 占用的 esbuild 文件，完成后已恢复原地址。
+
+### 审查重点
+
+- 打开 `?quickread=1#quick-context`，依次点击八个时间点，确认每次都落到对应关键交互，且无需手动点击“继续学习”。
+- 对照普通模式与 Quick Read 模式，确认普通教程仍保留完整章节、扩展资料和表格，Quick Read 只负责快速导航。
+- 检查 1.1 是否已经从四问答题改为自然故事入口，并确认第 2-7 章分别承接作者工作与实验结果。
+- 在电脑投屏距离下检查 Canvas 标签、流程状态、模型矩阵和 5.2 五头巡检文字，确认无需浏览器缩放即可辨认。
+
 ## V0.52「起源星图·论证导航姬」
 
 日期：2026-08-16

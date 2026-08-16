@@ -46,7 +46,7 @@ const modes: Array<{
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left') {
   ctx.fillStyle = color;
-  ctx.font = `700 ${size}px Segoe UI, sans-serif`;
+  ctx.font = `700 ${Math.max(size, 13)}px Segoe UI, sans-serif`;
   ctx.textAlign = align;
   ctx.fillText(text, x, y);
   ctx.textAlign = 'left';
@@ -273,7 +273,7 @@ export const HyWorldLensLab: React.FC<WidgetProps> = () => {
   };
 
   return (
-    <div className={`worldlens-lab ${running ? 'is-running' : ''}`}>
+    <div id="quick-runtime" className={`worldlens-lab ${running ? 'is-running' : ''}`}>
       <div className="worldlens-modes" role="tablist" aria-label="选择 WorldLens 运行时能力">
         {modes.map((item) => (
           <button key={item.id} type="button" role="tab" aria-selected={item.id === mode} className={item.id === mode ? 'selected' : ''} onClick={() => selectMode(item.id)}>

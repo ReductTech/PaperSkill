@@ -73,7 +73,7 @@ export const HyInnovationMap: React.FC<WidgetProps> = () => {
   };
 
   return (
-    <div className="innovation-workbench">
+    <div id="quick-results" className="innovation-workbench">
       <section className="innovation-contribution-summary">
         <header><span>作者的工作不是一个孤立技巧</span><strong>四类贡献共同组成“生成辅助重建”系统</strong></header>
         <div>

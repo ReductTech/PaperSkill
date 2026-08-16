@@ -198,99 +198,23 @@ const stressMatrix: Record<ModelLensId, Record<StressTestId, {
   },
 };
 
-type PaperStoryId = 'background' | 'importance' | 'work' | 'results';
-
-type PaperStoryStep = {
-  id: PaperStoryId;
-  label: string;
-  title: string;
-  summary: string;
-  points: string[];
-  evidence: string;
-  proofs: Array<{ label: string; value: string; note: string }>;
-};
-
-const paperStory: PaperStoryStep[] = [
-  {
-    id: 'background',
-    label: '背景是什么',
-    title: '会“想象”的视频生成与会“测量”的三维重建长期分处两条路线',
-    summary: '生成模型能补出镜头没有拍到的内容，却容易让空间随视角漂移；重建模型能把多视图拉回统一几何，却无法凭空补齐从未观察的区域。',
-    points: ['像素连续不等于拥有可保存的三维世界', '忠实重建依赖足够多的真实观察', '稀疏输入和丰富输入需要不同处理路径'],
-    evidence: '论文 Introduction；官方 README 的 Why 3D World Models。',
-    proofs: [
-      { label: '视频生成', value: '擅长想象', note: '未见区域可生成，几何未必持久。' },
-      { label: '三维重建', value: '擅长测量', note: '已观测区域稳定，盲区缺少证据。' },
-      { label: '核心缺口', value: '两者未接通', note: '好看的新视角还不是可交付资产。' },
-    ],
-  },
-  {
-    id: 'importance',
-    label: '为什么重要',
-    title: '游戏、具身仿真和空间内容需要的是可重复进入的世界，而不只是一段视频',
-    summary: '真正可用的世界要能保存、重新加载、换视角渲染，并为 Mesh、碰撞、角色或后续编辑留下接口。把开放域生成转成显式三维资产，才可能进入生产与模拟链路。',
-    points: ['持久资产可以跨时间回访同一空间', '显式几何可以接入渲染、编辑与碰撞', '文本、单图、多图和视频最终需要统一交付形态'],
-    evidence: '论文 Figure 2 与系统介绍；腾讯混元项目主页的输出与 WorldLens 展示。',
-    proofs: [
-      { label: '内容生产', value: '可保存', note: '3DGS、Mesh、点云不随视频播放结束而消失。' },
-      { label: '空间应用', value: '可运行', note: '资产可进入光照、漫游和碰撞流程。' },
-      { label: '系统价值', value: '统一交付', note: '生成与重建最终落到显式三维。' },
-    ],
-  },
-  {
-    id: 'work',
-    label: '作者做了什么',
-    title: '作者搭建两条输入路线，并把四阶段生成链与共享前馈重建核心接在一起',
-    summary: '稀疏线索经过 HY-Pano 2.0、WorldNav、WorldStereo 2.0 扩展观察；多视图或视频可直接进入 WorldMirror 2.0。两条路线最终都生成可渲染的显式三维资产。',
-    points: ['HY-Pano + WorldNav：建立全景上下文并规划盲区视角', 'WorldStereo 2.0：用关键帧、双记忆与蒸馏扩展多视图', 'WorldMirror 2.0 + 3DGS：恢复几何、压缩资产并接入 WorldLens'],
-    evidence: '论文 Figure 2；Sections 3-7；Figures 3-14。',
-    proofs: [
-      { label: '工作 A+B', value: '世界种子与规划', note: '从中心全景主动寻找缺失观察。' },
-      { label: '工作 C', value: '一致的关键帧扩展', note: '全局骨架与局部参考分工记忆。' },
-      { label: '工作 D', value: '前馈几何与资产', note: '共享骨干多头输出并完成 3DGS 交付。' },
-    ],
-  },
-  {
-    id: 'results',
-    label: '取得什么效果',
-    title: '论文用多组子协议证明各环节生效，而不是给整个系统制造一个总分',
-    summary: '全景质量、跨轨迹一致性、重建精度、资产规模和重建效率分别在不同表格中验证。阅读时必须保留数据集、指标方向、输入规模与硬件条件。',
-    points: ['HY-Pano 2.0 在 Table 4 的 I2P CLIP-I 达到 0.844', '完整记忆配置在 Table 8 达到 PSNR 21.63、SSIM 0.669', '7-Scenes 高分辨率仅图像 Acc. 0.037；完整 3DGS 配方压到 1.381M 高斯'],
-    evidence: '论文 Tables 4、8、9、11、14；这些数字属于不同协议，不能相加成综合排名。',
-    proofs: [
-      { label: '全景', value: 'CLIP-I 0.844', note: 'Table 4，I2P 子协议，越高越好。' },
-      { label: '跨轨迹记忆', value: 'PSNR 21.63', note: 'Table 8，完整空间拼接配置。' },
-      { label: '显式资产', value: '6.000M → 1.381M', note: 'Table 9，PSNR 25.176 → 25.023。' },
-    ],
-  },
-];
-
 export const HyWorldModelBasics: React.FC<WidgetProps> = () => {
-  const [storyId, setStoryId] = useState<PaperStoryId>('background');
   const [lensId, setLensId] = useState<ModelLensId>('hy-world');
   const [stressTestId, setStressTestId] = useState<StressTestId>('revisit');
   const lens = lenses.find((item) => item.id === lensId) ?? lenses[3];
   const stressTest = stressTests.find((item) => item.id === stressTestId) ?? stressTests[1];
   const stress = stressMatrix[lens.id][stressTest.id];
-  const activeStory = paperStory.find((item) => item.id === storyId) ?? paperStory[0];
 
   return (
     <div className="world-model-lab">
-      <section className="paper-story-compass">
-        <header><span>读论文前先回答四个问题</span><strong>HY-World 2.0 的背景、价值、工作与结果</strong><small>先建立论证主线，再进入具体网络与交互细节。</small></header>
-        <div className="paper-story-tabs" role="tablist" aria-label="切换论文阅读问题">
-          {paperStory.map((item, index) => <button key={item.id} type="button" role="tab" aria-selected={storyId === item.id} className={storyId === item.id ? 'selected' : ''} onClick={() => setStoryId(item.id)}><span>0{index + 1}</span><strong>{item.label}</strong></button>)}
+      <section id="quick-context" className="world-model-story-bridge">
+        <header><span>故事起点</span><strong>好看的下一帧，为什么还不是一个可用世界？</strong></header>
+        <p>视频生成能补出没有拍到的画面，却未必把墙、门和物体位置长期保存；三维重建能守住已观察几何，却不能凭空测量盲区。游戏、具身仿真与空间内容真正需要的是一个能够保存、回访、换视角渲染并接入碰撞的显式世界。</p>
+        <div>
+          <article><span>生成补观察</span><strong>解决“没有看见”</strong><small>新内容来自生成先验，不能写成真实测量。</small></article>
+          <article><span>重建守几何</span><strong>解决“看见后如何对齐”</strong><small>多视图约束把相机和空间拉回同一坐标。</small></article>
+          <article><span>本文的系统选择</span><strong>先扩展观察，再交付资产</strong><small>后续章节沿这条因果链逐项展开作者工作与实验。</small></article>
         </div>
-        <article className={`paper-story-panel ${activeStory.id}`} aria-live="polite">
-          <div className="paper-story-copy">
-            <span>{activeStory.label}</span>
-            <h5>{activeStory.title}</h5>
-            <p>{activeStory.summary}</p>
-            <ul>{activeStory.points.map((point) => <li key={point}>{point}</li>)}</ul>
-            <small>{activeStory.evidence}</small>
-          </div>
-          <div className="paper-story-proofs">{activeStory.proofs.map((proof) => <div key={proof.label}><span>{proof.label}</span><strong>{proof.value}</strong><small>{proof.note}</small></div>)}</div>
-        </article>
       </section>
 
       <div className="world-model-section-lead"><span>范式对照实验</span><strong>四种“世界”到底保存了什么状态？</strong><p>切换模型与压力测试，区分生成画面、动作反馈、真实重建和持久显式三维。</p></div>

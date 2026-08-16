@@ -54,7 +54,7 @@ const stages = [
 ] as const;
 
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = C.ink, size = 12, align: CanvasTextAlign = 'left', weight = 700) {
-  ctx.fillStyle = color; ctx.font = `${weight} ${size}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
+  ctx.fillStyle = color; ctx.font = `${weight} ${Math.max(size, 13)}px Segoe UI, sans-serif`; ctx.textAlign = align; ctx.fillText(text, x, y); ctx.textAlign = 'left';
 }
 
 function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 10) {

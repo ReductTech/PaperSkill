@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v053',
+    version: 'V0.53',
+    alias: '四分钟星门·演示领航姬',
+    focus: 'Quick Read、叙事融入与投屏字号',
+    modules: ['Hero 四分钟入口', '八章关键锚点', '1.1 世界状态压力测试', 'Canvas 标签字号', '全教程演示字体'],
+    note: '新增可分享的四分钟专家展示模式，每章只链接一个关键落点；移除独立四问罗盘，让问题、意义、作者工作与结果沿系统故事自然出现，并系统提高投屏可读性。',
+  },
+  {
     id: 'v052',
     version: 'V0.52',
     alias: '起源星图·论证导航姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['全教程信息层级', '本节扩展资料', '演示字体下限', '5.2 五头候选画布', '5.2 全绿烟花预览'],
     note: '把主线压缩为现场能讲清的判断，把证据与术语留在按需展开区，并修复五个输出头和烟花实际绘制却不可见的问题。',
   },
-  {
-    id: 'v050',
-    version: 'V0.50',
-    alias: '万象镜检·烟火全绿姬',
-    focus: '相对资源、竖向巡检与统一比较语法',
-    modules: ['全教程静态图片路径', '5.2 随机五头巡检', '7.2 谱系矩阵统一', '7.3 同款效率分簇图', '8.2 版本星轨'],
-    note: '把部署路径、共享重建结构和两类模型比较统一到可复查、可重复操作的最终形态。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v052');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v053');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
