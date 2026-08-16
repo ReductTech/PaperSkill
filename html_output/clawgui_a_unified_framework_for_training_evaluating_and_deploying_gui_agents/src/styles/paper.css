@@ -1,0 +1,301 @@
+/* ============================================================================
+   ClawGUI 教程 —— 论文级样式覆盖（Tufte 暖纸风）
+
+   参照 teach 工作区的课程风格：暖纸底色、衬线标题、赭红点缀、
+   细规则线、几乎无阴影。加载顺序在 tokens.css / components.css 之后，
+   通过重定义 CSS 变量 + 少量选择器覆盖完成换肤，不改动框架文件。
+
+   语义色不变（contract §5）：红=失效，绿=成功，蓝=引导/当前状态，
+   橙=用户强调，紫=辅助。赭红只做页面装饰（序号/标签/标题点缀），
+   不参与状态语义。
+   ============================================================================ */
+
+:root {
+  /* —— 暖纸基底 —— */
+  --ui-bg-page: #f6f1e7;
+  --ui-bg-page-top: #fbf7ef;
+  --ui-bg-card: #fffcf7;
+  --ui-bg-soft: #f5f1e9;
+  --ui-bg-muted: #faf6ec;
+  --ui-text-main: #262220;
+  --ui-text-muted: #5c554e;
+  --ui-text-light: #8a8278;
+  --ui-border: #ddd6c8;
+  --ui-border-strong: #bfb5a2;
+
+  /* —— 主色：语义蓝保持（对应 Canvas 的引导色），赭红做装饰 —— */
+  --ui-accent: #27446e;
+  --ui-accent-alt: #d97706;
+  --ui-success: #1f6f43;
+  --ui-warning: #8a6314;
+  --ui-danger: #b3372f;
+
+  --rust-accent: #9c3218; /* teach 的赭红：序号、标签、标题点缀 */
+  --rust-bg: #fdf2ee;
+
+  /* —— 柔化别名 —— */
+  --blue-soft: #eef0e9;
+  --green-soft: rgba(31, 111, 67, 0.1);
+  --orange-soft: rgba(217, 119, 6, 0.12);
+  --red-soft: rgba(179, 55, 47, 0.09);
+  --purple-soft: #f3eff7;
+  --yellow-soft: rgba(138, 99, 20, 0.12);
+
+  /* —— 去阴影、收圆角：纸上靠细线分层 —— */
+  --ui-shadow-soft: 0 1px 2px rgba(60, 50, 30, 0.05);
+  --ui-shadow-hover: 0 2px 8px rgba(60, 50, 30, 0.08);
+  --shadow: var(--ui-shadow-soft);
+  --shadow-soft: none;
+  --shadow-hover: var(--ui-shadow-hover);
+  --ui-radius-xl: 14px;
+  --ui-radius-lg: 10px;
+  --ui-radius-md: 8px;
+  --ui-radius-sm: 5px;
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  /* —— 字体：衬线正文血统 + 中文宋体回退 —— */
+  --serif-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Source Serif 4', Georgia,
+    'Songti SC', 'Noto Serif CJK SC', serif;
+
+  /* —— 场景变量（Canvas kit 同源） —— */
+  --metaphor-field: #faf7ef;
+  --metaphor-guide: #27446e;
+  --metaphor-pass: #1f6f43;
+  --metaphor-fail: #b3372f;
+  --metaphor-axis: #ddd6c8;
+}
+
+/* ---------- 页面基底：安静的纸，不要蓝色光晕 ---------- */
+
+body {
+  background: var(--ui-bg-page);
+  color: var(--ui-text-main);
+}
+
+/* ---------- Hero：报头化 ---------- */
+
+.hero h1 {
+  font-family: var(--serif-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.hero-venue {
+  font-family: var(--ui-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rust-accent);
+  background: transparent;
+  border: 1px solid var(--ui-border);
+}
+
+.hero-sub {
+  font-family: var(--serif-display);
+  font-style: italic;
+  color: var(--ui-text-muted);
+}
+
+/* ---------- 章节标题：衬线 + 赭红序号 ---------- */
+
+.chap-title {
+  font-family: var(--serif-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--ui-border);
+  padding-bottom: 10px;
+}
+
+.chap-title .num {
+  color: var(--rust-accent);
+}
+
+.badge-tag {
+  font-family: var(--ui-font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+
+.badge-tag.inf { background: var(--green-soft); color: var(--ui-success); }
+.badge-tag.trn { background: var(--rust-bg); color: var(--rust-accent); }
+.badge-tag.both { background: var(--blue-soft); color: var(--ui-accent); }
+
+/* ---------- 桥段与洞察：teach 的 callout 形态 ---------- */
+
+.chap-bridge {
+  background: var(--ui-bg-muted);
+  border-left: 3px solid var(--rust-accent);
+  border-radius: 0 5px 5px 0;
+}
+
+.insight-bar {
+  background: var(--yellow-soft);
+  border-left: 3px solid var(--ui-warning);
+  border-radius: 0 5px 5px 0;
+}
+
+/* ---------- 模块头：小型大写 eyebrow ---------- */
+
+.module-head {
+  background: var(--ui-bg-muted);
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.module-head .num {
+  color: var(--rust-accent);
+  font-family: var(--ui-font-mono);
+}
+
+.module-head h4 {
+  font-family: var(--serif-display);
+  font-weight: 600;
+}
+
+/* ---------- 公式区：纸上白框 ---------- */
+
+.formula-explain {
+  background: var(--ui-bg-muted);
+  border: 1px solid var(--ui-border);
+}
+
+.formula {
+  font-family: var(--serif-display);
+  background: var(--ui-bg-card);
+  border: 1px solid var(--ui-border);
+}
+
+/* ---------- 收束区 ---------- */
+
+.embed-takeaway,
+.reversibility-takeaway {
+  background: var(--ui-bg-muted);
+  border: 1px solid var(--ui-border);
+}
+
+.et-title {
+  font-family: var(--serif-display);
+  font-weight: 600;
+}
+
+/* ---------- 类比卡：暖纸上的黄色便签 → 改为纸边框 ---------- */
+
+.analogy-card {
+  background: var(--ui-bg-card);
+  border: 1px solid var(--ui-border);
+}
+
+.analogy-visual {
+  background: var(--metaphor-field);
+  border-right: 1px solid var(--ui-border);
+}
+
+.analogy-visual canvas {
+  background: var(--metaphor-field);
+}
+
+.analogy-title {
+  font-family: var(--serif-display);
+  color: var(--rust-accent);
+}
+
+/* ---------- 控件：细线纸感 ---------- */
+
+.chip {
+  background: var(--ui-bg-card);
+  border-color: var(--ui-border-strong);
+}
+
+.chip.selected {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+
+.feedback {
+  font-style: normal;
+  background: var(--ui-bg-muted);
+}
+
+.metric {
+  box-shadow: none;
+}
+
+.metric .v {
+  font-family: var(--serif-display);
+  font-weight: 700;
+}
+
+/* ---------- 章节加载按钮 ---------- */
+
+.chap-loader-btn {
+  font-family: var(--ui-font-sans);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 论文专属组件（沿用旧类名，换纸色） ---------- */
+
+.module-body .tech-inset {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-bg-muted);
+  padding: 10px 12px;
+  margin-top: 12px;
+}
+
+.module-body .src-note {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ui-text-light);
+}
+
+.module-body .src-note.warn {
+  color: var(--ui-warning);
+}
+
+.module-body .evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 10px;
+  font-family: var(--ui-font-sans);
+}
+
+.module-body .evidence-table th,
+.module-body .evidence-table td {
+  border-bottom: 1px solid var(--ui-border);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 7px 10px;
+  text-align: left;
+}
+
+.module-body .evidence-table th {
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-text-light);
+  border-bottom: 1.5px solid var(--ui-text-main);
+}
+
+.module-body .evidence-table td.hit {
+  color: var(--ui-success);
+  font-weight: 600;
+}
+
+.module-body .evidence-table td.miss {
+  color: var(--ui-danger);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.module-body .evidence-table tr.is-ours td {
+  background: var(--green-soft);
+}
