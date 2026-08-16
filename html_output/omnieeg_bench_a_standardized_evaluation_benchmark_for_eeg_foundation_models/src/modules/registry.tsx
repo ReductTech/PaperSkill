@@ -1,0 +1,52 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { OmniDragAlignment } from './omni-drag-alignment';
+import { OmniOutputReadout } from './omni-output-readout';
+import { OmniAnalogy } from './omni-analogy';
+import { OmniHero } from './omni-hero';
+import { OmniLab1 } from './omni-lab-1';
+import { OmniLabSplit } from './omni-lab-split';
+import { OmniLab10 } from './omni-lab-10';
+import { OmniLab11 } from './omni-lab-11';
+import { OmniLab12 } from './omni-lab-12';
+import { OmniLab13 } from './omni-lab-13';
+import { OmniLab14 } from './omni-lab-14';
+import { OmniLab2 } from './omni-lab-2';
+import { OmniLab3 } from './omni-lab-3';
+import { OmniLab4 } from './omni-lab-4';
+import { OmniLab5 } from './omni-lab-5';
+import { OmniLab6 } from './omni-lab-6';
+import { OmniLab7 } from './omni-lab-7';
+import { OmniLab8 } from './omni-lab-8';
+import { OmniLab9 } from './omni-lab-9';
+import { OmniSharedPreview } from './omni-shared-preview';
+import { OmniMotivationCoverage } from './omni-motivation-coverage';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['omni-alignment-lab'] = OmniDragAlignment;
+widgetRegistry['omni-output-readout'] = OmniOutputReadout;
+widgetRegistry['omni-analogy'] = OmniAnalogy;
+widgetRegistry['omni-hero'] = OmniHero;
+widgetRegistry['omni-lab-1'] = OmniLab1;
+widgetRegistry['omni-lab-split'] = OmniLabSplit;
+widgetRegistry['omni-lab-10'] = OmniLab10;
+widgetRegistry['omni-lab-11'] = OmniLab11;
+widgetRegistry['omni-lab-12'] = OmniLab12;
+widgetRegistry['omni-lab-13'] = OmniLab13;
+widgetRegistry['omni-lab-14'] = OmniLab14;
+widgetRegistry['omni-lab-2'] = OmniLab2;
+widgetRegistry['omni-lab-3'] = OmniLab3;
+widgetRegistry['omni-lab-4'] = OmniLab4;
+widgetRegistry['omni-lab-5'] = OmniLab5;
+widgetRegistry['omni-lab-6'] = OmniLab6;
+widgetRegistry['omni-lab-7'] = OmniLab7;
+widgetRegistry['omni-lab-8'] = OmniLab8;
+widgetRegistry['omni-lab-9'] = OmniLab9;
+widgetRegistry['omni-shared-preview'] = OmniSharedPreview;
+widgetRegistry['omni-motivation-coverage'] = OmniMotivationCoverage;
