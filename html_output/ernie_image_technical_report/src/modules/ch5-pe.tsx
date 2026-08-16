@@ -23,19 +23,19 @@ const MODES: Record<PeMode, { label: string; color: string }> = {
 
 const IMAGES: Record<PeCase, Record<PeMode, string>> = {
   aime: {
-    raw: '/images/pe-aime-raw.jpg',
-    '3b': '/images/pe-aime-3b.jpg',
-    large: '/images/pe-aime-large.jpg',
+    raw: `${import.meta.env.BASE_URL}images/pe-aime-raw.jpg`,
+    '3b': `${import.meta.env.BASE_URL}images/pe-aime-3b.jpg`,
+    large: `${import.meta.env.BASE_URL}images/pe-aime-large.jpg`,
   },
   rpg: {
-    raw: '/images/pe-rpg-raw.jpg',
-    '3b': '/images/pe-rpg-3b.jpg',
-    large: '/images/pe-rpg-large.jpg',
+    raw: `${import.meta.env.BASE_URL}images/pe-rpg-raw.jpg`,
+    '3b': `${import.meta.env.BASE_URL}images/pe-rpg-3b.jpg`,
+    large: `${import.meta.env.BASE_URL}images/pe-rpg-large.jpg`,
   },
   web: {
-    raw: '/images/pe-web-raw.jpg',
-    '3b': '/images/pe-web-3b.jpg',
-    large: '/images/pe-web-large.jpg',
+    raw: `${import.meta.env.BASE_URL}images/pe-web-raw.jpg`,
+    '3b': `${import.meta.env.BASE_URL}images/pe-web-3b.jpg`,
+    large: `${import.meta.env.BASE_URL}images/pe-web-large.jpg`,
   },
 };
 

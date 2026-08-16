@@ -172,7 +172,7 @@ export const Ch9AestheticWidget: React.FC<WidgetProps> = ({ chapterId, moduleId 
     {view === 'flow' ? <>
       <div className="aesthetic-flow-grid">
         <figure className="paper-figure" style={{ margin: 0 }}>
-          <img src="/images/swiss-interface.jpg" alt="论文原始 Swiss 两两审美标注界面" style={{ width: '100%', maxHeight: 380, objectFit: 'contain' }} />
+          <img src={`${import.meta.env.BASE_URL}images/swiss-interface.jpg`} alt="论文原始 Swiss 两两审美标注界面" style={{ width: '100%', maxHeight: 380, objectFit: 'contain' }} />
           <figcaption>论文原图：Swiss 两两标注界面。它是流程证据，不是本教程生成的校样。</figcaption>
         </figure>
         <div>
@@ -181,7 +181,7 @@ export const Ch9AestheticWidget: React.FC<WidgetProps> = ({ chapterId, moduleId 
           <div className="step-ctrl" role="radiogroup" aria-label="本轮偏好"><button className={`tiny ${choices[round - 1] === 'left' ? '' : 'ghost'}`} role="radio" aria-checked={choices[round - 1] === 'left'} onClick={() => choose('left')}>{pair[0]} 更美</button><button className={`tiny ${choices[round - 1] === 'right' ? '' : 'ghost'}`} role="radio" aria-checked={choices[round - 1] === 'right'} onClick={() => choose('right')}>{pair[1]} 更美</button></div>
         </div>
       </div>
-      <details style={{ marginTop: 12 }}><summary>查看论文层级预览图</summary><figure className="paper-figure"><img src="/images/tier-preview.png" alt="论文原始审美层级预览图" style={{ width: '100%', maxHeight: 420, objectFit: 'contain' }} /><figcaption>审美层级预览。</figcaption></figure></details>
+      <details style={{ marginTop: 12 }}><summary>查看论文层级预览图</summary><figure className="paper-figure"><img src={`${import.meta.env.BASE_URL}images/tier-preview.png`} alt="论文原始审美层级预览图" style={{ width: '100%', maxHeight: 420, objectFit: 'contain' }} /><figcaption>审美层级预览。</figcaption></figure></details>
     </> : <div className="eria-evaluation-row">
       <canvas id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={H_ERIA} aria-label={`ERIA-1K ${metric} 持出评测流程与四模型结果`} />
       <div className="chip-row" role="radiogroup" aria-label="相关系数">{(['SRCC', 'PLCC'] as Metric[]).map((item) => <button key={item} className={`chip ${metric === item ? 'selected' : ''}`} role="radio" aria-checked={metric === item} onClick={() => selectMetric(item)}>{item}（越高越好）</button>)}</div>
