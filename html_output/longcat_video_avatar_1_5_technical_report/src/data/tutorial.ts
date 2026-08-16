@@ -14,7 +14,7 @@ export const tutorial: TutorialData = {
   },
   hero: {
     oldMethod: {
-      desc: '左图是一张<b>概念性基线归纳</b>：集中呈现 v1.0 的音频编码、原视频级 GRPO、多步扩散和原双人 MultiTalk 各自暴露的限制，并不代表论文定义了这样一套统一架构。',
+      desc: '左图是一张<b>概念性基线归纳</b>：集中呈现 v1.0 的音频编码、原视频级 GRPO、多步扩散和原双人 MultiTalk 各自暴露的限制。',
       componentId: 'hero-demo',
     },
     newMethod: {
@@ -26,9 +26,9 @@ export const tutorial: TutorialData = {
     {
       kind: 'chapter',
       id: 'chap-1',
-      title: '这篇论文解决了什么问题？',
+      title: 'Video Avatar 生成的学术研究与商业部署差距',
       badge: 'inf',
-      badgeLabel: '问题地图',
+      badgeLabel: '背景挑战',
       bridge: '这篇论文从一个更实际的问题出发：<b>研究演示为什么还不能稳定进入产品？</b> 已有方法能让人物说话；一旦换成长视频、复杂发音、局部肢体和多人画面，可靠性与成本问题会同时暴露。LongCat 1.5 希望用一套开源方案，<em>把这些分散的产品化缺口连起来</em>。',
       analogy: {
         title: '从一次成功，走到可重复交付',
@@ -66,8 +66,8 @@ export const tutorial: TutorialData = {
       badgeLabel: '音画对齐',
       bridge: '上一章把问题分成五类，本章先处理最直接的音画接口：<em>语音究竟提供了多细的时间信息</em>。v1.0 使用 Wav2Vec2；v1.5 改用 Whisper-large，并将 33 层声学表示压缩、重采样，最终 <b>严格对齐到视频潜变量的时间轴</b>。',
       analogy: {
-        title: '跟歌词不够，还要跟住每个音素',
-        text: '歌手的嘴型随起音、爆破和收尾连续变化；模型不仅要听懂内容，还要<b>跟住音素何时变化</b>。',
+        title: '跟住文字不够，还要跟住每个音素',
+        text: '演讲者的嘴型随起音、爆破和收尾连续变化；模型不仅要听懂内容，还要<b>跟住音素何时变化</b>。',
         componentId: 'scene-phoneme',
       },
       modules: [
@@ -75,13 +75,13 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '2.1',
           title: '同一段发音，两种音频编码器',
-          desc: '同步播放两种编码器的示意响应，比较 Wav2Vec2 的迟滞阶梯与 Whisper-large 更连续的音素轨迹。图中轨迹用于<b>解释论文的定性观察</b>；论文没有报告对应的数值消融。',
+          desc: '同步播放两种编码器的示意响应，比较 Wav2Vec2 的迟滞阶梯与 Whisper-large 更连续的音素轨迹。图中轨迹用于<b>解释论文的定性观察</b>。',
           componentId: 'phoneme-compare',
         },
         {
           kind: 'module',
           id: '2.2',
-          title: '把 33 层声学表示对齐到视频潜变量',
+          title: '音画对齐：把 33 层声学表示对齐到视频潜变量',
           desc: '先从微观流程观察 33 层特征如何变成 5 组、从 50 Hz 对齐到 25 FPS，并查看每个 DiT block 内部的条件注入顺序；下方宏观动画再解释 <b>AT2V、参考图像生成和视频续写三种输入配置</b> 如何与音频条件汇入统一 DiT。',
           componentId: 'audio-alignment',
         },

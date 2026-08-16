@@ -274,6 +274,8 @@ const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) 
         drawSinger(ctx, 96, 69, c.blue, p); drawMic(ctx, 150, 71); drawWave(ctx, 215, 70, 385, 16 + p * 10, t * 5, c.green);
         ['起音', '爆破', '收尾'].forEach((x, i) => label(ctx, x, 230 + i * 145, 132, i === Math.floor(p * 2.99) ? c.orange : c.muted, true));
       } else if (variant === 'review') {
+        microLabel(ctx, 'VIDEO-LEVEL REWARD', 43, 29, c.muted);
+        microLabel(ctx, 'PER-FRAME REWARD', 512, 29, c.orange);
         const bad = Math.floor(p * 7.99); for (let i = 0; i < 8; i++) { const x = 43 + i * 72; ctx.fillStyle = i === bad ? c.red : c.booth; roundRect(ctx, x, 49, 52, 61, 8); centeredLabel(ctx, String(i + 1), x + 26, 79, i === bad ? '#fff' : c.text, 13, true); }
         ctx.strokeStyle = c.orange; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(69 + bad * 72, 79, 34, 0, Math.PI * 2); ctx.stroke(); centeredLabel(ctx, '整段总分找不到坏帧；逐帧奖励能圈出具体位置', 330, 145, c.orange, 11.5, true);
       } else if (variant === 'distill') {
@@ -287,15 +289,21 @@ const StudioScene: React.FC<WidgetProps & { variant: Variant }> = ({ variant }) 
         for(let i=0;i<anchors;i++){const x=45+i*(570/(anchors-1));const active=i<=Math.floor(phase*anchors);ctx.fillStyle=active?c.green:'#fff';ctx.strokeStyle=c.green;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,128,active?7:5.5,0,Math.PI*2);ctx.fill();ctx.stroke();}
         centeredLabel(ctx,'DMD2：让短链生成分布靠近教师分布',330,158,c.orange,11.5,true);
       } else if (variant === 'routing') {
+        centeredLabel(ctx, '目标说话人 A', 115, 22, c.blue, 10, true);
+        centeredLabel(ctx, '目标说话人 B', 330, 22, c.blue, 10, true);
+        centeredLabel(ctx, '背景人物', 545, 22, c.purple, 10, true);
         [115, 330, 545].forEach((x, i) => drawSinger(ctx, x, 57, i === 2 ? c.purple : c.blue, i === 2 ? .05 : p));
         ctx.strokeStyle = c.green; ctx.lineWidth = 4; [[98,126,115,82],[313,126,330,82]].forEach(v=>{ctx.beginPath();ctx.moveTo(v[0],v[1]);ctx.lineTo(v[2],v[3]);ctx.stroke();});
         ctx.strokeStyle = c.purple; ctx.beginPath(); ctx.moveTo(562,126); ctx.lineTo(545,82); ctx.stroke();
-        label(ctx, 'Audio A', 68, 151, c.green, true); label(ctx, 'Audio B', 283, 151, c.green, true); label(ctx, 'Silent', 530, 151, c.purple, true);
+        ctx.fillStyle='#eef8f3';roundRect(ctx,57,130,116,31,8);centeredLabel(ctx,'Audio A',115,146,c.green,12,true);
+        ctx.fillStyle='#eef8f3';roundRect(ctx,272,130,116,31,8);centeredLabel(ctx,'Audio B',330,146,c.green,12,true);
+        ctx.fillStyle='#f5f0ff';roundRect(ctx,487,130,116,31,8);centeredLabel(ctx,'Silent Condition',545,146,c.purple,10.5,true);
       } else if (variant === 'cleaning') {
         drawWave(ctx, 45, 79, 570, 22, t * 2, c.blue); const x = 62 + p * 535;
         ctx.fillStyle = c.green; ctx.globalAlpha = .18; roundRect(ctx, 45, 36, Math.max(15, x - 45), 86, 8); ctx.globalAlpha = 1;
         ctx.strokeStyle = c.orange; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, 29); ctx.lineTo(x, 131); ctx.stroke(); centeredLabel(ctx, '在线窗口级质检', x, 154, c.orange, 11, true);
       } else {
+        microLabel(ctx,'QUALITY / EXPRESSIVENESS',53,24,c.blue);microLabel(ctx,'STABILITY / DEPLOYMENT',432,24,c.green);
         ctx.fillStyle='#f7f9fc';roundRect(ctx,33,31,282,105,12);ctx.fillStyle=c.blue;roundRect(ctx,33,31,282,7,8);
         label(ctx,'BASE',53,61,c.blue,true);label(ctx,'150 NFE',224,61,c.orange,true);
         label(ctx,'动作与镜头更丰富',53,91,c.text,true);label(ctx,'细腻表情 · 口型细节',53,116,c.muted);
