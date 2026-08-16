@@ -8,14 +8,14 @@ const C = {
 };
 
 const quickReadStops = [
-  { id: 'quick-context', time: '00:00', chapter: '第 1 章', title: '画面为什么还不是世界', cue: '生成能补盲区，重建能守几何；专家首先需要看到这两个目标为何必须协作。' },
-  { id: 'quick-planning', time: '00:30', chapter: '第 2 章', title: '先看全，再决定拍哪里', cue: 'HY-Pano 建立世界种子，WorldNav 把有限视角预算投向真正缺失的区域。' },
-  { id: 'quick-memory', time: '01:00', chapter: '第 3 章', title: '双记忆守住跨路线一致性', cue: 'GGM 固定全局骨架，SSM++ 检索局部参考，解决长距离扩展时的结构与纹理漂移。' },
-  { id: 'quick-training', time: '01:30', chapter: '第 4 章', title: '能力按依赖顺序训练', cue: '作者先建立相机控制，再加入跨轨迹记忆，最后把成熟教师蒸馏成四步学生。' },
-  { id: 'quick-reconstruction', time: '02:00', chapter: '第 5 章', title: '一次前向恢复五类三维产物', cue: 'WorldMirror 2.0 用共享骨干同时恢复相机、点图、深度、法线与 3DGS。' },
-  { id: 'quick-runtime', time: '02:30', chapter: '第 6 章', title: '资产生成后进入运行时', cue: '深度对齐与高斯压缩负责交付，WorldLens 再提供光照、碰撞和角色漫游。' },
-  { id: 'quick-results', time: '03:00', chapter: '第 7 章', title: '创新必须接回旧问题与证据', cue: '规划、记忆、前馈重建和资产工程各自解决不同瓶颈，实验也必须按协议解读。' },
-  { id: 'quick-conclusion', time: '03:35', chapter: '第 8 章', title: '一句话收束贡献与边界', cue: 'HY-World 2.0 交付的是可保存、可渲染、可运行的显式世界，但完整生成仍是离线分钟级流程。' },
+  { id: 'quick-context', chapter: '第 1 章', title: '画面为什么还不是世界', cue: '生成能补盲区，重建能守几何；专家首先需要看到这两个目标为何必须协作。' },
+  { id: 'quick-planning', chapter: '第 2 章', title: '先看全，再决定拍哪里', cue: 'HY-Pano 建立世界种子，WorldNav 把有限视角预算投向真正缺失的区域。' },
+  { id: 'quick-memory', chapter: '第 3 章', title: '双记忆守住跨路线一致性', cue: 'GGM 固定全局骨架，SSM++ 检索局部参考，解决长距离扩展时的结构与纹理漂移。' },
+  { id: 'quick-training', chapter: '第 4 章', title: '能力按依赖顺序训练', cue: '作者先建立相机控制，再加入跨轨迹记忆，最后把成熟教师蒸馏成四步学生。' },
+  { id: 'quick-reconstruction', chapter: '第 5 章', title: '一次前向恢复五类三维产物', cue: 'WorldMirror 2.0 用共享骨干同时恢复相机、点图、深度、法线与 3DGS。' },
+  { id: 'quick-runtime', chapter: '第 6 章', title: '资产生成后进入运行时', cue: '深度对齐与高斯压缩负责交付，WorldLens 再提供光照、碰撞和角色漫游。' },
+  { id: 'quick-results', chapter: '第 7 章', title: '创新必须接回旧问题与证据', cue: '规划、记忆、前馈重建和资产工程各自解决不同瓶颈，实验也必须按协议解读。' },
+  { id: 'quick-conclusion', chapter: '第 8 章', title: '一句话收束贡献与边界', cue: 'HY-World 2.0 交付的是可保存、可渲染、可运行的显式世界，但完整生成仍是离线分钟级流程。' },
 ] as const;
 
 const waitForQuickReadFrame = (delay: number) => new Promise<void>((resolve) => window.setTimeout(resolve, delay));
@@ -59,15 +59,14 @@ function QuickReadNavigator() {
     window.history.replaceState(null, '', `?quickread=1#${targetId}`);
   };
 
-  return <aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="四分钟 Quick Read 导航">
+  return <aside className={`quick-read-panel ${collapsed ? 'collapsed' : ''}`} aria-label="Quick Read 导航">
     <header>
-      <div><span>4 MIN QUICK READ</span><strong>专家展示导航</strong><small>每章一个关键落点</small></div>
+      <div><span>QUICK READ</span><strong>专家展示导航</strong><small>八章关键落点</small><a href="./">返回完整教程</a></div>
       <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? '展开 Quick Read 导航' : '收起 Quick Read 导航'} title={collapsed ? '展开导航' : '收起导航'}>{collapsed ? '＋' : '−'}</button>
     </header>
     {collapsed ? null : <>
-      <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><time>{item.time}</time><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
+      <nav>{quickReadStops.map((item) => <button key={item.id} type="button" className={active.id === item.id ? 'selected' : ''} aria-current={active.id === item.id ? 'step' : undefined} onClick={() => goTo(item.id)}><span>{item.chapter}</span><strong>{item.title}</strong></button>)}</nav>
       <section aria-live="polite"><span>当前讲解提示</span><strong>{active.title}</strong><p>{active.cue}</p></section>
-      <footer><a href="./">返回完整教程</a><span>建议总时长 4 分钟</span></footer>
     </>}
   </aside>;
 }

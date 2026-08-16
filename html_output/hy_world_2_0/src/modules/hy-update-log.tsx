@@ -4,6 +4,14 @@ import type { WidgetProps } from './registry';
 
 const releases = [
   {
+    id: 'v054',
+    version: 'V0.54',
+    alias: '归航星带·无刻领航姬',
+    focus: '无时间导航与居中展示布局',
+    modules: ['Quick Read 顶部导览条', '八章无时间索引', '正文居中恢复', '目标滚动安全区', '窄屏折叠导航'],
+    note: '删除每章时间和总时长提示，把右侧浮动面板重构为顶部横向导览条；正文恢复完整居中宽度，导航只占纵向空间，不再把章节整体向左推移。',
+  },
+  {
     id: 'v053',
     version: 'V0.53',
     alias: '四分钟星门·演示领航姬',
@@ -19,18 +27,10 @@ const releases = [
     modules: ['1.1 四问阅读罗盘', '八章论证顺序', '7.1 作者工作证据链', '8.1 官方功能展示', '8.1 逐篇第三方评论'],
     note: '把教程从模块百科重排为论文论证：先讲为何重要和作者做了什么，再用方法、实验、官方功能与署名评论逐层验证。',
   },
-  {
-    id: 'v051',
-    version: 'V0.51',
-    alias: '轻装星卷·花火终端姬',
-    focus: '信息减负、演示字号与五头可视巡检',
-    modules: ['全教程信息层级', '本节扩展资料', '演示字体下限', '5.2 五头候选画布', '5.2 全绿烟花预览'],
-    note: '把主线压缩为现场能讲清的判断，把证据与术语留在按需展开区，并修复五个输出头和烟花实际绘制却不可见的问题。',
-  },
 ] as const;
 
 export const HyUpdateLog: React.FC<WidgetProps> = () => {
-  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v053');
+  const [selectedId, setSelectedId] = useState<(typeof releases)[number]['id']>('v054');
   const selected = releases.find((release) => release.id === selectedId) ?? releases[0];
 
   return <div className="update-log-lab">
