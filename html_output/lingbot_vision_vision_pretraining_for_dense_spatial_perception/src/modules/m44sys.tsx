@@ -1,137 +1,74 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import React from 'react';
 import type { WidgetProps } from './registry';
 
-// Ch4 Module 1 —— 系统三件套：Student / Teacher / Frozen Corner Detector
-// 点击三个框，高亮并显示各自职责：谁被更新、谁是 EMA、谁冻结。
-const W = 560;
-const H = 260;
+// Ch4 Module 1 —— 系统三件套：静态信息表格（纯文字呈现，不做 canvas 动画）
+// 明确列出 Student / Teacher / Corner Detector 三者的结构与职责。
+const ROWS = [
+  {
+    name: 'Student（θ）',
+    structure: '主 ViT（backbone + 各 head）',
+    train: '✅ 反向传播更新',
+    role: '真正被梯度更新的那个，学语义 + 几何',
+  },
+  {
+    name: 'Teacher（θ̄）',
+    structure: 'Student 的 EMA 副本（同结构）',
+    train: '❌ 无梯度，只被 EMA 更新',
+    role: '在线预测边界场，负责出题（提供目标）',
+  },
+  {
+    name: 'Frozen Corner Detector',
+    structure: '单 block 小 ViT',
+    train: '❌ 完全冻结',
+    role: '只找稀疏角点 C₁…Cₘ，给解码做锚点',
+  },
+];
 
-type Which = 'student' | 'teacher' | 'corner';
-
-const INFO: Record<Which, { title: string; role: string; train: string; out: string }> = {
-  student: {
-    title: 'Student ViT',
-    role: '真正被梯度更新的主模型',
-    train: '✅ 反向传播更新 backbone + 各 head',
-    out: '输出：语义特征 + 边界几何，供 loss 反向传播',
-  },
-  teacher: {
-    title: 'Teacher ViT',
-    role: 'Student 的 EMA 副本（历史平均）',
-    train: '❌ 无梯度；每次迭代后 θ̄ ← λθ̄ + (1−λ)θ',
-    out: '输出：在线预测边界场（造伪标签的目标）',
-  },
-  corner: {
-    title: 'Frozen Corner Detector',
-    role: '单 block 小 ViT，完全冻结',
-    train: '❌ 不参与训练，只在前向找角点',
-    out: '输出：稀疏角点 C₁…Cₘ，给解码做锚点',
-  },
+const th: React.CSSProperties = {
+  textAlign: 'left',
+  padding: '8px 10px',
+  fontSize: 13,
+  borderBottom: '2px solid #d7e0ea',
+  color: '#21324a',
+  background: '#eef2f7',
+};
+const td: React.CSSProperties = {
+  padding: '8px 10px',
+  fontSize: 13,
+  borderBottom: '1px solid #e4eaf2',
+  color: '#333',
+  verticalAlign: 'top',
 };
 
-export const M44Sys: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [sel, setSel] = useState<Which>('student');
-  const [feedback, setFeedback] = useState({
-    text: '点击三个框，看系统三件套各自干什么：谁被更新、谁是 EMA、谁冻结。',
-    cls: '',
-  });
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    let ctx: CanvasRenderingContext2D;
-    try {
-      ctx = setupCanvas(canvas, W, H);
-    } catch {
-      return;
-    }
-    const render = (w: Which) => {
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#f5f8f0';
-      ctx.fillRect(0, 0, W, H);
-
-      // RGB image 输入
-      const imgX = (W - 120) / 2;
-      ctx.fillStyle = '#21324a';
-      ctx.fillRect(imgX, 12, 120, 34);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 13px "Segoe UI", sans-serif';
-      ctx.fillText('RGB image', imgX + 18, 35);
-
-      // 三列
-      const cols: Array<{ id: Which; x: number; label: string; color: string }> = [
-        { id: 'student', x: 24, label: 'Student', color: '#27446e' },
-        { id: 'teacher', x: 205, label: 'Teacher', color: '#7c3aed' },
-        { id: 'corner', x: 386, label: 'Corner Det', color: '#228d5c' },
-      ];
-      const bw = 150;
-      const by = 66;
-      const bh = 92;
-      cols.forEach((c) => {
-        const active = w === c.id;
-        ctx.fillStyle = active ? c.color : '#ffffff';
-        ctx.fillRect(c.x, by, bw, bh);
-        ctx.strokeStyle = active ? c.color : '#9fb0c8';
-        ctx.lineWidth = active ? 3 : 1.6;
-        ctx.strokeRect(c.x, by, bw, bh);
-        ctx.fillStyle = active ? '#fff' : c.color;
-        ctx.font = 'bold 15px "Segoe UI", sans-serif';
-        ctx.fillText(c.label, c.x + 22, by + 40);
-        ctx.font = '12px "Segoe UI", sans-serif';
-        ctx.fillStyle = active ? '#f0f0f0' : '#667';
-        ctx.fillText(active ? '正在看它' : '点击查看', c.x + 22, by + 62);
-      });
-
-      // 从 RGB 分出三条箭头
-      ctx.strokeStyle = '#9fb0c8';
-      ctx.lineWidth = 1.4;
-      const fromY = 46;
-      const toY = by;
-      cols.forEach((c) => {
-        ctx.beginPath();
-        ctx.moveTo(imgX + 60, fromY);
-        ctx.lineTo(c.x + bw / 2, toY);
-        ctx.stroke();
-      });
-
-      // 底部说明卡
-      const info = INFO[w];
-      const cx = 24;
-      const cy = by + bh + 16;
-      const cw2 = W - 48;
-      const ch2 = 86;
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#d7e0ea';
-      ctx.fillRect(cx, cy, cw2, ch2);
-      ctx.strokeRect(cx, cy, cw2, ch2);
-      ctx.fillStyle = '#21324a';
-      ctx.font = 'bold 14px "Segoe UI", sans-serif';
-      ctx.fillText(info.title + ' —— ' + info.role, cx + 14, cy + 24);
-      ctx.fillStyle = '#333';
-      ctx.font = '12.5px "Segoe UI", sans-serif';
-      ctx.fillText(info.train, cx + 14, cy + 46);
-      ctx.fillStyle = '#556';
-      ctx.fillText(info.out, cx + 14, cy + 68);
-    };
-    const start = () => {
-      render(sel);
-    };
-    const stop = () => {};
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => disconnect();
-  }, [sel]);
-
+export const M44Text: React.FC<WidgetProps> = () => {
   return (
-    <div className="widget">
-      <canvas ref={canvasRef} width={W} height={H} style={{ maxWidth: '100%' }} />
-      <div className="widget-controls">
-        <button onClick={() => { setSel('student'); setFeedback({ text: 'Student 是真正学习的那一个：一次迭代里只有它被梯度更新。', cls: 'ok' }); }}>Student</button>
-        <button onClick={() => { setSel('teacher'); setFeedback({ text: 'Teacher 是 EMA 副本：不参与梯度，只负责在线造边界目标（出题）。', cls: 'ok' }); }}>Teacher</button>
-        <button onClick={() => { setSel('corner'); setFeedback({ text: 'Frozen Corner Detector：冻结的小 ViT，只找稀疏角点，给解码当锚点。', cls: 'ok' }); }}>Corner Detector</button>
-      </div>
-      <div className={`feedback ${feedback.cls}`}>{feedback.text}</div>
+    <div className="m44-sys-table">
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={th}>组件</th>
+            <th style={th}>结构</th>
+            <th style={th}>参与训练</th>
+            <th style={th}>职责</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ROWS.map((r) => (
+            <tr key={r.name}>
+              <td style={td}>
+                <b>{r.name}</b>
+              </td>
+              <td style={td}>{r.structure}</td>
+              <td style={td}>{r.train}</td>
+              <td style={td}>{r.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="m44-note" style={{ marginTop: 8, fontSize: 12.5, color: '#556', lineHeight: 1.6 }}>
+        关键点：<b>角点检测器是整条边界自举链路上唯一固定不动的小组件</b>——它不预测边界，
+        只给后面的线段解码提供角点锚点；真正被梯度更新的始终只有 Student。
+      </p>
     </div>
   );
 };

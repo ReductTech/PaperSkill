@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna7:React.FC<WidgetProps>=()=> <AnalogyScene action="specialize" label="配置专用侦查装备"/>;
