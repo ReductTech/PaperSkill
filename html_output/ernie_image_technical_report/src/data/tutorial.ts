@@ -9,7 +9,7 @@ export const tutorial: TutorialData = {
     "affiliation": "Baidu",
     "domain": "文生图 · 潜空间扩散 · DiT · 偏好对齐 · 蒸馏 · 审美评估",
     "coreProblem": "开放权重文生图模型在复杂指令、可见文字和审美质量上仍有缺口；单纯扩大模型参数规模会遇到边际收益递减和更高计算成本，不能替代对数据与监督质量的改进。",
-    "coreInsight": "ERNIE-Image 以 8B 单流 DiT 为生成主体，把预训练数据组织、分辨率课程、真实提示适配、偏好对齐、多教师蒸馏和审美评估接成一条可检查的系统链路。",
+    "coreInsight": "ERNIE-Image 以 8B 单流 DiT 为生成主体，系统涵盖预训练数据组织、审美评估、分辨率课程、真实提示词适配、偏好对齐和多教师蒸馏的完整链路",
     "keywords": [
       "8B 单流 DiT",
       "分层采样",
@@ -32,51 +32,11 @@ export const tutorial: TutorialData = {
   "chapters": [
     {
       kind: "chapter",
-      "id": "chap-1",
-      "title": "为什么需要一个开放、强大且易用的文生图模型？",
-      "badge": "inf",
-      "badgeLabel": "Motivation",
-      "bridge": "论文从现实落差出发：领先文生图模型多为闭源，限制深入研究、私有部署和垂直微调；现有开源模型又难以同时兼顾能力、计算成本与易用性。",
-      "analogy": {
-        "title": "把封闭的专业工具变成可打开的工具箱",
-        "text": "展柜里的工具再强，也难以拆解和改造；论文希望提供一套能够打开、能力足够而且容易使用的工具箱。",
-        "componentId": "poster-analogies"
-      },
-      "modules": [
-        {
-          kind: "module",
-          "id": "1.1",
-          "title": "沿四步问题链读懂论文动机",
-          "desc": "依次点击“闭源壁垒、开源两难、能力缺口、论文目标”，查看每一步如何推出下一步。这里呈现的是引言中的问题陈述，不虚构参数规模消融。",
-          componentId: "ch1-motivation"
-        }
-      ],
-      "insight": "ERNIE-Image 的出发点是缩小开源模型与领先闭源系统之间的差距，并让复杂文生图能力能够被研究、部署和实际使用。",
-      "takeaways": [
-        {
-          "icon": "🔓",
-          "title": "开放性缺口",
-          "desc": "闭源策略限制深入研究、私有部署与垂直领域微调。"
-        },
-        {
-          "icon": "⚠️",
-          "title": "开源两难",
-          "desc": "直接扩展规模带来成本与边际收益问题，高效小模型又仍有困难任务短板。"
-        },
-        {
-          "icon": "🎯",
-          "title": "论文目标",
-          "desc": "构建开放、强大、易用的模型，重点补齐复杂指令、文字渲染与审美生成。"
-        }
-      ]
-    },
-    {
-      kind: "chapter",
       "id": "chap-2",
-      "title": "ERNIE-Image 的整体架构是什么？",
+      "title": "ERNIE-Image 的整体架构",
       "badge": "inf",
       "badgeLabel": "架构",
-      "bridge": "论文没有给出正式架构图。本节依据 Introduction 明确公开的组件重建高层架构：8B 单流 DiT 是生成主体，FLUX.2 VAE 提供图像潜空间，Ministral-3（3B）提供文字条件，Prompt Enhancer 与 ERNIE-Image-Aes 分别承担提示扩展和数据/评估侧路。",
+      "bridge": "8B 单流 DiT 是生成主体，FLUX.2 VAE 提供图像潜空间，Ministral-3（3B）提供文字条件，Prompt Enhancer 与 ERNIE-Image-Aes 分别承担提示扩展和数据/评估侧路。",
       "analogy": {
         "title": "先把生成主路与辅助侧路分开",
         "text": "像阅读一张系统蓝图：文字条件与图像潜变量汇入生成主体；提示增强发生在输入前，Aes 则位于数据筛选和审美评估侧。",
@@ -85,13 +45,13 @@ export const tutorial: TutorialData = {
       "modules": [
         {
           kind: "module",
-          "id": "2.1",
-          "title": "沿高层架构图追踪每个组件",
-          "desc": "先查看根据论文文字生成的顶会风格架构图，再点击组件追踪生成主路或数据/评估侧路。图中不补写论文未公开的张量尺寸、层数和逐层连接。",
+          "id": "1.1",
+          "title": "Pipeline",
+          "desc": "",
           componentId: "ch2-representation"
         }
       ],
-      "insight": "ERNIE-Image 的核心是受文字条件约束的 8B 单流 DiT；Prompt Enhancer 改写输入，VAE 管理图像潜空间，Aes 负责数据与评估，它们不能互相替代。",
+      "insight": "",
       "takeaways": [
         {
           "icon": "🖼️",
@@ -106,32 +66,26 @@ export const tutorial: TutorialData = {
         {
           "icon": "📐",
           "title": "辅助组件",
-          "desc": "Prompt Enhancer 是可选输入预处理；Aes 位于数据筛选和审美评估侧，不直接生成图像。"
+          "desc": "Prompt Enhancer 是可选提示词预处理；Aes 位于数据筛选和审美评估侧，不参与生成图像。"
         }
       ]
     },
     {
       kind: "chapter",
       "id": "chap-3",
-      "title": "海量数据如何同时保住长尾和质量？",
+      "title": "如何筛选海量数据？",
       "badge": "inf",
       "badgeLabel": "预训练数据",
-      "bridge": "表征确定后，下一步是决定喂给模型什么数据。论文把类间语义覆盖与类内审美质量拆成两级问题，并增加文字感知描述。",
-      "analogy": {
-        "title": "把一张样片推到合适的位置",
-        "text": "只挑热门漂亮样片会丢掉长尾，只追求稀有也不保证质量。两级采样把这两个问题分开处理。",
-        "componentId": "poster-analogies"
-      },
+      "bridge": "表征确定后，下一步是决定喂给模型什么数据。论文先用 10,000 个细粒度类别组织海量样本，再把类间语义覆盖与类内审美质量拆成两级采样问题。",
       "modules": [
         {
           kind: "module",
-          "id": "3.1",
-          "title": "拖动样片，分清两级采样",
-          "desc": "水平拖动表示从常见类别到长尾覆盖，垂直拖动表示同一类别内从较低到较高审美质量；再对比“只描述画面”和“同时写入图中文字”，观察文字感知描述究竟多保留了什么信息。坐标明确标注为教学示意，不显示虚构概率。",
+          "id": "2.1",
+          "title": "看两级采样如何兼顾长尾与质量",
+          "desc": "依次切换原始数据池、类间平衡和类内择优：先观察样本如何集中在高频类别，再看长尾类别获得更多采样机会，最后查看各类别中高审美质量样本如何被共同高亮。",
           componentId: "ch3-data"
         }
       ],
-      "insight": "一个总体质量排名无法同时修复长尾缺失；类间覆盖和类内择优必须分开解释。",
       "takeaways": [
         {
           "icon": "🗂️",
@@ -148,10 +102,10 @@ export const tutorial: TutorialData = {
     {
       kind: "chapter",
       "id": "chap-9",
-      "title": "审美分数从哪里来，又如何服务数据筛选？",
+      "title": "审美筛选",
       "badge": "trn",
       "badgeLabel": "审美数据治理",
-      "bridge": "上一章的类内采样依赖可靠的审美分数。本章继续追问这个分数如何获得：论文先用两两判断和 Swiss 配对构造人工标签，再训练 ERNIE-Image-Aes 为预训练语料评分；ERIA-1K 则作为持出集检查评分器是否符合人工判断。",
+      "bridge": "上一章的类内采样依赖可靠的审美分数，那这个分数如何获得：论文先用两两判断和 Swiss 配对构造人工标签，再训练 ERNIE-Image-Aes 为预训练语料评分；ERIA-1K 则作为持出集检查评分器是否符合人工判断。",
       "analogy": {
         "title": "只比较这一对校样",
         "text": "绝对打分容易随时间漂移，两两判断只回答“这一对谁更美”。Swiss配对再让相近名次继续比较。",
@@ -160,9 +114,9 @@ export const tutorial: TutorialData = {
       "modules": [
         {
           kind: "module",
-          "id": "4.1",
+          "id": "3.1",
           "title": "从 Swiss 标注到 ERNIE-Image-Aes",
-          "desc": "原始 Swiss 标注界面与层级预览图展示论文的标签构建方法；Canvas 名次和三轮配对只用于解释机制。切到 ERIA-1K 后，可查看评分器在持出集上的 SRCC、PLCC；这些结果验证评分器，而审美分数随后用于预训练数据的过滤与分层采样。",
+          "desc": "在四张校样的三次微型判断中，读者每次只选择更美的一张；胜负会即时更新当前名次，随后再比较排名接近的样本。切到 ERIA-1K 后，可查看评分器在持出集上的 SRCC、PLCC；这些结果验证评分器，而审美分数随后用于预训练数据的过滤与分层采样。",
           componentId: "ch9-aesthetic"
         }
       ],
@@ -187,10 +141,67 @@ export const tutorial: TutorialData = {
     },
     {
       kind: "chapter",
+      "id": "chap-8",
+      "title": "Flow Matching：模型如何学会把噪声变成图像？",
+      "badge": "trn",
+      "badgeLabel": "预训练目标",
+      "bridge": "前三章解决了模型结构和预训练数据问题，但数据本身不会告诉 DiT 如何生成图像。Flow Matching 把生成过程写成一条从噪声潜变量到图像潜变量的连续路径，让模型学习路径上每个位置应该前进的速度。",
+      "analogy": {
+        "title": "沿着修正方向打磨校样",
+        "text": "编辑不必一次完成整张海报，只要在每个中间状态判断下一笔该往哪里修正；连续采用这些局部方向，模糊校样最终就会形成清晰结构。",
+        "componentId": "poster-analogies"
+      },
+      "modules": [
+        {
+          kind: "module",
+          "id": "4.1",
+          "title": "在路径中随机抽一道训练题",
+          "desc": "拖动时间 t，观察噪声 ε、图像潜变量 z 与中间状态 zₜ 的关系。每道训练题只要求 DiT 根据 zₜ、t 和文本条件 c 预测当前位置的目标速度。",
+          componentId: "ch8-flow-training"
+        },
+        {
+          kind: "module",
+          "id": "4.2",
+          "title": "把局部速度连成一次完整生成",
+          "desc": "逐次调用 DiT：每次函数调用预测当前位置的速度，ODE 求解器据此更新潜变量。连续积分后得到结构化图像潜变量，最后再由 VAE 解码成可见图片。",
+          componentId: "ch8-flow-sampling"
+        }
+      ],
+      "insight": "Flow Matching 不是让模型背出终点图片，而是回归一条概率路径上的速度场；训练可以直接随机抽取时刻，生成时再沿学到的场积分。",
+      "formula": {
+        "lead": "一般地，先选定连接噪声与数据的条件路径 ψₜ，再让模型回归这条路径的时间导数。",
+        "unicode": "zₜ = ψₜ(ε,z),　uₜ = ∂ψₜ(ε,z)/∂t,　L_FM = E‖vθ(zₜ,t,c) − uₜ‖²",
+        "symbols": [
+          { "sym": "ε / z", "desc": "噪声潜变量与真实图像经 VAE 编码得到的数据潜变量。" },
+          { "sym": "t / zₜ", "desc": "连续时间，以及路径在该时刻的中间潜变量。" },
+          { "sym": "uₜ", "desc": "所选条件路径在 zₜ 处提供的目标速度。" },
+          { "sym": "vθ", "desc": "DiT 在文本条件 c 下预测的速度场。" }
+        ]
+      },
+      "takeaways": [
+        {
+          "icon": "🛣️",
+          "title": "先规定路径",
+          "desc": "路径 ψₜ 连接简单噪声分布与图像潜变量分布。"
+        },
+        {
+          "icon": "🧭",
+          "title": "学习局部速度",
+          "desc": "DiT 回归当前位置应有的速度，而不是一次直接输出最终图片。"
+        },
+        {
+          "icon": "∫",
+          "title": "积分得到样本",
+          "desc": "推理时从噪声出发，沿预测速度场进行 ODE 积分，再由 VAE 解码。"
+        }
+      ]
+    },
+    {
+      kind: "chapter",
       "id": "chap-4",
       "title": "渐进提高分辨率的三阶段训练策略",
       "badge": "trn",
-      "badgeLabel": "预训练课程",
+      "badgeLabel": "预训练阶段",
       "bridge": "语义组织、文字描述与审美筛选共同确定预训练数据后，基础模型再按 256×256、512×512、1024×1024 三段课程逐步提高分辨率，并在每个阶段保留多种长宽比。",
       "analogy": {
         "title": "把取景框扩到目标尺寸",
@@ -230,11 +241,11 @@ export const tutorial: TutorialData = {
       "id": "chap-5",
       "title": "模型如何听懂真实用户的不同说法？",
       "badge": "both",
-      "badgeLabel": "SFT与PE",
-      "bridge": "训练期的监督微调（SFT）让模型见过不同领域与用户表达，推理前的提示增强器（Prompt Enhancer, PE）再把过短输入扩成结构化说明；两者相邻但不相同。",
+      "badgeLabel": "SFT与BE",
+      "bridge": "后训练时，监督微调（SFT）让模型学习不同领域与用户表达；推理时，提示增强器（Prompt Enhancer, PE）再把过短输入扩成结构化说明。",
       "analogy": {
-        "title": "把标准说明改成用户会说的话",
-        "text": "训练时先见过短词、自然请求和详细构图，使用时再把过短需求补成结构化说明。两步发生在不同阶段。",
+        "title": "把标准描述拓展为多样化的用户风格描述",
+        "text": "训练时先学习短描述、自然请求和详细构图，使用时再把过短需求补成结构化说明。两步发生在不同阶段。",
         "componentId": "poster-analogies"
       },
       "modules": [
@@ -242,7 +253,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "6.1",
           "title": "同一图片，换成四种用户表达",
-          "desc": "选择重点领域与用户表达形式，观察训练期 SFT 如何构造多样提示。K2.5 改写属于训练数据构建，不是运行时提示增强。",
+          "desc": "选择海报、游戏、人像、产品或动漫图片：左侧显示同一张真实图片及原始描述，右侧并列展示关键词、自然请求、指令式和详细构图四种用户表达。",
           componentId: "ch5-sft"
         },
         {
@@ -275,7 +286,7 @@ export const tutorial: TutorialData = {
     {
       kind: "chapter",
       "id": "chap-6",
-      "title": "偏好怎样进入流匹配训练而不被钻空子？",
+      "title": "如何生成符合人类偏好的图片？",
       "badge": "both",
       "badgeLabel": "DPO",
       "bridge": "直接偏好优化（DPO）比较策略模型与冻结参考模型的胜负重建误差差距。只把负样本误差推高也能拉开差距，却会形成奖励投机；论文用胜负锚定项约束这种路径。",
@@ -289,11 +300,11 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "7.1",
           "title": "对比健康优化与奖励投机",
-          "desc": "分别拖动胜样本和负样本的教学误差，观察两条路径为什么都能降低 L_DPO；再把目标切换为 L_DPO + Anchor Losses，查看锚定惩罚如何改变 L_total 的优化方向。β=0.05、λ_win=0.35、λ_lose=0.15 是论文设置，其余数值为公式教学代入。",
+          "desc": "点击播放，让同一参考点在两张二维等损失图上同时下降。左侧展示仅 DPO 如何走向提高负样本误差的投机区，右侧展示 Anchor Losses 如何把总目标的下降方向转向受约束区域。",
           componentId: "ch6-dpo"
         }
       ],
-      "insight": "降低胜样本误差和抬高负样本误差都能改善 DPO 单项；Anchor Losses 通过奖励前者、惩罚后者，让总目标区分健康优化与奖励投机。",
+      "insight": "降低胜样本误差和抬高负样本误差都能改善 DPO 单项；Anchor Losses 给胜负误差都加上正向代价，使一味抬高负样本误差不再是总目标的下降方向。",
       "formula": {
         "lead": "sigmoid 是 logistic 函数 sigmoid(z)=1/(1+e^(−z))；这里的 sigmoid 与下一章表示噪声尺度的符号无关。",
         "unicode": "Diff_policy = ℓ_pol^win − ℓ_pol^lose<br/>L_DPO = −E[log sigmoid(−β(Diff_policy − Diff_ref))]<br/>L_total = L_DPO + λ_win E[ℓ_win] + λ_lose E[ℓ_lose]<br/>ℓ = ‖vθ(x_t,h,t) − v_t‖₂²",
@@ -343,7 +354,7 @@ export const tutorial: TutorialData = {
       "takeaways": [
         {
           "icon": "⚖️",
-          "title": "比较相对差距",
+          "title": "DPO",
           "desc": "DPO 比较策略模型与冻结参考模型的胜负重建误差差距。"
         },
         {
@@ -353,35 +364,35 @@ export const tutorial: TutorialData = {
         },
         {
           "icon": "⚓",
-          "title": "DPO",
-          "desc": ""
+          "title": "优化后的DPO",
+          "desc": "用Anchor Loss避免奖励投机"
         }
       ]
     },
     {
       kind: "chapter",
       "id": "chap-7",
-      "title": "ERNIE-Image-Turbo 如何兼顾速度与能力？",
+      "title": "为什么要蒸馏？",
       "badge": "trn",
       "badgeLabel": "MT-DMD",
-      "bridge": "本章把两个阶段明确分开：训练时，MT-DMD 根据噪声状态、语义条件和 CA/DM 目标组合多位教师的监督；蒸馏完成后，Turbo 学生模型独立完成 8 NFE（八次模型函数求值），教师不再参与生成。",
+      "bridge": "扩散模型通常要反复调用生成网络，逐步把噪声还原成图像。蒸馏要把这条迭代过程压缩进少步学生模型；但论文观察到，使用数据子集训练会带来轻微能力漂移。因此 ERNIE-Image 不是只追求少步，而是用 MT-DMD 汇集不同专长教师的监督，再让 Turbo 学生独立以 8 NFE 完成推理。",
       "analogy": {
-        "title": "先由多位老师会诊，再让学生独立完成",
-        "text": "训练阶段由不同领域教师共同监督学生；训练完成后，学生把这些能力带入自己的八次模型函数求值，推理时不再调用教师。",
+        "title": "先学会多位教师的长程修正，再独立走完短路径",
+        "text": "训练时，多位领域教师针对当前噪声、语义与优化目标提供监督；推理时，监督已经写入学生参数，Turbo 不再调用任何教师。",
         "componentId": "poster-analogies"
       },
       "modules": [
         {
           kind: "module",
           "id": "8.1",
-          "title": "分开观察 MT-DMD 训练与 8 NFE 推理",
-          "desc": "",
+          "title": "从多教师蒸馏到学生独立推理",
+          "desc": "先切到训练阶段，观察高噪声到低噪声时教师专长如何变化，以及 CA 与 DM 分别约束什么；再切到推理阶段，播放 Turbo 的 8 次模型函数求值。",
           componentId: "ch7-turbo"
         }
       ],
-      "insight": "MT-DMD 是训练期的多教师监督机制，8 NFE 是蒸馏后 Turbo 的推理预算；教师能力被吸收到学生参数中，而不是在推理八步里继续路由。",
+      "insight": "蒸馏压缩的是去噪过程，不是简单删掉步骤：MT-DMD 在训练期用动态路由组合多位专家教师，尽量把构图、文字、风格和细节能力一同保留下来。",
       "formula": {
-        "lead": "论文给出单个路由权重属于 [0,1]，但没有报告所有权重和为 1，也没有公开逐步路由轨迹。",
+        "lead": "路由权重 Wₖ 会同时读取当前潜变量、噪声尺度、语义条件和 CA/DM 目标，为这一训练状态组合教师的去噪预测。",
         "unicode": "x̂₀ = Σₖ Wₖ(x_t, noise_scale, c, O) · Eₖ(x_t, noise_scale, c)",
         "symbols": [
           {
@@ -414,25 +425,36 @@ export const tutorial: TutorialData = {
           }
         ]
       },
-      "takeaways": []
+      "takeaways": [
+        {
+          "icon": "⚡",
+          "title": "为什么蒸馏",
+          "desc": "把需要多次网络调用的迭代去噪过程压缩为少步生成，同时尽量保留原模型能力。"
+        },
+        {
+          "icon": "🧩",
+          "title": "训练时做什么",
+          "desc": "MT-DMD 根据 x_t、噪声尺度、语义条件和 CA/DM 目标动态组合多位专家教师的监督。"
+        },
+        {
+          "icon": "🏁",
+          "title": "推理时做什么",
+          "desc": "Turbo 学生独立执行 8 NFE；教师模型和训练期路由都不再参与生成。"
+        }
+      ]
     },
     {
       kind: "chapter",
       "id": "chap-10",
-      "title": "结果",
+      "title": "模型表现",
       "badge": "both",
-      "badgeLabel": "结果与边界",
-      "bridge": "每个结果都绑定具体数据集、模型版本、指标方向和证据强度。公开基准、内部人工评测与定性图片不能被混成一个跨协议总排名。",
-      "analogy": {
-        "title": "只给同一份验收表盖章",
-        "text": "不同测试集像不同验收表，不能混成一场总排名。每次只在同一协议里比较。",
-        "componentId": "poster-analogies"
-      },
+      "badgeLabel": "Evaluation",
+      "bridge": "",
       "modules": [
         {
           kind: "module",
           "id": "9.1",
-          "title": "先看论文原图，再读取对应评测表",
+          "title": "定性比较",
           "desc": "",
           componentId: "ch10-results"
         }

@@ -47,8 +47,8 @@ export default function App() {
                 <span className={`badge-tag ${ch.badge}`}>{ch.badgeLabel}</span>
               </h2>
               <FlowMini total={total} revealed={revealed} />
-              <ChapterBridge text={ch.bridge} />
-              <AnalogyCard analogy={ch.analogy} chapterId={ch.id} />
+              {ch.bridge ? <ChapterBridge text={ch.bridge} /> : null}
+              {ch.analogy ? <AnalogyCard analogy={ch.analogy} chapterId={ch.id} /> : null}
               {ch.modules.map((m) => (
                 <Module key={m.id} module={m} chapterId={ch.id} />
               ))}

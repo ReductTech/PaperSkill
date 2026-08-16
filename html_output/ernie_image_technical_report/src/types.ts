@@ -75,7 +75,7 @@ export interface ChapterDef {
   badge: Badge;
   badgeLabel: string;
   bridge: string; // "本节作用" copy
-  analogy: AnalogyCard;
+  analogy?: AnalogyCard;
   modules: ModuleDef[];
   insight?: string;
   formula?: FormulaDef;
