@@ -153,12 +153,12 @@ export const tutorial: TutorialData = {
         {
           kind: "module",
           "id": "3.1",
-          "title": "盲区勘景任务台",
-          "desc": "先指定物体背面、走廊远端或俯视盲区，再从五类 WorldNav 路线中组合最多两类策略，比较覆盖目标、执行条件与互补性。",
+          "title": "WorldNav 五层规划回放",
+          "desc": "选择五类轨迹任务之一，逐层查看场景语义与 NavMesh、候选均匀采样、Ray-casting 碰撞筛选、双向贪心连接和尾部修剪；最后让相机按折线分段长度移动并在拐点真实转向。",
           componentId: "hy-trajectory"
         }
       ],
-      "insight": "五类路线是互补的启发式策略，而不是一个端到端学习的最优策略。",
+      "insight": "WorldNav 把语义目标、可导航几何和启发式路径连接组合起来；五类路线不是端到端学习到的全局最优策略，工程流程细节也需要与论文证据分层阅读。",
       "takeaways": [
         {
           "icon": "🗺️",
@@ -494,7 +494,7 @@ export const tutorial: TutorialData = {
       "title": "从对齐深度到紧凑 3DGS",
       "badge": "trn",
       "badgeLabel": "训练细节",
-      "bridge": "前馈重建给出的深度仍有尺度歧义，直接把所有点变成高斯又会在效率、细节和漂浮物之间冲突。",
+      "bridge": "前馈重建给出的深度仍有尺度歧义，直接把所有点变成高斯又会在效率、细节和漂浮物之间冲突；资产完成后，还需要一个运行时层把光照、碰撞和角色真正接入世界。",
       "analogy": {
         "title": "先把照片对齐，再删掉重复的拍摄点",
         "text": "生成深度先对齐到全景坐标，随后只在需要细节的区域保留足够高斯。",
@@ -507,9 +507,16 @@ export const tutorial: TutorialData = {
           "title": "高斯预算帕累托实验",
           "desc": "调节最大高斯数量与最低 PSNR，在表 9 的五个真实配置中寻找可行点、最低数量推荐与被支配方案，再展开原表核对完整指标。",
           componentId: "hy-composition"
+        },
+        {
+          kind: "module",
+          "id": "9.2",
+          "title": "WorldLens 运行时实验",
+          "desc": "切换 IBL 环境光照、碰撞代理和角色漫游三种运行时能力，观察同一资产如何被重新照亮、阻挡穿模并支持第三人称折线跟随；官方 GIF 放在此处作为真实案例参照。",
+          componentId: "hy-worldlens-lab"
         }
       ],
-      "insight": "均匀降采样会伤害高频细节；非天空增密与概率掩码共同实现更紧凑的表示。",
+      "insight": "非天空增密与概率掩码把高斯压缩成更紧凑的显式表示，WorldLens 再把生成完成后的资产接入实时渲染与交互；资产生成和运行时是两个不同阶段。",
       "formula": {
         "lead": "高斯存在掩码参与渲染，并与颜色、几何和正则项一起优化。",
         "unicode": "c(x)=Σ M_k c_k σ_k T_k;  L_GS=L_color+L_geo+L_reg+L_mask",
@@ -541,8 +548,8 @@ export const tutorial: TutorialData = {
         },
         {
           "icon": "☁️",
-          "title": "天空限制增密",
-          "desc": "减少缺少深度监督区域产生漂浮物。"
+          "title": "资产进入运行时",
+          "desc": "WorldLens 负责 IBL、碰撞和角色漫游，不负责实时生成整个世界。"
         }
       ]
     },
@@ -570,11 +577,18 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "10.2",
           "title": "模型能力进化图鉴",
-          "desc": "点击模型与功能交叉单元格，再沿同一能力轴切换历代与外部参照，对比用途、2.0 改进点与证据边界。",
+          "desc": "在 HY 历代谱系和外部谱系之间切换；外部视图只保留 HY-World 2.0、GenEx、video2world 与 Marble 1.0，再沿同一能力轴比较用途、改进点与证据边界。",
           componentId: "hy-model-evolution"
+        },
+        {
+          kind: "module",
+          "id": "10.3",
+          "title": "协议安全性能条形图",
+          "desc": "在论文表 4、表 12 与表 14 的兼容协议内切换全景质量、相机与深度、新视角合成、显存和墙钟时间；保留非领先结果与 OOM 状态，并禁止跨协议合并总分。",
+          componentId: "hy-performance-compare"
         }
       ],
-      "insight": "HY-World 2.0 的系统价值来自把稀疏输入生成、密集输入重建、持久三维资产和运行时交互接入同一框架；但不同前代与外部模型的目标并不相同，Marble 也只有定性比较，不能把能力矩阵误读成统一排行榜。",
+      "insight": "HY-World 2.0 的系统价值来自把稀疏输入生成、密集输入重建、持久三维资产和运行时交互接入同一框架；定量条形图只能在同一任务协议内比较，能力矩阵也不能被误读成跨谱系统一排行榜。",
       "takeaways": [
         {
           "icon": "📊",

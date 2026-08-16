@@ -144,7 +144,7 @@ export const HyComposition:React.FC<WidgetProps>=()=>{
     </div>
 
     <PaperTable tableId="table-9" />
-    <div className="official-gif-grid"><OfficialGif src="/images/official-mesh.gif" title="轻量 Mesh 漫游" caption="官方演示展示从生成结果得到的可漫游完整三维资产，帮助理解网格为何需要兼顾碰撞代理与快速加载。" alt="HY-World 2.0 官方轻量网格漫游演示" /><OfficialGif src="/images/official-interactive.gif" title="角色交互与物理反馈" caption="官方演示展示角色在场景中的移动与空间交互。它证明的是当前演示能力，不应被解读为论文统一协议下的定量指标。" alt="HY-World 2.0 官方角色交互演示" /></div>
+    <div className="official-gif-grid"><OfficialGif src="/images/official-mesh.gif" title="轻量 Mesh 漫游" caption="官方演示展示从生成结果得到的可漫游完整三维资产，帮助理解网格为何需要兼顾碰撞代理与快速加载。" alt="HY-World 2.0 官方轻量网格漫游演示" /></div>
   </div>;
 };
 

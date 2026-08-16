@@ -12,6 +12,619 @@
   --paper-photo: #ffffff;
 }
 
+/* V0.43: WorldNav planning replay, WorldLens runtime lab, and protocol-safe charts */
+.evolution-matrix.external {
+  grid-template-columns: minmax(150px, .9fr) repeat(4, minmax(138px, 1fr));
+}
+
+.trajectory-task-switch,
+.trajectory-stage-tabs,
+.worldlens-modes,
+.performance-groups {
+  display: grid;
+  gap: 8px;
+}
+
+.trajectory-task-switch {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.trajectory-task-switch button,
+.trajectory-stage-tabs button,
+.worldlens-modes button,
+.performance-groups button {
+  min-width: 0;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 6px;
+  background: #fff;
+  color: #21324a;
+  cursor: pointer;
+  text-align: left;
+}
+
+.trajectory-task-switch button {
+  min-height: 58px;
+  padding: 9px 10px;
+}
+
+.trajectory-task-switch strong,
+.trajectory-task-switch span,
+.trajectory-stage-tabs strong,
+.trajectory-stage-tabs small,
+.worldlens-modes strong,
+.worldlens-modes span,
+.performance-groups strong,
+.performance-groups span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.trajectory-task-switch strong {
+  font-size: 14px;
+}
+
+.trajectory-task-switch span {
+  margin-top: 3px;
+  color: #68778f;
+  font-size: 11px;
+}
+
+.trajectory-task-switch button.selected,
+.trajectory-stage-tabs button.selected,
+.worldlens-modes button.selected,
+.performance-groups button.selected {
+  border-color: #27446e;
+  background: #eef4fa;
+  box-shadow: inset 0 0 0 1px #27446e;
+}
+
+.trajectory-stage-tabs {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.trajectory-stage-tabs button {
+  display: flex;
+  min-height: 76px;
+  gap: 8px;
+  padding: 9px;
+}
+
+.trajectory-stage-tabs button > i {
+  display: grid;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7ebf1;
+  color: #68778f;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.trajectory-stage-tabs button.complete > i {
+  background: #dcefe5;
+  color: #228d5c;
+}
+
+.trajectory-stage-tabs button.selected > i {
+  background: #27446e;
+  color: #fff;
+}
+
+.trajectory-stage-tabs strong {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.trajectory-stage-tabs small {
+  margin-top: 4px;
+  color: #68778f;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.trajectory-planner-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(250px, .85fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.trajectory-planner-stage > canvas,
+.worldlens-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #d7deea;
+  border-radius: 6px;
+  background: #f5f8f0;
+}
+
+.trajectory-stage-detail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 15px;
+  border: 1px solid #d7deea;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.trajectory-stage-detail > span,
+.worldlens-detail header > span,
+.performance-chart header span {
+  color: #68778f;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.trajectory-stage-detail h5,
+.worldlens-detail h5,
+.performance-chart h5 {
+  margin: 4px 0 8px;
+  color: #21324a;
+  font-size: 18px;
+}
+
+.trajectory-stage-detail > p {
+  margin: 0 0 12px;
+  color: #43526a;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.trajectory-stage-detail dl {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.trajectory-stage-detail dl > div {
+  padding: 8px 9px;
+  border-left: 3px solid #aab8c9;
+  background: #f7f9fb;
+}
+
+.trajectory-stage-detail dt {
+  color: #27446e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.trajectory-stage-detail dd {
+  margin: 3px 0 0;
+  color: #43526a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.trajectory-stage-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.trajectory-stage-actions button,
+.performance-controls button,
+.performance-metrics button {
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 1px solid #b9c3d1;
+  border-radius: 5px;
+  background: #fff;
+  color: #27446e;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.trajectory-stage-actions button.primary,
+.performance-controls button.selected,
+.performance-metrics button.selected {
+  border-color: #27446e;
+  background: #27446e;
+  color: #fff;
+}
+
+.trajectory-stage-actions button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.worldlens-modes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.worldlens-modes button {
+  min-height: 64px;
+  padding: 10px 12px;
+}
+
+.worldlens-modes strong,
+.performance-groups strong {
+  font-size: 14px;
+}
+
+.worldlens-modes span,
+.performance-groups span {
+  margin-top: 4px;
+  color: #68778f;
+  font-size: 11px;
+}
+
+.worldlens-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.worldlens-status {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border: 1px solid rgba(39,68,110,.2);
+  border-radius: 5px;
+  background: rgba(255,255,255,.92);
+  color: #43526a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.worldlens-status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #228d5c;
+}
+
+.worldlens-lab.is-running .worldlens-status i {
+  background: #d97706;
+  animation: worldlens-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes worldlens-pulse {
+  to { transform: scale(1.45); opacity: .55; }
+}
+
+.worldlens-detail {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #d7deea;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.worldlens-detail header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.worldlens-detail header > span,
+.worldlens-detail h5 {
+  grid-column: 1;
+}
+
+.worldlens-detail header button {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #b9c3d1;
+  border-radius: 50%;
+  background: #fff;
+  color: #27446e;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.worldlens-detail > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.worldlens-detail p {
+  margin: 0;
+  padding: 10px;
+  border-top: 3px solid #aab8c9;
+  background: #f7f9fb;
+  color: #43526a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.worldlens-detail p b {
+  display: block;
+  margin-bottom: 4px;
+  color: #27446e;
+}
+
+.performance-groups {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.performance-groups button {
+  min-height: 62px;
+  padding: 10px 12px;
+}
+
+.performance-controls,
+.performance-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.performance-controls > div {
+  display: flex;
+  gap: 6px;
+}
+
+.performance-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #43526a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.performance-controls select {
+  min-height: 38px;
+  padding: 6px 30px 6px 9px;
+  border: 1px solid #b9c3d1;
+  border-radius: 5px;
+  background: #fff;
+  color: #21324a;
+}
+
+.performance-chart {
+  padding: 15px;
+  border: 1px solid #d7deea;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.performance-chart > header {
+  display: grid;
+  grid-template-columns: minmax(150px, .7fr) minmax(260px, 1.3fr);
+  gap: 18px;
+  align-items: end;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e7ed;
+}
+
+.performance-chart > header small {
+  color: #68778f;
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: right;
+}
+
+.performance-bars {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.performance-row {
+  display: grid;
+  grid-template-columns: minmax(150px, .75fr) minmax(280px, 1.7fr) minmax(126px, .65fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.performance-row > div:first-child {
+  min-width: 0;
+}
+
+.performance-row > div:first-child strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #21324a;
+  font-size: 12px;
+}
+
+.performance-row > div:first-child span {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #dcefe5;
+  color: #176b45;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.performance-track {
+  position: relative;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #edf0f4;
+}
+
+.performance-track i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  background: #7890ad;
+  transition: width 420ms ease, background-color 180ms ease;
+}
+
+.performance-row.target .performance-track i {
+  background: #27446e;
+}
+
+.performance-row.best .performance-track i {
+  background: #228d5c;
+}
+
+.performance-track b {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 9px;
+  color: #21324a;
+  font-size: 11px;
+}
+
+.performance-row > small {
+  color: #68778f;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.performance-row.oom .performance-track {
+  background: repeating-linear-gradient(135deg, #e4e6e9 0, #e4e6e9 8px, #f1f2f3 8px, #f1f2f3 16px);
+}
+
+.performance-row.oom .performance-track b {
+  justify-content: center;
+  color: #68778f;
+}
+
+.performance-chart > p {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid #228d5c;
+  background: #f1f8f4;
+  color: #315142;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.performance-boundary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 11px 12px;
+  border: 1px solid #e5c486;
+  border-radius: 6px;
+  background: #fff8e8;
+  color: #6f4a0b;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .trajectory-task-switch,
+  .trajectory-stage-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trajectory-planner-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .trajectory-stage-detail {
+    min-height: 340px;
+  }
+
+  .performance-row {
+    grid-template-columns: minmax(130px, .7fr) minmax(220px, 1.3fr);
+  }
+
+  .performance-row > small {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .evolution-matrix.external {
+    grid-template-columns: minmax(112px, .9fr) repeat(4, minmax(118px, 1fr));
+  }
+
+  .worldlens-detail > div,
+  .performance-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .performance-chart > header {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .performance-chart > header small {
+    text-align: left;
+  }
+}
+
+@media (max-width: 560px) {
+  .trajectory-task-switch,
+  .trajectory-stage-tabs,
+  .worldlens-modes,
+  .worldlens-detail > div,
+  .performance-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .trajectory-stage-tabs button {
+    min-height: 58px;
+  }
+
+  .trajectory-stage-detail {
+    min-height: 0;
+  }
+
+  .worldlens-status {
+    position: static;
+    border-radius: 0 0 6px 6px;
+  }
+
+  .performance-controls,
+  .performance-controls label,
+  .performance-controls > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .performance-controls select,
+  .performance-controls button {
+    width: 100%;
+  }
+
+  .performance-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .performance-row > small {
+    grid-column: auto;
+  }
+
+  .performance-boundary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .worldlens-lab.is-running .worldlens-status i {
+    animation: none;
+  }
+
+  .performance-track i {
+    transition: none;
+  }
+}
+
 .creation-pipeline {
   display: grid;
   gap: 14px;

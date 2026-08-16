@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { WidgetProps } from './registry';
 
 type Status = 'complete' | 'partial' | 'qualitative' | 'unreported' | 'closed';
-type MatrixScope = 'lineage' | 'all';
+type MatrixScope = 'lineage' | 'external';
 type CapabilityId = 'generation' | 'reconstruction' | 'panorama' | 'expansion' | 'assets' | 'interaction' | 'open';
 type ModelId = 'hy1' | 'hy15' | 'wm1' | 'genex' | 'video2world' | 'marble' | 'hy2';
 
@@ -256,6 +256,7 @@ const models: ModelProfile[] = [
 const modelOrder: ModelId[] = ['hy2', 'hy15', 'hy1', 'wm1', 'genex', 'video2world', 'marble'];
 const orderedModels = modelOrder.map((modelId) => models.find((model) => model.id === modelId) as ModelProfile);
 const lineageIds = new Set<ModelId>(['hy2', 'hy15', 'hy1', 'wm1']);
+const externalIds = new Set<ModelId>(['hy2', 'genex', 'video2world', 'marble']);
 
 export const HyModelEvolution: React.FC<WidgetProps> = () => {
   const [selectedModelId, setSelectedModelId] = useState<ModelId>('hy2');
@@ -272,7 +273,9 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
   );
   const selectedState = selectedModel.capabilities[selectedCapability.id];
   const selectedStatus = statusMeta[selectedState.status];
-  const visibleModels = matrixScope === 'lineage' ? orderedModels.filter((model) => lineageIds.has(model.id)) : orderedModels;
+  const visibleModels = matrixScope === 'lineage'
+    ? orderedModels.filter((model) => lineageIds.has(model.id))
+    : orderedModels.filter((model) => externalIds.has(model.id));
   const axisStates = visibleModels.map((model) => ({ model, state: model.capabilities[selectedCapability.id] }));
   const axisCounts = axisStates.reduce<Record<Status, number>>(
     (counts, item) => ({ ...counts, [item.state.status]: counts[item.state.status] + 1 }),
@@ -282,6 +285,7 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
   const changeScope = (nextScope: MatrixScope) => {
     setMatrixScope(nextScope);
     if (nextScope === 'lineage' && !lineageIds.has(selectedModelId)) setSelectedModelId('hy2');
+    if (nextScope === 'external' && !externalIds.has(selectedModelId)) setSelectedModelId('hy2');
   };
 
   return (
@@ -302,11 +306,11 @@ export const HyModelEvolution: React.FC<WidgetProps> = () => {
 
       <div className="evolution-scope-switch" role="group" aria-label="选择模型比较范围">
         <button type="button" className={matrixScope === 'lineage' ? 'selected' : ''} aria-pressed={matrixScope === 'lineage'} onClick={() => changeScope('lineage')}><strong>只看 HY 谱系</strong><small>2.0 → 1.5 → 1.0 → WorldMirror 1.0</small></button>
-        <button type="button" className={matrixScope === 'all' ? 'selected' : ''} aria-pressed={matrixScope === 'all'} onClick={() => changeScope('all')}><strong>对比其它谱系</strong><small>加入 GenEx、video2world 与 Marble 1.0</small></button>
+        <button type="button" className={matrixScope === 'external' ? 'selected' : ''} aria-pressed={matrixScope === 'external'} onClick={() => changeScope('external')}><strong>对比其它谱系</strong><small>HY 2.0 + GenEx + video2world + Marble 1.0</small></button>
       </div>
 
       <div className="evolution-matrix-scroll" tabIndex={0} aria-label="模型能力矩阵，可横向滚动">
-        <div className={`evolution-matrix ${matrixScope}`} role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 历代与外部模型能力比较'}>
+        <div className={`evolution-matrix ${matrixScope}`} role="grid" aria-label={matrixScope === 'lineage' ? 'HY-World 2.0 与历代模型能力比较' : 'HY-World 2.0 与外部模型能力比较'}>
           <div className="evolution-corner" role="columnheader">功能 \ 模型</div>
           {visibleModels.map((model) => (
             <div key={model.id} className={`evolution-model-head ${model.id === 'hy2' ? 'target' : ''} ${model.id === selectedModel.id ? 'selected-column' : ''}`} role="columnheader">

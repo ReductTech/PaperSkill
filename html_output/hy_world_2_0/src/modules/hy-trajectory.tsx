@@ -115,123 +115,149 @@ export const HyPanorama: React.FC<WidgetProps> = () => {
 };
 
 type TrajectoryName = '常规' | '环绕' | '重建感知' | '漫游' | '航拍';
-type BlindSpotId = 'object-back' | 'corridor' | 'overhead';
+type PlannerStage = 0 | 1 | 2 | 3 | 4;
+type Point = [number, number];
 
-const routeData: Record<TrajectoryName, {
-  n: number;
-  note: string;
-  condition: string;
-  color: string;
-  covers: BlindSpotId[];
-  path: Array<[number, number]>;
-}> = {
-  常规: { n: 9, note: '离开固定视点，补充普通新视角。', condition: '不绑定对象，可直接执行。', color: C.blue, covers: ['corridor'], path: [[55,215],[155,165],[330,198],[500,92]] },
-  环绕: { n: 5, note: '围绕显著物体补足侧面和背面。', condition: '需要检测到可绑定对象。', color: C.green, covers: ['object-back'], path: [[55,215],[150,165],[190,78],[305,58],[350,145]] },
-  重建感知: { n: 10, note: '针对当前重建中欠观察的区域迭代补拍。', condition: '依赖重建反馈，并迭代执行。', color: C.purple, covers: ['object-back','overhead'], path: [[55,215],[145,185],[315,210],[350,145],[435,72]] },
-  漫游: { n: 3, note: '沿可导航区域走向街道或走廊远端。', condition: '不绑定对象，依赖 NavMesh。', color: C.orange, covers: ['corridor'], path: [[55,215],[105,82],[190,48],[345,58],[500,92]] },
-  航拍: { n: 8, note: '抬高相机补充俯视观察。', condition: '碰撞风险升高时会动态减小俯仰。', color: C.brown, covers: ['overhead'], path: [[55,215],[145,160],[275,105],[420,58]] },
+const routeData: Record<TrajectoryName, { n: number; note: string; condition: string; color: string; path: Point[] }> = {
+  常规: { n: 9, note: '从中心视点向外补充普通新视角。', condition: '不绑定对象，覆盖通用盲区。', color: C.blue, path: [[62,226],[142,196],[205,151],[310,177],[390,122],[506,88]] },
+  环绕: { n: 5, note: '围绕显著物体补足侧面与背面。', condition: '先检测可绑定对象，再生成环绕候选。', color: C.green, path: [[62,226],[140,194],[185,126],[205,68],[305,54],[365,91],[414,122]] },
+  重建感知: { n: 10, note: '由欠观察区域反向提出下一批相机。', condition: '依赖重建反馈，可能迭代多轮。', color: C.purple, path: [[62,226],[142,201],[230,218],[315,191],[370,136],[430,77],[505,68]] },
+  漫游: { n: 3, note: '沿可导航区域走向街道或走廊远端。', condition: '依赖 NavMesh，不绑定单个物体。', color: C.orange, path: [[62,226],[112,139],[170,85],[260,84],[336,114],[414,84],[506,88]] },
+  航拍: { n: 8, note: '抬高相机补充平台、屋顶与俯视观察。', condition: '碰撞风险升高时动态减小俯仰。', color: C.brown, path: [[62,226],[142,184],[224,142],[302,106],[392,75],[486,50]] },
 };
 
-const blindSpots: Array<{
-  id: BlindSpotId;
-  title: string;
-  prompt: string;
-  recommended: TrajectoryName[];
-  point: [number, number];
-}> = [
-  { id: 'object-back', title: '物体背面', prompt: '中心全景看到了物体正面，但背后仍缺少观察。', recommended: ['环绕','重建感知'], point: [350,145] },
-  { id: 'corridor', title: '走廊远端', prompt: '固定视点无法确认远端拐角后的空间。', recommended: ['漫游','常规'], point: [500,92] },
-  { id: 'overhead', title: '俯视盲区', prompt: '地面视角缺少屋顶、平台或高处结构。', recommended: ['航拍','重建感知'], point: [420,58] },
+const plannerStages: Array<{ title: string; short: string; body: string; evidence: string }> = [
+  { title: '场景语义与 NavMesh', short: '把可走区域从画面里分离出来', body: 'VLM/场景解析提供对象和任务语义，点云与 NavMesh 把墙体、障碍和可导航区域变成规划约束。', evidence: '论文描述场景感知轨迹系统；具体工程步骤参考知乎文章的模块解读。' },
+  { title: '均匀采样候选', short: '先铺开多种可能路线', body: '在可导航区域上均匀取候选点，形成多个方向与长度不同的折线路径，避免一开始就押注单一路线。', evidence: '均匀采样属于第三方文章对 WorldNav 工程流程的解释。' },
+  { title: 'Ray-casting 筛碰撞', short: '让穿墙路线立即出局', body: '从候选相机向下一节点发射检测线，与障碍相交的候选标红并淘汰，只保留可通行路线。', evidence: '这是工程讲解，不代表论文报告了碰撞召回率或全局最优保证。' },
+  { title: '双向贪心连接', short: '起点和目标同时向中间靠拢', body: '从起点与目标两端选择当前可连接节点，逐步拼出一条连续路线；它是启发式连接，不是端到端学习规划器。', evidence: '双向贪心来自知乎文章的模块细节说明。' },
+  { title: '尾部修剪与相机回放', short: '删除多余折返，再按折线逐段运行', body: '删去目标附近的冗余尾段，得到最终折线。相机按每段真实长度推进，并在拐点切换朝向。', evidence: '五类路线与最大数量来自论文表 1；修剪流程来自第三方工程解读。' },
 ];
 
-export const HyTrajectory: React.FC<WidgetProps> = () => {
-  const [blindSpotId, setBlindSpotId] = useState<BlindSpotId>('object-back');
-  const [selectedRoutes, setSelectedRoutes] = useState<TrajectoryName[]>(['环绕']);
-  const blindSpot = blindSpots.find((item) => item.id === blindSpotId) ?? blindSpots[0];
-  const covered = selectedRoutes.some((name) => routeData[name].covers.includes(blindSpot.id));
-  const complete = blindSpot.recommended.every((name) => selectedRoutes.includes(name));
+const obstacles = [
+  { x: 214, y: 96, w: 76, h: 58 },
+  { x: 355, y: 147, w: 82, h: 54 },
+];
 
-  const toggleRoute = (name: TrajectoryName) => {
-    setSelectedRoutes((current) => {
-      if (current.includes(name)) return current.filter((item) => item !== name);
-      if (current.length >= 2) return current;
-      return [...current, name];
-    });
+function poseOnPath(points: Point[], progress: number) {
+  const lengths = points.slice(1).map((point, index) => Math.hypot(point[0] - points[index][0], point[1] - points[index][1]));
+  const total = lengths.reduce((sum, length) => sum + length, 0);
+  let remaining = clamp(progress, 0, 1) * total;
+  for (let index = 0; index < lengths.length; index += 1) {
+    if (remaining <= lengths[index] || index === lengths.length - 1) {
+      const local = lengths[index] === 0 ? 0 : remaining / lengths[index];
+      const from = points[index];
+      const to = points[index + 1];
+      return { x: from[0] + (to[0] - from[0]) * local, y: from[1] + (to[1] - from[1]) * local, angle: Math.atan2(to[1] - from[1], to[0] - from[0]) };
+    }
+    remaining -= lengths[index];
+  }
+  return { x: points[0][0], y: points[0][1], angle: 0 };
+}
+
+function drawRouteCamera(ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, color: string) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = 'rgba(39,68,110,.12)';
+  ctx.beginPath(); ctx.moveTo(12, 0); ctx.lineTo(62, -24); ctx.lineTo(62, 24); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = color; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(-14, -9, 28, 18, 4); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = C.white; ctx.beginPath(); ctx.arc(4, 0, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+export const HyTrajectory: React.FC<WidgetProps> = () => {
+  const [trajectory, setTrajectory] = useState<TrajectoryName>('漫游');
+  const [stage, setStage] = useState<PlannerStage>(0);
+  const animationStart = useRef(performance.now());
+  const routeInfo = routeData[trajectory];
+  const activeStage = plannerStages[stage];
+
+  const showStage = (next: PlannerStage) => {
+    animationStart.current = performance.now();
+    setStage(next);
   };
 
-  const selectBlindSpot = (id: BlindSpotId) => {
-    setBlindSpotId(id);
-    const next = blindSpots.find((item) => item.id === id) ?? blindSpots[0];
-    setSelectedRoutes([next.recommended[0]]);
+  const changeTrajectory = (next: TrajectoryName) => {
+    animationStart.current = performance.now();
+    setTrajectory(next);
+    setStage(0);
   };
 
   return (
-    <div className="trajectory-lab">
-      <div className="trajectory-targets" role="tablist" aria-label="选择需要补看的盲区">
-        {blindSpots.map((item) => (
-          <button key={item.id} type="button" role="tab" aria-selected={blindSpot.id === item.id} className={blindSpot.id === item.id ? 'selected' : ''} onClick={() => selectBlindSpot(item.id)}>
-            <strong>{item.title}</strong>
-            <span>{item.prompt}</span>
+    <div className="trajectory-lab trajectory-planner">
+      <div className="trajectory-task-switch" role="tablist" aria-label="选择 WorldNav 轨迹任务">
+        {(Object.keys(routeData) as TrajectoryName[]).map((name) => (
+          <button key={name} type="button" role="tab" aria-selected={trajectory === name} className={trajectory === name ? 'selected' : ''} onClick={() => changeTrajectory(name)}>
+            <strong>{name}</strong><span>最多 {routeData[name].n} 条</span>
           </button>
         ))}
       </div>
 
-      <div className="trajectory-workbench">
-        <CanvasView height={280} draw={(ctx) => {
-          clearStudio(ctx,560,280);
-          ctx.fillStyle='#cbd5c0'; ctx.fillRect(205,72,88,64); ctx.fillRect(374,132,78,58);
-          label(ctx,'障碍',249,108,C.muted,12,'center');
-          label(ctx,'起点',55,246,C.muted,11,'center');
-          (Object.keys(routeData) as TrajectoryName[]).forEach((name) => {
-            const item = routeData[name];
-            route(ctx,item.path,selectedRoutes.includes(name) ? item.color : '#d5dbe4',selectedRoutes.includes(name) ? 5 : 2,selectedRoutes.includes(name) ? [] : [5,6]);
+      <div className="trajectory-stage-tabs" role="group" aria-label="逐步查看 WorldNav 规划过程">
+        {plannerStages.map((item, index) => (
+          <button key={item.title} type="button" className={`${stage === index ? 'selected' : ''} ${stage > index ? 'complete' : ''}`} onClick={() => showStage(index as PlannerStage)}>
+            <i>{index + 1}</i><span><strong>{item.title}</strong><small>{item.short}</small></span>
+          </button>
+        ))}
+      </div>
+
+      <div className="trajectory-planner-stage">
+        <CanvasView height={300} animate draw={(ctx, time) => {
+          const p = easeInOutQuad(clamp((time - animationStart.current) / (stage === 4 ? 2600 : 950), 0, 1));
+          clearStudio(ctx, 560, 300);
+          ctx.fillStyle = '#edf2e9'; ctx.fillRect(22, 48, 516, 210);
+          ctx.strokeStyle = '#b8c9a7'; ctx.lineWidth = 1.5;
+          [[50,226],[126,184],[182,110],[300,74],[340,126],[470,68],[505,88]].forEach(([x,y], index, nodes) => {
+            if (index < nodes.length - 1) { ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(nodes[index + 1][0],nodes[index + 1][1]); ctx.stroke(); }
+            ctx.fillStyle = index === 0 ? C.blue : '#a8b99d'; ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
           });
-          selectedRoutes.forEach((name, index) => {
-            const item = routeData[name];
-            const end = item.path[item.path.length - 1];
-            camera(ctx,end[0],end[1],item.color,.52 + index * .05);
-          });
-          target(ctx,blindSpot.point[0],blindSpot.point[1],covered);
-          label(ctx,blindSpot.title,blindSpot.point[0],blindSpot.point[1]-32,covered?C.green:C.red,13,'center');
-          label(ctx,selectedRoutes.length ? `已组合 ${selectedRoutes.length} / 2 类策略` : '尚未选择策略',35,35,selectedRoutes.length?C.blue:C.red,13);
+          obstacles.forEach((item) => { ctx.fillStyle = '#9ba994'; ctx.fillRect(item.x,item.y,item.w,item.h); ctx.strokeStyle = C.ink; ctx.strokeRect(item.x,item.y,item.w,item.h); });
+          label(ctx,'NavMesh 可走区域',34,34,C.green,12);
+          label(ctx,'障碍',252,128,C.white,11,'center'); label(ctx,'障碍',396,177,C.white,11,'center');
+          target(ctx,routeInfo.path[routeInfo.path.length - 1][0],routeInfo.path[routeInfo.path.length - 1][1],stage === 4 && p > .9);
+
+          if (stage >= 1) {
+            const candidates: Point[][] = [routeInfo.path, [[62,226],[178,190],[252,126],[382,80],[506,88]], [[62,226],[118,112],[248,116],[372,174],[506,88]]];
+            candidates.forEach((candidate, index) => route(ctx,candidate,index === 0 ? routeInfo.color : stage >= 2 ? C.red : '#91a4bd',index === 0 ? 4 : 2, index > 0 ? [7,5] : []));
+            if (stage === 1) label(ctx,'均匀铺开候选',310,280,C.blue,12,'center');
+          }
+          if (stage >= 2) {
+            ctx.strokeStyle = C.red; ctx.lineWidth = 3;
+            [[252,126],[372,174]].forEach(([x,y]) => { ctx.beginPath(); ctx.moveTo(x-8,y-8); ctx.lineTo(x+8,y+8); ctx.moveTo(x+8,y-8); ctx.lineTo(x-8,y+8); ctx.stroke(); });
+            label(ctx,'Ray hit：淘汰',348,218,C.red,11);
+          }
+          if (stage >= 3) {
+            const split = Math.max(2, Math.floor(routeInfo.path.length / 2));
+            route(ctx,routeInfo.path.slice(0,split + 1),C.blue,6);
+            route(ctx,routeInfo.path.slice(split),C.green,6);
+            label(ctx,'起点 →',74,251,C.blue,11); label(ctx,'← 目标',488,34,C.green,11,'right');
+          }
+          if (stage === 4) {
+            route(ctx,routeInfo.path,'#d7deea',8);
+            route(ctx,routeInfo.path,routeInfo.color,4);
+            const pose = poseOnPath(routeInfo.path,p);
+            drawRouteCamera(ctx,pose.x,pose.y,pose.angle,routeInfo.color);
+            label(ctx,p > .96 ? '抵达目标，折线朝向已完整回放' : '按分段长度移动，拐点同步转向',280,282,p > .96 ? C.green : routeInfo.color,12,'center');
+          } else {
+            drawRouteCamera(ctx,routeInfo.path[0][0],routeInfo.path[0][1],Math.atan2(routeInfo.path[1][1]-routeInfo.path[0][1],routeInfo.path[1][0]-routeInfo.path[0][0]),routeInfo.color);
+          }
         }} />
 
-        <section className={`trajectory-mission ${complete ? 'complete' : covered ? 'covered' : 'missing'}`} aria-live="polite">
-          <span>当前勘景任务</span>
-          <h5>补看：{blindSpot.title}</h5>
-          <p>{blindSpot.prompt}</p>
-          <div>
-            <small>教学推荐组合</small>
-            <strong>{blindSpot.recommended.join(' + ')}</strong>
+        <section className="trajectory-stage-detail" aria-live="polite">
+          <span>第 {stage + 1} 层 · {trajectory}任务</span>
+          <h5>{activeStage.title}</h5>
+          <p>{activeStage.body}</p>
+          <dl><div><dt>任务用途</dt><dd>{routeInfo.note}</dd></div><div><dt>执行条件</dt><dd>{routeInfo.condition}</dd></div><div><dt>证据边界</dt><dd>{activeStage.evidence}</dd></div></dl>
+          <div className="trajectory-stage-actions">
+            <button type="button" onClick={() => showStage(Math.max(0, stage - 1) as PlannerStage)} disabled={stage === 0}>上一步</button>
+            <button type="button" className="primary" onClick={() => stage === 4 ? showStage(4) : showStage((stage + 1) as PlannerStage)}>{stage === 4 ? '重播最终路线' : '下一层'}</button>
           </div>
-          <p className="trajectory-mission-result">
-            {complete
-              ? '两类策略形成互补：一类直接触达盲区，另一类根据对象、重建反馈或普通新视角补充证据。'
-              : covered
-                ? '当前路线能够触达目标，但还缺少推荐的互补策略；这不代表路线无效，只表示观察类型仍单一。'
-                : '当前组合没有针对这个盲区。请撤下一条路线，再选择能够覆盖目标的策略。'}
-          </p>
         </section>
       </div>
 
-      <div className="trajectory-strategies" role="group" aria-label="组合最多两类 WorldNav 路线">
-        {(Object.keys(routeData) as TrajectoryName[]).map((name) => {
-          const item = routeData[name];
-          const selected = selectedRoutes.includes(name);
-          const disabled = !selected && selectedRoutes.length >= 2;
-          return (
-            <button key={name} type="button" className={selected ? 'selected' : ''} aria-pressed={selected} disabled={disabled} onClick={() => toggleRoute(name)}>
-              <span><strong>{name}</strong><b>最大数量 {item.n}</b></span>
-              <small>{item.note}</small>
-              <em>{item.condition}</em>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className={`feedback ${complete ? 'good' : covered ? '' : 'bad'}`}>
-        最多组合两类路线用于教学比较；“最大数量”来自论文表 1 的启发式上限，不是本实验的预算成本，也不代表路线质量分数。
-      </div>
+      <div className="feedback good">五类路线及“最大数量”来自论文表 1；均匀采样、Ray-casting、双向贪心与尾部修剪采用知乎文章的工程讲解视角，不被表述为论文证明的全局最优算法。</div>
       <PaperTable tableId="table-1" />
     </div>
   );

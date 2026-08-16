@@ -15,10 +15,12 @@ import { HyMissionPlanner } from './hy-mission-planner';
 import { HyModelEvolution } from './hy-model-evolution';
 import { HyPanorama } from './hy-panorama';
 import { HyPanoramaCuration } from './hy-panorama-curation';
+import { HyPerformanceCompare } from './hy-performance-compare';
 import { HyResolution } from './hy-resolution';
 import { HyTrainingStages } from './hy-training-stages';
 import { HyTrajectory } from './hy-trajectory';
 import { HyWorldModelBasics } from './hy-world-model-basics';
+import { HyWorldLensLab } from './hy-worldlens-lab';
 
 export interface WidgetProps {
   chapterId: string;
@@ -42,7 +44,9 @@ widgetRegistry['hy-mission-planner'] = HyMissionPlanner;
 widgetRegistry['hy-model-evolution'] = HyModelEvolution;
 widgetRegistry['hy-panorama'] = HyPanorama;
 widgetRegistry['hy-panorama-curation'] = HyPanoramaCuration;
+widgetRegistry['hy-performance-compare'] = HyPerformanceCompare;
 widgetRegistry['hy-resolution'] = HyResolution;
 widgetRegistry['hy-training-stages'] = HyTrainingStages;
 widgetRegistry['hy-trajectory'] = HyTrajectory;
 widgetRegistry['hy-world-model-basics'] = HyWorldModelBasics;
+widgetRegistry['hy-worldlens-lab'] = HyWorldLensLab;
