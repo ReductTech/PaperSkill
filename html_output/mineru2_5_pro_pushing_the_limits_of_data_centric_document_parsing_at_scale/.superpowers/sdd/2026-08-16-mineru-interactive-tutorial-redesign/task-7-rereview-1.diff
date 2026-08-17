@@ -1,0 +1,1633 @@
+﻿Task 7 full current no-index package after fix round 1 (no Git intermediate snapshot available)
+
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\components\\FurtherLearning.tsx" "b/src\\components\\FurtherLearning.tsx"
+index c15fccc..1cfdde0 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\components\\FurtherLearning.tsx"
++++ "b/src\\components\\FurtherLearning.tsx"
+@@ -1,427 +1,199 @@
+-import React, { useEffect, useMemo, useRef, useState } from 'react';
++import React, { useEffect, useRef, useState } from 'react';
++import { createPortal } from 'react-dom';
+ import {
+   FURTHER_LEARNING_RESOURCES,
+   LEARNING_RESOURCE_KIND_LABEL,
+   LEARNING_RESOURCE_SECTIONS,
+   type LearningResource,
+-  type LearningResourceSectionId,
+ } from '../data/further-learning';
++import { getMediaAsset } from '../data/media';
+ import '../styles/further-learning.css';
+ import { GlossaryText } from './Glossary';
+ 
+-const VIDEO_PROGRESS_STORAGE_KEY = 'mineru2.5-pro.video-learning.v1';
+-
+-type VideoTaskStage = 'before' | 'watching' | 'check';
+-
+ function ResourceGlyph({ resource }: { resource: LearningResource }) {
+-  if (resource.kind === 'video') {
+-    return (
+-      <span className="further-resource__glyph further-resource__glyph--video" aria-hidden="true">
+-        <i />
+-        <small>BILI</small>
+-      </span>
+-    );
+-  }
++  return <span className="further-footer-glyph" aria-hidden="true">{resource.kind === 'code' ? '&lt;/&gt;' : resource.kind === 'video' ? 'BILI' : 'PDF'}</span>;
++}
+ 
++function ReferenceCard({ resource }: { resource: LearningResource }) {
+   return (
+-    <span className={`further-resource__glyph further-resource__glyph--${resource.kind}`} aria-hidden="true">
+-      <b>{resource.kind === 'code' ? '&lt;/&gt;' : resource.kind === 'survey' ? 'Σ' : 'PDF'}</b>
+-    </span>
++    <article className="further-reference-card">
++      <ResourceGlyph resource={resource} />
++      <div>
++        <small>{LEARNING_RESOURCE_KIND_LABEL[resource.kind]} · {resource.provider}</small>
++        <h4><GlossaryText text={resource.title} /></h4>
++        <p><GlossaryText text={resource.learn} /></p>
++      </div>
++      <a href={resource.href} target="_blank" rel="noopener noreferrer">打开原始资料 ↗</a>
++    </article>
+   );
+ }
+ 
+-function ResourceCard({
+-  resource,
+-  index,
+-  completed = false,
+-  onCompletedChange,
+-}: {
+-  resource: LearningResource;
+-  index: number;
+-  completed?: boolean;
+-  onCompletedChange?: (completed: boolean) => void;
+-}) {
+-  const [previewOpen, setPreviewOpen] = useState(false);
+-  const [previewState, setPreviewState] = useState<'loading' | 'ready' | 'failed'>('loading');
+-  const [taskStage, setTaskStage] = useState<VideoTaskStage>(completed ? 'check' : 'before');
+-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(
+-    completed && resource.videoTask ? resource.videoTask.correctOptionId : null,
+-  );
+-  const previewButtonRef = useRef<HTMLButtonElement>(null);
+-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+-  const selfCheckRef = useRef<HTMLDivElement>(null);
+-  const task = resource.videoTask;
+-  const answerIsCorrect = Boolean(task && selectedAnswer === task.correctOptionId);
++function getFocusableElements(container: HTMLElement) {
++  return Array.from(container.querySelectorAll<HTMLElement>(
++    'a[href], button:not([disabled]), iframe:not([tabindex="-1"]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
++  ));
++}
++
++export function FurtherLearning({ id = 'further-learning' }: { id?: string }) {
++  const [activeResource, setActiveResource] = useState<LearningResource | null>(null);
++  const [pendingResource, setPendingResource] = useState<LearningResource | null>(null);
++  const [hasConsented, setHasConsented] = useState(false);
++  const [modalHost, setModalHost] = useState<HTMLDivElement | null>(null);
++  const requestedButtonRef = useRef<HTMLButtonElement | null>(null);
++  const dialogRef = useRef<HTMLElement | null>(null);
++  const videos = FURTHER_LEARNING_RESOURCES.filter((resource) => resource.videoAssetId);
++  const asset = activeResource?.videoAssetId ? getMediaAsset(activeResource.videoAssetId) : null;
++  const modalOpen = Boolean(activeResource || pendingResource);
+ 
+   useEffect(() => {
+-    if (!previewOpen) return;
+-    setPreviewState('loading');
+-    requestAnimationFrame(() => closeButtonRef.current?.focus());
++    const host = document.createElement('div');
++    host.dataset.furtherLearningModalHost = 'true';
++    document.body.appendChild(host);
++    setModalHost(host);
++    return () => host.remove();
++  }, []);
+ 
+-    const onKeyDown = (event: KeyboardEvent) => {
+-      if (event.key !== 'Escape') return;
+-      setPreviewOpen(false);
+-      requestAnimationFrame(() => previewButtonRef.current?.focus());
++  useEffect(() => {
++    if (!modalOpen || !modalHost) return;
++    const background = Array.from(document.body.children).filter((element) => element !== modalHost);
++    const previous = background.map((element) => ({
++      element,
++      inert: element.hasAttribute('inert'),
++      ariaHidden: element.getAttribute('aria-hidden'),
++    }));
++    background.forEach((element) => {
++      element.setAttribute('inert', '');
++      element.setAttribute('aria-hidden', 'true');
++    });
++    return () => {
++      previous.forEach(({ element, inert, ariaHidden }) => {
++        if (!inert) element.removeAttribute('inert');
++        if (ariaHidden === null) element.removeAttribute('aria-hidden');
++        else element.setAttribute('aria-hidden', ariaHidden);
++      });
+     };
++  }, [modalHost, modalOpen]);
++
++  const returnFocus = () => requestAnimationFrame(() => requestedButtonRef.current?.focus());
++  const closeModal = () => {
++    setActiveResource(null);
++    setPendingResource(null);
++    returnFocus();
++  };
+ 
++  useEffect(() => {
++    if (!modalOpen) return;
++    requestAnimationFrame(() => getFocusableElements(dialogRef.current ?? document.body)[0]?.focus());
++    const onKeyDown = (event: KeyboardEvent) => {
++      if (event.key === 'Escape') closeModal();
++    };
+     document.addEventListener('keydown', onKeyDown);
+     return () => document.removeEventListener('keydown', onKeyDown);
+-  }, [previewOpen]);
++  }, [modalOpen, activeResource, pendingResource]);
+ 
+-  const closePreview = () => {
+-    setPreviewOpen(false);
+-    requestAnimationFrame(() => previewButtonRef.current?.focus());
++  const requestPlayback = (resource: LearningResource, button: HTMLButtonElement) => {
++    requestedButtonRef.current = button;
++    if (hasConsented) setActiveResource(resource);
++    else setPendingResource(resource);
+   };
+ 
+-  const beginWatching = () => {
+-    setTaskStage('watching');
+-    setPreviewOpen(true);
++  const continuePlayback = () => {
++    if (!pendingResource) return;
++    setHasConsented(true);
++    setActiveResource(pendingResource);
++    setPendingResource(null);
+   };
+ 
+-  const beginSelfCheck = () => {
+-    setTaskStage('check');
+-    setPreviewOpen(false);
+-    requestAnimationFrame(() => selfCheckRef.current?.focus());
++  const trapFocus = (event: React.KeyboardEvent) => {
++    if (event.key !== 'Tab' || !dialogRef.current) return;
++    const focusable = getFocusableElements(dialogRef.current);
++    if (!focusable.length) return;
++    const first = focusable[0];
++    const last = focusable[focusable.length - 1];
++    if (event.shiftKey && (!dialogRef.current.contains(document.activeElement) || document.activeElement === first)) {
++      event.preventDefault();
++      last.focus();
++    } else if (!event.shiftKey && (!dialogRef.current.contains(document.activeElement) || document.activeElement === last)) {
++      event.preventDefault();
++      first.focus();
++    }
+   };
+ 
+-  const resetTask = () => {
+-    setSelectedAnswer(null);
+-    setTaskStage('before');
+-    onCompletedChange?.(false);
++  const renderModal = () => {
++    if (!modalHost || !modalOpen) return null;
++    const isPlayer = Boolean(activeResource && asset);
++    return createPortal(
++      <div className="further-modal-layer" role="presentation" onKeyDown={trapFocus}>
++        {isPlayer && activeResource && asset ? (
++          <section ref={dialogRef} className="further-modal further-modal--player" role="dialog" aria-modal="true" aria-label="Bilibili 播放器">
++            <header className="further-modal__header">
++              <div><span>第三方播放器</span><h3>{activeResource.title}</h3></div>
++              <button type="button" onClick={closeModal}>关闭播放器</button>
++            </header>
++            <iframe src={asset.src} title={`${activeResource.title} · Bilibili`} tabIndex={-1} loading="eager" referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
++            <p>播放器无法加载时，可<a href={activeResource.href} target="_blank" rel="noopener noreferrer">打开 Bilibili 原页</a>。关闭按钮始终可用；在对话框中按 Esc 也会立即移除播放器。</p>
++          </section>
++        ) : pendingResource ? (
++          <section ref={dialogRef} className="further-modal" role="dialog" aria-modal="true" aria-labelledby={`${id}-consent-title`}>
++            <h3 id={`${id}-consent-title`}>连接第三方视频提示</h3>
++            <p>继续后会连接 Bilibili 播放器，第三方可能收到你的 IP、浏览器信息或已有 Cookie。此同意只在当前页面会话有效。</p>
++            <div className="further-modal__actions"><button type="button" onClick={continuePlayback}>继续播放</button><button type="button" onClick={closeModal}>取消</button></div>
++          </section>
++        ) : null}
++      </div>,
++      modalHost,
++    );
+   };
+ 
+   return (
+-    <article className={`further-resource further-resource--${resource.kind}${previewOpen ? ' has-preview' : ''}`}>
+-      <div className="further-resource__visual">
+-        <ResourceGlyph resource={resource} />
+-        <span>{String(index + 1).padStart(2, '0')}</span>
+-      </div>
+-
+-      <div className="further-resource__body">
+-        <div className="further-resource__meta">
+-          <span>{LEARNING_RESOURCE_KIND_LABEL[resource.kind]}</span>
+-          <span>{resource.audience}</span>
+-          <small>{resource.provider}</small>
+-        </div>
+-        <h3><GlossaryText text={resource.title} /></h3>
+-        <p><GlossaryText text={resource.summary} /></p>
+-        {task ? (
+-          <section className={`video-learning-task is-${taskStage}${completed ? ' is-complete' : ''}`} aria-label="视频学习任务">
+-            <div className="video-learning-task__rail" aria-label="观看任务进度">
+-              <span className={taskStage === 'before' ? 'is-current' : 'is-passed'}><i>1</i>观看前</span>
+-              <span className={taskStage === 'watching' ? 'is-current' : taskStage === 'check' ? 'is-passed' : ''}><i>2</i>观看中</span>
+-              <span className={taskStage === 'check' ? 'is-current' : ''}><i>{completed ? '✓' : '3'}</i>看完后</span>
+-            </div>
+-
+-            {taskStage === 'before' ? (
+-              <div className="video-learning-task__stage">
+-                <small>先预测</small>
+-                <strong><GlossaryText text={task.beforeQuestion} /></strong>
+-                <div className="video-learning-task__buttons">
+-                  <button type="button" onClick={beginWatching}>带着问题播放 <span aria-hidden="true">▶</span></button>
+-                  <button type="button" className="is-quiet" onClick={beginSelfCheck}>已看过，直接自检</button>
+-                </div>
+-              </div>
+-            ) : taskStage === 'watching' ? (
+-              <div className="video-learning-task__stage">
+-                <small>观看时只抓三件事</small>
+-                <ol className="video-learning-task__focus">
+-                  {task.focusPoints.map((point, pointIndex) => (
+-                    <li key={point}><i>{pointIndex + 1}</i><GlossaryText text={point} /></li>
+-                  ))}
+-                </ol>
+-                <div className="video-learning-task__buttons">
+-                  <button type="button" onClick={beginSelfCheck}>已观看，开始自检</button>
+-                  <a href={task.relatedChapter.href}>{task.relatedChapter.label} →</a>
+-                </div>
+-              </div>
+-            ) : (
+-              <div className="video-learning-task__stage video-learning-task__stage--check" ref={selfCheckRef} tabIndex={-1}>
+-                <small>{completed ? '任务已完成' : '一分钟自检'}</small>
+-                <strong><GlossaryText text={task.selfCheckQuestion} /></strong>
+-                <div className="video-learning-task__options" role="group" aria-label={task.selfCheckQuestion}>
+-                  {task.selfCheckOptions.map((option) => {
+-                    const isSelected = selectedAnswer === option.id;
+-                    const stateClass = isSelected
+-                      ? option.id === task.correctOptionId ? 'is-correct' : 'is-wrong'
+-                      : '';
+-                    return (
+-                      <button
+-                        key={option.id}
+-                        type="button"
+-                        className={stateClass}
+-                        aria-pressed={isSelected}
+-                        onClick={() => setSelectedAnswer(option.id)}
+-                      >
+-                        <span aria-hidden="true">{isSelected ? option.id === task.correctOptionId ? '✓' : '×' : '○'}</span>
+-                        {option.label}
+-                      </button>
+-                    );
+-                  })}
+-                </div>
+-                {selectedAnswer ? (
+-                  <p className={`video-learning-task__feedback ${answerIsCorrect ? 'is-correct' : 'is-wrong'}`} role="status">
+-                    {answerIsCorrect ? task.correctFeedback : task.retryFeedback}
+-                  </p>
+-                ) : null}
+-                <div className="video-learning-task__buttons">
+-                  {answerIsCorrect && !completed ? (
+-                    <button type="button" onClick={() => onCompletedChange?.(true)}>完成这个观看任务</button>
+-                  ) : null}
+-                  {completed ? <button type="button" className="is-quiet" onClick={resetTask}>重新自检</button> : null}
+-                  <a href={task.relatedChapter.href}>{task.relatedChapter.label} →</a>
+-                </div>
+-              </div>
+-            )}
+-          </section>
+-        ) : (
+-          <div className="further-resource__learn">
+-            <b>带着这个问题看</b>
+-            <span><GlossaryText text={resource.learn} /></span>
++    <>
++      <section className="further-learning" id={id} aria-labelledby={`${id}-title`}>
++        <header className="further-learning__header">
++          <span className="source-tag research">可选延伸 · 站外资料</span>
++          <div>
++            <h2 id={`${id}-title`}>完成第 6 步后，还可以继续看什么？</h2>
++            <p>下面资料不参与章节解锁、学习进度或论文事实判断；教程主体始终可离线使用。</p>
+           </div>
+-        )}
+-        <ul className="further-resource__tags" aria-label="资源主题">
+-          {resource.tags.map((tag) => <li key={tag}><GlossaryText text={tag} /></li>)}
+-        </ul>
+-        {resource.note ? <small className="further-resource__note">边界：{resource.note}</small> : null}
+-      </div>
++        </header>
+ 
+-      <div className="further-resource__actions">
+-        {resource.embedHref ? (
+-          <button
+-            ref={previewButtonRef}
+-            type="button"
+-            className="further-resource__preview-button"
+-            aria-expanded={previewOpen}
+-            onClick={() => {
+-              if (previewOpen) {
+-                closePreview();
+-              } else {
+-                if (task && taskStage === 'before') setTaskStage('watching');
+-                setPreviewOpen(true);
+-              }
+-            }}
+-          >
+-            <span>{previewOpen ? '关闭预览' : '页面内播放'}</span>
+-            <small>{previewOpen ? '停止外部加载' : '点击后才连接 Bilibili'}</small>
+-          </button>
+-        ) : null}
+-        <a
+-          className="further-resource__action"
+-          href={resource.href}
+-          target="_blank"
+-          rel="noopener noreferrer"
+-          aria-label={`离开本站，在新标签页打开：${resource.title}`}
+-          onClick={() => {
+-            if (task && taskStage === 'before') setTaskStage('watching');
+-          }}
+-        >
+-          <span>{resource.kind === 'video' ? '打开原站' : resource.kind === 'code' ? '查看仓库' : '阅读原文'}</span>
+-          <small>将离开本站 ↗</small>
+-        </a>
+-      </div>
+-
+-      {previewOpen && resource.embedHref ? (
+-        <section className="further-resource__preview" aria-label={`${resource.title} 页面内预览`}>
+-          <header>
+-            <div>
+-              <b>正在连接 Bilibili 外部播放器</b>
+-              <p>播放器会请求 player.bilibili.com，并可能向该站传递 IP、浏览器信息或已有 Cookie。关闭预览后，播放器 iframe 会立即从页面移除。</p>
+-            </div>
+-            <button ref={closeButtonRef} type="button" onClick={closePreview}>关闭预览</button>
+-          </header>
+-          <div className={`further-resource__preview-layout${task ? ' has-focus-guide' : ''}`}>
+-            <div className="further-resource__iframe-shell">
+-              <iframe
+-                src={resource.embedHref}
+-                title={`${resource.title} · Bilibili 外部播放器`}
+-                loading="eager"
+-                referrerPolicy="strict-origin-when-cross-origin"
+-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+-                allowFullScreen
+-                onLoad={() => setPreviewState('ready')}
+-                onError={() => setPreviewState('failed')}
+-              />
+-            </div>
+-            {task ? (
+-              <aside className="further-resource__focus-guide" aria-label="观看关注点">
+-                <small>WATCH FOR</small>
+-                <b>不必记笔记，只找这三件事</b>
+-                <ol>
+-                  {task.focusPoints.map((point, pointIndex) => (
+-                    <li key={point}><i>{pointIndex + 1}</i><GlossaryText text={point} /></li>
+-                  ))}
+-                </ol>
+-                <button type="button" onClick={beginSelfCheck}>已观看 · 开始自检 →</button>
+-              </aside>
+-            ) : null}
++        <section className="further-video-section" aria-labelledby={`${id}-video-title`}>
++          <div className="further-section-heading">
++            <div><span>可选视频</span><h3 id={`${id}-video-title`}>Bilibili：只作背景与实践参考</h3></div>
++            <p>点击播放才会连接第三方站点；不保存同意或观看进度。</p>
+           </div>
+-          <div className={`further-resource__preview-status is-${previewState}`} aria-live="polite">
+-            <span>
+-              {previewState === 'loading'
+-                ? '正在载入外部播放器…'
+-                : previewState === 'failed'
+-                  ? '页面内播放器载入失败。'
+-                  : '播放器已载入；视频内容和可用性由 Bilibili 提供。'}
+-            </span>
+-            <a href={resource.href} target="_blank" rel="noopener noreferrer">无法播放？前往 Bilibili 原页 ↗</a>
++          <div className="further-video-grid">
++            {videos.map((resource) => {
++              const videoAsset = getMediaAsset(resource.videoAssetId!);
++              return (
++                <article className="further-video-card" key={resource.id}>
++                  <small>{resource.provider}</small>
++                  <h4><GlossaryText text={resource.title} /></h4>
++                  <p><b>为什么看：</b><GlossaryText text={resource.videoWhy ?? resource.learn} /></p>
++                  {resource.watchFor ? <ul aria-label="观看关注点">{resource.watchFor.map((point) => <li key={point}><GlossaryText text={point} /></li>)}</ul> : null}
++                  <div className="further-video-card__actions">
++                    <button type="button" onClick={(event) => requestPlayback(resource, event.currentTarget)}>播放视频</button>
++                    <a href={resource.href} target="_blank" rel="noopener noreferrer">打开 Bilibili 原页 ↗</a>
++                  </div>
++                  <p className="further-video-card__boundary">边界：{resource.note ?? videoAsset.allowedClaim}</p>
++                </article>
++              );
++            })}
+           </div>
+         </section>
+-      ) : null}
+-    </article>
+-  );
+-}
+-
+-export function FurtherLearning({
+-  id = 'further-learning',
+-  initialSection = 'video',
+-}: {
+-  id?: string;
+-  initialSection?: LearningResourceSectionId;
+-}) {
+-  const [activeSection, setActiveSection] = useState<LearningResourceSectionId>(initialSection);
+-  const [completedVideoIds, setCompletedVideoIds] = useState<Set<string>>(() => {
+-    try {
+-      const saved = JSON.parse(window.localStorage.getItem(VIDEO_PROGRESS_STORAGE_KEY) ?? '[]');
+-      return new Set(Array.isArray(saved) ? saved.filter((item): item is string => typeof item === 'string') : []);
+-    } catch {
+-      return new Set();
+-    }
+-  });
+-  const section = LEARNING_RESOURCE_SECTIONS.find((item) => item.id === activeSection)
+-    ?? LEARNING_RESOURCE_SECTIONS[0];
+-  const resources = useMemo(
+-    () => FURTHER_LEARNING_RESOURCES.filter((resource) => resource.section === activeSection),
+-    [activeSection],
+-  );
+-  const videoResources = useMemo(
+-    () => FURTHER_LEARNING_RESOURCES.filter((resource) => resource.videoTask),
+-    [],
+-  );
+-  const completedVideoCount = videoResources.filter((resource) => completedVideoIds.has(resource.id)).length;
+-
+-  const setVideoCompleted = (resourceId: string, completed: boolean) => {
+-    setCompletedVideoIds((current) => {
+-      const next = new Set(current);
+-      if (completed) next.add(resourceId);
+-      else next.delete(resourceId);
+-      try {
+-        window.localStorage.setItem(VIDEO_PROGRESS_STORAGE_KEY, JSON.stringify([...next]));
+-      } catch {
+-        // Progress is a convenience only; the learning tasks remain fully usable.
+-      }
+-      return next;
+-    });
+-  };
+-
+-  const moveTabFocus = (currentIndex: number, direction: 'next' | 'previous' | 'first' | 'last') => {
+-    const lastIndex = LEARNING_RESOURCE_SECTIONS.length - 1;
+-    const nextIndex = direction === 'first'
+-      ? 0
+-      : direction === 'last'
+-        ? lastIndex
+-        : direction === 'next'
+-          ? (currentIndex + 1) % LEARNING_RESOURCE_SECTIONS.length
+-          : (currentIndex - 1 + LEARNING_RESOURCE_SECTIONS.length) % LEARNING_RESOURCE_SECTIONS.length;
+-    const nextSection = LEARNING_RESOURCE_SECTIONS[nextIndex];
+-    setActiveSection(nextSection.id);
+-    requestAnimationFrame(() => document.getElementById(`${id}-tab-${nextSection.id}`)?.focus());
+-  };
+-
+-  return (
+-    <section className="further-learning" id={id} aria-labelledby={`${id}-title`}>
+-      <header className="further-learning__header">
+-        <div>
+-          <span className="source-tag research">可选延伸 · 站外资源</span>
+-          <h2 id={`${id}-title`}>从交互教程走向原始资料</h2>
+-          <p>页面本身无需联网。下面的资源只在你主动点击时打开，用于建立直觉、核对论文或补齐先修知识。</p>
+-        </div>
+-        <div className="further-learning__route" aria-hidden="true">
+-          <span>看见问题</span><i>→</i><span>核对证据</span><i>→</i><span>补齐概念</span>
+-        </div>
+-      </header>
+-
+-      <div className="further-learning__tabs" role="tablist" aria-label="进一步学习路线">
+-        {LEARNING_RESOURCE_SECTIONS.map((item, index) => {
+-          const selected = item.id === activeSection;
+-          return (
+-            <button
+-              key={item.id}
+-              id={`${id}-tab-${item.id}`}
+-              type="button"
+-              role="tab"
+-              aria-selected={selected}
+-              aria-controls={`${id}-panel`}
+-              tabIndex={selected ? 0 : -1}
+-              className={selected ? 'is-active' : ''}
+-              onClick={() => setActiveSection(item.id)}
+-              onKeyDown={(event) => {
+-                if (event.key === 'ArrowRight') {
+-                  event.preventDefault();
+-                  moveTabFocus(index, 'next');
+-                } else if (event.key === 'ArrowLeft') {
+-                  event.preventDefault();
+-                  moveTabFocus(index, 'previous');
+-                } else if (event.key === 'Home') {
+-                  event.preventDefault();
+-                  moveTabFocus(index, 'first');
+-                } else if (event.key === 'End') {
+-                  event.preventDefault();
+-                  moveTabFocus(index, 'last');
+-                }
+-              }}
+-            >
+-              <i>{String(index + 1).padStart(2, '0')}</i>
+-              <span><b>{item.label}</b><small>{item.eyebrow}</small></span>
+-            </button>
+-          );
+-        })}
+-      </div>
+ 
+-      <div
+-        className="further-learning__panel"
+-        id={`${id}-panel`}
+-        role="tabpanel"
+-        aria-labelledby={`${id}-tab-${activeSection}`}
+-      >
+-        <div className="further-learning__question">
+-          <span>本路线先回答</span>
+-          <h3><GlossaryText text={section.question} /></h3>
+-          <p><GlossaryText text={section.answer} /></p>
+-        </div>
+-
+-        {activeSection === 'video' ? (
+-          <div className="video-learning-progress" aria-live="polite">
+-            <div>
+-              <span>观看任务</span>
+-              <b>{completedVideoCount} / {videoResources.length}</b>
++        {LEARNING_RESOURCE_SECTIONS.filter((section) => section.id !== 'video').map((section) => (
++          <section className="further-reference-section" key={section.id} aria-labelledby={`${id}-${section.id}-title`}>
++            <div className="further-section-heading">
++              <div><span>{section.eyebrow}</span><h3 id={`${id}-${section.id}-title`}>{section.label}</h3></div>
++              <p><GlossaryText text={section.answer} /></p>
+             </div>
+-            <div className="video-learning-progress__track" aria-hidden="true">
+-              {videoResources.map((resource) => (
+-                <i key={resource.id} className={completedVideoIds.has(resource.id) ? 'is-complete' : ''} />
+-              ))}
++            <div className="further-reference-grid">
++              {FURTHER_LEARNING_RESOURCES.filter((resource) => resource.section === section.id).map((resource) => <ReferenceCard key={resource.id} resource={resource} />)}
+             </div>
+-            <p>{completedVideoCount === videoResources.length ? '三个视角已连成完整学习路径。' : '每段视频只完成一个小任务；进度保存在本机。'}</p>
+-          </div>
+-        ) : null}
+-
+-        <div className="further-learning__grid">
+-          {resources.map((resource, index) => (
+-            <ResourceCard
+-              key={resource.id}
+-              resource={resource}
+-              index={index}
+-              completed={completedVideoIds.has(resource.id)}
+-              onCompletedChange={(completed) => setVideoCompleted(resource.id, completed)}
+-            />
+-          ))}
+-        </div>
+-      </div>
+-
+-      <footer className="further-learning__footer">
+-        <span aria-hidden="true">✓</span>
+-        <p><b>来源规则：</b>论文数字仍以 MinerU2.5-Pro arXiv 版本为准；视频只承担背景导读和实践演示，不作为实验结论证据。</p>
+-      </footer>
+-    </section>
++          </section>
++        ))}
++      </section>
++      {renderModal()}
++    </>
+   );
+ }
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\components\\FurtherLearning.test.tsx" "b/src\\components\\FurtherLearning.test.tsx"
+index e69de29..c6ed37b 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\components\\FurtherLearning.test.tsx"
++++ "b/src\\components\\FurtherLearning.test.tsx"
+@@ -0,0 +1,105 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { FurtherLearning } from './FurtherLearning';
++import { GlossaryProvider } from './Glossary';
++
++function renderFurtherLearning() {
++  return render(
++    <GlossaryProvider>
++      <FurtherLearning />
++    </GlossaryProvider>,
++  );
++}
++
++beforeEach(() => {
++  window.localStorage.clear();
++});
++
++afterEach(() => {
++  window.localStorage.clear();
++  vi.restoreAllMocks();
++});
++
++describe('FurtherLearning', () => {
++  it('asks for third-party consent before creating the first Bilibili player and destroys it on Escape', async () => {
++    const user = userEvent.setup();
++    const setItem = vi.spyOn(Storage.prototype, 'setItem');
++    renderFurtherLearning();
++
++    const playButtons = screen.getAllByRole('button', { name: /播放/ });
++    expect(playButtons).toHaveLength(3);
++    expect(document.querySelector('iframe')).toBeNull();
++    expect(screen.queryByRole('dialog', { name: '连接第三方视频提示' })).not.toBeInTheDocument();
++
++    await user.click(playButtons[0]);
++    expect(screen.getByRole('dialog', { name: '连接第三方视频提示' })).toBeVisible();
++    expect(document.querySelector('iframe')).toBeNull();
++
++    await user.click(screen.getByRole('button', { name: '继续播放' }));
++    expect(screen.getByTitle(/Bilibili/)).toBeVisible();
++    expect(setItem.mock.calls.some(([key]) => String(key).includes('video-learning'))).toBe(false);
++
++    await user.keyboard('{Escape}');
++    expect(document.querySelector('iframe')).toBeNull();
++    expect(playButtons[0]).toHaveFocus();
++  });
++
++  it('opens later videos directly for the current page session without persisting consent', async () => {
++    const user = userEvent.setup();
++    const setItem = vi.spyOn(Storage.prototype, 'setItem');
++    renderFurtherLearning();
++
++    const playButtons = screen.getAllByRole('button', { name: /播放/ });
++    await user.click(playButtons[0]);
++    await user.click(screen.getByRole('button', { name: '继续播放' }));
++    await user.keyboard('{Escape}');
++    await user.click(playButtons[1]);
++
++    expect(screen.queryByRole('dialog', { name: '连接第三方视频提示' })).not.toBeInTheDocument();
++    expect(screen.getByTitle(/Bilibili/)).toBeVisible();
++    expect(setItem).not.toHaveBeenCalled();
++  });
++
++  it('keeps Tab and Shift+Tab inside the consent dialog and restores the inert background on cancel', async () => {
++    const user = userEvent.setup();
++    const { container } = renderFurtherLearning();
++
++    await user.click(screen.getAllByRole('button', { name: /播放/ })[0]);
++    const continueButton = screen.getByRole('button', { name: '继续播放' });
++    const cancelButton = screen.getByRole('button', { name: '取消' });
++
++    expect(container).toHaveAttribute('inert');
++    expect(continueButton).toHaveFocus();
++    await user.tab({ shift: true });
++    expect(cancelButton).toHaveFocus();
++    await user.tab();
++    expect(continueButton).toHaveFocus();
++
++    await user.click(cancelButton);
++    expect(container).not.toHaveAttribute('inert');
++    expect(screen.getAllByRole('button', { name: /播放/ })[0]).toHaveFocus();
++  });
++
++  it('keeps the player close control reachable in its portal modal', async () => {
++    const user = userEvent.setup();
++    const { container } = renderFurtherLearning();
++
++    await user.click(screen.getAllByRole('button', { name: /播放/ })[0]);
++    await user.click(screen.getByRole('button', { name: '继续播放' }));
++
++    const player = screen.getByRole('dialog', { name: 'Bilibili 播放器' });
++    const closeButton = screen.getByRole('button', { name: '关闭播放器' });
++    const fallbackLink = screen.getByRole('link', { name: '打开 Bilibili 原页' });
++    expect(player.parentElement).toHaveClass('further-modal-layer');
++    expect(container).toHaveAttribute('inert');
++    expect(closeButton).toHaveFocus();
++
++    expect(screen.getByTitle(/Bilibili/)).toHaveAttribute('tabindex', '-1');
++    fallbackLink.focus();
++    await user.tab();
++    expect(closeButton).toHaveFocus();
++    await user.tab({ shift: true });
++    expect(fallbackLink).toHaveFocus();
++  });
++});
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\data\\further-learning.ts" "b/src\\data\\further-learning.ts"
+index 9d39db7..a88845c 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\data\\further-learning.ts"
++++ "b/src\\data\\further-learning.ts"
+@@ -1,45 +1,31 @@
++import type { MediaAssetId } from './media';
++
+ export type LearningResourceSectionId = 'video' | 'primary' | 'foundation';
+ 
+ export type LearningResourceKind = 'video' | 'paper' | 'code' | 'survey';
+ 
+-export interface VideoLearningTask {
+-  beforeQuestion: string;
+-  focusPoints: string[];
+-  selfCheckQuestion: string;
+-  selfCheckOptions: Array<{
+-    id: string;
+-    label: string;
+-  }>;
+-  correctOptionId: string;
+-  correctFeedback: string;
+-  retryFeedback: string;
+-  relatedChapter: {
+-    href: `#${string}`;
+-    label: string;
+-  };
+-}
+-
+ export interface LearningResource {
+   id: string;
+   section: LearningResourceSectionId;
+   kind: LearningResourceKind;
+   title: string;
+   provider: string;
+   href: string;
+-  embedHref?: string;
+   summary: string;
+   learn: string;
+   tags: string[];
+   audience: '入门' | '进阶' | '实践';
+   note?: string;
+-  videoTask?: VideoLearningTask;
++  videoAssetId?: MediaAssetId;
++  videoWhy?: string;
++  watchFor?: readonly [string, string];
+ }
+ 
+ export interface LearningResourceSection {
+   id: LearningResourceSectionId;
+   label: string;
+   eyebrow: string;
+   question: string;
+   answer: string;
+ }
+ 
+@@ -71,95 +57,59 @@ export const LEARNING_RESOURCE_SECTIONS: LearningResourceSection[] = [
+ ];
+ 
+ export const FURTHER_LEARNING_RESOURCES: LearningResource[] = [
+   {
+     id: 'video-mineru-open-talk',
+     section: 'video',
+     kind: 'video',
+     title: '开源工具 MinerU 助力复杂 PDF 高效解析提取',
+     provider: 'OpenMMLab · Bilibili',
+     href: 'https://www.bilibili.com/video/BV15rHSeyEk2/',
+-    embedHref: 'https://player.bilibili.com/player.html?bvid=BV15rHSeyEk2&p=1&autoplay=0&danmaku=0&poster=1',
+     summary: 'OpenDataLab 数据提取工程师从高质量语料需求出发，介绍 MinerU 的任务背景与复杂文档解析流程。',
+     learn: '适合在教程入口前观看，先把“PDF 不是纯文本”变成具体问题。',
+     tags: ['复杂 PDF', '数据提取', '任务背景'],
+     audience: '入门',
+     note: '这是 MinerU 工具与问题背景导读，不是 MinerU2.5-Pro 论文逐节讲解。',
+-    videoTask: {
+-      beforeQuestion: '如果已经识别出全部文字，为什么复杂 PDF 仍可能无法被机器正确使用？',
+-      focusPoints: ['页面里有哪些不同元素', '阅读顺序如何被恢复', '结构化输出怎样进入后续流程'],
+-      selfCheckQuestion: '文档解析比普通文字识别多恢复了什么？',
+-      selfCheckOptions: [
+-        { id: 'characters', label: '只恢复更多字符' },
+-        { id: 'structure', label: '元素类型、位置、顺序与结构' },
+-        { id: 'pages', label: '只统计 PDF 页数' },
+-      ],
+-      correctOptionId: 'structure',
+-      correctFeedback: '正确：识别文字只是起点，文档解析还要恢复可用的页面结构。',
+-      retryFeedback: '再想一步：如果字符都对，但公式、表格与阅读顺序错了，输出仍不可用。',
+-      relatedChapter: { href: '#step-1', label: '回看第 1 步：数据瓶颈' },
+-    },
++    videoAssetId: 'bili-mineru-open-talk',
++    videoWhy: '把“PDF 不只是纯文本”变成具体的页面与结构问题。',
++    watchFor: ['页面里有哪些不同元素', '阅读顺序如何被恢复'],
+   },
+   {
+     id: 'video-mineru-ai-talk',
+     section: 'video',
+     kind: 'video',
+     title: '详解 MinerU：赋能大模型的高质量网页与 PDF 数据提取技术及工具分享',
+     provider: 'OpenDataLab · Bilibili',
+     href: 'https://www.bilibili.com/video/BV1uf421q7gp/',
+-    embedHref: 'https://player.bilibili.com/player.html?bvid=BV1uf421q7gp&p=1&autoplay=0&danmaku=0&poster=1',
+     summary: 'MinerU 核心开发者介绍网页与 PDF 数据提取的技术背景、工具链和实际需求。',
+     learn: '看完后更容易理解论文为什么把文档解析视为训练数据基础设施。',
+     tags: ['高质量数据', '工具链', '开发者分享'],
+     audience: '进阶',
+-    videoTask: {
+-      beforeQuestion: '为什么一个 PDF 解析器会影响后续大模型能学到什么？',
+-      focusPoints: ['原始页面怎样变成结构化语料', '质量问题会在哪些环节累积', '工具链为何需要可复核输出'],
+-      selfCheckQuestion: '解析工具被称为“数据基础设施”的核心原因是？',
+-      selfCheckOptions: [
+-        { id: 'interface', label: '界面看起来更专业' },
+-        { id: 'corpus', label: '解析结果可形成后续训练可用的结构化语料' },
+-        { id: 'model-size', label: '它一定会增大模型参数量' },
+-      ],
+-      correctOptionId: 'corpus',
+-      correctFeedback: '正确：解析质量决定进入训练管线的数据内容与结构是否可信。',
+-      retryFeedback: '提示：关注解析输出最终流向哪里，而不是工具本身的界面或模型大小。',
+-      relatedChapter: { href: '#step-2', label: '回看第 2 步：DDAS 选数' },
+-    },
++    videoAssetId: 'bili-mineru-data-talk',
++    videoWhy: '理解网页与 PDF 数据提取为何会影响后续可用语料。',
++    watchFor: ['原始页面怎样变成结构化语料', '质量问题会在哪些环节累积'],
+   },
+   {
+     id: 'video-mineru25-deploy',
+     section: 'video',
+     kind: 'video',
+     title: 'PDF 解析之神！新一代 MinerU2.5 本地部署保姆级教程',
+     provider: '第三方实践 · Bilibili',
+     href: 'https://www.bilibili.com/video/BV1UVnkzKEnk/',
+-    embedHref: 'https://player.bilibili.com/player.html?bvid=BV1UVnkzKEnk&p=1&autoplay=0&danmaku=0&poster=1',
+     summary: '以本地部署和实际文档处理为主，帮助读者把论文模型与可运行工具联系起来。',
+     learn: '适合想进一步动手的读者；部署结论和效果判断应以官方仓库当前版本为准。',
+     tags: ['MinerU2.5', '本地部署', '实践'],
+     audience: '实践',
+     note: '第三方视频，不作为本教程论文事实或性能数字的来源。',
+-    videoTask: {
+-      beforeQuestion: '一次本地部署演示，能直接证明论文报告的性能提升吗？',
+-      focusPoints: ['演示使用的版本与运行环境', '输入文档和输出格式', '哪些结论仍需回到论文与评测代码核对'],
+-      selfCheckQuestion: '看到第三方部署效果后，最稳妥的结论是什么？',
+-      selfCheckOptions: [
+-        { id: 'proof', label: '单个演示即可证明论文全部实验结论' },
+-        { id: 'replace', label: '视频结果可替代官方评测' },
+-        { id: 'practice', label: '它说明工具可实践，性能结论仍需核对版本与官方证据' },
+-      ],
+-      correctOptionId: 'practice',
+-      correctFeedback: '正确：部署视频帮助理解工程使用，论文数字仍应由原文与官方评测支撑。',
+-      retryFeedback: '注意证据层级：工程演示、标准评测和论文消融回答的是不同问题。',
+-      relatedChapter: { href: '#step-6', label: '回看第 6 步：公平评测' },
+-    },
++    videoAssetId: 'bili-mineru25-deploy',
++    videoWhy: '将论文中的模型与实际本地部署工具联系起来。',
++    watchFor: ['演示使用的版本与运行环境', '输入文档和输出格式'],
+   },
+   {
+     id: 'paper-mineru25-pro',
+     section: 'primary',
+     kind: 'paper',
+     title: 'MinerU2.5-Pro: Pushing the Limits of Data-Centric Document Parsing at Scale',
+     provider: '作者论文 · arXiv',
+     href: 'https://arxiv.org/abs/2604.04771v2',
+     summary: '本教程的主要事实来源，包含 DDAS、CMCV、Judge-and-Refine、分阶段训练、GRPO 与 OmniDocBench v1.6 实验。',
+     learn: '核对教程中的机制、数据口径、实验结果和证据边界。',
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\styles\\further-learning.css" "b/src\\styles\\further-learning.css"
+index 0d635c0..8fadef3 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\styles\\further-learning.css"
++++ "b/src\\styles\\further-learning.css"
+@@ -1,629 +1,61 @@
+ .further-learning {
+-  margin: 34px 0 8px;
+-  padding: clamp(20px, 3vw, 30px);
+-  overflow: hidden;
+-  background:
+-    radial-gradient(circle at 100% 0, rgba(110, 74, 181, .10), transparent 26rem),
+-    #fff;
+-  border: 1px solid var(--line);
+-  border-radius: var(--radius);
+-  box-shadow: var(--shadow-soft);
+-}
+-
+-.further-learning__header {
+-  display: grid;
+-  grid-template-columns: minmax(0, 1fr) auto;
+-  gap: 24px;
+-  align-items: end;
+-}
+-
+-.further-learning__header h2 {
+-  max-width: 720px;
+-  margin: 12px 0 7px;
+-  color: var(--navy);
+-  font-size: clamp(27px, 3.4vw, 42px);
+-  line-height: 1.15;
+-}
+-
+-.further-learning__header p {
+-  max-width: 760px;
+-  margin: 0;
+-  color: var(--muted);
+-  font-size: 16px;
+-}
+-
+-.further-learning__route {
+-  display: flex;
+-  align-items: center;
+-  gap: 7px;
+-  padding: 11px 13px;
+-  background: var(--purple-soft);
+-  border: 1px solid #d9cdef;
+-  border-radius: 10px;
+-  color: var(--purple);
+-  font-size: 12px;
+-  font-weight: 900;
+-  white-space: nowrap;
+-}
+-
+-.further-learning__route i { color: #a392c9; font-style: normal; }
+-
+-.further-learning__tabs {
+-  display: grid;
+-  grid-template-columns: repeat(3, minmax(0, 1fr));
+-  gap: 9px;
+-  margin-top: 24px;
+-  padding: 6px;
+-  background: var(--surface-soft);
+-  border: 1px solid var(--line);
+-  border-radius: 13px;
+-}
+-
+-.further-learning__tabs button {
+   display: grid;
+-  min-height: 64px;
+-  grid-template-columns: auto 1fr;
+-  gap: 10px;
+-  align-items: center;
+-  padding: 9px 12px;
+-  background: transparent;
+-  border: 1px solid transparent;
+-  border-radius: 9px;
+-  color: var(--muted);
+-  text-align: left;
+-}
+-
+-.further-learning__tabs button:hover { background: #fff; color: var(--navy); }
+-.further-learning__tabs button.is-active {
++  gap: 22px;
++  margin: 28px 0 8px;
++  padding: clamp(18px, 3vw, 28px);
+   background: #fff;
+-  border-color: var(--line-strong);
+-  color: var(--navy);
+-  box-shadow: var(--shadow-soft);
+-}
+-
+-.further-learning__tabs button > i {
+-  display: grid;
+-  width: 33px;
+-  height: 33px;
+-  place-items: center;
+-  background: var(--blue-soft);
+-  border-radius: 50%;
+-  color: var(--blue);
+-  font: 900 11px var(--ui-font-mono);
+-  font-style: normal;
+-}
+-
+-.further-learning__tabs button.is-active > i { background: var(--navy); color: #fff; }
+-.further-learning__tabs button > span { display: grid; line-height: 1.25; }
+-.further-learning__tabs b { font-size: 14px; }
+-.further-learning__tabs small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+-
+-.further-learning__panel { margin-top: 20px; }
+-
+-.further-learning__question {
+-  display: grid;
+-  grid-template-columns: auto minmax(0, 1fr);
+-  gap: 3px 13px;
+-  align-items: center;
+-  margin-bottom: 13px;
+-  padding: 13px 15px;
+-  background: var(--blue-soft);
+-  border-left: 4px solid var(--blue);
+-  border-radius: 8px;
+-}
+-
+-.further-learning__question > span {
+-  grid-row: 1 / 3;
+-  padding: 4px 7px;
+-  background: #fff;
+-  border-radius: 6px;
+-  color: var(--blue);
+-  font: 900 11px var(--ui-font-mono);
+-  white-space: nowrap;
+-}
+-
+-.further-learning__question h3 { margin: 0; color: var(--navy); font-size: 18px; }
+-.further-learning__question p { margin: 0; color: var(--muted); font-size: 13px; }
+-
+-.further-learning__grid { display: grid; gap: 10px; }
+-
+-.further-resource {
+-  display: grid;
+-  grid-template-columns: 94px minmax(0, 1fr) 116px;
+-  min-height: 190px;
+-  overflow: hidden;
+-  background: var(--surface-soft);
+   border: 1px solid var(--line);
+-  border-radius: 12px;
+-  transition: border-color var(--t-fast) ease, box-shadow var(--t-fast) ease, transform var(--t-fast) ease;
+-}
+-
+-.further-resource:hover {
+-  border-color: var(--line-strong);
++  border-radius: var(--radius);
+   box-shadow: var(--shadow-soft);
+-  transform: translateY(-2px);
+-}
+-
+-.further-resource__visual {
+-  display: grid;
+-  align-content: space-between;
+-  justify-items: center;
+-  padding: 17px 11px 13px;
+-  background: var(--navy);
+-  color: #fff;
+-}
+-
+-.further-resource--video .further-resource__visual { background: #e96b75; }
+-.further-resource--survey .further-resource__visual { background: var(--purple); }
+-.further-resource--code .further-resource__visual { background: #25313f; }
+-.further-resource__visual > span { color: rgba(255, 255, 255, .72); font: 800 11px var(--ui-font-mono); }
+-
+-.further-resource__glyph {
+-  display: grid;
+-  width: 58px;
+-  height: 58px;
+-  place-items: center;
+-  border: 1px solid rgba(255, 255, 255, .5);
+-  border-radius: 14px;
+-  color: #fff;
+-}
+-
+-.further-resource__glyph b { font: 900 14px var(--ui-font-mono); }
+-.further-resource__glyph--survey b { font-size: 25px; }
+-.further-resource__glyph--video { position: relative; align-content: center; gap: 4px; }
+-.further-resource__glyph--video i {
+-  width: 0;
+-  height: 0;
+-  margin-left: 4px;
+-  border-top: 9px solid transparent;
+-  border-bottom: 9px solid transparent;
+-  border-left: 14px solid #fff;
+-}
+-.further-resource__glyph--video small { font: 800 8px var(--ui-font-mono); letter-spacing: .12em; }
+-
+-.further-resource__body {
+-  min-width: 0;
+-  padding: 17px 18px;
+-}
+-
+-.further-resource__meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+-.further-resource__meta > span {
+-  padding: 2px 7px;
+-  background: var(--blue-soft);
+-  border-radius: 999px;
+-  color: var(--blue);
+-  font: 800 10px var(--ui-font-mono);
+-}
+-.further-resource--video .further-resource__meta > span:first-child { background: var(--red-soft); color: var(--red); }
+-.further-resource__meta small { color: var(--muted); font-size: 11px; }
+-.further-resource__body h3 { margin: 8px 0 5px; color: var(--navy); font-size: 17px; line-height: 1.35; }
+-.further-resource__body > p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+-
+-.further-resource__learn {
+-  display: flex;
+-  gap: 8px;
+-  align-items: flex-start;
+-  margin-top: 9px;
+-  padding: 8px 10px;
+-  background: #fff;
+-  border-radius: 7px;
+-  color: var(--ink);
+-  font-size: 12px;
+-}
+-.further-resource__learn b { flex: none; color: var(--green); }
+-.further-resource--video .further-resource__tags { display: none; }
+-
+-.video-learning-progress {
+-  display: grid;
+-  grid-template-columns: auto minmax(120px, 240px) minmax(0, 1fr);
+-  gap: 12px;
+-  align-items: center;
+-  margin: 0 0 12px;
+-  padding: 10px 13px;
+-  background: #fff8f8;
+-  border: 1px solid #f1d4d7;
+-  border-radius: 9px;
+-}
+-
+-.video-learning-progress > div:first-child {
+-  display: flex;
+-  gap: 8px;
+-  align-items: baseline;
+-  color: var(--muted);
+-  font-size: 11px;
+-  font-weight: 800;
+-}
+-
+-.video-learning-progress > div:first-child b {
+-  color: #b84450;
+-  font: 900 15px var(--ui-font-mono);
+-}
+-
+-.video-learning-progress__track { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+-.video-learning-progress__track i {
+-  height: 7px;
+-  overflow: hidden;
+-  background: #eadfe0;
+-  border-radius: 999px;
+-}
+-.video-learning-progress__track i.is-complete { background: #e96b75; }
+-.video-learning-progress p { margin: 0; color: var(--muted); font-size: 11px; }
+-
+-.video-learning-task {
+-  margin-top: 11px;
+-  overflow: hidden;
+-  background: #fff;
+-  border: 1px solid #dce5ee;
+-  border-radius: 9px;
+-}
+-
+-.video-learning-task.is-complete { border-color: #add9c3; box-shadow: inset 3px 0 #2a9d68; }
+-
+-.video-learning-task__rail {
+-  display: grid;
+-  grid-template-columns: repeat(3, 1fr);
+-  background: #f4f7fa;
+-  border-bottom: 1px solid #dce5ee;
+-}
+-
+-.video-learning-task__rail span {
+-  position: relative;
+-  display: flex;
+-  min-height: 35px;
+-  align-items: center;
+-  justify-content: center;
+-  gap: 5px;
+-  color: #7b8794;
+-  font-size: 10px;
+-  font-weight: 800;
+-}
+-
+-.video-learning-task__rail span + span::before {
+-  position: absolute;
+-  left: -4px;
+-  color: #bbc6d0;
+-  content: '›';
+-}
+-
+-.video-learning-task__rail i {
+-  display: grid;
+-  width: 19px;
+-  height: 19px;
+-  place-items: center;
+-  background: #e0e7ed;
+-  border-radius: 50%;
+-  font: 900 9px var(--ui-font-mono);
+-  font-style: normal;
+-}
+-
+-.video-learning-task__rail .is-current { background: #fff4f5; color: #a93642; }
+-.video-learning-task__rail .is-current i { background: #e96b75; color: #fff; }
+-.video-learning-task__rail .is-passed { color: #287957; }
+-.video-learning-task__rail .is-passed i { background: #d8f0e4; color: #287957; }
+-
+-.video-learning-task__stage {
+-  display: grid;
+-  gap: 8px;
+-  padding: 11px 12px 12px;
+-  outline: 0;
+ }
+ 
+-.video-learning-task__stage:focus-visible { box-shadow: inset 0 0 0 3px rgba(32, 105, 169, .2); }
+-.video-learning-task__stage > small {
+-  width: max-content;
+-  padding: 2px 6px;
+-  background: #fff0f1;
+-  border-radius: 4px;
+-  color: #a93642;
+-  font: 900 9px var(--ui-font-mono);
+-  letter-spacing: .08em;
+-}
+-.video-learning-task__stage > strong { color: var(--navy); font-size: 13px; line-height: 1.5; }
+-
+-.video-learning-task__buttons { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+-.video-learning-task__buttons button,
+-.video-learning-task__buttons a {
+-  display: inline-flex;
+-  min-height: 44px;
+-  align-items: center;
+-  justify-content: center;
+-  gap: 5px;
+-  padding: 8px 11px;
+-  background: var(--navy);
+-  border: 1px solid var(--navy);
+-  border-radius: 7px;
+-  color: #fff;
+-  font-size: 11px;
+-  font-weight: 900;
+-  text-decoration: none;
+-}
+-.video-learning-task__buttons button:hover,
+-.video-learning-task__buttons a:hover { background: var(--blue); border-color: var(--blue); }
+-.video-learning-task__buttons button.is-quiet,
+-.video-learning-task__buttons a { background: #fff; border-color: #cad5df; color: var(--navy); }
+-.video-learning-task__buttons button.is-quiet:hover,
+-.video-learning-task__buttons a:hover { background: var(--blue-soft); border-color: #a8c7e2; color: var(--blue); }
+-
+-.video-learning-task__focus {
+-  display: grid;
+-  grid-template-columns: repeat(3, minmax(0, 1fr));
+-  gap: 6px;
+-  margin: 0;
+-  padding: 0;
+-  list-style: none;
+-}
+-.video-learning-task__focus li {
+-  display: grid;
+-  grid-template-columns: 20px 1fr;
+-  gap: 5px;
+-  align-items: center;
+-  min-height: 44px;
+-  padding: 6px;
+-  background: #f4f7fa;
+-  border-radius: 6px;
+-  color: var(--ink);
+-  font-size: 10px;
+-  line-height: 1.35;
+-}
+-.video-learning-task__focus i,
+-.further-resource__focus-guide li i {
+-  display: grid;
+-  width: 20px;
+-  height: 20px;
+-  place-items: center;
+-  background: var(--blue-soft);
+-  border-radius: 50%;
+-  color: var(--blue);
+-  font: 900 9px var(--ui-font-mono);
+-  font-style: normal;
+-}
+-
+-.video-learning-task__options { display: grid; gap: 6px; }
+-.video-learning-task__options button {
+-  display: grid;
+-  min-height: 44px;
+-  grid-template-columns: 22px 1fr;
+-  gap: 6px;
+-  align-items: center;
+-  padding: 7px 9px;
+-  background: #f7f9fb;
+-  border: 1px solid #dce5ee;
+-  border-radius: 7px;
+-  color: var(--ink);
+-  font-size: 11px;
+-  text-align: left;
+-}
+-.video-learning-task__options button:hover { background: var(--blue-soft); border-color: #9fc2df; }
+-.video-learning-task__options button.is-correct { background: #edf9f3; border-color: #75c49c; color: #17603e; }
+-.video-learning-task__options button.is-wrong { background: #fff2f3; border-color: #e9a1a8; color: #95303a; }
+-.video-learning-task__options button span { font-size: 15px; font-weight: 900; }
+-
+-.video-learning-task__feedback {
+-  margin: 0;
+-  padding: 8px 9px;
+-  border-radius: 6px;
+-  font-size: 11px;
+-  line-height: 1.45;
+-}
+-.video-learning-task__feedback.is-correct { background: #edf9f3; color: #17603e; }
+-.video-learning-task__feedback.is-wrong { background: #fff4e8; color: #8b531a; }
+-.further-resource__tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 9px 0 0; padding: 0; list-style: none; }
+-.further-resource__tags li { color: var(--muted); font-size: 10px; }
+-.further-resource__tags li + li::before { margin-right: 5px; color: var(--line-strong); content: '·'; }
+-.further-resource__note { display: block; margin-top: 7px; color: var(--orange); font-size: 11px; line-height: 1.5; }
+-
+-.further-resource__actions {
+-  display: grid;
+-  min-height: 100%;
+-  grid-template-rows: repeat(2, minmax(0, 1fr));
+-  background: #fff;
+-  border-left: 1px solid var(--line);
+-}
+-.further-resource--video .further-resource__actions {
+-  grid-template-rows: repeat(2, 76px);
+-  align-content: center;
+-}
+-
+-.further-resource__action,
+-.further-resource__preview-button {
+-  display: grid;
+-  min-width: 0;
+-  min-height: 50px;
+-  place-content: center;
+-  gap: 3px;
+-  padding: 12px;
+-  background: #fff;
+-  border: 0;
+-  color: var(--navy);
+-  font-weight: 900;
+-  text-align: center;
+-  text-decoration: none;
+-}
+-.further-resource__preview-button { border-bottom: 1px solid var(--line); }
+-.further-resource__action:hover,
+-.further-resource__preview-button:hover { background: var(--blue-soft); color: var(--blue); }
+-.further-resource__action small,
+-.further-resource__preview-button small { color: var(--muted); font-size: 9px; font-weight: 600; }
+-
+-.further-resource__preview {
+-  grid-column: 1 / -1;
+-  padding: 15px;
+-  background: #101b2a;
+-  color: #fff;
+-  animation: furtherPreviewIn 260ms var(--ease-out) both;
+-}
+-
+-.further-resource__preview > header {
+-  display: flex;
+-  align-items: flex-start;
+-  justify-content: space-between;
+-  gap: 18px;
+-  margin-bottom: 12px;
+-}
+-
+-.further-resource__preview header b { color: #fff; font-size: 14px; }
+-.further-resource__preview header p { max-width: 780px; margin: 3px 0 0; color: #b8c7d7; font-size: 12px; line-height: 1.55; }
+-.further-resource__preview header button {
+-  min-width: 88px;
+-  min-height: 44px;
+-  flex: none;
+-  padding: 8px 11px;
+-  background: transparent;
+-  border: 1px solid #70849a;
+-  border-radius: 8px;
+-  color: #fff;
+-  font-weight: 800;
+-}
+-.further-resource__preview header button:hover { background: rgba(255, 255, 255, .1); }
+-
+-.further-resource__iframe-shell {
+-  position: relative;
+-  width: 100%;
+-  aspect-ratio: 16 / 9;
+-  overflow: hidden;
+-  background: #050a10;
+-  border: 1px solid #35475b;
+-  border-radius: 10px;
+-}
+-.further-resource__iframe-shell iframe { display: block; width: 100%; height: 100%; border: 0; }
+-
+-.further-resource__preview-layout.has-focus-guide {
+-  display: grid;
+-  grid-template-columns: minmax(0, 1fr) 230px;
+-  gap: 12px;
+-  align-items: start;
+-}
+-
+-.further-resource__focus-guide {
+-  display: grid;
+-  gap: 9px;
+-  padding: 13px;
+-  background: #17263a;
+-  border: 1px solid #35475b;
+-  border-radius: 10px;
+-}
+-.further-resource__focus-guide > small { color: #ee8e97; font: 900 9px var(--ui-font-mono); letter-spacing: .14em; }
+-.further-resource__focus-guide > b { color: #fff; font-size: 13px; line-height: 1.45; }
+-.further-resource__focus-guide ol { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+-.further-resource__focus-guide li {
+-  display: grid;
+-  grid-template-columns: 22px 1fr;
+-  gap: 7px;
+-  align-items: center;
+-  min-height: 43px;
+-  color: #c6d3df;
+-  font-size: 11px;
+-  line-height: 1.4;
+-}
+-.further-resource__focus-guide button {
+-  min-height: 44px;
+-  padding: 8px;
+-  background: #e96b75;
+-  border: 0;
+-  border-radius: 7px;
+-  color: #fff;
+-  font-size: 11px;
+-  font-weight: 900;
+-}
+-.further-resource__focus-guide button:hover { background: #f17f89; }
+-
+-.further-resource__preview-status {
+-  display: flex;
+-  min-height: 44px;
+-  align-items: center;
+-  justify-content: space-between;
+-  gap: 12px;
+-  margin-top: 8px;
+-  color: #b8c7d7;
+-  font-size: 11px;
+-}
+-.further-resource__preview-status.is-failed { color: #ffb4bb; }
+-.further-resource__preview-status a { color: #9bc7eb; font-weight: 800; }
+-
+-@keyframes furtherPreviewIn {
+-  from { opacity: 0; transform: translateY(-8px); }
+-  to { opacity: 1; transform: none; }
+-}
+-
+-.further-learning__footer {
+-  display: grid;
+-  grid-template-columns: auto 1fr;
+-  gap: 9px;
+-  align-items: start;
+-  margin-top: 15px;
+-  padding: 12px 14px;
+-  background: var(--green-soft);
+-  border: 1px solid #b8dcc9;
+-  border-radius: 8px;
+-  color: #185d40;
+-}
+-.further-learning__footer > span { display: grid; width: 24px; height: 24px; place-items: center; background: #fff; border-radius: 50%; font-weight: 900; }
+-.further-learning__footer p { margin: 0; font-size: 12px; }
++.further-learning__header { display: grid; gap: 8px; }
++.further-learning__header h2 { margin: 0 0 6px; color: var(--navy); font-size: clamp(24px, 3vw, 34px); }
++.further-learning__header p { max-width: 760px; margin: 0; color: var(--muted); }
++.further-video-section, .further-reference-section { display: grid; gap: 12px; }
++.further-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
++.further-section-heading span { color: var(--purple); font: 900 11px var(--ui-font-mono); letter-spacing: .08em; text-transform: uppercase; }
++.further-section-heading h3 { margin: 4px 0 0; color: var(--navy); font-size: 19px; }
++.further-section-heading p { max-width: 500px; margin: 0; color: var(--muted); font-size: 13px; }
++
++.further-video-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
++.further-video-card, .further-reference-card { min-width: 0; padding: 15px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 10px; }
++.further-video-card > small, .further-reference-card small { color: var(--purple); font-size: 11px; font-weight: 800; }
++.further-video-card h4, .further-reference-card h4 { margin: 7px 0; color: var(--navy); font-size: 16px; line-height: 1.35; }
++.further-video-card p, .further-reference-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
++.further-video-card ul { display: grid; gap: 5px; margin: 11px 0; padding-left: 18px; color: var(--ink); font-size: 12px; }
++.further-video-card__actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 13px; }
++.further-video-card__actions button, .further-modal button { min-height: 44px; padding: 8px 12px; background: var(--navy); border: 1px solid var(--navy); border-radius: 8px; color: #fff; font-weight: 800; }
++.further-video-card__actions a, .further-reference-card > a { display: inline-flex; min-height: 44px; align-items: center; color: var(--blue); font-size: 13px; font-weight: 800; }
++.further-video-card__boundary { margin-top: 10px !important; padding-top: 9px; border-top: 1px solid var(--line); font-size: 11px !important; }
++
++.further-reference-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
++.further-reference-card { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 8px 11px; align-items: start; }
++.further-reference-card > a { grid-column: 2; min-height: auto; }
++.further-footer-glyph { display: grid; width: 38px; height: 30px; place-items: center; background: var(--purple-soft); border: 1px solid #d9cdef; border-radius: 6px; color: var(--purple); font: 900 10px var(--ui-font-mono); }
++
++.further-modal-layer { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 12px; background: rgba(15, 32, 50, .58); }
++.further-modal { width: min(560px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; padding: 20px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
++.further-modal--player { display: grid; width: min(860px, 100%); grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; }
++.further-modal h3 { margin: 0; color: var(--navy); }
++.further-modal p { color: var(--muted); line-height: 1.55; }
++.further-modal__header { position: sticky; top: -20px; z-index: 1; display: flex; align-items: start; justify-content: space-between; gap: 14px; margin: -20px -20px 0; padding: 20px; background: #fff; border-bottom: 1px solid var(--line); }
++.further-modal__header span { color: var(--purple); font-size: 11px; font-weight: 900; }
++.further-modal__header button { flex: 0 0 auto; }
++.further-modal iframe { display: block; width: 100%; max-height: min(56dvh, 460px); aspect-ratio: 16 / 9; border: 0; background: var(--navy); }
++.further-modal__actions { display: flex; flex-wrap: wrap; gap: 9px; }
++.further-modal__actions button + button { background: #fff; border-color: var(--line-strong); color: var(--navy); }
+ 
+ @media (max-width: 820px) {
+-  .further-learning__header { grid-template-columns: 1fr; }
+-  .further-learning__route { width: max-content; max-width: 100%; }
+-  .further-resource { grid-template-columns: 76px minmax(0, 1fr); }
+-  .further-resource__actions {
+-    grid-column: 1 / -1;
+-    min-height: 50px;
+-    grid-template-columns: repeat(2, minmax(0, 1fr));
+-    grid-template-rows: 1fr;
+-    gap: 8px;
+-    border-top: 1px solid var(--line);
+-    border-left: 0;
+-  }
+-  .further-resource--video .further-resource__actions { grid-template-rows: 1fr; align-content: stretch; }
+-  .further-resource__preview-button { border-right: 1px solid var(--line); border-bottom: 0; }
+-  .further-resource__preview-layout.has-focus-guide { grid-template-columns: 1fr; }
+-  .further-resource__focus-guide ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
++  .further-video-grid { grid-template-columns: 1fr; }
++  .further-section-heading { display: grid; }
+ }
+ 
+ @media (max-width: 560px) {
+   .further-learning { margin-right: -2px; margin-left: -2px; padding: 16px; border-radius: 14px; }
+-  .further-learning__tabs { grid-template-columns: 1fr; }
+-  .further-learning__tabs button { min-height: 58px; }
+-  .further-learning__question { grid-template-columns: 1fr; }
+-  .further-learning__question > span { grid-row: auto; width: max-content; }
+-  .further-learning__question h3 { margin-top: 4px; font-size: 19px; }
+-  .further-learning__question p,
+-  .further-resource__body > p,
+-  .further-resource__learn,
+-  .further-resource__note,
+-  .further-learning__footer p { font-size: 16px; }
+-  .video-learning-progress { grid-template-columns: auto 1fr; }
+-  .video-learning-progress p { grid-column: 1 / -1; font-size: 14px; }
+-  .further-resource { grid-template-columns: 1fr; }
+-  .further-resource__visual { min-height: 94px; grid-template-columns: 1fr auto; align-items: center; align-content: center; justify-items: start; }
+-  .further-resource__visual > span { justify-self: end; }
+-  .further-resource__body { padding: 16px; }
+-  .further-resource__body h3 { font-size: 20px; }
+-  .video-learning-task__rail span { min-height: 44px; font-size: 12px; }
+-  .video-learning-task__stage > small { font-size: 11px; }
+-  .video-learning-task__stage > strong { font-size: 16px; }
+-  .video-learning-task__focus,
+-  .further-resource__focus-guide ol { grid-template-columns: 1fr; }
+-  .video-learning-task__focus li,
+-  .video-learning-task__options button,
+-  .video-learning-task__buttons button,
+-  .video-learning-task__buttons a,
+-  .video-learning-task__feedback,
+-  .further-resource__focus-guide li,
+-  .further-resource__focus-guide button { font-size: 14px; }
+-  .video-learning-task__buttons > * { width: 100%; }
+-  .further-resource__learn { display: grid; }
+-  .further-resource__action,
+-  .further-resource__preview-button { min-height: 52px; }
+-  .further-resource__action small,
+-  .further-resource__preview-button small { font-size: 12px; }
+-  .further-resource__preview { padding: 11px; }
+-  .further-resource__preview > header { display: grid; }
+-  .further-resource__preview header button { width: 100%; }
+-  .further-resource__preview-status { align-items: flex-start; flex-direction: column; padding: 7px 0; font-size: 14px; }
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  .further-resource { transition: none; }
+-  .further-resource:hover { transform: none; }
+-  .further-resource__preview { animation: none; }
++  .further-reference-grid { grid-template-columns: 1fr; }
++  .further-modal { padding: 14px; }
++  .further-modal__header { top: -14px; margin: -14px -14px 0; padding: 14px; }
++  .further-modal__header { display: grid; }
++  .further-modal__header button { width: 100%; }
+ }
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\App.tsx" "b/src\\App.tsx"
+index 4c0ceff..2a524e1 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\App.tsx"
++++ "b/src\\App.tsx"
+@@ -1,20 +1,21 @@
+ import React, { useCallback, useEffect, useState } from 'react';
+ import { tutorial } from './data/tutorial';
+ import { PAPER_URL, RESEARCH_DIRECTIONS } from './data/facts';
+ import type { ExperienceStateChange, ModuleDef } from './types';
+ import { GlossaryButton, GlossaryProvider, GlossaryText } from './components/Glossary';
+ import { DocumentPrimer } from './components/DocumentPrimer';
+ import { ChapterEvidence } from './components/ChapterEvidence';
+ import { ChapterExperience } from './components/ChapterExperience';
+ import { ResearchProblemOverview } from './components/ResearchProblemOverview';
+ import { HeroMethodContrast } from './components/HeroMethodContrast';
++import { FurtherLearning } from './components/FurtherLearning';
+ import {
+   ChapterUnlockProvider,
+   ChapterUnlockReset,
+   ProgressiveChapter,
+   useChapterNavigationState,
+ } from './components/ProgressiveChapter';
+ 
+ const PROGRESS_KEY = 'mineru2.5-pro.tutorial-progress.v2';
+ const CHAPTER_IDS = tutorial.chapters.map((chapter) => chapter.id);
+ 
+@@ -285,34 +286,37 @@ function AppContent() {
+                   modules={step.modules}
+                   restoredModuleState={restoredStateForModules(step.id, step.modules)}
+                   onInteract={markInteraction}
+                   onStateChange={({ moduleId, state }) => writeStateHash(step.id, moduleId, state)}
+                   onComplete={() => markInteraction(`chapter:${step.id}`)}
+                 />
+ 
+                 <ChapterEvidence items={step.evidence} />
+ 
+                 {step.id === 'step-6' ? (
++                  <>
+                   <section className="research-lens" aria-labelledby="research-title">
+                     <div className="research-head">
+                       <span className="source-tag research">研究者视角</span>
+                       <h3 id="research-title">如果接着做这项研究，优先补什么？</h3>
+                     </div>
+                     <div className="research-grid">
+                       {RESEARCH_DIRECTIONS.map((item, index) => (
+                         <details key={item.title}>
+                           <summary><span>{String(index + 1).padStart(2, '0')}</span>{item.title}</summary>
+                           <p><GlossaryText text={item.text} /></p>
+                         </details>
+                       ))}
+                     </div>
+                   </section>
++                  <FurtherLearning />
++                  </>
+                 ) : null}
+                 </ProgressiveChapter>
+               );
+             })}
+           </div>
+         </div>
+       </main>
+ 
+       <footer className="site-footer">
+         <div><b>MinerU2.5-Pro 交互式教程</b><span><GlossaryText text="所有核心数字已按 arXiv v2 核对。" /></span></div>
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\styles\\paper.css" "b/src\\styles\\paper.css"
+index f59713e..580fbbc 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-7-before\\src\\styles\\paper.css"
++++ "b/src\\styles\\paper.css"
+@@ -420,21 +420,21 @@ main#top { display: block; }
+ .checkpoint-options button:hover { background: rgba(255,255,255,0.18); }
+ .checkpoint-options button.correct { background: var(--green); border-color: #72d7a6; }
+ .checkpoint-options button.wrong { background: var(--red); border-color: #ef9cac; }
+ .checkpoint-feedback { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 14px; }
+ .checkpoint-feedback b { margin-right: 5px; }
+ .checkpoint-feedback.correct b { color: #83e0b0; }
+ .checkpoint-feedback.wrong b { color: #ffadba; }
+ 
+ .research-lens { margin-top: 28px; padding: 24px; background: var(--purple-soft); border: 1px solid #d9cdef; border-radius: var(--radius); }
+ .research-head h3 { margin: 8px 0 17px; font-size: clamp(23px, 3vw, 32px); }
+-.research-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
++.research-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
+ .research-grid details { background: #fff; border: 1px solid #dfd6ef; border-radius: 9px; }
+ .research-grid summary { display: flex; min-height: 50px; align-items: center; gap: 9px; padding: 10px 12px; font-weight: 800; cursor: pointer; }
+ .research-grid summary span { color: var(--purple); font-family: var(--ui-font-mono); font-size: 11px; }
+ .research-grid p { margin: 0; padding: 0 13px 13px 42px; color: var(--muted); font-size: 14px; }
+ .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px max(22px, calc((100vw - 1240px) / 2)); background: var(--navy); color: #fff; }
+ .site-footer div { display: grid; }
+ .site-footer span { color: #b9c8d7; font-size: 13px; }
+ .site-footer a { color: #8ce0b6; font-weight: 800; }
+ .site-footer .site-footer__actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+ .site-footer .chapter-unlock-reset { border-color: rgba(255,255,255,.35); color: #dce6ef; }

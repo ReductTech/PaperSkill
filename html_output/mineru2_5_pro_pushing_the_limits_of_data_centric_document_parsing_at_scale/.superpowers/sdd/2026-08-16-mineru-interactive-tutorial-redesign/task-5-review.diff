@@ -1,0 +1,534 @@
+# Task 5 non-Git review package
+
+
+## src\experiences\TrainingTimeline.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\TrainingTimeline.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\TrainingTimeline.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\TrainingTimeline.test.tsx"
+index e69de29..e3942d6 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\TrainingTimeline.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\TrainingTimeline.test.tsx"
+@@ -0,0 +1,86 @@
++import { act, fireEvent, render, screen, within } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { TrainingTimeline } from './TrainingTimeline';
++
++const props = () => ({
++  stepId: 'step-5',
++  modules: [],
++  onInteract: vi.fn(),
++  onStateChange: vi.fn(),
++  onComplete: vi.fn(),
++});
++
++describe('TrainingTimeline', () => {
++  afterEach(() => {
++    vi.useRealTimers();
++    vi.unstubAllGlobals();
++  });
++
++  it('plays and pauses the 24-second narrative, then scrubs into the Stage 3 rollout frame', () => {
++    vi.useFakeTimers();
++    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 16) as unknown as number);
++    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((id: number) => clearTimeout(id));
++    const callbacks = props();
++    render(<TrainingTimeline {...callbacks} />);
++
++    expect(screen.getByText('65.5M')).toBeVisible();
++    expect(screen.queryByTestId('rollout-field')).not.toBeInTheDocument();
++
++    fireEvent.click(screen.getByRole('button', { name: '播放训练过程' }));
++    expect(screen.getByRole('button', { name: '暂停训练过程' })).toBeVisible();
++    act(() => vi.advanceTimersByTime(8100));
++    expect(screen.getByText('3.9M')).toBeVisible();
++    expect(screen.getByText('其中 192K Hard')).toBeVisible();
++    expect(screen.getByText('Replay')).toBeVisible();
++
++    fireEvent.click(screen.getByRole('button', { name: '暂停训练过程' }));
++    expect(screen.getByRole('button', { name: '播放训练过程' })).toBeVisible();
++    fireEvent.change(screen.getByRole('slider', { name: '训练时间轴' }), { target: { value: '75' } });
++    expect(screen.getAllByTestId('rollout-dot')).toHaveLength(16);
++    expect(callbacks.onComplete).not.toHaveBeenCalled();
++
++    fireEvent.click(screen.getByRole('button', { name: '表格指标' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-teds' });
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++
++    fireEvent.click(screen.getByRole('button', { name: '重播' }));
++    expect(screen.getByText('65.5M')).toBeVisible();
++    expect(screen.getByRole('button', { name: '暂停训练过程' })).toBeVisible();
++    fireEvent.click(screen.getByRole('button', { name: '暂停训练过程' }));
++  });
++
++  it('maps each task to its paper-supported reward and reorders stable candidate rows', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<TrainingTimeline {...callbacks} restoredModuleState={{ moduleId: 'stage-training', state: 'stage-3' }} />);
++    const ranking = screen.getByTestId('candidate-ranking');
++
++    await user.click(screen.getByRole('button', { name: '文本指标' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-edit-distance' });
++    expect(within(ranking).getAllByRole('listitem')[0]).toHaveAttribute('data-candidate-id', 'candidate-b');
++
++    await user.click(screen.getByRole('button', { name: '公式指标' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-cdm' });
++
++    await user.click(screen.getByRole('button', { name: '表格指标' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-teds' });
++
++    await user.click(screen.getByRole('button', { name: '版面指标' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-iou' });
++    expect(within(ranking).getAllByRole('listitem')[0]).toHaveAttribute('data-candidate-id', 'candidate-d');
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++  });
++
++  it('does not auto-play when reduced motion is requested and keeps manual stage controls available', () => {
++    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
++    const callbacks = props();
++    render(<TrainingTimeline {...callbacks} />);
++
++    expect(screen.getByRole('button', { name: '播放训练过程' })).toBeDisabled();
++    expect(screen.getByText(/减少动态效果/)).toBeVisible();
++    fireEvent.click(screen.getByRole('button', { name: '下一阶段' }));
++    expect(screen.getByText('3.9M')).toBeVisible();
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'stage-training', state: 'stage-2' });
++  });
++});
+
+## src\experiences\TrainingTimeline.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\TrainingTimeline.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\TrainingTimeline.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\TrainingTimeline.tsx"
+index e69de29..5889e66 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\TrainingTimeline.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\TrainingTimeline.tsx"
+@@ -0,0 +1,157 @@
++import { useEffect, useMemo, useRef, useState } from 'react';
++import { PaperMedia } from '../components/PaperMedia';
++import { PAPER_FACTS } from '../data/facts';
++import { usePlaybackTimeline } from '../hooks/usePlaybackTimeline';
++import type { ChapterExperienceProps } from '../types';
++import '../styles/experience-training.css';
++
++const DURATION_MS = 24_000;
++const STAGE_BEATS = [0, 8_000, 16_000, 24_000] as const;
++
++type TaskId = 'text' | 'formula' | 'table' | 'layout';
++type MetricState = 'metric-edit-distance' | 'metric-cdm' | 'metric-teds' | 'metric-iou';
++
++const TASKS: readonly { id: TaskId; label: string; metric: string; state: MetricState }[] = [
++  { id: 'text', label: '文本指标', metric: PAPER_FACTS.rewards[0], state: 'metric-edit-distance' },
++  { id: 'formula', label: '公式指标', metric: PAPER_FACTS.rewards[1], state: 'metric-cdm' },
++  { id: 'table', label: '表格指标', metric: PAPER_FACTS.rewards[2], state: 'metric-teds' },
++  { id: 'layout', label: '版面指标', metric: PAPER_FACTS.rewards[3], state: 'metric-iou' },
++] as const;
++
++const CANDIDATES = [
++  { id: 'candidate-a', label: '候选 A', scores: { text: 81, formula: 74, table: 89, layout: 77 } },
++  { id: 'candidate-b', label: '候选 B', scores: { text: 96, formula: 83, table: 78, layout: 86 } },
++  { id: 'candidate-c', label: '候选 C', scores: { text: 88, formula: 97, table: 94, layout: 72 } },
++  { id: 'candidate-d', label: '候选 D', scores: { text: 79, formula: 86, table: 82, layout: 98 } },
++] as const;
++
++const stageFromState = (state?: string) => state === 'stage-3' ? 2 : state === 'stage-2' ? 1 : 0;
++
++const taskFromState = (state?: string): TaskId => TASKS.find((task) => task.state === state)?.id ?? 'text';
++
++const timeLabel = (milliseconds: number) => `00:${String(Math.floor(milliseconds / 1000)).padStart(2, '0')}`;
++
++export function TrainingTimeline({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
++  const restoredStage = restoredModuleState?.moduleId === 'grpo-lab'
++    ? 2
++    : stageFromState(restoredModuleState?.state);
++  const timeline = usePlaybackTimeline({ durationMs: DURATION_MS, beatMs: STAGE_BEATS, initialMs: STAGE_BEATS[restoredStage] });
++  const [task, setTask] = useState<TaskId>(() => taskFromState(restoredModuleState?.moduleId === 'grpo-lab' ? restoredModuleState.state : undefined));
++  const previousBeat = useRef(timeline.activeBeat);
++  const completed = useRef(false);
++  const stage = Math.min(timeline.activeBeat, 2);
++
++  useEffect(() => {
++    if (!restoredModuleState) return;
++    if (restoredModuleState.moduleId === 'grpo-lab') {
++      timeline.pause();
++      timeline.seek(2 / 3);
++      setTask(taskFromState(restoredModuleState.state));
++      previousBeat.current = 2;
++      return;
++    }
++    if (restoredModuleState.moduleId === 'stage-training') {
++      const nextStage = stageFromState(restoredModuleState.state);
++      timeline.pause();
++      timeline.seek(STAGE_BEATS[nextStage] / DURATION_MS);
++      previousBeat.current = nextStage;
++    }
++  // The timeline methods are stable callbacks; restoration follows only the deep-link value.
++  // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [restoredModuleState]);
++
++  useEffect(() => {
++    const nextBeat = Math.min(timeline.activeBeat, 2);
++    if (nextBeat === previousBeat.current) return;
++    previousBeat.current = nextBeat;
++    onInteract('stage-training');
++    onStateChange({ moduleId: 'stage-training', state: `stage-${nextBeat + 1}` });
++  }, [onInteract, onStateChange, timeline.activeBeat]);
++
++  const rankedCandidates = useMemo(
++    () => [...CANDIDATES].sort((left, right) => right.scores[task] - left.scores[task]),
++    [task],
++  );
++  const activeTask = TASKS.find((candidate) => candidate.id === task) ?? TASKS[0];
++
++  const seekStage = (nextStage: number) => {
++    const safeStage = Math.max(0, Math.min(2, nextStage));
++    timeline.pause();
++    timeline.seek(STAGE_BEATS[safeStage] / DURATION_MS);
++    previousBeat.current = safeStage;
++    onInteract('stage-training');
++    onStateChange({ moduleId: 'stage-training', state: `stage-${safeStage + 1}` });
++  };
++
++  const chooseTask = (nextTask: TaskId) => {
++    const definition = TASKS.find((candidate) => candidate.id === nextTask) ?? TASKS[0];
++    setTask(nextTask);
++    onInteract('grpo-lab');
++    onStateChange({ moduleId: 'grpo-lab', state: definition.state });
++    if (stage >= 2 && !completed.current) {
++      completed.current = true;
++      onComplete();
++    }
++  };
++
++  return <section className="training-timeline" aria-label="训练与 GRPO 播放器" data-stage={stage + 1}>
++    <header className="training-timeline__header">
++      <div><span className="source-tag teaching">基于论文重绘</span><h3>让数据包沿训练路线进入 GRPO</h3></div>
++      <p>24 秒内依次查看三阶段；只有到达 Stage 3 并查看任务排名才完成。</p>
++    </header>
++
++    <div className="training-timeline__cinema">
++      <PaperMedia assetId="mineru-data-engine" cropId="trainingRoutes" label="论文原图节选" caption="Figure 2 的训练去向用于核对路线；下方数据包和候选排序是教学动画。" className="training-timeline__paper" />
++      <div className="training-timeline__route" aria-live="polite">
++        <div className="training-timeline__stage-copy">
++          <span>Stage {stage + 1}</span>
++          {stage === 0 ? <><strong>{PAPER_FACTS.data.stage1.split(' ')[0]}</strong><p>跨任务数据进入监督微调，先建立广覆盖能力。</p></> : null}
++          {stage === 1 ? <><strong>{PAPER_FACTS.data.stage2.split(' ')[0]}</strong><b>其中 {PAPER_FACTS.data.expertHard.split(' ')[0]} Hard</b><p>筛选后的难例通过回放机制返回训练回环。</p></> : null}
++          {stage === 2 ? <><strong>{PAPER_FACTS.data.stage3.split(' ')[0]}</strong><p>高质量集合进入 GRPO，同一输入展开多候选。</p></> : null}
++        </div>
++        <div className="training-timeline__packets" aria-hidden="true">
++          <i /><i /><i /><i /><i /><i />
++          {stage === 1 ? <span className="training-timeline__replay">Replay</span> : null}
++        </div>
++        {stage === 2 ? <div className="training-timeline__rollouts" data-testid="rollout-field" aria-label={`${PAPER_FACTS.data.rollouts} 个 rollout`}>
++          {Array.from({ length: PAPER_FACTS.data.rollouts }, (_, index) => <i key={index} data-testid="rollout-dot" style={{ '--rollout-index': index } as React.CSSProperties} />)}
++        </div> : null}
++      </div>
++    </div>
++
++    <div className="training-timeline__controls" role="group" aria-label="训练播放控制">
++      <button type="button" onClick={timeline.toggle} disabled={timeline.reducedMotion} aria-label={timeline.playing ? '暂停训练过程' : '播放训练过程'}>{timeline.playing ? '暂停' : '播放'}</button>
++      <button type="button" onClick={() => seekStage(stage - 1)} disabled={stage === 0}>上一阶段</button>
++      <button type="button" onClick={() => seekStage(stage + 1)} disabled={stage === 2}>下一阶段</button>
++      <button type="button" onClick={() => { timeline.replay(); previousBeat.current = 0; onInteract('stage-training'); onStateChange({ moduleId: 'stage-training', state: 'stage-1' }); }} disabled={timeline.reducedMotion}>重播</button>
++      <span>{timeLabel(timeline.currentMs)} / 00:24</span>
++    </div>
++    {timeline.reducedMotion ? <p className="training-timeline__motion-note">已启用减少动态效果：自动播放关闭，请用阶段按钮或时间轴查看关键帧。</p> : null}
++    <label className="training-timeline__slider">训练时间轴
++      <input type="range" min="0" max="100" value={Math.round(timeline.progress * 100)} aria-label="训练时间轴" onChange={(event) => {
++        const progress = Number(event.target.value) / 100;
++        const nextStage = progress >= 2 / 3 ? 2 : progress >= 1 / 3 ? 1 : 0;
++        timeline.pause();
++        timeline.seek(progress);
++        previousBeat.current = nextStage;
++        onInteract('stage-training');
++        onStateChange({ moduleId: 'stage-training', state: `stage-${nextStage + 1}` });
++      }} />
++    </label>
++
++    {stage === 2 ? <div className="training-timeline__grpo">
++      <div className="training-timeline__tasks" role="group" aria-label="选择 GRPO 任务指标">
++        {TASKS.map((definition) => <button key={definition.id} type="button" data-active={task === definition.id} onClick={() => chooseTask(definition.id)}>{definition.label}</button>)}
++      </div>
++      <div className="training-timeline__ranking">
++        <p>按 <strong>{activeTask.metric}</strong> 重排；这些分数仅用于展示排序机制。</p>
++        <ol data-testid="candidate-ranking">
++          {rankedCandidates.map((candidate) => <li key={candidate.id} data-candidate-id={candidate.id}><span>{candidate.label}</span><b>{candidate.scores[task]}</b></li>)}
++        </ol>
++      </div>
++    </div> : null}
++    <p className="experience-boundary">事实边界：数据规模与奖励类型来自论文；数据包运动、候选内容和教学分数不是论文训练日志。OmniDocBench 页面只代表类似挑战属性。</p>
++  </section>;
++}
++
++export default TrainingTimeline;
+
+## src\experiences\MgamMatchingPuzzle.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\MgamMatchingPuzzle.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\MgamMatchingPuzzle.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\MgamMatchingPuzzle.test.tsx"
+index e69de29..41da87a 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\MgamMatchingPuzzle.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\MgamMatchingPuzzle.test.tsx"
+@@ -0,0 +1,62 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { describe, expect, it, vi } from 'vitest';
++import { MgamMatchingPuzzle } from './MgamMatchingPuzzle';
++
++const props = () => ({
++  stepId: 'step-6',
++  modules: [],
++  onInteract: vi.fn(),
++  onStateChange: vi.fn(),
++  onComplete: vi.fn(),
++});
++
++describe('MgamMatchingPuzzle', () => {
++  it('keeps held-out GT fixed while prediction-only merges recompute the matching', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<MgamMatchingPuzzle {...callbacks} />);
++
++    expect(screen.getByText('HELD-OUT TEST')).toBeVisible();
++    expect(screen.getByText('TEST-296')).toBeVisible();
++    expect(screen.getByTestId('mgam-ground-truth')).toHaveAttribute('data-immutable', 'true');
++    expect(screen.getByText(/真实 Markdown 对比不是原始 MGAM 示例/)).toBeVisible();
++
++    await user.click(screen.getByRole('button', { name: '合并预测块 1 和 2' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'mgam-lab', state: 'partition-2' });
++    expect(screen.getByTestId('mgam-ground-truth')).toHaveTextContent('Invoice total');
++    expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '2');
++
++    await user.click(screen.getByRole('button', { name: '合并预测块 2 和 3' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'mgam-lab', state: 'partition-1' });
++    expect(screen.getByText('合理匹配')).toBeVisible();
++    expect(screen.getByText('94.08')).toBeVisible();
++    expect(screen.getByText('92.01')).toBeVisible();
++    expect(screen.getByText('+2.07')).toBeVisible();
++    expect(screen.getByText(/分段报告.*2.72.*端点.*2.71/)).toBeVisible();
++    expect(screen.queryByText('92.48')).not.toBeInTheDocument();
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++  });
++
++  it('keeps the appendix comparator discrepancy folded and reports its evidence state', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />);
++
++    const evidence = screen.getByText('证据口径与边界').closest('details');
++    expect(evidence).not.toHaveAttribute('open');
++    expect(screen.queryByText(/附录 Table 8.*92.48.*1.60/)).not.toBeInTheDocument();
++
++    await user.click(screen.getByText('证据口径与边界'));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'results-boundary', state: 'evidence-open' });
++    expect(screen.getByText(/附录 Table 8.*92.48.*1.60/)).toBeVisible();
++  });
++
++  it('reconstructs the completed puzzle when a results-boundary deep link is restored', () => {
++    const callbacks = props();
++    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'results-boundary', state: 'evidence-open' }} />);
++
++    expect(screen.getByText('合理匹配')).toBeVisible();
++    expect(screen.getByText(/附录 Table 8.*92.48.*1.60/)).toBeVisible();
++  });
++});
+
+## src\experiences\MgamMatchingPuzzle.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\MgamMatchingPuzzle.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\MgamMatchingPuzzle.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\MgamMatchingPuzzle.tsx"
+index e69de29..2b80fab 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\experiences\\MgamMatchingPuzzle.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\MgamMatchingPuzzle.tsx"
+@@ -0,0 +1,106 @@
++import { useRef, useState } from 'react';
++import { PaperMedia } from '../components/PaperMedia';
++import { PAPER_FACTS } from '../data/facts';
++import type { ChapterExperienceProps } from '../types';
++import '../styles/experience-training.css';
++
++const partitionFromState = (state?: string) => state === 'partition-1' ? 1 : state === 'partition-2' ? 2 : 3;
++
++export function MgamMatchingPuzzle({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
++  const restoredPartition = restoredModuleState?.moduleId === 'results-boundary'
++    ? 1
++    : restoredModuleState?.moduleId === 'mgam-lab' ? partitionFromState(restoredModuleState.state) : 3;
++  const [merged12, setMerged12] = useState(restoredPartition <= 2);
++  const [merged23, setMerged23] = useState(restoredPartition === 1);
++  const [evidenceOpen, setEvidenceOpen] = useState(restoredModuleState?.moduleId === 'results-boundary' && restoredModuleState.state === 'evidence-open');
++  const completed = useRef(false);
++  const partition = 3 - Number(merged12) - Number(merged23);
++  const correct = partition === 1;
++
++  const groups = correct
++    ? ['Invoice total = $320']
++    : merged12
++      ? ['Invoice total', '= $320']
++      : merged23
++        ? ['Invoice', 'total = $320']
++        : ['Invoice', 'total', '= $320'];
++
++  const merge = (separator: '12' | '23') => {
++    const nextMerged12 = merged12 || separator === '12';
++    const nextMerged23 = merged23 || separator === '23';
++    const nextPartition = 3 - Number(nextMerged12) - Number(nextMerged23);
++    setMerged12(nextMerged12);
++    setMerged23(nextMerged23);
++    onInteract('mgam-lab');
++    onStateChange({ moduleId: 'mgam-lab', state: `partition-${nextPartition}` });
++    if (!completed.current) {
++      completed.current = true;
++      onComplete();
++    }
++  };
++
++  return <section className="mgam-puzzle" aria-label="MGAM 匹配拼图" data-partition={partition}>
++    <header className="mgam-puzzle__header">
++      <div><span className="mgam-puzzle__heldout">HELD-OUT TEST</span><h3>TEST-{PAPER_FACTS.benchmark.hardPages}</h3></div>
++      <p>这是与训练阶段视觉和 ID 均不同的新测试样本；GT 始终固定，只合并预测侧。</p>
++    </header>
++
++    <div className="mgam-puzzle__reference">
++      <PaperMedia assetId="omni-output" cropId="outputA" label="论文原图节选" caption="真实 Markdown 输出规范差异，用于帮助解释评测边界。" />
++      <p><strong>来源边界：</strong>真实 Markdown 对比不是原始 MGAM 示例；下方 MGAM 分块完全是教学示意。</p>
++    </div>
++
++    <div className="mgam-puzzle__board">
++      <div className="mgam-puzzle__lane" data-testid="mgam-ground-truth" data-immutable="true">
++        <span>GT · 固定</span><strong>Invoice total = $320</strong>
++      </div>
++      <div className="mgam-puzzle__lines" data-testid="mgam-matching-lines" data-partition={partition} aria-hidden="true">
++        {groups.map((_, index) => <i key={`${partition}-${index}`} />)}
++      </div>
++      <div className="mgam-puzzle__prediction">
++        <span>Prediction · 仅此侧可合并</span>
++        <div className="mgam-puzzle__blocks">
++          {groups.map((group, index) => <strong key={`${partition}-${group}`} data-group={index + 1}>{group}</strong>)}
++        </div>
++        <div className="mgam-puzzle__separators" role="group" aria-label="预测块分隔线">
++          {!merged12 ? <button type="button" onClick={() => merge('12')}>合并预测块 1 和 2</button> : null}
++          {!merged23 ? <button type="button" onClick={() => merge('23')}>合并预测块 2 和 3</button> : null}
++        </div>
++      </div>
++      <div className="mgam-puzzle__score" aria-live="polite">
++        <span>匹配质量</span>
++        <strong>{correct ? '合理匹配' : partition === 2 ? '更接近 GT' : '过度分块'}</strong>
++        <b>{correct ? '粒度已对齐' : partition === 2 ? '已重算：仍有 1 条分隔线' : '等待合并预测块'}</b>
++      </div>
++    </div>
++
++    {correct ? <div className="mgam-puzzle__results">
++      <div className="mgam-puzzle__waterfall" aria-label="训练阶段消融瀑布">
++        {[
++          ['Base', PAPER_FACTS.scores.stage0],
++          ['Stage 1', PAPER_FACTS.scores.stage1],
++          ['Stage 2', PAPER_FACTS.scores.stage2],
++          ['Stage 3', PAPER_FACTS.scores.stage3],
++        ].map(([label, score]) => <div key={label}><span>{label}</span><strong>{score}</strong></div>)}
++      </div>
++      <p className="mgam-puzzle__rounding">分段报告 +{PAPER_FACTS.scores.roundedStageGain}；端点 +{PAPER_FACTS.scores.endpointGain}。差异来自四舍五入。</p>
++      <div className="mgam-puzzle__benchmarks">
++        <p><span>Base</span><strong>{PAPER_FACTS.scores.basePro}</strong><small>非第一；Best {PAPER_FACTS.scores.baseBest}</small></p>
++        <p><span>Hard</span><strong>{PAPER_FACTS.scores.hardPro}</strong><small><span>v2 主文第二名</span> <b>{PAPER_FACTS.scores.hardMainTextComparator}</b></small><b>{`+${PAPER_FACTS.scores.hardMainTextLead}`}</b></p>
++      </div>
++    </div> : null}
++
++    {correct ? <details className="mgam-puzzle__evidence" open={evidenceOpen} onToggle={(event) => {
++      const open = event.currentTarget.open;
++      setEvidenceOpen(open);
++      onInteract('results-boundary');
++      onStateChange({ moduleId: 'results-boundary', state: open ? 'evidence-open' : 'evidence-closed' });
++    }}>
++      <summary>证据口径与边界</summary>
++      {evidenceOpen ? <p>v2 主文以 {PAPER_FACTS.scores.hardMainTextComparator} 为比较项；附录 Table 8 另列 {PAPER_FACTS.scores.hardAppendixRunnerUp}，对应领先 +{PAPER_FACTS.scores.hardAppendixLead.toFixed(2)}。两种口径不可混写。</p> : null}
++    </details> : null}
++    <p className="experience-boundary">事实边界：MGAM 固定 GT，并只枚举预测侧连续合并；教学分块不证明语义等价，也不是论文原始评测样本。</p>
++  </section>;
++}
++
++export default MgamMatchingPuzzle;
+
+## src\styles\experience-training.css
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\styles\experience-training.css', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\styles\\experience-training.css" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-training.css"
+index e69de29..02d15aa 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\src\\styles\\experience-training.css"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-training.css"
+@@ -0,0 +1,62 @@
++.training-timeline, .mgam-puzzle { display: grid; gap: 16px; color: var(--navy, #21324a); }
++.training-timeline__header, .mgam-puzzle__header { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
++.training-timeline__header h3, .mgam-puzzle__header h3 { margin: 6px 0 0; font-size: clamp(1.3rem, 3vw, 1.85rem); }
++.training-timeline__header p, .mgam-puzzle__header p { max-width: 36ch; margin: 0; color: var(--muted, #68778f); font-size: 13px; line-height: 1.55; }
++.training-timeline__cinema { display: grid; grid-template-columns: minmax(220px, .82fr) 1.18fr; gap: 14px; min-height: 330px; padding: 14px; overflow: hidden; border: 2px solid #18283d; border-radius: 20px; background: radial-gradient(circle at 84% 16%, #28435f, #111c2b 58%); color: #fff; }
++.training-timeline__paper { min-width: 0; margin: 0; align-self: stretch; }
++.training-timeline__paper figcaption { color: #d7e2ee; }
++.training-timeline__paper .paper-media__source { color: #bad7ff; }
++.training-timeline__route { position: relative; display: grid; min-width: 0; min-height: 290px; align-content: center; isolation: isolate; }
++.training-timeline__stage-copy { display: grid; gap: 8px; max-width: 29rem; z-index: 2; }
++.training-timeline__stage-copy > span { color: #9ec5f4; font-size: 12px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
++.training-timeline__stage-copy > strong { font-size: clamp(2.7rem, 7vw, 5rem); line-height: .9; }
++.training-timeline__stage-copy > b { color: #fed7aa; font-size: 1.05rem; }
++.training-timeline__stage-copy p { max-width: 38ch; margin: 0; color: #cdd8e5; line-height: 1.55; }
++.training-timeline__stage-copy em { color: #fde68a; font-style: normal; font-weight: 900; }
++.training-timeline__packets { display: grid; grid-template-columns: repeat(6, 20px); gap: 7px; margin-top: 24px; }
++.training-timeline__packets i { height: 26px; border: 1px solid #7dd3fc; border-radius: 5px; background: linear-gradient(145deg, #60a5fa, #1d4ed8); box-shadow: 0 6px 14px rgba(0,0,0,.24); transform: translateY(calc((var(--packet-index, 0)) * 1px)); }
++.training-timeline__replay { align-self: center; margin-left: 8px; padding: 5px 9px; border: 1px solid #fbbf24; border-radius: 999px; color: #fde68a; font-size: 12px; font-weight: 900; }
++.training-timeline__rollouts { display: grid; grid-template-columns: repeat(8, minmax(12px, 1fr)); gap: 8px; margin-top: 22px; padding: 12px; border: 1px solid #44627f; border-radius: 14px; background: rgba(11, 26, 43, .72); }
++.training-timeline__rollouts i { aspect-ratio: 1; border-radius: 50%; background: hsl(calc(202 + var(--rollout-index) * 3) 76% 62%); box-shadow: 0 0 12px rgba(125, 211, 252, .24); }
++.training-timeline__controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
++.training-timeline__controls button, .training-timeline__tasks button, .mgam-puzzle__separators button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--blue, #27446e); border-radius: 10px; background: #fff; color: var(--blue, #27446e); cursor: pointer; font: inherit; font-weight: 850; }
++.training-timeline__controls button:disabled { cursor: not-allowed; opacity: .45; }
++.training-timeline__controls span { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 850; }
++.training-timeline__motion-note { margin: -8px 0 0; color: var(--muted, #68778f); font-size: 12px; }
++.training-timeline__slider { display: grid; gap: 4px; font-size: 13px; font-weight: 850; }
++.training-timeline__slider input { box-sizing: border-box; width: 100%; min-height: 44px; padding-block: 10px; accent-color: var(--orange, #d97706); }
++.training-timeline__grpo { display: grid; grid-template-columns: minmax(170px, .55fr) 1.45fr; gap: 12px; }
++.training-timeline__tasks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
++.training-timeline__tasks button[data-active="true"] { border-color: var(--green, #228d5c); background: #eaf8f0; color: #176943; }
++.training-timeline__ranking { padding: 12px; border-radius: 14px; background: #eef3f8; }
++.training-timeline__ranking p { margin: 0 0 9px; font-size: 13px; }
++.training-timeline__ranking ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 0; padding: 0; list-style: none; }
++.training-timeline__ranking li { display: grid; gap: 4px; padding: 9px; border-radius: 9px; background: #fff; transition: transform .22s ease; }
++.training-timeline__ranking li:first-child { outline: 2px solid var(--green, #228d5c); }
++.training-timeline__ranking li span { color: var(--muted, #68778f); font-size: 11px; }.training-timeline__ranking li b { font-size: 1.25rem; }
++.mgam-puzzle__heldout { display: inline-block; padding: 5px 9px; border-radius: 999px; background: #18283d; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: .13em; }
++.mgam-puzzle__reference { display: grid; grid-template-columns: minmax(180px, .6fr) 1.4fr; gap: 14px; align-items: center; padding: 12px; border: 1px solid var(--line, #d7deea); border-radius: 15px; background: #f7f5ee; }
++.mgam-puzzle__reference .paper-media { margin: 0; }.mgam-puzzle__reference figcaption, .mgam-puzzle__reference .paper-media__source { display: none; }
++.mgam-puzzle__reference p { margin: 0; color: var(--muted, #68778f); font-size: 13px; line-height: 1.6; }
++.mgam-puzzle__board { display: grid; grid-template-columns: 1fr 76px 1fr minmax(130px, .45fr); gap: 10px; align-items: stretch; padding: 16px; border: 2px solid #c9d4e0; border-radius: 18px; background: #f8fafc; }
++.mgam-puzzle__lane, .mgam-puzzle__prediction { display: grid; gap: 10px; padding: 14px; border-radius: 13px; background: #fff; }
++.mgam-puzzle__lane > span, .mgam-puzzle__prediction > span { color: var(--muted, #68778f); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
++.mgam-puzzle__lane > strong { align-self: center; padding: 16px; border: 2px solid #315d87; border-radius: 10px; text-align: center; }
++.mgam-puzzle__lines { display: grid; gap: 8px; align-content: center; }
++.mgam-puzzle__lines i { display: block; height: 3px; background: linear-gradient(90deg, #315d87, #e29a36); transform-origin: center; }
++.mgam-puzzle__lines[data-partition="3"] i:nth-child(2) { transform: rotate(-9deg); }.mgam-puzzle__lines[data-partition="3"] i:nth-child(3) { transform: rotate(9deg); }
++.mgam-puzzle__blocks { display: flex; gap: 5px; align-items: center; }
++.mgam-puzzle__blocks strong { flex: 1; min-width: 0; padding: 14px 7px; border: 2px solid #e29a36; border-radius: 9px; background: #fff8eb; text-align: center; transition: flex .24s ease, transform .24s ease; }
++.mgam-puzzle__separators { display: flex; gap: 7px; flex-wrap: wrap; }.mgam-puzzle__separators button { flex: 1 1 140px; border-style: dashed; border-color: #bd6513; color: #9a4d0a; }
++.mgam-puzzle__score { display: grid; gap: 7px; align-content: center; padding: 12px; border-radius: 12px; background: #18283d; color: #fff; }
++.mgam-puzzle__score span, .mgam-puzzle__score b { color: #cbd8e6; font-size: 11px; }.mgam-puzzle__score strong { color: #fde68a; font-size: 1.2rem; }
++.mgam-puzzle__results { display: grid; gap: 12px; }.mgam-puzzle__waterfall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
++.mgam-puzzle__waterfall div { display: grid; gap: 3px; padding: 11px; border-left: 5px solid #315d87; border-radius: 8px; background: #edf3f8; }
++.mgam-puzzle__waterfall div:nth-child(2) { transform: translateY(-4px); }.mgam-puzzle__waterfall div:nth-child(3) { transform: translateY(-8px); }.mgam-puzzle__waterfall div:nth-child(4) { transform: translateY(-12px); border-color: var(--green, #228d5c); }
++.mgam-puzzle__waterfall span, .mgam-puzzle__waterfall b { color: var(--muted, #68778f); font-size: 11px; }.mgam-puzzle__waterfall strong { font-size: 1.35rem; }
++.mgam-puzzle__rounding { margin: -4px 0 0; color: var(--muted, #68778f); font-size: 12px; }
++.mgam-puzzle__benchmarks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }.mgam-puzzle__benchmarks p { display: grid; grid-template-columns: auto 1fr auto; gap: 5px 10px; align-items: baseline; margin: 0; padding: 12px; border-radius: 11px; background: #f7f5ee; }.mgam-puzzle__benchmarks strong { font-size: 1.6rem; }.mgam-puzzle__benchmarks small { grid-column: 1 / -1; color: var(--muted, #68778f); }.mgam-puzzle__benchmarks b { color: var(--green, #228d5c); }
++.mgam-puzzle__evidence { padding: 11px 13px; border: 1px solid var(--line, #d7deea); border-radius: 11px; }.mgam-puzzle__evidence summary { min-height: 44px; line-height: 44px; cursor: pointer; font-weight: 850; }.mgam-puzzle__evidence p { margin: 8px 0 0; color: var(--muted, #68778f); line-height: 1.6; }
++@media (prefers-reduced-motion: reduce) { .training-timeline__ranking li, .mgam-puzzle__blocks strong { transition: none; } }
++@media (max-width: 760px) { .training-timeline__header, .mgam-puzzle__header, .training-timeline__cinema, .training-timeline__grpo, .mgam-puzzle__reference { grid-template-columns: 1fr; display: grid; }.training-timeline__cinema { min-height: 0; }.training-timeline__route { min-height: 250px; }.training-timeline__controls button { flex: 1 1 42%; }.training-timeline__controls span { width: 100%; margin-left: 0; text-align: right; }.training-timeline__tasks { grid-template-columns: 1fr 1fr; }.training-timeline__ranking ol { grid-template-columns: 1fr 1fr; }.mgam-puzzle__board { grid-template-columns: 1fr; }.mgam-puzzle__lines { grid-template-columns: repeat(3, 1fr); min-height: 28px; }.mgam-puzzle__lines i { transform: rotate(90deg) !important; }.mgam-puzzle__waterfall { grid-template-columns: 1fr 1fr; }.mgam-puzzle__waterfall div { transform: none !important; }.mgam-puzzle__benchmarks { grid-template-columns: 1fr; } }
++@media (max-width: 420px) { .training-timeline__tasks, .training-timeline__ranking ol, .mgam-puzzle__waterfall { grid-template-columns: 1fr; }.mgam-puzzle__blocks { align-items: stretch; flex-direction: column; }.mgam-puzzle__separators button { width: 100%; } }
+
+## docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-5-before\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md" "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+index 5f771b5..80cd484 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-5-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+@@ -1,9 +1,10 @@
+ # MinerU2.5-Pro Redesign Progress
+ 
+ - Task 1 complete: test harness, shared contracts, and media registry. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
+ - Task 2 complete: shared PaperMedia/viewer and playback timeline primitives; reviewer Major findings repaired with PaperFigureCard context/error and visibility-state regression coverage. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
+ - Task 3 checkpoint: added DataCounterfactual and DdasMicroscope with real local PaperMedia crops, stable chapter-state callbacks, keyboard/pointer/mobile controls, and reduced-motion handling. Tests: `npm test -- src/experiences/DataCounterfactual.test.tsx src/experiences/DdasMicroscope.test.tsx` (5 passed); build: `npm run build` (PASS); PaperSkill validator: PASS. Browser visual QA: NOT RUN — no browser connection available.
+ - Task 3 review fix: page DDAS now reports/restores `random|cluster|ddas`; Figure 3 element views are reversible; the single control group preserves text/formula/table actions on mobile as full-width 52px controls; cluster thumbnails use PaperMedia fallbacks; the 512-dimensional ViT-base fact appears once. Tests: targeted 8 passed; full suite 15 passed; build and validator PASS.
+ - Task 4 checkpoint: added CMCV routing (native drag/drop plus equivalent buttons) and Render-forensics (one comparison slider plus keyboard repair hotspot). CMCV records `cmcv-router` and reveals the consensus boundary only after a route attempt; Render repair synchronizes the teaching source, render alignment, and diff state. Tests: `npm test -- src/experiences/CmcvRoutingChallenge.test.tsx src/experiences/RenderForensics.test.tsx` (5 passed); build: `npm run build` (PASS); PaperSkill validator: PASS. Browser visual QA: NOT RUN 鈥?no browser connection available.
+ - Task 4 review fix: slider changes now report and restore `compare-p0|compare-p50|compare-p100`; `repaired` restores the repaired p100 terminal state. One CMCV route now automatically records and unfolds `cmcv-trust/consensus:correct`, whose deep link reconstructs the Medium lane/token/outcome. Synthetic route/feedback scope is explicitly labeled teaching demonstration, and the range hit area has a 44px minimum height. Tests: targeted 6 passed; full suite 21 passed; build and PaperSkill validator PASS. Browser visual QA: NOT RUN 鈥?no browser connection available.
+ - Task 4 re-review fix: after repair, moving the enabled comparison slider clears `repaired` before emitting its `compare-p*` state, so the current source/render/diff frame matches restoration of that same state. Tests: targeted 7 passed; full suite 22 passed; build and PaperSkill validator PASS. Browser visual QA: NOT RUN 鈥?no browser connection available.
++- Task 5 checkpoint: added the sole full 24-second TrainingTimeline player and prediction-only MgamMatchingPuzzle. Stage 3 completion requires a task-specific ranking; all four task-to-metric states, reduced-motion stepping, stable replay/scrub states, secondary-module deep links, fixed GT, held-out identity, main-text Hard evidence, folded appendix discrepancy, and endpoint/rounded-gain distinction are covered. Tests: targeted 6 passed; full suite 28 passed; build and PaperSkill validator PASS. Browser visual QA: NOT RUN — Task 5 components are intentionally not mounted until Task 6 integration.
