@@ -92,7 +92,7 @@ export const tutorial: TutorialData = {
           "title": "对照论文 Figure 5：Mage-Flow 的完整架构",
           "desc": "论文原图展示 Qwen3-VL、Mage-VAE、原生分辨率序列和 NR-MMDiT 的连接方式。下方交互图进一步拆解各节点的输入、输出与任务角色。",
           componentId: "static-figure",
-          "figure": "/images/mage-flow-architecture.png",
+          "figure": "./images/mage-flow-architecture.png",
           "figureCaption": "论文 Figure 5：左侧为 Mage-Flow 整体架构与原生分辨率打包，右侧为 Native-Resolution MMDiT 模块。"
         },
         {
@@ -441,7 +441,7 @@ export const tutorial: TutorialData = {
           "title": "三阶段训练：先获得能力，再单步化，最后对齐",
           "desc": "Stage I 分别预训练多步 encoder 和 decoder；Stage II 将 decoder 蒸馏为单步；Stage III 先固定 decoder 训练单步 encoder，再解冻二者联合微调。论文原图给出三个阶段及其依赖关系。",
           componentId: "static-figure",
-          "figure": "/images/mage-vae-training.png",
+          "figure": "./images/mage-vae-training.png",
           "figureCaption": "论文 Figure 6：左侧给出 FLUX.2 anchor 与 Mage-VAE 对偶架构，右侧展示三阶段训练过程。"
         },
         {
