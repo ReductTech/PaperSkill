@@ -110,7 +110,7 @@ export const tutorial: TutorialData = {
           title: '点亮训练闭环的每一环',
           desc: '任务 → Rollout 管理器 → 虚拟环境 / 真机 → 轨迹 → 奖励管理器 → RL 训练器 → 更新模型，回到环境继续试错。',
           componentId: 'rl-pipeline',
-          figure: '/images/fig2-rl.png',
+          figure: './images/fig2-rl.png',
         },
         {
           kind: 'module',
