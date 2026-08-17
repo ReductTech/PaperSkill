@@ -12,7 +12,7 @@ export const FigureTwoExplorer:React.FC<WidgetProps>=()=>{
  return <div className="paper-figure-explorer">
   <div className="figure-guide-tabs" role="tablist" aria-label="Figure 2 阅读视角">{fig2.map((s,i)=><button key={s.key} type="button" className={sel===i?'active':''} onClick={()=>setSel(i)}>{s.tab}</button>)}</div>
   <div className={`figure-2-stage focus-${x.key}`}>
-   <img src="/images/figure-2.png" alt="论文 Figure 2：Hierarchical-B 逐帧编码与 DCVC-UF 并行块编码对比"/>
+   <img src={`${import.meta.env.BASE_URL}images/figure-2.png`} alt="论文 Figure 2：Hierarchical-B 逐帧编码与 DCVC-UF 并行块编码对比"/>
    {x.key!=='contrast'&&<span className="figure-2-focus" aria-hidden="true"/>}
   </div>
   <div className="figure-reading-card"><span>当前聚焦</span><strong>{x.title}</strong><p>{x.text}</p></div>
@@ -33,6 +33,6 @@ export const FigureThreeExplorer:React.FC<WidgetProps>=()=>{
  return <div className="paper-figure-explorer framework-explorer">
   <div className="framework-steps" role="tablist" aria-label="Figure 3 数据流步骤">{fig3.map((s,i)=><button key={s.tab} type="button" className={sel===i?'active':''} onClick={()=>setSel(i)}><small>STEP {i+1}</small><b>{s.tab.slice(2)}</b></button>)}</div>
   <div className="framework-path" aria-live="polite"><span>当前路径</span><strong>{x.path}</strong><p>{x.text}</p></div>
-  <figure className="paper-framework-figure"><div className="framework-image-stage"><img src="/images/figure-3.svg" alt="论文 Figure 3：DCVC-UF 总体框架图"/>{x.boxes.map((b,i)=><span key={i} className="framework-focus-box" style={{left:`${b.x}%`,top:`${b.y}%`,width:`${b.w}%`,height:`${b.h}%`}} aria-hidden="true"/>)}</div><figcaption>论文 Figure 3 原图。点击上方 STEP，青色高亮会定位到原图中的对应模块与数据路径。</figcaption></figure>
+  <figure className="paper-framework-figure"><div className="framework-image-stage"><img src={`${import.meta.env.BASE_URL}images/figure-3.svg`} alt="论文 Figure 3：DCVC-UF 总体框架图"/>{x.boxes.map((b,i)=><span key={i} className="framework-focus-box" style={{left:`${b.x}%`,top:`${b.y}%`,width:`${b.w}%`,height:`${b.h}%`}} aria-hidden="true"/>)}</div><figcaption>论文 Figure 3 原图。点击上方 STEP，青色高亮会定位到原图中的对应模块与数据路径。</figcaption></figure>
  </div>;
 };
