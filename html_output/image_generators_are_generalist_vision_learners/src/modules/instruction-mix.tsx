@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { clamp, lerp, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { paperImage } from './paper-image';
 import type { WidgetProps } from './registry';
 
 const W=560,H=250,MW=244,MH=130;
@@ -21,9 +22,9 @@ function drawMain(ctx:CanvasRenderingContext2D,state:MixState){ctx.clearRect(0,0
   ctx.strokeStyle=C.blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(160,122);ctx.lineTo(188,122);ctx.moveTo(328,122);ctx.lineTo(384,122);ctx.stroke();if(state.phase==='preserve')seal(ctx,348,190,'近似保留');}
 
 const retentionExamples:Record<RetentionView,{tab:string;prompt:string;image:string;alt:string;columns:string[];source:string;observation:string}>={
-  'ghost-ship':{tab:'文生图 · 幽灵船',prompt:'一艘幽灵般的船航行在雾气笼罩、月光照耀的海面上。',image:'/images/paper-retention-ghost-ship.png',alt:'幽灵船文生图对比：左侧为 Vision Banana，右侧为 Nano Banana Pro',columns:['Vision Banana','Nano Banana Pro'],source:'论文图 11 · 文生图',observation:'两种模型都保留了幽灵船、雾海与月光等关键语义。'},
-  'yellow-taxi':{tab:'文生图 · 黄色出租车',prompt:'一辆黄色出租车等候在一座现代玻璃建筑外。',image:'/images/paper-retention-yellow-taxi.png',alt:'黄色出租车文生图对比：左侧为 Vision Banana，右侧为 Nano Banana Pro',columns:['Vision Banana','Nano Banana Pro'],source:'论文图 11 · 文生图',observation:'两种模型都生成了现代玻璃建筑外的黄色出租车。'},
-  'red-vehicle':{tab:'图像编辑 · 车辆改红',prompt:'把车辆颜色改成红色。',image:'/images/paper-retention-red-vehicle.png',alt:'车辆改红图像编辑对比：从左到右为原图、Vision Banana 和 Nano Banana Pro',columns:['原图','Vision Banana','Nano Banana Pro'],source:'论文图 12 · 图像编辑',observation:'两种模型都把车辆改为红色，同时保留了森林和露营车的主体结构。'},
+  'ghost-ship':{tab:'文生图 · 幽灵船',prompt:'一艘幽灵般的船航行在雾气笼罩、月光照耀的海面上。',image:paperImage('paper-retention-ghost-ship.png'),alt:'幽灵船文生图对比：左侧为 Vision Banana，右侧为 Nano Banana Pro',columns:['Vision Banana','Nano Banana Pro'],source:'论文图 11 · 文生图',observation:'两种模型都保留了幽灵船、雾海与月光等关键语义。'},
+  'yellow-taxi':{tab:'文生图 · 黄色出租车',prompt:'一辆黄色出租车等候在一座现代玻璃建筑外。',image:paperImage('paper-retention-yellow-taxi.png'),alt:'黄色出租车文生图对比：左侧为 Vision Banana，右侧为 Nano Banana Pro',columns:['Vision Banana','Nano Banana Pro'],source:'论文图 11 · 文生图',observation:'两种模型都生成了现代玻璃建筑外的黄色出租车。'},
+  'red-vehicle':{tab:'图像编辑 · 车辆改红',prompt:'把车辆颜色改成红色。',image:paperImage('paper-retention-red-vehicle.png'),alt:'车辆改红图像编辑对比：从左到右为原图、Vision Banana 和 Nano Banana Pro',columns:['原图','Vision Banana','Nano Banana Pro'],source:'论文图 12 · 图像编辑',observation:'两种模型都把车辆改为红色，同时保留了森林和露营车的主体结构。'},
 };
 
 export const InstructionMix:React.FC<WidgetProps>=({chapterId,moduleId})=>{const compact=compactMode(moduleId);const canvasRef=useRef<HTMLCanvasElement>(null);const [state,setState]=useState<MixState>({phase:'base',sourceFocus:'generation',hasMixed:false,dropletProgress:0});const [retentionView,setRetentionView]=useState<RetentionView>('ghost-ship');

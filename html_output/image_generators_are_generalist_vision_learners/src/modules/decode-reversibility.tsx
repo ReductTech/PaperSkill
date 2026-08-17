@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clamp, easeInOutQuad, lerp, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { paperImage } from './paper-image';
 import type { WidgetProps } from './registry';
 
 type SampleId = 'cat-pixel' | 'lock-pixel' | 'exit-pixel' | 'background-pixel';
@@ -458,11 +459,11 @@ export const DecodeReversibility: React.FC<WidgetProps> = ({ chapterId, moduleId
       <figure className="paper-evidence-figure">
         <div className="paper-task-evidence-grid">
           <div className="paper-task-evidence-panel">
-            <img src="/images/paper-semantic-input.png" alt="论文图 2：橱窗中猫、门锁和出口标志的输入图像" loading="lazy" />
+            <img src={paperImage('paper-semantic-input.png')} alt="论文图 2：橱窗中猫、门锁和出口标志的输入图像" loading="lazy" />
             <span>输入图像</span>
           </div>
           <div className="paper-task-evidence-panel">
-            <img src="/images/paper-semantic-natural.png" alt="论文图 2：按照提示颜色生成的开放词汇语义分割结果" loading="lazy" />
+            <img src={paperImage('paper-semantic-natural.png')} alt="论文图 2：按照提示颜色生成的开放词汇语义分割结果" loading="lazy" />
             <span>生成的 RGB 语义图</span>
           </div>
         </div>

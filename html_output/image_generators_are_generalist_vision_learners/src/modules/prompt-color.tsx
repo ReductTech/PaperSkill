@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { paperImage } from './paper-image';
 import type { WidgetProps } from './registry';
 
 const MINI_W = 244;
@@ -39,9 +40,9 @@ const TASKS: Record<Task, TaskRecord> = {
   semantic: {
     label: '语义分割',
     figures: [
-      { src: '/images/paper-semantic-input.png', label: '输入图像', alt: '论文图 2：橱窗中的猫' },
-      { src: '/images/paper-semantic-natural.png', label: '自然语言颜色提示', alt: '论文图 2：自然语言颜色提示生成的语义分割结果' },
-      { src: '/images/paper-semantic-structured.png', label: '结构化 RGB 提示', alt: '论文图 2：结构化 RGB 提示生成的语义分割结果' },
+      { src: paperImage('paper-semantic-input.png'), label: '输入图像', alt: '论文图 2：橱窗中的猫' },
+      { src: paperImage('paper-semantic-natural.png'), label: '自然语言颜色提示', alt: '论文图 2：自然语言颜色提示生成的语义分割结果' },
+      { src: paperImage('paper-semantic-structured.png'), label: '结构化 RGB 提示', alt: '论文图 2：结构化 RGB 提示生成的语义分割结果' },
     ],
     figureNumber: '图 2',
     promptExamples: [
@@ -73,9 +74,9 @@ const TASKS: Record<Task, TaskRecord> = {
   instance: {
     label: '实例分割',
     figures: [
-      { src: '/images/paper-instance-input.png', label: '输入图像', alt: '论文图 3：砂锅与牛肉拼盘的输入图像' },
-      { src: '/images/paper-instance-prompt-a.png', label: '提示：每瓣大蒜', alt: '论文图 3：大蒜实例被分别着色' },
-      { src: '/images/paper-instance-prompt-b.png', label: '提示：每块牛肉', alt: '论文图 3：牛肉实例被分别着色' },
+      { src: paperImage('paper-instance-input.png'), label: '输入图像', alt: '论文图 3：砂锅与牛肉拼盘的输入图像' },
+      { src: paperImage('paper-instance-prompt-a.png'), label: '提示：每瓣大蒜', alt: '论文图 3：大蒜实例被分别着色' },
+      { src: paperImage('paper-instance-prompt-b.png'), label: '提示：每块牛肉', alt: '论文图 3：牛肉实例被分别着色' },
     ],
     figureNumber: '图 3',
     promptExamples: [
@@ -110,8 +111,8 @@ const TASKS: Record<Task, TaskRecord> = {
   referring: {
     label: '指代表达分割',
     figures: [
-      { src: '/images/paper-referring-input.png', label: '输入图像', alt: '论文图 4：广场上的两名男子' },
-      { src: '/images/paper-referring-output.png', label: '“穿粉色 T 恤的男子”', alt: '论文图 4：自由文本指代分割输出' },
+      { src: paperImage('paper-referring-input.png'), label: '输入图像', alt: '论文图 4：广场上的两名男子' },
+      { src: paperImage('paper-referring-output.png'), label: '“穿粉色 T 恤的男子”', alt: '论文图 4：自由文本指代分割输出' },
     ],
     figureNumber: '图 4',
     promptExamples: [
