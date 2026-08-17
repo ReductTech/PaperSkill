@@ -122,7 +122,7 @@ export const RankEvidenceWorkspace: React.FC<WidgetProps> = () => {
         <section className="af-compact-evidence optimization">
           <header><div><h3>训练效率</h3></div><small>Fig. 6</small></header>
           {/* Source: AsymFlow paper Fig. 6, page 7. */}
-          <img className="af-figure6-image" src="/images/experiments/figure6-convergence.png" alt="Figure 6: AsymFlow and JiT convergence speed comparison" />
+          <img className="af-figure6-image" src={`${import.meta.env.BASE_URL}images/experiments/figure6-convergence.png`} alt="Figure 6: AsymFlow and JiT convergence speed comparison" />
           <p className="af-evidence-statement">Comparable FID，约快 40%。</p>
         </section>
 

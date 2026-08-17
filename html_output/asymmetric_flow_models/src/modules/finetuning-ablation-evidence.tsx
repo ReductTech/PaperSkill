@@ -163,7 +163,7 @@ export const FinetuningAblationEvidence: React.FC<WidgetProps> = () => {
               {active.asset ? (
                 <img
                   key={active.asset}
-                  src={`/images/experiments/fig8-eyes-${active.asset}.png`}
+                  src={`${import.meta.env.BASE_URL}images/experiments/fig8-eyes-${active.asset}.png`}
                   alt={`Figure 8 crop: ${active.label}`}
                 />
               ) : (

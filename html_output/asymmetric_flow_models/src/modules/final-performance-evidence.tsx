@@ -99,7 +99,7 @@ export const FinalPerformanceEvidence: React.FC<WidgetProps> = () => {
           {FILM_MODELS.map((model) => (
             <figure key={`${prompt}-${model.key}`} className={model.key === 'asym' ? 'active' : ''}>
               {/* Source: AsymFlow paper Fig. 7, page 8. */}
-              <img src={`/images/experiments/fig7-${prompt}-${model.key}.png`} alt={`${PROMPTS.find((item) => item.key === prompt)?.label}: ${model.label}`} />
+              <img src={`${import.meta.env.BASE_URL}images/experiments/fig7-${prompt}-${model.key}.png`} alt={`${PROMPTS.find((item) => item.key === prompt)?.label}: ${model.label}`} />
               <figcaption><b>{model.label}</b></figcaption>
             </figure>
           ))}
