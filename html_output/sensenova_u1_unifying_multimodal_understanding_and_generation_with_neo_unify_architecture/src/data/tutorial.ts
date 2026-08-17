@@ -55,7 +55,7 @@ const sourceTutorial: TutorialData = {
           "title": "选择同时支持理解与生成的接口",
           "desc": "对比视觉编码器（VE）、变分自编码器（VAE）与本文的轻量像素接口。前两者分别偏向理解或生成；本文用两层卷积编码与类 MLP 解码连接原生像素和词，并与主干联合训练。",
           componentId: "interface-choice",
-          "figure": "/images/figure-04-neo-unify-architecture.png"
+          "figure": "./images/figure-04-neo-unify-architecture.png"
         }
       ],
       "insight": "研究现状并非“旧方法都没有统一”，而是统一逐步从系统层推进到序列形式和表示层，却始终留下特定瓶颈。SenseNova-U1 的回答是去掉预训练 VE、VAE 与深解码头，让任务表示在原生输入的联合训练中形成。",
@@ -96,7 +96,7 @@ const sourceTutorial: TutorialData = {
           "title": "追踪载荷如何流过六个环节",
           "desc": "先选择理解、生成或联合训练路径，再按输入、编码、合流、主干、输出和闭环逐步检查。彩色胶囊标出当前载荷；阶段轨道、高亮模块和反馈文字同步说明它从哪里出发、经过什么处理、最终变成什么。",
           componentId: "system-overview",
-          "figure": "/images/figure-03-overview.png"
+          "figure": "./images/figure-03-overview.png"
         }
       ],
       "insight": "阅读这篇论文时，不要把接口、MoT、目标、训练和推理当作五个并列技巧：接口决定 token 从哪里来，主干决定它们怎样交互，目标与训练决定能力怎样形成，推理系统决定能力怎样运行。",
@@ -144,7 +144,7 @@ const sourceTutorial: TutorialData = {
           "title": "打开图像接口：像素怎样变成 token，又怎样还原",
           "desc": "按“选取 patch → 两层卷积 → 位置编码 → 视觉 token → 生成侧像素解码”逐步检查。共享主干只作为前后连接点，不重复展开；重建证据单独检验这套图像接口保留了多少像素信息。",
           componentId: "patch-lens",
-          "figure": "/images/figure-10-reconstruction-outdomain.png"
+          "figure": "./images/figure-10-reconstruction-outdomain.png"
         }
       ],
       "insight": "统一输入不等于共用同一种 tokenizer：文本保留原 LLM tokenizer，图像与噪声使用轻量 patch 编码；真正的汇合点是投影后的共享嵌入空间。",
@@ -536,7 +536,7 @@ const sourceTutorial: TutorialData = {
           "title": "按阶段检查数据、损失与更新范围",
           "desc": "依次查看理解热身、生成预训、统一中训与统一 SFT。切换阶段后，核对使用的数据、启用的损失和实际更新的参数。",
           componentId: "training-curriculum",
-          "figure": "/images/figure-12-und-gen-cotraining.png"
+          "figure": "./images/figure-12-und-gen-cotraining.png"
         }
       ],
       "insight": "损失可以联合，训练课程仍需分段；8B-MoT 的前后对照未显示明显冲突，但不能推广为普遍保证。",
@@ -609,7 +609,7 @@ const sourceTutorial: TutorialData = {
           "title": "选择部署方式与注意力内核",
           "desc": "先切换分置或共置部署，再选择纯文本或含图像的 M-block。点击引擎与内核区域，查看状态交换和注意力快路如何变化。",
           componentId: "serving-kernel",
-          "figure": "/images/figure-05-disaggregated-inference.png"
+          "figure": "./images/figure-05-disaggregated-inference.png"
         }
       ],
       "insight": "论文报告的 0.415/0.443 秒是特定硬件与并行配置下的单步延迟，不是端到端响应时间。",
@@ -650,7 +650,7 @@ const sourceTutorial: TutorialData = {
           "title": "选择实验协议，再比较证据",
           "desc": "先选择 RealUnify、GenEval、联合中训、重建或边界，再选择证据行。模块只允许同协议比较，并单独呈现编辑、网格伪影、VLA 与世界模型的证据等级。",
           componentId: "evidence-race",
-          "figure": "/images/figure-13-data-scaling-curves.png"
+          "figure": "./images/figure-13-data-scaling-curves.png"
         }
       ],
       "insight": "数据规模曲线支持“随规模改善”的报告性观察；它不能替代具体协议下的端点数据，也不能推出全面领先。",
@@ -1004,14 +1004,14 @@ const inferenceChapter: TutorialData['chapters'][number] = {
       title: '双引擎分置：统一服务，独立优化两类负载',
       desc: '双引擎架构的作用是在保持统一 API 和生成上下文的同时，解除理解与生成在调度、并行策略和资源预算上的耦合。LightLLM 承担多模态 prefill、自回归文本流与控制，LightX2V 承担迭代像素去噪；二者通过固定页共享内存交换 KV cache 和生成状态，从而支持独立扩缩容、故障隔离，以及分置 GPU 或同 GPU 共置两种部署方式。',
       componentId: 'inference-route',
-      figure: '/images/figure-05-disaggregated-inference.png',
+      figure: './images/figure-05-disaggregated-inference.png',
     },
     {
       kind: 'module', id: '7.2',
       title: '混合注意力内核：保留文本快路，扩展图像范围',
       desc: '混合注意力内核用于高效执行统一多模态 prefill 中并存的两类可见性规则：文本行保持标准因果注意力，图像行读取完整文本前缀与整个图像 span。内核按 M-block 判断是否包含图像 token；纯文本块继续使用原有 causal Key 范围，只有含图像的块才扩展到 image-span end，因此不会让所有请求共同承担多模态掩码的额外计算。',
       componentId: 'serving-kernel',
-      figure: '/images/figure-06-hybrid-attention-pattern.png',
+      figure: './images/figure-06-hybrid-attention-pattern.png',
     },
   ],
   insight: '“分置”发生在运行时，不发生在模型语义上：两台引擎共享生成上下文并对外提供统一 API；混合注意力内核则让含图像块获得必要的双向范围，同时让纯文本块保留标准因果快路。',
@@ -1036,7 +1036,7 @@ const dataChapter: TutorialData['chapters'][number] = {
     title: '数据组织：为不同能力提供可验证的训练供给',
     desc: '数据组织的作用是为理解与生成提供不同但可协同的能力来源，并在进入训练前控制对齐、覆盖和质量。理解数据按预训练、中训与 SFT 逐步从广覆盖转向高质量指令，生成数据则按文本生图、图像编辑与图文交错分别构造和验证；组成比例回答语料包含什么，处理流程回答样本为何可用，训练采样比才决定各阶段实际看到多少。由论文余量推导的比例继续以“≈”标记，不作为原文直接报告值。',
     componentId: 'data-construction-map',
-    figure: '/images/figure-08-data-distribution-sunburst.png',
+    figure: './images/figure-08-data-distribution-sunburst.png',
   }],
   insight: '数据构造、训练采样和损失加权属于三个层次：Section 4 决定样本如何产生与筛选，Table 2 决定各训练阶段如何混合数据，CE:MSE 决定两类目标怎样加权。',
   formula: undefined,
