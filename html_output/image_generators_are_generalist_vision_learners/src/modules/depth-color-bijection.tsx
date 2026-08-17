@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { clamp, lerp, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { paperImage } from './paper-image';
 import type { WidgetProps } from './registry';
 
 const MAIN_W = 560;
@@ -314,7 +315,7 @@ export const DepthColorBijection: React.FC<WidgetProps> = ({ chapterId, moduleId
   return (
     <div>
       <figure className="paper-evidence-figure">
-        <img src="/images/paper-depth-in-wild.png" alt="论文图 7 高分辨率局部：金阁寺手机照片、Vision Banana 深度图与 Google 地图测距" loading="lazy" />
+        <img src={paperImage('paper-depth-in-wild.png')} alt="论文图 7 高分辨率局部：金阁寺手机照片、Vision Banana 深度图与 Google 地图测距" loading="lazy" />
         <figcaption>
           <strong>图 7｜真实场景的米制深度检查</strong>
           <span>模型从普通手机照片估计相机到金阁寺约 13.71 米；Google 地图测得约 12.87 米。这个案例提供直观校验，但不能替代六个基准上的定量结果。</span>

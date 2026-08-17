@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { clamp, observeCanvas, setupCanvas } from '../lib/canvasKit';
+import { paperImage } from './paper-image';
 import type { WidgetProps } from './registry';
 
 const W = 560;
@@ -380,7 +381,7 @@ export const SurfaceNormalEncoding: React.FC<WidgetProps> = ({ chapterId, module
   return (
     <div>
       <figure className="paper-evidence-figure">
-        <img src="/images/paper-normal-cat.png" alt="论文图 8 高分辨率局部：输入猫咪、Lotus-2 法线图与 Vision Banana 法线图" loading="lazy" />
+        <img src={paperImage('paper-normal-cat.png')} alt="论文图 8 高分辨率局部：输入猫咪、Lotus-2 法线图与 Vision Banana 法线图" loading="lazy" />
         <figcaption>
           <strong>图 8｜表面法线的三列对照</strong>
           <span>从左到右为输入、Lotus-2 和 Vision Banana。局部裁切保留猫毛、树皮和草叶等细节，避免整页复合图缩小后无法辨认。</span>
