@@ -15,11 +15,11 @@ export const tutorial: TutorialData = {
   hero: {
     oldMethod: {
       desc: '通用 VLM 能说出“这是红杯”，却不能直接回答是哪一个、边界在哪里、离我多远，以及从哪里接触。',
-      figure: '/images/kitchen-baseline.png',
+      figure: './images/kitchen-baseline.png',
     },
     newMethod: {
       desc: 'HY-Embodied-0.5 把细粒度感知、具身推理和端侧蒸馏接成闭环，再通过 Action Expert 输出连续机器人动作。',
-      figure: '/images/kitchen-hy-embodied.png',
+      figure: './images/kitchen-hy-embodied.png',
     },
   },
   chapters: [

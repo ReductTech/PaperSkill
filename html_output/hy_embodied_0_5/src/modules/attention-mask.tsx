@@ -31,7 +31,7 @@ function PatchWhy() {
     <div className="patch-why-text old"><span>只按先后读取</span><b>杯口暂时看不到杯身与杯柄</b></div>
     <div className="patch-why-figure">
       <div className="real-cup-patch" role="img" aria-label="写实红色马克杯被切分为 6 乘 8 个图像 Patch，杯口、杯身和杯柄属于同一视觉元素">
-        <img src="/assets/red-mug-patch.png" alt="写实红色马克杯" />
+        <img src="./assets/red-mug-patch.png" alt="写实红色马克杯" />
         <div className="real-patch-grid" aria-hidden="true">
           {Array.from({ length: 48 }, (_, index) => <span key={index} />)}
         </div>
