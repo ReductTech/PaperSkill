@@ -959,7 +959,7 @@ export const EcosystemWidget: React.FC<WidgetProps> = ({ chapterId, moduleId }) 
     imageRef.current = null;
     if (moduleId !== '6.1') return;
     const image = new Image();
-    image.src = '/images/figure-10-retention.png';
+    image.src = `${import.meta.env.BASE_URL}images/figure-10-retention.png`;
     image.onload = () => { imageRef.current = image; };
     return () => { image.onload = null; };
   }, [moduleId]);
