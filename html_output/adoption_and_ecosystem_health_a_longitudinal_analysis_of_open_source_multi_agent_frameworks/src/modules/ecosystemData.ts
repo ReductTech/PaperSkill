@@ -21,22 +21,24 @@ export const groupLabels: Record<FrameworkGroup, string> = {
   official: '厂商官方开发工具',
 };
 
+const publicAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
+
 export const frameworks: FrameworkRecord[] = [
-  { id: 'langchain', name: 'LangChain', short: 'LangChain', created: '2022.10', focus: '通用 LLM 应用框架', group: 'general', logo: '/images/frameworks/langchain.png', stars: 130000, contributors: 5362, density: 41.2 },
-  { id: 'semantic-kernel', name: 'Semantic Kernel', short: 'Semantic', created: '2023.02', focus: '企业级 .NET / Python SDK', group: 'general', logo: '/images/frameworks/microsoft.png', stars: 27437, contributors: 618, density: 22.5 },
-  { id: 'agent-framework', name: 'Microsoft Agent Framework', short: 'Agent FW', created: '2025.04', focus: '微软统一 Agent 框架', group: 'general', logo: '/images/frameworks/microsoft.png', stars: 7872, contributors: 204, density: 25.9 },
-  { id: 'autogpt', name: 'AutoGPT', short: 'AutoGPT', created: '2023.03', focus: '自主 Agent 循环平台', group: 'multi', logo: '/images/frameworks/autogpt.png', stars: 182405, contributors: 1716, density: 9.4 },
-  { id: 'metagpt', name: 'MetaGPT', short: 'MetaGPT', created: '2023.06', focus: 'SOP 驱动的多角色协作', group: 'multi', logo: '/images/frameworks/metagpt.png', stars: 65424, contributors: 257, density: 3.9 },
-  { id: 'autogen', name: 'AutoGen', short: 'AutoGen', created: '2023.08', focus: '对话式多智能体框架', group: 'multi', logo: '/images/frameworks/microsoft.png', stars: 55842, contributors: 869, density: 15.6 },
-  { id: 'crewai', name: 'CrewAI', short: 'CrewAI', created: '2023.10', focus: '基于角色的任务编排', group: 'multi', logo: '/images/frameworks/crewai.png', stars: 46105, contributors: 645, density: 14.0 },
-  { id: 'agentscope', name: 'AgentScope', short: 'AgentScope', created: '2024.01', focus: '强调容错的多智能体平台', group: 'multi', logo: '/images/frameworks/agentscope.png', stars: 18027, contributors: 145, density: 8.0 },
-  { id: 'langflow', name: 'LangFlow', short: 'LangFlow', created: '2023.02', focus: '低代码可视化 RAG / Agent 构建', group: 'visual', logo: '/images/frameworks/langflow.png', stars: 146655, contributors: 707, density: 4.8 },
-  { id: 'langgraph', name: 'LangGraph', short: 'LangGraph', created: '2023.08', focus: '有状态多参与者图编排', group: 'visual', logo: '/images/frameworks/langchain.png', stars: 26295, contributors: 607, density: 23.1 },
-  { id: 'pydantic-ai', name: 'Pydantic-AI', short: 'Pydantic', created: '2024.06', focus: '类型安全与结构化输出', group: 'code', logo: '/images/frameworks/pydantic.png', stars: 15950, contributors: 675, density: 42.3 },
-  { id: 'mastra', name: 'Mastra', short: 'Mastra', created: '2024.08', focus: 'TypeScript 原生 Agent / 工作流', group: 'code', logo: '/images/frameworks/mastra.png', stars: 21931, contributors: 484, density: 22.1 },
-  { id: 'smolagents', name: 'smolagents', short: 'smolagents', created: '2024.12', focus: '轻量代码优先 Agent 框架', group: 'official', logo: '/images/frameworks/huggingface.png', stars: 25940, contributors: 395, density: 15.2 },
-  { id: 'openai-agents', name: 'OpenAI Agents', short: 'OpenAI', created: '2025.03', focus: 'OpenAI 官方 Python SDK', group: 'official', logo: '/images/frameworks/openai.png', stars: 19699, contributors: 438, density: 22.2 },
-  { id: 'google-adk', name: 'Google ADK', short: 'Google ADK', created: '2025.04', focus: 'Google Agent 开发工具包', group: 'official', logo: '/images/frameworks/google.png', stars: 18460, contributors: 621, density: 33.6 },
+  { id: 'langchain', name: 'LangChain', short: 'LangChain', created: '2022.10', focus: '通用 LLM 应用框架', group: 'general', logo: publicAsset('images/frameworks/langchain.png'), stars: 130000, contributors: 5362, density: 41.2 },
+  { id: 'semantic-kernel', name: 'Semantic Kernel', short: 'Semantic', created: '2023.02', focus: '企业级 .NET / Python SDK', group: 'general', logo: publicAsset('images/frameworks/microsoft.png'), stars: 27437, contributors: 618, density: 22.5 },
+  { id: 'agent-framework', name: 'Microsoft Agent Framework', short: 'Agent FW', created: '2025.04', focus: '微软统一 Agent 框架', group: 'general', logo: publicAsset('images/frameworks/microsoft.png'), stars: 7872, contributors: 204, density: 25.9 },
+  { id: 'autogpt', name: 'AutoGPT', short: 'AutoGPT', created: '2023.03', focus: '自主 Agent 循环平台', group: 'multi', logo: publicAsset('images/frameworks/autogpt.png'), stars: 182405, contributors: 1716, density: 9.4 },
+  { id: 'metagpt', name: 'MetaGPT', short: 'MetaGPT', created: '2023.06', focus: 'SOP 驱动的多角色协作', group: 'multi', logo: publicAsset('images/frameworks/metagpt.png'), stars: 65424, contributors: 257, density: 3.9 },
+  { id: 'autogen', name: 'AutoGen', short: 'AutoGen', created: '2023.08', focus: '对话式多智能体框架', group: 'multi', logo: publicAsset('images/frameworks/microsoft.png'), stars: 55842, contributors: 869, density: 15.6 },
+  { id: 'crewai', name: 'CrewAI', short: 'CrewAI', created: '2023.10', focus: '基于角色的任务编排', group: 'multi', logo: publicAsset('images/frameworks/crewai.png'), stars: 46105, contributors: 645, density: 14.0 },
+  { id: 'agentscope', name: 'AgentScope', short: 'AgentScope', created: '2024.01', focus: '强调容错的多智能体平台', group: 'multi', logo: publicAsset('images/frameworks/agentscope.png'), stars: 18027, contributors: 145, density: 8.0 },
+  { id: 'langflow', name: 'LangFlow', short: 'LangFlow', created: '2023.02', focus: '低代码可视化 RAG / Agent 构建', group: 'visual', logo: publicAsset('images/frameworks/langflow.png'), stars: 146655, contributors: 707, density: 4.8 },
+  { id: 'langgraph', name: 'LangGraph', short: 'LangGraph', created: '2023.08', focus: '有状态多参与者图编排', group: 'visual', logo: publicAsset('images/frameworks/langchain.png'), stars: 26295, contributors: 607, density: 23.1 },
+  { id: 'pydantic-ai', name: 'Pydantic-AI', short: 'Pydantic', created: '2024.06', focus: '类型安全与结构化输出', group: 'code', logo: publicAsset('images/frameworks/pydantic.png'), stars: 15950, contributors: 675, density: 42.3 },
+  { id: 'mastra', name: 'Mastra', short: 'Mastra', created: '2024.08', focus: 'TypeScript 原生 Agent / 工作流', group: 'code', logo: publicAsset('images/frameworks/mastra.png'), stars: 21931, contributors: 484, density: 22.1 },
+  { id: 'smolagents', name: 'smolagents', short: 'smolagents', created: '2024.12', focus: '轻量代码优先 Agent 框架', group: 'official', logo: publicAsset('images/frameworks/huggingface.png'), stars: 25940, contributors: 395, density: 15.2 },
+  { id: 'openai-agents', name: 'OpenAI Agents', short: 'OpenAI', created: '2025.03', focus: 'OpenAI 官方 Python SDK', group: 'official', logo: publicAsset('images/frameworks/openai.png'), stars: 19699, contributors: 438, density: 22.2 },
+  { id: 'google-adk', name: 'Google ADK', short: 'Google ADK', created: '2025.04', focus: 'Google Agent 开发工具包', group: 'official', logo: publicAsset('images/frameworks/google.png'), stars: 18460, contributors: 621, density: 33.6 },
 ];
 
 export interface CrossEdge {
