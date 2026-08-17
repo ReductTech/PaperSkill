@@ -266,7 +266,7 @@ export const M2a: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           }}
         >
           <img
-            src="/images/fig1-overview.png"
+            src="./images/fig1-overview.png"
             alt="论文 Figure 1：ClawGUI 框架总览"
             loading="lazy"
             style={{
