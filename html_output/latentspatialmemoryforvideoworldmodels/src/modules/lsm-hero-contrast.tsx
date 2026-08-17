@@ -28,7 +28,7 @@ export const LsmHeroContrast: React.FC<WidgetProps> = ({ moduleId }) => {
       <div className="hero-video-stage">
         <video
           ref={videoRef}
-          src={isOld ? '/images/gen3c.mp4' : '/images/ours.mp4'}
+          src={`${import.meta.env.BASE_URL}images/${isOld ? 'gen3c.mp4' : 'ours.mp4'}`}
           autoPlay
           muted
           loop

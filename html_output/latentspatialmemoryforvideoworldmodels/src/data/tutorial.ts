@@ -380,20 +380,6 @@ export const tutorial: TutorialData = {
           "title": "切换训练阶段，看谁在更新",
           "desc": "阶段一只训练侧分支；阶段二再加入注意力 q/k/v/o 上的 rank-64 LoRA。VAE 与 Wan2.2 原始权重始终冻结；单阶段消融改变的是训练顺序，而不是改成全参数微调。",
           componentId: "lsm-c7-main"
-        },
-        {
-          kind: "module",
-          "id": "7.2",
-          "title": "鎺ュ叆璁板繂渚у垎鏀",
-          "desc": "鐐瑰嚮涓嶅悓鎺ュ叆鐐癸紝瑙傚療 latent 璁板繂濡備綍杩涘叆瑙嗛楠ㄥ共銆",
-          componentId: "lsm-c8-main"
-        },
-        {
-          kind: "module",
-          "id": "7.3",
-          "title": "姣旇緝璁板繂鏂规硶",
-          "desc": "鍒囨崲璇勪及缁存暟锛岃瑙傛瘮杈冩寔涔呰蹇嗙殑璐ㄩ噺涓庢晥鐜囥€�",
-          componentId: "lsm-c10-main"
         }
       ],
       "takeaways": [
