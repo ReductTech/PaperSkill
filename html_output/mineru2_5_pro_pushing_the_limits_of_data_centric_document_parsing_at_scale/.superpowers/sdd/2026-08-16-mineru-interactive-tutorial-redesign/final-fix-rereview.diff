@@ -1,0 +1,1493 @@
+﻿Final fix scoped no-index package. Additional changed current files without same-time baseline: src/components/PaperMedia.test.tsx; src/components/ChapterExperience.test.tsx; src/components/ResearchProblemOverview.test.tsx; src/modules/results-boundary.tsx.
+
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md" "b/docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+index 40474d9..6c1adb9 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
++++ "b/docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+@@ -14,10 +14,11 @@
+ - Task 6 fix 2: closed the remaining re-review finding by requiring both `hashState.stepId === 'document-primer'` and `hashState.moduleId === 'document-primer'` before restoring the primer. RED: the wrong-step hash `#step-3/document-primer/formula` incorrectly restored formula while the legal hash passed; GREEN: focused 3/3, targeted 24/24, full suite 53/53, build PASS, validator PASS (6 chapters / 11 modules / 11 component IDs). The negative regression also preserves the locked-step prompt/scroll contract. No deployment, PR, Git initialization, or Git mutation performed.
+ - Task 7 checkpoint: remounted `FurtherLearning` only after Step 6 as the optional footer. The three Bilibili cards now use `videoAssetId` and `MEDIA_ASSETS` as the sole iframe source; they keep original-page/source boundaries, show one reason plus at most two watch-for points, ask once per page session before connecting a third party, and remove the iframe on close/Escape with focus return. No video consent/progress is persisted. Primary/foundation resources remain; research directions are a compact 3-column/two-row index retaining all six items. RED: old UI exposed six “播放” controls and no consent dialog. GREEN: targeted App/footer 17/17; full suite 14 files/55 tests; build PASS; validator PASS (6 chapters, 11 active modules, 11 component IDs). Browser visual QA: NOT RUN — no connected browser. No deployment, PR, Git initialization, or Git mutation performed.
+ - Task 7 review fix: reproduced the Major modal issue (footer-nested `aria-modal` dialogs had neither background isolation nor Tab trap) and moved consent/player into one body portal overlay. Opening now applies/restores `inert` and prior `aria-hidden` on background body children; Tab/Shift+Tab is constrained to the dialog; close returns focus; the player has a sticky close control, `max-height: calc(100dvh - 24px)`, overflow, a viewport-bounded iframe, and removes the cross-origin iframe from the keyboard Tab sequence. Replaced all legacy tabs/task/self-check/preview CSS with current footer-only selectors and an explicit 38×30 glyph. RED: inert/portal assertions and iframe keyboard-boundary assertion failed on the prior implementation. GREEN: footer+App 19/19; full suite 14 files/57 tests; build PASS; validator PASS (6 chapters, 11 active modules, 11 component IDs). Browser visual QA: NOT RUN — no connected browser. No deployment, PR, Git initialization, or Git mutation performed.
+ - Task 7 review fix round 2: restored embedded Bilibili keyboard access by changing the iframe from `tabIndex={-1}` to `tabIndex={0}` and retaining it in the modal focusable selector. The ordered dialog sequence is close button → iframe → original-page fallback → close button (reverse wraps correspondingly); portal/background inert/sticky close/short-viewport scrolling remain unchanged. RED: the player iframe lacked `tabindex="0"`; GREEN: footer+App 19/19, full suite 14 files/57 tests, build PASS, validator PASS (6 chapters, 11 active modules, 11 component IDs). JSDOM does not emulate native Tab exit from a cross-origin iframe, so the test verifies the exposed focusable contract/order and parent-document boundary wrapping. Browser visual QA: NOT RUN — no connected browser. No deployment, PR, Git initialization, or Git mutation performed.
+ - Task 8 checkpoint: expanded the all-unlocked App regression to prove six named chapter experiences remain reachable and all obsolete runtime shells remain absent; deleted `StepConceptVisual`, `LearningLab`, `RealDocumentCases`, their two dedicated stylesheets, the stale main import, matching CSS residue, and three mistaken root report duplicates while preserving the canonical SDD reports, all 11 module implementations, and all 11 explicit widget registrations. Added 760px/420px overflow, stacking, full-width keyboard alternative, 16px body-copy, 44px control, anchor-offset, and reduced-motion/static animation safeguards. README now documents the six interaction types, local-media provenance/license limitations, footer-only Bilibili, offline boundaries, verification commands, removed four-minute/speed-run/independent-video modes, and delivery status. Regression baseline: App 15/15. Fresh full suite: 14 files/57 tests PASS. Build: PASS, 65 modules transformed. Validator: PASS (6 chapters, 11 active modules, all 11 component IDs registered). Required legacy `rg`: exit 1, 0 matches. HTTP: 13/13 returned 200 (`/`, six local images, six experience modules), and the temporary listener was stopped. Strict UTF-8/U+FFFD scan: PASS across 197 project-owned text files; 0 invalid UTF-8 and 0 files containing U+FFFD.
+ Browser visual QA: NOT RUN — no browser connection available
+ No deployment, PR, or Git initialization performed.
+ - Task 8 review fix 1: the prior checkpoint's 420px body-copy/control statement was not cascade-safe and is superseded by this entry. Added a real CSS cascade regression that expands all applicable 420px runtime rules, matches representative DOM selectors, resolves importance/specificity/source order, and tests both paper-first and paper-last loading. RED on old CSS: App 15 passed / 1 failed, with DataCounterfactual body copy resolving to 13px. GREEN: targeted App 16/16; the fixture now proves one text surface from all six experiences plus research/further-learning at >=16px, and brand/footer links plus button/summary/input targets at >=44px. `paper.css` now uses ID-scoped important body-copy overrides and inline-flex 44px anchor targets without inline padding, plus 44px native/role control dimensions. Fresh full suite: 14 files/58 tests PASS. Build: PASS, 65 modules transformed. Validator: PASS (6 chapters, 11 active modules, all 11 component IDs registered). Required legacy `rg`: exit 1, 0 matches. Strict UTF-8/U+FFFD scan: PASS across 199 project-owned text files; 0 invalid UTF-8 and 0 files containing U+FFFD.
+ Browser visual QA: NOT RUN — no browser connection available
+ No deployment, PR, or Git initialization performed.
++- Final unified fix: closed all 4 Important + 1 Minor findings from `final-review.md`. RED proved the MGAM comparator mislabel, mount-time/non-visual Step 1 preview, missing DDAS/CMCV/Training/MGAM point-of-use terms, missing Omni training/296-Hard prohibitions, and continued playback under the global glossary. GREEN: MGAM 7/7; Step 1 5/5; DDAS/CMCV/Training 15/15; media/viewer 5/5; shared glossary attention-pause 9/9. Fresh full suite: 15 files/67 tests PASS. Build: PASS, 65 modules transformed. Official validator: PASS (6 chapters, 11 active modules, 11 component IDs). Legacy/network/infinite/wrong-MGAM-label scans: 0 matches each. Strict UTF-8/U+FFFD: PASS across 224 project-owned text files; 0 invalid UTF-8 and 0 files containing U+FFFD. Browser visual QA: NOT RUN — browser connection remained empty. No deployment, PR, Git initialization, or Git mutation performed.
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\components\\Glossary.tsx" "b/src\\components\\Glossary.tsx"
+index 621aefd..080580e 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\components\\Glossary.tsx"
++++ "b/src\\components\\Glossary.tsx"
+@@ -56,20 +56,21 @@ export interface GlossaryTextProps {
+   /** Keep long paragraphs readable by linking only the first occurrence of each term. */
+   oncePerTerm?: boolean;
+ }
+ 
+ export interface GlossaryButtonProps {
+   children?: ReactNode;
+   className?: string;
+ }
+ 
+ const GlossaryContext = createContext<GlossaryContextValue | null>(null);
++const GlossaryAttentionContext = createContext(false);
+ 
+ interface GlossaryMatcher {
+   id: string;
+   label: string;
+   normalized: string;
+   needsWordBoundary: boolean;
+ }
+ 
+ const GLOSSARY_MATCHERS: readonly GlossaryMatcher[] = GLOSSARY
+   .flatMap((entry) => [entry.term, ...(entry.aliases ?? [])].map((label) => ({
+@@ -163,20 +164,25 @@ function matchesSearch(entry: GlossaryEntry, query: string): boolean {
+ }
+ 
+ function useGlossary(): GlossaryContextValue {
+   const value = useContext(GlossaryContext);
+   if (!value) {
+     throw new Error('Term 和 GlossaryButton 必须放在 GlossaryProvider 内。');
+   }
+   return value;
+ }
+ 
++/** A shared attention signal for any automatic narrative below GlossaryProvider. */
++export function useGlossaryAttentionPause(): boolean {
++  return useContext(GlossaryAttentionContext);
++}
++
+ function TermDetail({
+   entry,
+   headingId,
+   close,
+   openTerm,
+   openIndex,
+ }: {
+   entry: GlossaryEntry;
+   headingId: string;
+   close: () => void;
+@@ -627,24 +633,26 @@ export function GlossaryProvider({ children }: GlossaryProviderProps) {
+             setQuery={setQuery}
+             close={close}
+             openTerm={(id) => openTerm(id)}
+           />
+         )}
+       </section>
+     </div>
+   ) : null;
+ 
+   return (
+-    <GlossaryContext.Provider value={contextValue}>
+-      {children}
+-      {panel && typeof document !== 'undefined' ? createPortal(panel, document.body) : null}
+-    </GlossaryContext.Provider>
++    <GlossaryAttentionContext.Provider value={activePanel !== null}>
++      <GlossaryContext.Provider value={contextValue}>
++        {children}
++        {panel && typeof document !== 'undefined' ? createPortal(panel, document.body) : null}
++      </GlossaryContext.Provider>
++    </GlossaryAttentionContext.Provider>
+   );
+ }
+ 
+ export function Term({ id, children, className }: TermProps) {
+   const { activePanel, panelId, openTerm, close } = useGlossary();
+   const buttonRef = useRef<HTMLButtonElement>(null);
+   const entry = getGlossaryEntry(id);
+ 
+   if (!entry) {
+     return (
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\components\\ResearchProblemOverview.tsx" "b/src\\components\\ResearchProblemOverview.tsx"
+index 9f40b69..9534f5c 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\components\\ResearchProblemOverview.tsx"
++++ "b/src\\components\\ResearchProblemOverview.tsx"
+@@ -1,13 +1,13 @@
+ import React, { useEffect, useRef, useState } from 'react';
+ import '../styles/research-overview.css';
+-import { GlossaryText } from './Glossary';
++import { GlossaryText, useGlossaryAttentionPause } from './Glossary';
+ 
+ const ABSTRACT_URL = 'https://arxiv.org/html/2604.04771v2#abstract';
+ 
+ const FLOW_STEPS = [
+   {
+     short: '现象',
+     title: '不同模型，一起卡在同样的难题上',
+     answer: '先观察跨架构、跨规模模型的共同失败。',
+   },
+   {
+@@ -139,25 +139,28 @@ function ResultFigure() {
+ }
+ 
+ const STAGE_FIGURES = [
+   <SharedFailureFigure key="failure" />,
+   <DataProblemFigure key="problems" />,
+   <CoreWorkFigure key="works" />,
+   <ResultFigure key="result" />,
+ ];
+ 
+ export function ResearchProblemOverview() {
++  const attentionPaused = useGlossaryAttentionPause();
+   const rootRef = useRef<HTMLElement>(null);
+   const [activeStep, setActiveStep] = useState(0);
+   const [hasEntered, setHasEntered] = useState(false);
+   const [autoRunning, setAutoRunning] = useState(false);
+   const reduceMotionRef = useRef(false);
++  const attentionPausedRef = useRef(attentionPaused);
++  attentionPausedRef.current = attentionPaused;
+ 
+   useEffect(() => {
+     reduceMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+     const node = rootRef.current;
+     if (!node || !('IntersectionObserver' in window)) {
+       setHasEntered(true);
+       return undefined;
+     }
+ 
+     const observer = new IntersectionObserver(([entry]) => {
+@@ -165,41 +168,45 @@ export function ResearchProblemOverview() {
+         setHasEntered(true);
+         observer.disconnect();
+       }
+     }, { threshold: 0.35 });
+     observer.observe(node);
+     return () => observer.disconnect();
+   }, []);
+ 
+   useEffect(() => {
+     if (!hasEntered || reduceMotionRef.current) return;
+-    setAutoRunning(true);
++    if (!attentionPausedRef.current) setAutoRunning(true);
+   }, [hasEntered]);
+ 
++  useEffect(() => {
++    if (attentionPaused) setAutoRunning(false);
++  }, [attentionPaused]);
++
+   useEffect(() => {
+     if (!autoRunning) return undefined;
+     if (activeStep >= FLOW_STEPS.length - 1) {
+       setAutoRunning(false);
+       return undefined;
+     }
+     const timer = window.setTimeout(() => setActiveStep((step) => step + 1), 1550);
+     return () => window.clearTimeout(timer);
+   }, [activeStep, autoRunning]);
+ 
+   const chooseStep = (index: number) => {
+     setAutoRunning(false);
+     setActiveStep(index);
+   };
+ 
+   const replay = () => {
+     setActiveStep(0);
+-    if (!reduceMotionRef.current) setAutoRunning(true);
++    if (!reduceMotionRef.current && !attentionPaused) setAutoRunning(true);
+   };
+ 
+   const step = FLOW_STEPS[activeStep];
+ 
+   return (
+     <section className="research-overview" id="research-problem" ref={rootRef} aria-labelledby="research-overview-title">
+       <header className="research-overview__intro">
+         <span className="eyebrow">先读懂问题，再进入方法</span>
+         <h2 id="research-overview-title">这篇论文解决的，不是“怎样换一个更大的模型”</h2>
+         <p>
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\data\\media.test.ts" "b/src\\data\\media.test.ts"
+index 2565c31..d78b99a 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\data\\media.test.ts"
++++ "b/src\\data\\media.test.ts"
+@@ -18,11 +18,20 @@ describe('MEDIA_ASSETS', () => {
+       doubleColumn: expect.any(Object),
+       tripleColumn: expect.any(Object),
+       complexLayout: expect.any(Object),
+     });
+     expect(getMediaAsset('omni-table').crops).toMatchObject({
+       rotated: expect.any(Object),
+       formula: expect.any(Object),
+       mergedCells: expect.any(Object),
+     });
+   });
++
++  it('centrally forbids treating every Omni asset as training data or the 296-page Hard subset', () => {
++    for (const assetId of ['omni-output', 'omni-layout', 'omni-table'] as const) {
++      expect(getMediaAsset(assetId).forbiddenClaims).toEqual(expect.arrayContaining([
++        '不是 MinerU2.5-Pro 训练样本。',
++        '不能默认视为 OmniDocBench v1.6 的296页Hard子集。',
++      ]));
++    }
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\data\\media.ts" "b/src\\data\\media.ts"
+index c6bed28..89ef74b 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\data\\media.ts"
++++ "b/src\\data\\media.ts"
+@@ -23,20 +23,22 @@ const MEDIA_CROPS = {
+     complexLayout: { x: 66.1, y: 6, width: 31.2, height: 82, label: '复杂杂志版式' },
+   },
+   'omni-table': {
+     rotated: { x: 2.2, y: 7, width: 31, height: 80, label: '旋转表格' },
+     formula: { x: 34.2, y: 7, width: 31, height: 80, label: '公式嵌入表格' },
+     mergedCells: { x: 66, y: 7, width: 31.4, height: 80, label: '彩色与合并单元格' },
+   },
+ } as const satisfies Record<string, Record<string, MediaCrop>>;
+ 
+ const OMNI_FORBIDDEN_CLAIMS = [
++  '不是 MinerU2.5-Pro 训练样本。',
++  '不能默认视为 OmniDocBench v1.6 的296页Hard子集。',
+   '不能将 OmniDocBench 原图解读为 MinerU2.5-Pro 的性能证据。',
+   '不能将截图或原图用作 296 页 Hard 训练隔离的独立证明。',
+ ];
+ 
+ export const MEDIA_ASSETS = {
+   'document-concept': {
+     id: 'document-concept',
+     kind: 'teaching-art',
+     src: 'images/document-parsing-concept.png',
+     width: 1536,
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\CmcvRoutingChallenge.test.tsx" "b/src\\experiences\\CmcvRoutingChallenge.test.tsx"
+index 6b79385..dcdaf23 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\CmcvRoutingChallenge.test.tsx"
++++ "b/src\\experiences\\CmcvRoutingChallenge.test.tsx"
+@@ -1,67 +1,79 @@
+ import { fireEvent, render, screen, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { describe, expect, it, vi } from 'vitest';
++import { GlossaryProvider } from '../components/Glossary';
+ import { CmcvRoutingChallenge } from './CmcvRoutingChallenge';
+ 
+ const props = () => ({
+   stepId: 'step-3',
+   modules: [],
+   onInteract: vi.fn(),
+   onStateChange: vi.fn(),
+   onComplete: vi.fn(),
+ });
+ 
+ describe('CmcvRoutingChallenge', () => {
+   it('routes the Medium sample and automatically unfolds its consensus boundary after one attempt', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<CmcvRoutingChallenge {...callbacks} />);
++    render(<CmcvRoutingChallenge {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.queryByText('共识不等于真值')).not.toBeInTheDocument();
+     expect(screen.getByLabelText('教学示意：合成分流与反馈')).toBeVisible();
+     await user.click(screen.getByRole('button', { name: '送入 Medium' }));
+ 
+     expect(screen.getByText('两个外部模型一致')).toBeVisible();
+     expect(screen.getByText('可靠外部答案')).toBeVisible();
+     expect(within(screen.getByTestId('cmcv-lane-medium')).getByText('训练去向：送入待审训练池')).toBeVisible();
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'cmcv-router', state: 'medium' });
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'cmcv-trust', state: 'consensus:correct' });
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+     expect(screen.getByText('共识不等于真值')).toBeVisible();
+     expect(screen.queryByRole('button', { name: '揭示共识边界' })).not.toBeInTheDocument();
+   });
+ 
+   it('offers native drag and drop with the same Medium route contract', () => {
+     const callbacks = props();
+-    render(<CmcvRoutingChallenge {...callbacks} />);
++    render(<CmcvRoutingChallenge {...callbacks} />, { wrapper: GlossaryProvider });
+     const token = screen.getByTestId('cmcv-sample-token');
+     const lane = screen.getByTestId('cmcv-lane-medium');
+ 
+     expect(token).toHaveAttribute('draggable', 'true');
+     fireEvent.dragStart(token, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } });
+     fireEvent.drop(lane, { dataTransfer: { getData: vi.fn() } });
+ 
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'cmcv-router', state: 'medium' });
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+   });
+ 
+   it('explains the precise pairwise mismatch and still unfolds the consensus lesson after an incorrect route', async () => {
+     const user = userEvent.setup();
+-    render(<CmcvRoutingChallenge {...props()} />);
++    render(<CmcvRoutingChallenge {...props()} />, { wrapper: GlossaryProvider });
+ 
+     await user.click(screen.getByRole('button', { name: '送入 Easy' }));
+ 
+     expect(screen.getByText(/目标输出与外部 A、外部 B 都不同/)).toBeVisible();
+     expect(screen.getByText('共识不等于真值')).toBeVisible();
+   });
+ 
+   it('reconstructs the Medium route, token, outcome, and boundary from the consensus deep link', () => {
+-    render(<CmcvRoutingChallenge {...props()} restoredModuleState={{ moduleId: 'cmcv-trust', state: 'consensus:correct' }} />);
++    render(<CmcvRoutingChallenge {...props()} restoredModuleState={{ moduleId: 'cmcv-trust', state: 'consensus:correct' }} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByTestId('cmcv-lane-medium')).toHaveAttribute('data-active', 'true');
+     expect(screen.getByTestId('cmcv-sample-token')).toHaveClass('cmcv-token--medium');
+     expect(screen.getByText('可靠外部答案')).toBeVisible();
+     expect(within(screen.getByTestId('cmcv-lane-medium')).getByText('训练去向：送入待审训练池')).toBeVisible();
+     expect(screen.getByText('共识不等于真值')).toBeVisible();
+   });
++
++  it('opens the Medium routing definition beside the three learner choices', async () => {
++    const user = userEvent.setup();
++    render(<CmcvRoutingChallenge {...props()} />, { wrapper: GlossaryProvider });
++
++    await user.click(screen.getByRole('button', { name: '解释术语：Medium 样本' }));
++
++    expect(screen.getByRole('heading', { name: 'Medium 样本' })).toBeVisible();
++    expect(screen.getByText(/两个外部模型彼此一致，但目标模型与它们明显不同/)).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '关闭术语讲解' }));
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\CmcvRoutingChallenge.tsx" "b/src\\experiences\\CmcvRoutingChallenge.tsx"
+index 74bdd05..8ffa263 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\CmcvRoutingChallenge.tsx"
++++ "b/src\\experiences\\CmcvRoutingChallenge.tsx"
+@@ -1,11 +1,12 @@
+ import { useEffect, useRef, useState } from 'react';
++import { Term } from '../components/Glossary';
+ import { PaperMedia } from '../components/PaperMedia';
+ import type { ChapterExperienceProps } from '../types';
+ import '../styles/experience-labeling.css';
+ 
+ type Route = 'easy' | 'medium' | 'hard';
+ 
+ const routeCopy: Record<Route, { title: string; labelSource: string; destination: string }> = {
+   easy: { title: 'Easy', labelSource: '目标与外部答案可直接核对', destination: '进入高置信训练池' },
+   medium: { title: 'Medium', labelSource: '可靠外部答案', destination: '送入待审训练池' },
+   hard: { title: 'Hard', labelSource: '外部答案彼此分歧', destination: '保留给困难样本审查' },
+@@ -37,36 +38,37 @@ export function CmcvRoutingChallenge({ restoredModuleState, onComplete, onIntera
+     if (!completed.current) {
+       completed.current = true;
+       onComplete();
+     }
+   };
+ 
+   const selected = route ? routeCopy[route] : null;
+   const correct = route === 'medium';
+   return <section className="cmcv-routing" aria-label="CMCV 样本分流挑战">
+     <header className="cmcv-routing__header">
+-      <div><span className="source-tag paper">论文原图节选</span><h3>把同一份样本送入恰当的置信通道</h3></div>
++      <div><span className="source-tag paper">论文原图节选</span><h3><Term id="cmcv">CMCV</Term>：把同一份样本送入恰当的置信通道</h3></div>
+       <p>原页只作为输入锚点；A / B / C 都是教学示意。</p>
+     </header>
+ 
+     <div className="cmcv-routing__board">
+       <PaperMedia assetId="omni-output" cropId="originalPdf" label="论文原图节选" caption="OmniDocBench 原页裁图仅用于提供文档输入锚点。" className="cmcv-routing__anchor" />
+       <div className="cmcv-routing__outputs" aria-label="教学示意输出">
+         <article><span className="source-tag teaching">教学示意</span><strong>目标输出 C</strong><code>Header → Revenue (2024)</code></article>
+         <article><span className="source-tag teaching">教学示意</span><strong>外部模型 A</strong><code>Header → Revenue</code></article>
+         <article><span className="source-tag teaching">教学示意</span><strong>外部模型 B</strong><code>Header → Revenue</code></article>
+       </div>
+       <p className="cmcv-routing__relation" role="status"><strong>两个外部模型一致</strong>，但目标输出 C 与它们不同。</p>
+     </div>
+ 
+     <div className="cmcv-routing__synthetic" aria-label="教学示意：合成分流与反馈">
+       <span className="source-tag teaching">教学示意：合成分流与反馈</span>
++      <p className="cmcv-routing__legend">分流口径：<Term id="easy">Easy</Term> · <Term id="medium">Medium</Term> · <Term id="hard">Hard</Term></p>
+       <div className="cmcv-routing__lanes" role="group" aria-label="选择样本通道">
+       {(['easy', 'medium', 'hard'] as const).map((lane) => <article
+         key={lane}
+         className="cmcv-lane"
+         data-testid={`cmcv-lane-${lane}`}
+         data-active={route === lane}
+         onDragOver={(event) => event.preventDefault()}
+         onDrop={(event) => { event.preventDefault(); chooseRoute(lane); }}
+       >
+         <h4>{routeCopy[lane].title}</h4>
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DataCounterfactual.test.tsx" "b/src\\experiences\\DataCounterfactual.test.tsx"
+index f798d16..0e37b2d 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DataCounterfactual.test.tsx"
++++ "b/src\\experiences\\DataCounterfactual.test.tsx"
+@@ -1,46 +1,167 @@
+-import { render, screen } from '@testing-library/react';
++import { act, fireEvent, render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+-import { describe, expect, it, vi } from 'vitest';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { GlossaryButton, GlossaryProvider } from '../components/Glossary';
+ import { DataCounterfactual } from './DataCounterfactual';
+ 
+ const props = () => ({
+   stepId: 'step-1',
+   modules: [],
+   onInteract: vi.fn(),
+   onStateChange: vi.fn(),
+   onComplete: vi.fn(),
+ });
+ 
++let intersectionCallback: IntersectionObserverCallback | undefined;
++
++class ControlledIntersectionObserver {
++  constructor(callback: IntersectionObserverCallback) {
++    intersectionCallback = callback;
++  }
++
++  disconnect = vi.fn();
++  observe = vi.fn();
++  takeRecords = vi.fn((): IntersectionObserverEntry[] => []);
++  unobserve = vi.fn();
++}
++
++function setReducedMotion(matches: boolean) {
++  vi.mocked(window.matchMedia).mockImplementation((query: string) => ({
++    matches,
++    media: query,
++    onchange: null,
++    addListener: vi.fn(),
++    removeListener: vi.fn(),
++    addEventListener: vi.fn(),
++    removeEventListener: vi.fn(),
++    dispatchEvent: vi.fn(),
++  }));
++}
++
++function enterViewport(root: HTMLElement) {
++  act(() => intersectionCallback?.([
++    { isIntersecting: true, target: root } as unknown as IntersectionObserverEntry,
++  ], {} as IntersectionObserver));
++}
++
+ describe('DataCounterfactual', () => {
+-  it('does not persist or complete during the six-second automatic intuition preview', async () => {
++  beforeEach(() => {
++    intersectionCallback = undefined;
++    vi.stubGlobal('IntersectionObserver', ControlledIntersectionObserver);
++    setReducedMotion(false);
++  });
++
++  afterEach(() => {
++    vi.useRealTimers();
++    vi.unstubAllGlobals();
++    setReducedMotion(false);
++  });
++
++  it('waits for first visibility, then drives the lanes and gaps through a six-second causal preview without persistence', async () => {
+     vi.useFakeTimers();
+     const callbacks = props();
+     render(<DataCounterfactual {...callbacks} />);
++    const root = screen.getByLabelText('等预算数据反事实');
++
++    await act(() => vi.advanceTimersByTimeAsync(6000));
++    expect(root).toHaveAttribute('data-preview', 'waiting');
++    expect(root.querySelector('.counterfactual-lane--ordinary')).toHaveAttribute('data-active', 'false');
++
++    enterViewport(root);
++    expect(root).toHaveAttribute('data-preview', 'ordinary-arriving');
++    expect(root.querySelector('.counterfactual-lane--ordinary')).toHaveAttribute('data-active', 'true');
++    expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'false');
++
++    await act(() => vi.advanceTimersByTimeAsync(2500));
++    expect(root).toHaveAttribute('data-preview', 'tail-formula');
++    expect(root.querySelector('.counterfactual-lane--tail')).toHaveAttribute('data-active', 'true');
++    expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'true');
++    expect(screen.getByText('复杂表格')).toHaveAttribute('data-covered', 'false');
++
++    await act(() => vi.advanceTimersByTimeAsync(1000));
++    expect(root).toHaveAttribute('data-preview', 'tail-table');
++    expect(screen.getByText('复杂表格')).toHaveAttribute('data-covered', 'true');
++    expect(screen.getByText('多栏版式')).toHaveAttribute('data-covered', 'false');
+ 
+-    await vi.advanceTimersByTimeAsync(6000);
++    await act(() => vi.advanceTimersByTimeAsync(1000));
++    expect(root).toHaveAttribute('data-preview', 'tail-multicolumn');
++    expect(screen.getByText('多栏版式')).toHaveAttribute('data-covered', 'true');
++
++    await act(() => vi.advanceTimersByTimeAsync(1500));
++    expect(root).toHaveAttribute('data-preview', 'complete');
+ 
+     expect(screen.getByText('固定 1.2B')).toBeVisible();
+     expect(callbacks.onStateChange).not.toHaveBeenCalled();
+     expect(callbacks.onComplete).not.toHaveBeenCalled();
+-    vi.useRealTimers();
+   });
+ 
+-  it('shows the static comparison immediately when reduced motion is requested', () => {
+-    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
++  it('moves directly to the stable final preview frame when reduced motion becomes visible', () => {
++    setReducedMotion(true);
+     const callbacks = props();
+     render(<DataCounterfactual {...callbacks} />);
++    const root = screen.getByLabelText('等预算数据反事实');
+ 
++    expect(root).toHaveAttribute('data-preview', 'waiting');
++    enterViewport(root);
++    expect(root).toHaveAttribute('data-preview', 'complete');
++    expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'true');
++    expect(screen.getByText('复杂表格')).toHaveAttribute('data-covered', 'true');
++    expect(screen.getByText('多栏版式')).toHaveAttribute('data-covered', 'true');
+     expect(screen.getByText('自动对照仅建立直觉；只有你的选择会保存状态。')).toBeVisible();
+     expect(callbacks.onStateChange).not.toHaveBeenCalled();
+   });
+ 
++  it('lets a learner take over immediately and prevents the automatic preview from resuming', () => {
++    vi.useFakeTimers();
++    const callbacks = props();
++    render(<DataCounterfactual {...callbacks} />);
++    const root = screen.getByLabelText('等预算数据反事实');
++    enterViewport(root);
++    act(() => vi.advanceTimersByTime(2500));
++
++    fireEvent.click(screen.getByRole('button', { name: '继续普通页' }));
++    expect(root).toHaveAttribute('data-preview', 'user-ordinary');
++    act(() => vi.advanceTimersByTime(10_000));
++    expect(root).toHaveAttribute('data-preview', 'user-ordinary');
++    expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'false');
++    expect(callbacks.onComplete).not.toHaveBeenCalled();
++
++    fireEvent.click(screen.getByRole('button', { name: '补长尾页' }));
++    expect(root).toHaveAttribute('data-preview', 'user-tail');
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++  });
++
++  it('pauses the visible preview at its current phase when the global glossary opens and does not force resume on close', () => {
++    vi.useFakeTimers();
++    const callbacks = props();
++    render(
++      <GlossaryProvider>
++        <GlossaryButton>页头术语表</GlossaryButton>
++        <DataCounterfactual {...callbacks} />
++      </GlossaryProvider>,
++    );
++    const root = screen.getByLabelText('等预算数据反事实');
++    enterViewport(root);
++    act(() => vi.advanceTimersByTime(1000));
++    expect(root).toHaveAttribute('data-preview', 'ordinary-arriving');
++
++    fireEvent.click(screen.getByRole('button', { name: '页头术语表' }));
++    act(() => vi.advanceTimersByTime(10_000));
++    expect(root).toHaveAttribute('data-preview', 'ordinary-arriving');
++
++    fireEvent.click(screen.getByRole('button', { name: '页头术语表' }));
++    act(() => vi.advanceTimersByTime(10_000));
++    expect(root).toHaveAttribute('data-preview', 'ordinary-arriving');
++    expect(callbacks.onStateChange).not.toHaveBeenCalled();
++  });
++
+   it('records and completes only after the learner chooses the long-tail counterfactual', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+     render(<DataCounterfactual {...callbacks} />);
+ 
+     await user.click(screen.getByRole('button', { name: '补长尾页' }));
+ 
+     expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'true');
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'data-bias', state: 'tail' });
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DataCounterfactual.tsx" "b/src\\experiences\\DataCounterfactual.tsx"
+index 9386f2c..d16944c 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DataCounterfactual.tsx"
++++ "b/src\\experiences\\DataCounterfactual.tsx"
+@@ -1,84 +1,150 @@
+ import { useEffect, useRef, useState } from 'react';
++import { useGlossaryAttentionPause } from '../components/Glossary';
+ import { PaperMedia } from '../components/PaperMedia';
+ import type { ChapterExperienceProps } from '../types';
+ 
+ type Choice = 'ordinary' | 'tail';
++type PreviewPhase = 'waiting' | 'ordinary-arriving' | 'tail-formula' | 'tail-table' | 'tail-multicolumn' | 'complete';
+ 
+ export function DataCounterfactual({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
+-  const [choice, setChoice] = useState<Choice>('ordinary');
++  const attentionPaused = useGlossaryAttentionPause();
++  const initialChoice = restoredModuleState?.moduleId === 'data-bias'
++    && (restoredModuleState.state === 'ordinary' || restoredModuleState.state === 'tail')
++    ? restoredModuleState.state as Choice
++    : null;
++  const rootRef = useRef<HTMLElement>(null);
++  const [choice, setChoice] = useState<Choice>(initialChoice ?? 'ordinary');
++  const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
++  const [hasUserChoice, setHasUserChoice] = useState(Boolean(initialChoice));
++  const [previewPhase, setPreviewPhase] = useState<PreviewPhase>('waiting');
++  const [previewStopped, setPreviewStopped] = useState(false);
+   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+-  const [previewComplete, setPreviewComplete] = useState(reducedMotion);
+   const completed = useRef(false);
+ 
+   useEffect(() => {
+-    if (reducedMotion) return undefined;
+-    const timer = window.setTimeout(() => setPreviewComplete(true), 6000);
+-    return () => window.clearTimeout(timer);
+-  }, [reducedMotion]);
++    const node = rootRef.current;
++    if (!node || !('IntersectionObserver' in window)) {
++      setHasEnteredViewport(true);
++      return undefined;
++    }
++
++    const observer = new IntersectionObserver(([entry]) => {
++      if (!entry.isIntersecting) return;
++      setHasEnteredViewport(true);
++      observer.disconnect();
++    }, { threshold: 0.3 });
++    observer.observe(node);
++    return () => observer.disconnect();
++  }, []);
++
++  useEffect(() => {
++    if (!hasEnteredViewport || hasUserChoice || previewStopped) return undefined;
++    if (reducedMotion) {
++      setPreviewPhase('complete');
++      return undefined;
++    }
++
++    setPreviewPhase('ordinary-arriving');
++    const timers = [
++      window.setTimeout(() => setPreviewPhase('tail-formula'), 2500),
++      window.setTimeout(() => setPreviewPhase('tail-table'), 3500),
++      window.setTimeout(() => setPreviewPhase('tail-multicolumn'), 4500),
++      window.setTimeout(() => setPreviewPhase('complete'), 6000),
++    ];
++    return () => timers.forEach((timer) => window.clearTimeout(timer));
++  }, [hasEnteredViewport, hasUserChoice, previewStopped, reducedMotion]);
++
++  useEffect(() => {
++    const previewIsRunning = previewPhase !== 'waiting' && previewPhase !== 'complete';
++    if (attentionPaused && hasEnteredViewport && !hasUserChoice && previewIsRunning) {
++      setPreviewStopped(true);
++    }
++  }, [attentionPaused, hasEnteredViewport, hasUserChoice, previewPhase]);
+ 
+   useEffect(() => {
+     if (restoredModuleState?.moduleId === 'data-bias' && (restoredModuleState.state === 'ordinary' || restoredModuleState.state === 'tail')) {
+       setChoice(restoredModuleState.state);
++      setHasUserChoice(true);
++      setPreviewStopped(true);
+     }
+   }, [restoredModuleState]);
+ 
+   const choose = (next: Choice) => {
+     setChoice(next);
++    setHasUserChoice(true);
++    setPreviewStopped(true);
+     onInteract('data-bias');
+     onStateChange({ moduleId: 'architecture-lock', state: 'locked' });
+     onStateChange({ moduleId: 'data-bias', state: next });
+     if (next === 'tail' && !completed.current) {
+       completed.current = true;
+       onComplete();
+     }
+   };
+ 
+-  const tail = choice === 'tail';
++  const previewCoverage = previewPhase === 'tail-formula' ? 1
++    : previewPhase === 'tail-table' ? 2
++      : previewPhase === 'tail-multicolumn' || previewPhase === 'complete' ? 3 : 0;
++  const tail = hasUserChoice ? choice === 'tail' : previewCoverage > 0;
++  const ordinaryActive = hasUserChoice ? choice === 'ordinary' : previewPhase === 'ordinary-arriving';
++  const isCovered = (index: number) => hasUserChoice ? choice === 'tail' : previewCoverage > index;
++  const previewState = hasUserChoice ? `user-${choice}` : previewPhase;
++  const hint = hasUserChoice
++    ? '你的选择已接管画面并保存为本章状态。'
++    : previewStopped
++      ? '自动对照已暂停在当前关键帧；请用下方选择继续。'
++      : previewPhase === 'complete'
++        ? '自动对照仅建立直觉；只有你的选择会保存状态。'
++        : previewPhase === 'waiting'
++          ? '进入视口后才开始一次自动对照。'
++          : tail
++            ? '长尾页正在依次补上公式、表格与多栏缺口。'
++            : '普通页正在进入同一预算的对照。';
+   return (
+-    <section className="data-counterfactual" data-preview={previewComplete ? 'tail-previewed' : 'ordinary-arriving'} aria-label="等预算数据反事实">
++    <section ref={rootRef} className="data-counterfactual" data-preview={previewState} aria-label="等预算数据反事实">
+       <header className="data-counterfactual__header">
+         <div>
+           <span className="source-tag paper">论文原图节选</span>
+           <h3>同一预算下，缺口会留在哪里？</h3>
+         </div>
+         <div className="architecture-lock" aria-label="架构控制变量已锁定"><strong>固定 1.2B</strong><span>架构锁定</span></div>
+       </header>
+ 
+       <div className="data-counterfactual__budget" aria-label="固定采样预算">
+         <span>相同采样预算</span><i aria-hidden="true" /><span>只改变补充策略</span>
+       </div>
+ 
+       <div className="data-counterfactual__comparison">
+-        <article className="counterfactual-lane counterfactual-lane--ordinary" data-active={choice === 'ordinary'}>
++        <article className="counterfactual-lane counterfactual-lane--ordinary" data-active={ordinaryActive}>
+           <div><strong>继续加入普通页</strong><span>数量上升，高频版式仍重复进入</span></div>
+           <PaperMedia assetId="omni-layout" cropId="doubleColumn" label="论文原图节选" caption="Figure S7 的双栏页面，用作普通版式的可视化对照。" />
+         </article>
+         <article className="counterfactual-lane counterfactual-lane--tail" data-active={tail}>
+           <div><strong>补长尾页</strong><span>把低频版式带入候选范围</span></div>
+           <PaperMedia assetId="omni-layout" cropId="complexLayout" label="论文原图节选" caption="Figure S7 的复杂版式页面，用作长尾版式的可视化对照。" />
+         </article>
+       </div>
+ 
+       <div className="data-counterfactual__gaps" aria-live="polite">
+-        <span data-covered={tail ? 'true' : 'false'}>复杂公式</span>
+-        <span data-covered={tail ? 'true' : 'false'}>复杂表格</span>
+-        <span data-covered={tail ? 'true' : 'false'}>多栏版式</span>
++        <span data-covered={isCovered(0) ? 'true' : 'false'}>复杂公式</span>
++        <span data-covered={isCovered(1) ? 'true' : 'false'}>复杂表格</span>
++        <span data-covered={isCovered(2) ? 'true' : 'false'}>多栏版式</span>
+       </div>
+ 
+       <div className="data-counterfactual__actions" role="group" aria-label="选择数据补充策略">
+         <button type="button" aria-pressed={choice === 'ordinary'} onClick={() => choose('ordinary')}>继续普通页</button>
+         <button type="button" aria-pressed={tail} onClick={() => choose('tail')}>补长尾页</button>
+       </div>
+ 
+       <p className="data-counterfactual__hint" role="status">
+-        {previewComplete ? '自动对照仅建立直觉；只有你的选择会保存状态。' : '普通页正在进入同一预算的对照。'}
++        {hint}
+       </p>
+       <div className="data-counterfactual__result">
+         <output aria-describedby="full-process-boundary">+2.71</output>
+         <p id="full-process-boundary">论文报告的端点差值来自完整流程的数据工程与训练组合，不能归因于这一次补页操作。</p>
+       </div>
+       <p className="experience-boundary">事实边界：这里的 Figure S7 裁图来自 OmniDocBench，只展示版式样例，不是 MinerU2.5-Pro 的训练样本或独立性能证据。</p>
+     </section>
+   );
+ }
+ 
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DdasMicroscope.test.tsx" "b/src\\experiences\\DdasMicroscope.test.tsx"
+index 1d9e765..824a6b8 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DdasMicroscope.test.tsx"
++++ "b/src\\experiences\\DdasMicroscope.test.tsx"
+@@ -1,49 +1,50 @@
+ import { fireEvent, render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { describe, expect, it, vi } from 'vitest';
++import { GlossaryProvider } from '../components/Glossary';
+ import { DdasMicroscope } from './DdasMicroscope';
+ 
+ const props = () => ({
+   stepId: 'step-2',
+   modules: [],
+   onInteract: vi.fn(),
+   onStateChange: vi.fn(),
+   onComplete: vi.fn(),
+ });
+ 
+ describe('DdasMicroscope', () => {
+   it('reports random, cluster, and DDAS page choices, and restores each page-level deep-link state', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    const { rerender } = render(<DdasMicroscope {...callbacks} />);
++    const { rerender } = render(<DdasMicroscope {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     await user.click(screen.getByRole('button', { name: '查看随机候选' }));
+     await user.click(screen.getByRole('button', { name: '观察版式簇' }));
+     await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
+ 
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'random' });
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'cluster' });
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
+ 
+     rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'random' }} />);
+     expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'random');
+     rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'cluster' }} />);
+     expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'cluster');
+     rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'ddas' }} />);
+     expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'ddas');
+   });
+ 
+   it('keeps page and element Figure 3 views reversible through shared pointer, keyboard, and mobile-ready controls', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<DdasMicroscope {...callbacks} />);
++    render(<DdasMicroscope {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
+     await user.click(screen.getByRole('button', { name: '放大公式区域' }));
+     expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-view', 'element');
+     await user.click(screen.getByRole('button', { name: '返回页面级' }));
+     expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-view', 'page');
+ 
+     const textButton = screen.getByRole('button', { name: '查看文本元素' });
+     textButton.focus();
+     await user.keyboard('{Enter}');
+@@ -51,48 +52,60 @@ describe('DdasMicroscope', () => {
+     await user.click(screen.getByRole('button', { name: '返回页面级' }));
+     await user.click(screen.getByRole('button', { name: '查看表格元素' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'element-ddas', state: 'table' });
+     await user.click(screen.getByRole('button', { name: '返回页面级' }));
+ 
+     expect(screen.getByRole('group', { name: '显微镜操作' })).toHaveTextContent('查看文本元素');
+     expect(screen.getByRole('group', { name: '显微镜操作' })).toHaveTextContent('查看表格元素');
+   });
+ 
+   it('keeps the disclosed ViT-base fact to one occurrence in the main microscope view', () => {
+-    render(<DdasMicroscope {...props()} />);
+-    expect(screen.getAllByText(/512 维 ViT-base/)).toHaveLength(1);
++    render(<DdasMicroscope {...props()} />, { wrapper: GlossaryProvider });
++    expect(screen.getAllByRole('button', { name: '解释术语：ViT' })).toHaveLength(1);
++    expect(screen.getByText(/512 维/)).toBeVisible();
+   });
+ 
+   it('lets a learner enter page DDAS and then inspect a formula element on the same Figure 3 canvas', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<DdasMicroscope {...callbacks} />);
++    render(<DdasMicroscope {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
+ 
+     await user.click(screen.getByRole('button', { name: '放大公式区域' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'element-ddas', state: 'formula' });
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+     expect(screen.getAllByTestId('figure-3-canvas')).toHaveLength(1);
+   });
+ 
+   it('moves its normalized lens by pointer and keyboard, and Enter opens the focused page', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<DdasMicroscope {...callbacks} />);
++    render(<DdasMicroscope {...callbacks} />, { wrapper: GlossaryProvider });
+     const canvas = screen.getByTestId('figure-3-canvas');
+     Object.defineProperty(canvas, 'getBoundingClientRect', {
+       value: () => ({ left: 0, top: 0, width: 200, height: 100 }),
+     });
+ 
+     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 25 });
+     expect(canvas).toHaveAttribute('data-lens-x', '75');
+     expect(canvas).toHaveAttribute('data-lens-y', '25');
+     canvas.focus();
+     await user.keyboard('{ArrowLeft}{ArrowDown}{Enter}');
+ 
+     expect(canvas).toHaveAttribute('data-lens-x', '70');
+     expect(canvas).toHaveAttribute('data-lens-y', '30');
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
+   });
++
++  it('opens the K-Means sampling definition where the undisclosed boundary is used', async () => {
++    const user = userEvent.setup();
++    render(<DdasMicroscope {...props()} />, { wrapper: GlossaryProvider });
++
++    await user.click(screen.getByRole('button', { name: '解释术语：K-Means 聚类' }));
++
++    expect(screen.getByRole('heading', { name: 'K-Means 聚类' })).toBeVisible();
++    expect(screen.getByText(/按向量距离把相似样本自动分成 K 个簇/)).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '关闭术语讲解' }));
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DdasMicroscope.tsx" "b/src\\experiences\\DdasMicroscope.tsx"
+index caae681..cb0eeed 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\DdasMicroscope.tsx"
++++ "b/src\\experiences\\DdasMicroscope.tsx"
+@@ -1,11 +1,12 @@
+ import { useEffect, useRef, useState } from 'react';
++import { Term } from '../components/Glossary';
+ import { PaperMedia } from '../components/PaperMedia';
+ import type { ChapterExperienceProps } from '../types';
+ 
+ type View = 'cluster' | 'page' | 'element';
+ type ElementKind = 'text' | 'formula' | 'table';
+ type PageState = 'random' | 'cluster' | 'ddas';
+ 
+ const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
+ 
+ export function DdasMicroscope({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
+@@ -67,22 +68,22 @@ export function DdasMicroscope({ restoredModuleState, onComplete, onInteract, on
+     if (!delta) return;
+     event.preventDefault();
+     setLens((current) => ({ x: clamp(current.x + delta.x), y: clamp(current.y + delta.y) }));
+   };
+ 
+   const cropId = view === 'element' ? 'elementLevel' : 'pageLevel';
+   const pageStatus = pageState === 'random' ? '随机候选：高频页面更容易重复进入。' : pageState === 'cluster' ? '版式簇：观察长尾版式的聚类差异。' : '页面级 DDAS 已进入同一画布。';
+   return (
+     <section className={`ddas-microscope ddas-microscope--${view}`} aria-label="DDAS 采样显微镜">
+       <header className="ddas-microscope__header">
+-        <div><span className="source-tag paper">论文原图节选</span><h3>在同一画布中放大 DDAS</h3></div>
+-        <p><strong>512 维 ViT-base</strong><span>约 60M 页候选</span></p>
++        <div><span className="source-tag paper">论文原图节选</span><h3>在同一画布中放大 <Term id="ddas">DDAS</Term></h3></div>
++        <p><strong>512 维 <Term id="vit">ViT-base</Term></strong><span>约 60M 页候选</span></p>
+       </header>
+ 
+       <div
+         className="ddas-microscope__canvas"
+         data-testid="figure-3-canvas"
+         data-view={view}
+         data-page-state={pageState}
+         data-lens-x={lens.x}
+         data-lens-y={lens.y}
+         tabIndex={0}
+@@ -106,16 +107,16 @@ export function DdasMicroscope({ restoredModuleState, onComplete, onInteract, on
+           <button type="button" onClick={() => choosePageState('ddas')}>观察长尾版式簇</button>
+         </> : <>
+           <button type="button" onClick={() => inspectElement('text')}>查看文本元素</button>
+           <button type="button" onClick={() => inspectElement('formula')}>放大公式区域</button>
+           <button type="button" onClick={() => inspectElement('table')}>查看表格元素</button>
+           {view === 'element' ? <button type="button" onClick={returnToPage}>返回页面级</button> : null}
+         </>}
+       </div>
+ 
+       <p className="ddas-microscope__state" role="status">{view === 'element' ? `元素级 DDAS：${element}。` : pageStatus}</p>
+-      <p className="experience-boundary">事实边界：K-Means 的 K 和采样权重均未披露。版式缩略图通过 PaperMedia 使用本地图像及其故障占位，仅作观察锚点。</p>
++      <p className="experience-boundary">事实边界：<Term id="k-means">K-Means</Term> 的 K 和采样权重均未披露。版式缩略图通过 PaperMedia 使用本地图像及其故障占位，仅作观察锚点。</p>
+     </section>
+   );
+ }
+ 
+ export default DdasMicroscope;
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\MgamMatchingPuzzle.test.tsx" "b/src\\experiences\\MgamMatchingPuzzle.test.tsx"
+index 7c6da88..fc998a0 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\MgamMatchingPuzzle.test.tsx"
++++ "b/src\\experiences\\MgamMatchingPuzzle.test.tsx"
+@@ -1,87 +1,90 @@
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { describe, expect, it, vi } from 'vitest';
++import { GlossaryProvider } from '../components/Glossary';
+ import { MgamMatchingPuzzle } from './MgamMatchingPuzzle';
+ 
+ const props = () => ({
+   stepId: 'step-6',
+   modules: [],
+   onInteract: vi.fn(),
+   onStateChange: vi.fn(),
+   onComplete: vi.fn(),
+ });
+ 
+ describe('MgamMatchingPuzzle', () => {
+   it('keeps held-out GT fixed while prediction-only merges recompute the matching', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<MgamMatchingPuzzle {...callbacks} />);
++    render(<MgamMatchingPuzzle {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByText('HELD-OUT TEST')).toBeVisible();
+     expect(screen.getByText('TEST-296')).toBeVisible();
+     expect(screen.getByTestId('mgam-ground-truth')).toHaveAttribute('data-immutable', 'true');
+     expect(screen.getByText(/真实 Markdown 对比不是原始 MGAM 示例/)).toBeVisible();
+ 
+     await user.click(screen.getByRole('button', { name: '合并预测块 1 和 2' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'mgam-lab', state: 'partition-2' });
+     expect(screen.getByTestId('mgam-ground-truth')).toHaveTextContent('Invoice total');
+     expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '2');
+     expect(callbacks.onComplete).not.toHaveBeenCalled();
+ 
+     await user.click(screen.getByRole('button', { name: '合并预测块 2 和 3' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'mgam-lab', state: 'partition-1' });
+     expect(screen.getByText('合理匹配')).toBeVisible();
+     expect(screen.getByText('94.08')).toBeVisible();
+     expect(screen.getByText('92.01')).toBeVisible();
+     expect(screen.getByText('+2.07')).toBeVisible();
++    expect(screen.getByText('v2 主文比较项（GLM-OCR / PaddleOCR-VL-1.5）')).toBeVisible();
++    expect(screen.queryByText(/v2 主文第二名/)).not.toBeInTheDocument();
+     expect(screen.getByText(/分段报告.*2.72.*端点.*2.71/)).toBeVisible();
+     expect(screen.queryByText('92.48')).not.toBeInTheDocument();
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+   });
+ 
+   it('labels each waterfall step with the reported rounded segment gain', () => {
+     const callbacks = props();
+-    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />);
++    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByTestId('waterfall-stage-1')).toHaveTextContent('+1.31');
+     expect(screen.getByTestId('waterfall-stage-2')).toHaveTextContent('+0.96');
+     expect(screen.getByTestId('waterfall-stage-3')).toHaveTextContent('+0.45');
+     expect(screen.getByText(/分段报告.*2.72.*端点.*2.71/)).toBeVisible();
+   });
+ 
+   it('keeps the appendix comparator discrepancy folded and reports its evidence state', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />);
++    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />, { wrapper: GlossaryProvider });
+ 
+     const evidence = screen.getByText('证据口径与边界').closest('details');
+     expect(evidence).not.toHaveAttribute('open');
+     expect(screen.queryByText(/附录 Table 8.*92.48.*1.60/)).not.toBeInTheDocument();
+ 
+     await user.click(screen.getByText('证据口径与边界'));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'results-boundary', state: 'evidence-open' });
+     expect(screen.getByText(/附录 Table 8.*92.48.*1.60/)).toBeVisible();
+   });
+ 
+   it('reconstructs the completed puzzle when a results-boundary deep link is restored', () => {
+     const callbacks = props();
+-    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'results-boundary', state: 'evidence-open' }} />);
++    render(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'results-boundary', state: 'evidence-open' }} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByText('合理匹配')).toBeVisible();
+     expect(screen.getByText(/附录 Table 8.*92.48.*1.60/)).toBeVisible();
+   });
+ 
+   it('synchronizes every later restored state without clearing local state for an undefined prop', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    const { rerender } = render(<MgamMatchingPuzzle {...callbacks} />);
++    const { rerender } = render(<MgamMatchingPuzzle {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     await user.click(screen.getByRole('button', { name: '合并预测块 1 和 2' }));
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={undefined} />);
+     expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '2');
+ 
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-3' }} />);
+     expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '3');
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-2' }} />);
+     expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '2');
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-1' }} />);
+@@ -92,24 +95,36 @@ describe('MgamMatchingPuzzle', () => {
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'results-boundary', state: 'evidence-closed' }} />);
+     expect(screen.queryByText(/附录 Table 8.*92.48.*1.60/)).not.toBeInTheDocument();
+     rerender(<MgamMatchingPuzzle {...callbacks} restoredModuleState={{ moduleId: 'mgam-lab', state: 'partition-2' }} />);
+     expect(screen.queryByText('合理匹配')).not.toBeInTheDocument();
+     expect(screen.getByTestId('mgam-matching-lines')).toHaveAttribute('data-partition', '2');
+   });
+ 
+   it('preserves the three prediction token and matching-line DOM nodes through convergence', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    const { container } = render(<MgamMatchingPuzzle {...callbacks} />);
++    const { container } = render(<MgamMatchingPuzzle {...callbacks} />, { wrapper: GlossaryProvider });
+     const tokens = [...container.querySelectorAll('.mgam-puzzle__blocks strong')];
+     const lines = [...container.querySelectorAll('.mgam-puzzle__lines i')];
+ 
+     expect(tokens).toHaveLength(3);
+     expect(lines).toHaveLength(3);
+     await user.click(screen.getByRole('button', { name: '合并预测块 1 和 2' }));
+     expect([...container.querySelectorAll('.mgam-puzzle__blocks strong')]).toEqual(tokens);
+     expect([...container.querySelectorAll('.mgam-puzzle__lines i')]).toEqual(lines);
+     await user.click(screen.getByRole('button', { name: '合并预测块 2 和 3' }));
+     expect([...container.querySelectorAll('.mgam-puzzle__blocks strong')]).toEqual(tokens);
+     expect([...container.querySelectorAll('.mgam-puzzle__lines i')]).toEqual(lines);
+   });
++
++  it('opens the held-out evaluation definition at the main puzzle header', async () => {
++    const user = userEvent.setup();
++    render(<MgamMatchingPuzzle {...props()} />, { wrapper: GlossaryProvider });
++
++    await user.click(screen.getByRole('button', { name: '解释术语：隔离测试集' }));
++
++    expect(screen.getByRole('dialog')).toBeVisible();
++    expect(screen.getByRole('heading', { name: '隔离测试集' })).toBeVisible();
++    expect(screen.getByText(/训练和调参过程中完全不让模型接触/)).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '关闭术语讲解' }));
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\MgamMatchingPuzzle.tsx" "b/src\\experiences\\MgamMatchingPuzzle.tsx"
+index e35d1ac..c737f6c 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\MgamMatchingPuzzle.tsx"
++++ "b/src\\experiences\\MgamMatchingPuzzle.tsx"
+@@ -1,11 +1,12 @@
+ import { useEffect, useRef, useState } from 'react';
++import { Term } from '../components/Glossary';
+ import { PaperMedia } from '../components/PaperMedia';
+ import { PAPER_FACTS } from '../data/facts';
+ import type { ChapterExperienceProps } from '../types';
+ import '../styles/experience-training.css';
+ 
+ const partitionFromState = (state?: string) => state === 'partition-1' ? 1 : state === 'partition-2' ? 2 : 3;
+ 
+ const PREDICTION_TOKENS = [
+   { id: 'prediction-1', text: 'Invoice' },
+   { id: 'prediction-2', text: 'total' },
+@@ -48,21 +49,21 @@ export function MgamMatchingPuzzle({ restoredModuleState, onComplete, onInteract
+     onInteract('mgam-lab');
+     onStateChange({ moduleId: 'mgam-lab', state: `partition-${nextPartition}` });
+     if (nextPartition === 1 && !completed.current) {
+       completed.current = true;
+       onComplete();
+     }
+   };
+ 
+   return <section className="mgam-puzzle" aria-label="MGAM 匹配拼图" data-partition={partition}>
+     <header className="mgam-puzzle__header">
+-      <div><span className="mgam-puzzle__heldout">HELD-OUT TEST</span><h3>TEST-{PAPER_FACTS.benchmark.hardPages}</h3></div>
++      <div><span className="mgam-puzzle__heldout"><Term id="mgam">MGAM</Term> · <Term id="held-out">HELD-OUT TEST</Term></span><h3>TEST-{PAPER_FACTS.benchmark.hardPages}</h3></div>
+       <p>这是与训练阶段视觉和 ID 均不同的新测试样本；GT 始终固定，只合并预测侧。</p>
+     </header>
+ 
+     <div className="mgam-puzzle__reference">
+       <PaperMedia assetId="omni-output" cropId="outputA" label="论文原图节选" caption="真实 Markdown 输出规范差异，用于帮助解释评测边界。" />
+       <p><strong>来源边界：</strong>真实 Markdown 对比不是原始 MGAM 示例；下方 MGAM 分块完全是教学示意。</p>
+     </div>
+ 
+     <div className="mgam-puzzle__board">
+       <div className="mgam-puzzle__lane" data-testid="mgam-ground-truth" data-immutable="true">
+@@ -98,21 +99,21 @@ export function MgamMatchingPuzzle({ restoredModuleState, onComplete, onInteract
+         {[
+           { id: 'base', label: 'Base', score: PAPER_FACTS.scores.stage0 },
+           { id: 'stage-1', label: 'Stage 1', score: PAPER_FACTS.scores.stage1, gain: PAPER_FACTS.scores.stageGains.stage1 },
+           { id: 'stage-2', label: 'Stage 2', score: PAPER_FACTS.scores.stage2, gain: PAPER_FACTS.scores.stageGains.stage2 },
+           { id: 'stage-3', label: 'Stage 3', score: PAPER_FACTS.scores.stage3, gain: PAPER_FACTS.scores.stageGains.stage3 },
+         ].map(({ id, label, score, gain }) => <div key={id} data-testid={`waterfall-${id}`}><span>{label}</span><strong>{score}</strong>{gain ? <b>{`+${gain}`}</b> : null}</div>)}
+       </div>
+       <p className="mgam-puzzle__rounding">分段报告 +{PAPER_FACTS.scores.roundedStageGain}；端点 +{PAPER_FACTS.scores.endpointGain}。差异来自四舍五入。</p>
+       <div className="mgam-puzzle__benchmarks">
+         <p><span>Base</span><strong>{PAPER_FACTS.scores.basePro}</strong><small>非第一；Best {PAPER_FACTS.scores.baseBest}</small></p>
+-        <p><span>Hard</span><strong>{PAPER_FACTS.scores.hardPro}</strong><small><span>v2 主文第二名</span> <b>{PAPER_FACTS.scores.hardMainTextComparator}</b></small><b>{`+${PAPER_FACTS.scores.hardMainTextLead}`}</b></p>
++        <p><span>Hard</span><strong>{PAPER_FACTS.scores.hardPro}</strong><small><span>v2 主文比较项（GLM-OCR / PaddleOCR-VL-1.5）</span> <b>{PAPER_FACTS.scores.hardMainTextComparator}</b></small><b>{`+${PAPER_FACTS.scores.hardMainTextLead}`}</b></p>
+       </div>
+     </div> : null}
+ 
+     {correct ? <details className="mgam-puzzle__evidence" open={evidenceOpen} onToggle={(event) => {
+       const open = event.currentTarget.open;
+       setEvidenceOpen(open);
+       onInteract('results-boundary');
+       onStateChange({ moduleId: 'results-boundary', state: open ? 'evidence-open' : 'evidence-closed' });
+     }}>
+       <summary>证据口径与边界</summary>
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\TrainingTimeline.test.tsx" "b/src\\experiences\\TrainingTimeline.test.tsx"
+index e3942d6..a84e013 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\TrainingTimeline.test.tsx"
++++ "b/src\\experiences\\TrainingTimeline.test.tsx"
+@@ -1,13 +1,14 @@
+ import { act, fireEvent, render, screen, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { afterEach, describe, expect, it, vi } from 'vitest';
++import { GlossaryProvider } from '../components/Glossary';
+ import { TrainingTimeline } from './TrainingTimeline';
+ 
+ const props = () => ({
+   stepId: 'step-5',
+   modules: [],
+   onInteract: vi.fn(),
+   onStateChange: vi.fn(),
+   onComplete: vi.fn(),
+ });
+ 
+@@ -15,21 +16,21 @@ describe('TrainingTimeline', () => {
+   afterEach(() => {
+     vi.useRealTimers();
+     vi.unstubAllGlobals();
+   });
+ 
+   it('plays and pauses the 24-second narrative, then scrubs into the Stage 3 rollout frame', () => {
+     vi.useFakeTimers();
+     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 16) as unknown as number);
+     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((id: number) => clearTimeout(id));
+     const callbacks = props();
+-    render(<TrainingTimeline {...callbacks} />);
++    render(<TrainingTimeline {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByText('65.5M')).toBeVisible();
+     expect(screen.queryByTestId('rollout-field')).not.toBeInTheDocument();
+ 
+     fireEvent.click(screen.getByRole('button', { name: '播放训练过程' }));
+     expect(screen.getByRole('button', { name: '暂停训练过程' })).toBeVisible();
+     act(() => vi.advanceTimersByTime(8100));
+     expect(screen.getByText('3.9M')).toBeVisible();
+     expect(screen.getByText('其中 192K Hard')).toBeVisible();
+     expect(screen.getByText('Replay')).toBeVisible();
+@@ -46,21 +47,21 @@ describe('TrainingTimeline', () => {
+ 
+     fireEvent.click(screen.getByRole('button', { name: '重播' }));
+     expect(screen.getByText('65.5M')).toBeVisible();
+     expect(screen.getByRole('button', { name: '暂停训练过程' })).toBeVisible();
+     fireEvent.click(screen.getByRole('button', { name: '暂停训练过程' }));
+   });
+ 
+   it('maps each task to its paper-supported reward and reorders stable candidate rows', async () => {
+     const user = userEvent.setup();
+     const callbacks = props();
+-    render(<TrainingTimeline {...callbacks} restoredModuleState={{ moduleId: 'stage-training', state: 'stage-3' }} />);
++    render(<TrainingTimeline {...callbacks} restoredModuleState={{ moduleId: 'stage-training', state: 'stage-3' }} />, { wrapper: GlossaryProvider });
+     const ranking = screen.getByTestId('candidate-ranking');
+ 
+     await user.click(screen.getByRole('button', { name: '文本指标' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-edit-distance' });
+     expect(within(ranking).getAllByRole('listitem')[0]).toHaveAttribute('data-candidate-id', 'candidate-b');
+ 
+     await user.click(screen.getByRole('button', { name: '公式指标' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-cdm' });
+ 
+     await user.click(screen.getByRole('button', { name: '表格指标' }));
+@@ -68,19 +69,34 @@ describe('TrainingTimeline', () => {
+ 
+     await user.click(screen.getByRole('button', { name: '版面指标' }));
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'grpo-lab', state: 'metric-iou' });
+     expect(within(ranking).getAllByRole('listitem')[0]).toHaveAttribute('data-candidate-id', 'candidate-d');
+     expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
+   });
+ 
+   it('does not auto-play when reduced motion is requested and keeps manual stage controls available', () => {
+     vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
+     const callbacks = props();
+-    render(<TrainingTimeline {...callbacks} />);
++    render(<TrainingTimeline {...callbacks} />, { wrapper: GlossaryProvider });
+ 
+     expect(screen.getByRole('button', { name: '播放训练过程' })).toBeDisabled();
+     expect(screen.getByText(/减少动态效果/)).toBeVisible();
+     fireEvent.click(screen.getByRole('button', { name: '下一阶段' }));
+     expect(screen.getByText('3.9M')).toBeVisible();
+     expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'stage-training', state: 'stage-2' });
+   });
++
++  it('opens the reward and metric definitions at the Stage 3 ranking point of use', async () => {
++    const user = userEvent.setup();
++    render(<TrainingTimeline {...props()} restoredModuleState={{ moduleId: 'stage-training', state: 'stage-3' }} />, { wrapper: GlossaryProvider });
++
++    expect(screen.getByRole('button', { name: '解释术语：Rollout' })).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '解释术语：任务奖励' }));
++    expect(screen.getByRole('heading', { name: '任务奖励' })).toBeVisible();
++    expect(screen.getByText(/与具体任务相匹配的评分函数/)).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '关闭术语讲解' }));
++
++    await user.click(screen.getByRole('button', { name: '解释术语：编辑距离' }));
++    expect(screen.getByRole('heading', { name: '编辑距离' })).toBeVisible();
++    await user.click(screen.getByRole('button', { name: '关闭术语讲解' }));
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\TrainingTimeline.tsx" "b/src\\experiences\\TrainingTimeline.tsx"
+index 5889e66..b7cf4a9 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\experiences\\TrainingTimeline.tsx"
++++ "b/src\\experiences\\TrainingTimeline.tsx"
+@@ -1,28 +1,29 @@
+ import { useEffect, useMemo, useRef, useState } from 'react';
++import { Term } from '../components/Glossary';
+ import { PaperMedia } from '../components/PaperMedia';
+ import { PAPER_FACTS } from '../data/facts';
+ import { usePlaybackTimeline } from '../hooks/usePlaybackTimeline';
+ import type { ChapterExperienceProps } from '../types';
+ import '../styles/experience-training.css';
+ 
+ const DURATION_MS = 24_000;
+ const STAGE_BEATS = [0, 8_000, 16_000, 24_000] as const;
+ 
+ type TaskId = 'text' | 'formula' | 'table' | 'layout';
+ type MetricState = 'metric-edit-distance' | 'metric-cdm' | 'metric-teds' | 'metric-iou';
+ 
+-const TASKS: readonly { id: TaskId; label: string; metric: string; state: MetricState }[] = [
+-  { id: 'text', label: '文本指标', metric: PAPER_FACTS.rewards[0], state: 'metric-edit-distance' },
+-  { id: 'formula', label: '公式指标', metric: PAPER_FACTS.rewards[1], state: 'metric-cdm' },
+-  { id: 'table', label: '表格指标', metric: PAPER_FACTS.rewards[2], state: 'metric-teds' },
+-  { id: 'layout', label: '版面指标', metric: PAPER_FACTS.rewards[3], state: 'metric-iou' },
++const TASKS: readonly { id: TaskId; label: string; metric: string; state: MetricState; glossaryId: string }[] = [
++  { id: 'text', label: '文本指标', metric: PAPER_FACTS.rewards[0], state: 'metric-edit-distance', glossaryId: 'edit-distance' },
++  { id: 'formula', label: '公式指标', metric: PAPER_FACTS.rewards[1], state: 'metric-cdm', glossaryId: 'cdm' },
++  { id: 'table', label: '表格指标', metric: PAPER_FACTS.rewards[2], state: 'metric-teds', glossaryId: 'teds' },
++  { id: 'layout', label: '版面指标', metric: PAPER_FACTS.rewards[3], state: 'metric-iou', glossaryId: 'iou' },
+ ] as const;
+ 
+ const CANDIDATES = [
+   { id: 'candidate-a', label: '候选 A', scores: { text: 81, formula: 74, table: 89, layout: 77 } },
+   { id: 'candidate-b', label: '候选 B', scores: { text: 96, formula: 83, table: 78, layout: 86 } },
+   { id: 'candidate-c', label: '候选 C', scores: { text: 88, formula: 97, table: 94, layout: 72 } },
+   { id: 'candidate-d', label: '候选 D', scores: { text: 79, formula: 86, table: 82, layout: 98 } },
+ ] as const;
+ 
+ const stageFromState = (state?: string) => state === 'stage-3' ? 2 : state === 'stage-2' ? 1 : 0;
+@@ -89,36 +90,36 @@ export function TrainingTimeline({ restoredModuleState, onComplete, onInteract,
+     onInteract('grpo-lab');
+     onStateChange({ moduleId: 'grpo-lab', state: definition.state });
+     if (stage >= 2 && !completed.current) {
+       completed.current = true;
+       onComplete();
+     }
+   };
+ 
+   return <section className="training-timeline" aria-label="训练与 GRPO 播放器" data-stage={stage + 1}>
+     <header className="training-timeline__header">
+-      <div><span className="source-tag teaching">基于论文重绘</span><h3>让数据包沿训练路线进入 GRPO</h3></div>
+-      <p>24 秒内依次查看三阶段；只有到达 Stage 3 并查看任务排名才完成。</p>
++      <div><span className="source-tag teaching">基于论文重绘</span><h3>让数据包沿训练路线进入 <Term id="grpo">GRPO</Term></h3></div>
++      <p>24 秒内依次查看三阶段；只有到达第三阶段并查看任务排名才完成。</p>
+     </header>
+ 
+     <div className="training-timeline__cinema">
+       <PaperMedia assetId="mineru-data-engine" cropId="trainingRoutes" label="论文原图节选" caption="Figure 2 的训练去向用于核对路线；下方数据包和候选排序是教学动画。" className="training-timeline__paper" />
+       <div className="training-timeline__route" aria-live="polite">
+         <div className="training-timeline__stage-copy">
+-          <span>Stage {stage + 1}</span>
++          <span>{stage === 0 ? <Term id="pre-training">Stage 1 · 预训练</Term> : stage === 1 ? <Term id="fine-tuning">Stage 2 · 微调</Term> : <Term id="reinforcement-learning">Stage 3 · 强化学习</Term>}</span>
+           {stage === 0 ? <><strong>{PAPER_FACTS.data.stage1.split(' ')[0]}</strong><p>跨任务数据进入监督微调，先建立广覆盖能力。</p></> : null}
+-          {stage === 1 ? <><strong>{PAPER_FACTS.data.stage2.split(' ')[0]}</strong><b>其中 {PAPER_FACTS.data.expertHard.split(' ')[0]} Hard</b><p>筛选后的难例通过回放机制返回训练回环。</p></> : null}
+-          {stage === 2 ? <><strong>{PAPER_FACTS.data.stage3.split(' ')[0]}</strong><p>高质量集合进入 GRPO，同一输入展开多候选。</p></> : null}
++          {stage === 1 ? <><strong>{PAPER_FACTS.data.stage2.split(' ')[0]}</strong><b>其中 {PAPER_FACTS.data.expertHard.split(' ')[0]} Hard</b><p>筛选后的难例通过 <Term id="replay">Replay</Term> 回放返回训练回环。</p></> : null}
++          {stage === 2 ? <><strong>{PAPER_FACTS.data.stage3.split(' ')[0]}</strong><p>高质量集合进入 GRPO，同一输入展开 <Term id="rollout">rollout 候选</Term>。</p></> : null}
+         </div>
+         <div className="training-timeline__packets" aria-hidden="true">
+           <i /><i /><i /><i /><i /><i />
+-          {stage === 1 ? <span className="training-timeline__replay">Replay</span> : null}
++          {stage === 1 ? <span className="training-timeline__replay">↺</span> : null}
+         </div>
+         {stage === 2 ? <div className="training-timeline__rollouts" data-testid="rollout-field" aria-label={`${PAPER_FACTS.data.rollouts} 个 rollout`}>
+           {Array.from({ length: PAPER_FACTS.data.rollouts }, (_, index) => <i key={index} data-testid="rollout-dot" style={{ '--rollout-index': index } as React.CSSProperties} />)}
+         </div> : null}
+       </div>
+     </div>
+ 
+     <div className="training-timeline__controls" role="group" aria-label="训练播放控制">
+       <button type="button" onClick={timeline.toggle} disabled={timeline.reducedMotion} aria-label={timeline.playing ? '暂停训练过程' : '播放训练过程'}>{timeline.playing ? '暂停' : '播放'}</button>
+       <button type="button" onClick={() => seekStage(stage - 1)} disabled={stage === 0}>上一阶段</button>
+@@ -137,21 +138,21 @@ export function TrainingTimeline({ restoredModuleState, onComplete, onInteract,
+         onInteract('stage-training');
+         onStateChange({ moduleId: 'stage-training', state: `stage-${nextStage + 1}` });
+       }} />
+     </label>
+ 
+     {stage === 2 ? <div className="training-timeline__grpo">
+       <div className="training-timeline__tasks" role="group" aria-label="选择 GRPO 任务指标">
+         {TASKS.map((definition) => <button key={definition.id} type="button" data-active={task === definition.id} onClick={() => chooseTask(definition.id)}>{definition.label}</button>)}
+       </div>
+       <div className="training-timeline__ranking">
+-        <p>按 <strong>{activeTask.metric}</strong> 重排；这些分数仅用于展示排序机制。</p>
++        <p>用 <Term id="task-reward">任务奖励</Term> 按 <Term id={activeTask.glossaryId}>{activeTask.metric}</Term> 重排；这些分数仅用于展示排序机制。</p>
+         <ol data-testid="candidate-ranking">
+           {rankedCandidates.map((candidate) => <li key={candidate.id} data-candidate-id={candidate.id}><span>{candidate.label}</span><b>{candidate.scores[task]}</b></li>)}
+         </ol>
+       </div>
+     </div> : null}
+     <p className="experience-boundary">事实边界：数据规模与奖励类型来自论文；数据包运动、候选内容和教学分数不是论文训练日志。OmniDocBench 页面只代表类似挑战属性。</p>
+   </section>;
+ }
+ 
+ export default TrainingTimeline;
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\hooks\\usePlaybackTimeline.test.tsx" "b/src\\hooks\\usePlaybackTimeline.test.tsx"
+index bca2f3f..7ff3fd3 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\hooks\\usePlaybackTimeline.test.tsx"
++++ "b/src\\hooks\\usePlaybackTimeline.test.tsx"
+@@ -1,14 +1,20 @@
+-import { act, renderHook } from '@testing-library/react';
++import { act, fireEvent, renderHook, screen } from '@testing-library/react';
++import type { ReactNode } from 'react';
+ import { afterEach, describe, expect, it, vi } from 'vitest';
++import { GlossaryButton, GlossaryProvider } from '../components/Glossary';
+ import { usePlaybackTimeline } from './usePlaybackTimeline';
+ 
++function GlossaryHarness({ children }: { children: ReactNode }) {
++  return <GlossaryProvider><GlossaryButton>页头术语表</GlossaryButton>{children}</GlossaryProvider>;
++}
++
+ describe('usePlaybackTimeline', () => {
+   afterEach(() => {
+     delete (document as unknown as { hidden?: boolean }).hidden;
+     vi.useRealTimers();
+     vi.unstubAllGlobals();
+   });
+ 
+   it('advances through beats, seeks by progress, and pauses when visibility changes', () => {
+     vi.useFakeTimers();
+     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 16) as unknown as number);
+@@ -32,11 +38,40 @@ describe('usePlaybackTimeline', () => {
+ 
+     act(() => timeline.result.current.play());
+     Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+     act(() => document.dispatchEvent(new Event('visibilitychange')));
+     expect(timeline.result.current.playing).toBe(true);
+ 
+     Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+     act(() => document.dispatchEvent(new Event('visibilitychange')));
+     expect(timeline.result.current.playing).toBe(false);
+   });
++
++  it('saves elapsed progress when the provider glossary opens and does not auto-resume after close', () => {
++    vi.useFakeTimers();
++    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 16) as unknown as number);
++    vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
++    const timeline = renderHook(
++      () => usePlaybackTimeline({ durationMs: 24000, beatMs: [0, 8000, 16000, 24000] }),
++      { wrapper: GlossaryHarness },
++    );
++
++    try {
++      act(() => timeline.result.current.play());
++      act(() => vi.advanceTimersByTime(1100));
++      expect(timeline.result.current.currentMs).toBeGreaterThan(0);
++
++      fireEvent.click(screen.getByRole('button', { name: '页头术语表' }));
++      const pausedAt = timeline.result.current.currentMs;
++      act(() => vi.advanceTimersByTime(5000));
++      expect(timeline.result.current.playing).toBe(false);
++      expect(timeline.result.current.currentMs).toBe(pausedAt);
++
++      fireEvent.click(screen.getByRole('button', { name: '页头术语表' }));
++      act(() => vi.advanceTimersByTime(5000));
++      expect(timeline.result.current.playing).toBe(false);
++      expect(timeline.result.current.currentMs).toBe(pausedAt);
++    } finally {
++      act(() => timeline.result.current.pause());
++    }
++  });
+ });
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\hooks\\usePlaybackTimeline.ts" "b/src\\hooks\\usePlaybackTimeline.ts"
+index 865ea62..febed00 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\final-fix-before\\src\\hooks\\usePlaybackTimeline.ts"
++++ "b/src\\hooks\\usePlaybackTimeline.ts"
+@@ -1,11 +1,12 @@
+ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
++import { useGlossaryAttentionPause } from '../components/Glossary';
+ 
+ export interface PlaybackTimelineOptions {
+   durationMs: number;
+   beatMs: readonly number[];
+   initialMs?: number;
+ }
+ 
+ export interface PlaybackTimelineState {
+   currentMs: number;
+   progress: number;
+@@ -16,20 +17,21 @@ export interface PlaybackTimelineState {
+   pause(): void;
+   toggle(): void;
+   seek(progress: number): void;
+   step(delta: -1 | 1): void;
+   replay(): void;
+ }
+ 
+ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+ 
+ export function usePlaybackTimeline({ durationMs, beatMs, initialMs = 0 }: PlaybackTimelineOptions): PlaybackTimelineState {
++  const attentionPaused = useGlossaryAttentionPause();
+   const safeDuration = Math.max(0, durationMs);
+   const safeBeats = useMemo(() => [...beatMs].map((beat) => clamp(beat, 0, safeDuration)).sort((a, b) => a - b), [beatMs, safeDuration]);
+   const [currentMs, setCurrentMs] = useState(() => clamp(initialMs, 0, safeDuration));
+   const [playing, setPlaying] = useState(false);
+   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+   const currentRef = useRef(currentMs);
+   const playingRef = useRef(false);
+   const frameRef = useRef<number | null>(null);
+   const startedAtRef = useRef(0);
+ 
+@@ -42,34 +44,34 @@ export function usePlaybackTimeline({ durationMs, beatMs, initialMs = 0 }: Playb
+   const pause = useCallback(() => {
+     playingRef.current = false;
+     setPlaying(false);
+     if (frameRef.current !== null) {
+       window.cancelAnimationFrame(frameRef.current);
+       frameRef.current = null;
+     }
+   }, []);
+ 
+   const play = useCallback(() => {
+-    if (reducedMotion || safeDuration === 0 || playingRef.current) return;
++    if (attentionPaused || reducedMotion || safeDuration === 0 || playingRef.current) return;
+     if (currentRef.current >= safeDuration) setPosition(0);
+     startedAtRef.current = performance.now() - currentRef.current;
+     playingRef.current = true;
+     setPlaying(true);
+     const advance = (timestamp: number) => {
+       if (!playingRef.current) return;
+       const next = clamp(timestamp - startedAtRef.current, 0, safeDuration);
+       setPosition(next);
+       if (next >= safeDuration) { pause(); return; }
+       frameRef.current = window.requestAnimationFrame(advance);
+     };
+     frameRef.current = window.requestAnimationFrame(advance);
+-  }, [pause, reducedMotion, safeDuration, setPosition]);
++  }, [attentionPaused, pause, reducedMotion, safeDuration, setPosition]);
+ 
+   const seek = useCallback((progress: number) => {
+     setPosition(clamp(progress, 0, 1) * safeDuration);
+     if (playingRef.current) startedAtRef.current = performance.now() - currentRef.current;
+   }, [safeDuration, setPosition]);
+ 
+   const step = useCallback((delta: -1 | 1) => {
+     const active = safeBeats.reduce((index, beat, candidate) => (currentRef.current >= beat ? candidate : index), 0);
+     const nextIndex = clamp(active + delta, 0, Math.max(0, safeBeats.length - 1));
+     setPosition(safeBeats[nextIndex] ?? 0);
+@@ -90,16 +92,20 @@ export function usePlaybackTimeline({ durationMs, beatMs, initialMs = 0 }: Playb
+   }, [pause]);
+ 
+   useEffect(() => {
+     const pauseWhenVisibilityChanges = () => {
+       if (document.hidden) pause();
+     };
+     document.addEventListener('visibilitychange', pauseWhenVisibilityChanges);
+     return () => document.removeEventListener('visibilitychange', pauseWhenVisibilityChanges);
+   }, [pause]);
+ 
++  useEffect(() => {
++    if (attentionPaused) pause();
++  }, [attentionPaused, pause]);
++
+   useEffect(() => () => pause(), [pause]);
+ 
+   const progress = safeDuration === 0 ? 0 : currentMs / safeDuration;
+   const activeBeat = safeBeats.reduce((index, beat, candidate) => (currentMs >= beat ? candidate : index), 0);
+   return { currentMs, progress, activeBeat, playing, reducedMotion, play, pause, toggle, seek, step, replay };
+ }

@@ -1,0 +1,456 @@
+# Task 3 final non-Git re-review package
+
+
+## src\experiences\DataCounterfactual.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\DataCounterfactual.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DataCounterfactual.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DataCounterfactual.test.tsx"
+index e69de29..f798d16 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DataCounterfactual.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DataCounterfactual.test.tsx"
+@@ -0,0 +1,49 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { describe, expect, it, vi } from 'vitest';
++import { DataCounterfactual } from './DataCounterfactual';
++
++const props = () => ({
++  stepId: 'step-1',
++  modules: [],
++  onInteract: vi.fn(),
++  onStateChange: vi.fn(),
++  onComplete: vi.fn(),
++});
++
++describe('DataCounterfactual', () => {
++  it('does not persist or complete during the six-second automatic intuition preview', async () => {
++    vi.useFakeTimers();
++    const callbacks = props();
++    render(<DataCounterfactual {...callbacks} />);
++
++    await vi.advanceTimersByTimeAsync(6000);
++
++    expect(screen.getByText('固定 1.2B')).toBeVisible();
++    expect(callbacks.onStateChange).not.toHaveBeenCalled();
++    expect(callbacks.onComplete).not.toHaveBeenCalled();
++    vi.useRealTimers();
++  });
++
++  it('shows the static comparison immediately when reduced motion is requested', () => {
++    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
++    const callbacks = props();
++    render(<DataCounterfactual {...callbacks} />);
++
++    expect(screen.getByText('自动对照仅建立直觉；只有你的选择会保存状态。')).toBeVisible();
++    expect(callbacks.onStateChange).not.toHaveBeenCalled();
++  });
++
++  it('records and completes only after the learner chooses the long-tail counterfactual', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<DataCounterfactual {...callbacks} />);
++
++    await user.click(screen.getByRole('button', { name: '补长尾页' }));
++
++    expect(screen.getByText('复杂公式')).toHaveAttribute('data-covered', 'true');
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'data-bias', state: 'tail' });
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++    expect(screen.getByText('+2.71')).toHaveAccessibleDescription(/完整流程/);
++  });
++});
+
+## src\experiences\DataCounterfactual.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\DataCounterfactual.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DataCounterfactual.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DataCounterfactual.tsx"
+index e69de29..9386f2c 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DataCounterfactual.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DataCounterfactual.tsx"
+@@ -0,0 +1,85 @@
++import { useEffect, useRef, useState } from 'react';
++import { PaperMedia } from '../components/PaperMedia';
++import type { ChapterExperienceProps } from '../types';
++
++type Choice = 'ordinary' | 'tail';
++
++export function DataCounterfactual({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
++  const [choice, setChoice] = useState<Choice>('ordinary');
++  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
++  const [previewComplete, setPreviewComplete] = useState(reducedMotion);
++  const completed = useRef(false);
++
++  useEffect(() => {
++    if (reducedMotion) return undefined;
++    const timer = window.setTimeout(() => setPreviewComplete(true), 6000);
++    return () => window.clearTimeout(timer);
++  }, [reducedMotion]);
++
++  useEffect(() => {
++    if (restoredModuleState?.moduleId === 'data-bias' && (restoredModuleState.state === 'ordinary' || restoredModuleState.state === 'tail')) {
++      setChoice(restoredModuleState.state);
++    }
++  }, [restoredModuleState]);
++
++  const choose = (next: Choice) => {
++    setChoice(next);
++    onInteract('data-bias');
++    onStateChange({ moduleId: 'architecture-lock', state: 'locked' });
++    onStateChange({ moduleId: 'data-bias', state: next });
++    if (next === 'tail' && !completed.current) {
++      completed.current = true;
++      onComplete();
++    }
++  };
++
++  const tail = choice === 'tail';
++  return (
++    <section className="data-counterfactual" data-preview={previewComplete ? 'tail-previewed' : 'ordinary-arriving'} aria-label="等预算数据反事实">
++      <header className="data-counterfactual__header">
++        <div>
++          <span className="source-tag paper">论文原图节选</span>
++          <h3>同一预算下，缺口会留在哪里？</h3>
++        </div>
++        <div className="architecture-lock" aria-label="架构控制变量已锁定"><strong>固定 1.2B</strong><span>架构锁定</span></div>
++      </header>
++
++      <div className="data-counterfactual__budget" aria-label="固定采样预算">
++        <span>相同采样预算</span><i aria-hidden="true" /><span>只改变补充策略</span>
++      </div>
++
++      <div className="data-counterfactual__comparison">
++        <article className="counterfactual-lane counterfactual-lane--ordinary" data-active={choice === 'ordinary'}>
++          <div><strong>继续加入普通页</strong><span>数量上升，高频版式仍重复进入</span></div>
++          <PaperMedia assetId="omni-layout" cropId="doubleColumn" label="论文原图节选" caption="Figure S7 的双栏页面，用作普通版式的可视化对照。" />
++        </article>
++        <article className="counterfactual-lane counterfactual-lane--tail" data-active={tail}>
++          <div><strong>补长尾页</strong><span>把低频版式带入候选范围</span></div>
++          <PaperMedia assetId="omni-layout" cropId="complexLayout" label="论文原图节选" caption="Figure S7 的复杂版式页面，用作长尾版式的可视化对照。" />
++        </article>
++      </div>
++
++      <div className="data-counterfactual__gaps" aria-live="polite">
++        <span data-covered={tail ? 'true' : 'false'}>复杂公式</span>
++        <span data-covered={tail ? 'true' : 'false'}>复杂表格</span>
++        <span data-covered={tail ? 'true' : 'false'}>多栏版式</span>
++      </div>
++
++      <div className="data-counterfactual__actions" role="group" aria-label="选择数据补充策略">
++        <button type="button" aria-pressed={choice === 'ordinary'} onClick={() => choose('ordinary')}>继续普通页</button>
++        <button type="button" aria-pressed={tail} onClick={() => choose('tail')}>补长尾页</button>
++      </div>
++
++      <p className="data-counterfactual__hint" role="status">
++        {previewComplete ? '自动对照仅建立直觉；只有你的选择会保存状态。' : '普通页正在进入同一预算的对照。'}
++      </p>
++      <div className="data-counterfactual__result">
++        <output aria-describedby="full-process-boundary">+2.71</output>
++        <p id="full-process-boundary">论文报告的端点差值来自完整流程的数据工程与训练组合，不能归因于这一次补页操作。</p>
++      </div>
++      <p className="experience-boundary">事实边界：这里的 Figure S7 裁图来自 OmniDocBench，只展示版式样例，不是 MinerU2.5-Pro 的训练样本或独立性能证据。</p>
++    </section>
++  );
++}
++
++export default DataCounterfactual;
+
+## src\experiences\DdasMicroscope.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\DdasMicroscope.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DdasMicroscope.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DdasMicroscope.test.tsx"
+index e69de29..1d9e765 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DdasMicroscope.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DdasMicroscope.test.tsx"
+@@ -0,0 +1,98 @@
++import { fireEvent, render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { describe, expect, it, vi } from 'vitest';
++import { DdasMicroscope } from './DdasMicroscope';
++
++const props = () => ({
++  stepId: 'step-2',
++  modules: [],
++  onInteract: vi.fn(),
++  onStateChange: vi.fn(),
++  onComplete: vi.fn(),
++});
++
++describe('DdasMicroscope', () => {
++  it('reports random, cluster, and DDAS page choices, and restores each page-level deep-link state', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    const { rerender } = render(<DdasMicroscope {...callbacks} />);
++
++    await user.click(screen.getByRole('button', { name: '查看随机候选' }));
++    await user.click(screen.getByRole('button', { name: '观察版式簇' }));
++    await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
++
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'random' });
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'cluster' });
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
++
++    rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'random' }} />);
++    expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'random');
++    rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'cluster' }} />);
++    expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'cluster');
++    rerender(<DdasMicroscope {...props()} restoredModuleState={{ moduleId: 'page-ddas', state: 'ddas' }} />);
++    expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-page-state', 'ddas');
++  });
++
++  it('keeps page and element Figure 3 views reversible through shared pointer, keyboard, and mobile-ready controls', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<DdasMicroscope {...callbacks} />);
++
++    await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
++    await user.click(screen.getByRole('button', { name: '放大公式区域' }));
++    expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-view', 'element');
++    await user.click(screen.getByRole('button', { name: '返回页面级' }));
++    expect(screen.getByTestId('figure-3-canvas')).toHaveAttribute('data-view', 'page');
++
++    const textButton = screen.getByRole('button', { name: '查看文本元素' });
++    textButton.focus();
++    await user.keyboard('{Enter}');
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'element-ddas', state: 'text' });
++    await user.click(screen.getByRole('button', { name: '返回页面级' }));
++    await user.click(screen.getByRole('button', { name: '查看表格元素' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'element-ddas', state: 'table' });
++    await user.click(screen.getByRole('button', { name: '返回页面级' }));
++
++    expect(screen.getByRole('group', { name: '显微镜操作' })).toHaveTextContent('查看文本元素');
++    expect(screen.getByRole('group', { name: '显微镜操作' })).toHaveTextContent('查看表格元素');
++  });
++
++  it('keeps the disclosed ViT-base fact to one occurrence in the main microscope view', () => {
++    render(<DdasMicroscope {...props()} />);
++    expect(screen.getAllByText(/512 维 ViT-base/)).toHaveLength(1);
++  });
++
++  it('lets a learner enter page DDAS and then inspect a formula element on the same Figure 3 canvas', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<DdasMicroscope {...callbacks} />);
++
++    await user.click(screen.getByRole('button', { name: '观察长尾版式簇' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
++
++    await user.click(screen.getByRole('button', { name: '放大公式区域' }));
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'element-ddas', state: 'formula' });
++    expect(callbacks.onComplete).toHaveBeenCalledTimes(1);
++    expect(screen.getAllByTestId('figure-3-canvas')).toHaveLength(1);
++  });
++
++  it('moves its normalized lens by pointer and keyboard, and Enter opens the focused page', async () => {
++    const user = userEvent.setup();
++    const callbacks = props();
++    render(<DdasMicroscope {...callbacks} />);
++    const canvas = screen.getByTestId('figure-3-canvas');
++    Object.defineProperty(canvas, 'getBoundingClientRect', {
++      value: () => ({ left: 0, top: 0, width: 200, height: 100 }),
++    });
++
++    fireEvent.pointerMove(canvas, { clientX: 150, clientY: 25 });
++    expect(canvas).toHaveAttribute('data-lens-x', '75');
++    expect(canvas).toHaveAttribute('data-lens-y', '25');
++    canvas.focus();
++    await user.keyboard('{ArrowLeft}{ArrowDown}{Enter}');
++
++    expect(canvas).toHaveAttribute('data-lens-x', '70');
++    expect(canvas).toHaveAttribute('data-lens-y', '30');
++    expect(callbacks.onStateChange).toHaveBeenCalledWith({ moduleId: 'page-ddas', state: 'ddas' });
++  });
++});
+
+## src\experiences\DdasMicroscope.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\experiences\DdasMicroscope.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DdasMicroscope.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DdasMicroscope.tsx"
+index e69de29..caae681 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\experiences\\DdasMicroscope.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\experiences\\DdasMicroscope.tsx"
+@@ -0,0 +1,121 @@
++import { useEffect, useRef, useState } from 'react';
++import { PaperMedia } from '../components/PaperMedia';
++import type { ChapterExperienceProps } from '../types';
++
++type View = 'cluster' | 'page' | 'element';
++type ElementKind = 'text' | 'formula' | 'table';
++type PageState = 'random' | 'cluster' | 'ddas';
++
++const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
++
++export function DdasMicroscope({ restoredModuleState, onComplete, onInteract, onStateChange }: ChapterExperienceProps) {
++  const [view, setView] = useState<View>('cluster');
++  const [pageState, setPageState] = useState<PageState>('cluster');
++  const [element, setElement] = useState<ElementKind>('text');
++  const [lens, setLens] = useState({ x: 50, y: 50 });
++  const completed = useRef(false);
++
++  useEffect(() => {
++    if (restoredModuleState?.moduleId === 'page-ddas' && ['random', 'cluster', 'ddas'].includes(restoredModuleState.state)) {
++      const restoredPageState = restoredModuleState.state as PageState;
++      setPageState(restoredPageState);
++      setView(restoredPageState === 'ddas' ? 'page' : 'cluster');
++    }
++    if (restoredModuleState?.moduleId === 'element-ddas' && ['text', 'formula', 'table'].includes(restoredModuleState.state)) {
++      setElement(restoredModuleState.state as ElementKind);
++      setPageState('ddas');
++      setView('element');
++    }
++  }, [restoredModuleState]);
++
++  const choosePageState = (next: PageState) => {
++    setPageState(next);
++    setView(next === 'ddas' ? 'page' : 'cluster');
++    onInteract('page-ddas');
++    onStateChange({ moduleId: 'page-ddas', state: next });
++  };
++
++  const openPage = () => choosePageState('ddas');
++
++  const inspectElement = (next: ElementKind) => {
++    setElement(next);
++    setView('element');
++    onInteract('element-ddas');
++    onStateChange({ moduleId: 'element-ddas', state: next });
++    if (!completed.current) {
++      completed.current = true;
++      onComplete();
++    }
++  };
++
++  const returnToPage = () => {
++    setPageState('ddas');
++    setView('page');
++    onInteract('page-ddas');
++    onStateChange({ moduleId: 'page-ddas', state: 'ddas' });
++  };
++
++  const moveLens = (event: React.PointerEvent<HTMLDivElement>) => {
++    const box = event.currentTarget.getBoundingClientRect();
++    if (!box.width || !box.height) return;
++    setLens({ x: clamp(((event.clientX - box.left) / box.width) * 100), y: clamp(((event.clientY - box.top) / box.height) * 100) });
++  };
++
++  const keyMove = (event: React.KeyboardEvent<HTMLDivElement>) => {
++    const delta = event.key === 'ArrowLeft' ? { x: -5, y: 0 } : event.key === 'ArrowRight' ? { x: 5, y: 0 } : event.key === 'ArrowUp' ? { x: 0, y: -5 } : event.key === 'ArrowDown' ? { x: 0, y: 5 } : null;
++    if (event.key === 'Enter') { event.preventDefault(); openPage(); return; }
++    if (!delta) return;
++    event.preventDefault();
++    setLens((current) => ({ x: clamp(current.x + delta.x), y: clamp(current.y + delta.y) }));
++  };
++
++  const cropId = view === 'element' ? 'elementLevel' : 'pageLevel';
++  const pageStatus = pageState === 'random' ? '随机候选：高频页面更容易重复进入。' : pageState === 'cluster' ? '版式簇：观察长尾版式的聚类差异。' : '页面级 DDAS 已进入同一画布。';
++  return (
++    <section className={`ddas-microscope ddas-microscope--${view}`} aria-label="DDAS 采样显微镜">
++      <header className="ddas-microscope__header">
++        <div><span className="source-tag paper">论文原图节选</span><h3>在同一画布中放大 DDAS</h3></div>
++        <p><strong>512 维 ViT-base</strong><span>约 60M 页候选</span></p>
++      </header>
++
++      <div
++        className="ddas-microscope__canvas"
++        data-testid="figure-3-canvas"
++        data-view={view}
++        data-page-state={pageState}
++        data-lens-x={lens.x}
++        data-lens-y={lens.y}
++        tabIndex={0}
++        role="application"
++        aria-label="可移动的采样镜头；方向键移动 5%，Enter 打开聚焦页"
++        onPointerMove={moveLens}
++        onKeyDown={keyMove}
++      >
++        <PaperMedia assetId="mineru-ddas" cropId={cropId} label="论文原图节选" caption={view === 'element' ? 'Figure 3：切换到元素级采样裁图。' : 'Figure 3：页面级采样裁图。'} />
++        {view === 'cluster' ? <div className="ddas-microscope__clusters">
++          {(['doubleColumn', 'tripleColumn', 'complexLayout'] as const).map((crop) => <PaperMedia key={crop} className="ddas-microscope__thumbnail" assetId="omni-layout" cropId={crop} label="论文原图节选" />)}
++        </div> : null}
++        <span className="ddas-microscope__lens" aria-hidden="true" style={{ left: `${lens.x}%`, top: `${lens.y}%` }} />
++        {view === 'element' ? <div className="ddas-microscope__element-overlay" data-element={element}>正在放大：{element === 'formula' ? '公式' : element === 'table' ? '表格' : '文本'}</div> : null}
++      </div>
++
++      <div className="ddas-microscope__controls" role="group" aria-label="显微镜操作">
++        {view === 'cluster' ? <>
++          <button type="button" onClick={() => choosePageState('random')}>查看随机候选</button>
++          <button type="button" onClick={() => choosePageState('cluster')}>观察版式簇</button>
++          <button type="button" onClick={() => choosePageState('ddas')}>观察长尾版式簇</button>
++        </> : <>
++          <button type="button" onClick={() => inspectElement('text')}>查看文本元素</button>
++          <button type="button" onClick={() => inspectElement('formula')}>放大公式区域</button>
++          <button type="button" onClick={() => inspectElement('table')}>查看表格元素</button>
++          {view === 'element' ? <button type="button" onClick={returnToPage}>返回页面级</button> : null}
++        </>}
++      </div>
++
++      <p className="ddas-microscope__state" role="status">{view === 'element' ? `元素级 DDAS：${element}。` : pageStatus}</p>
++      <p className="experience-boundary">事实边界：K-Means 的 K 和采样权重均未披露。版式缩略图通过 PaperMedia 使用本地图像及其故障占位，仅作观察锚点。</p>
++    </section>
++  );
++}
++
++export default DdasMicroscope;
+
+## src\styles\experience-data.css
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\styles\experience-data.css', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\styles\\experience-data.css" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-data.css"
+index e69de29..48c0c7f 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\styles\\experience-data.css"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-data.css"
+@@ -0,0 +1,19 @@
++.data-counterfactual, .ddas-microscope { display: grid; gap: 16px; color: var(--navy, #21324a); }
++.data-counterfactual__header, .ddas-microscope__header { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
++.data-counterfactual h3, .ddas-microscope h3 { margin: 6px 0 0; font-size: clamp(1.3rem, 3vw, 1.8rem); }
++.architecture-lock { display: grid; gap: 2px; min-width: 112px; padding: 10px 12px; border: 2px solid var(--blue, #27446e); border-radius: 12px; background: var(--blue-soft, #eef3f8); color: var(--blue, #27446e); text-align: center; }
++.architecture-lock span { font-size: 12px; font-weight: 800; }
++.data-counterfactual__budget { display: flex; align-items: center; gap: 10px; color: var(--muted, #68778f); font-size: 13px; font-weight: 800; }
++.data-counterfactual__budget i { flex: 1; min-width: 40px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--blue, #27446e), #7e9cbd); }
++.data-counterfactual__comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
++.counterfactual-lane { display: grid; gap: 10px; padding: 13px; border: 1px solid var(--line, #d7deea); border-radius: 16px; background: #fff; transition: border-color .2s ease, transform .2s ease; }
++.counterfactual-lane[data-active="true"] { border: 2px solid var(--green, #228d5c); transform: translateY(-2px); }
++.counterfactual-lane > div { display: grid; gap: 3px; }.counterfactual-lane span { color: var(--muted, #68778f); font-size: 13px; }
++.data-counterfactual__gaps { display: flex; flex-wrap: wrap; gap: 8px; }.data-counterfactual__gaps span { padding: 8px 10px; border: 1px dashed var(--line, #d7deea); border-radius: 999px; color: var(--muted, #68778f); font-size: 13px; font-weight: 800; }.data-counterfactual__gaps span[data-covered="true"] { border-style: solid; border-color: var(--green, #228d5c); background: #edf8f2; color: var(--green, #228d5c); }
++.data-counterfactual__actions, .ddas-microscope__controls, .ddas-microscope__mobile-controls { display: flex; flex-wrap: wrap; gap: 10px; }.data-counterfactual button, .ddas-microscope button { min-height: 44px; padding: 9px 14px; border: 1px solid var(--blue, #27446e); border-radius: 10px; background: #fff; color: var(--blue, #27446e); cursor: pointer; font: inherit; font-weight: 800; }.data-counterfactual button[aria-pressed="true"], .ddas-microscope button:hover { background: var(--blue-soft, #eef3f8); }
++.data-counterfactual__hint, .ddas-microscope__state { margin: 0; color: var(--muted, #68778f); font-size: 13px; }.data-counterfactual__result { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; padding: 14px; border-left: 4px solid var(--green, #228d5c); background: #edf8f2; }.data-counterfactual__result output { color: var(--green, #228d5c); font-size: 1.75rem; font-weight: 900; }.data-counterfactual__result p, .experience-boundary { margin: 0; color: var(--muted, #68778f); font-size: 12px; line-height: 1.55; }
++.ddas-microscope__header p { display: grid; gap: 4px; margin: 0; color: var(--blue, #27446e); font-size: 13px; text-align: right; }.ddas-microscope__header p span { color: var(--muted, #68778f); }
++.ddas-microscope__canvas { position: relative; overflow: hidden; min-height: 290px; border: 2px solid var(--line, #d7deea); border-radius: 18px; background: #f5f8f0; outline: none; }.ddas-microscope__canvas:focus-visible { outline: 3px solid var(--blue, #27446e); outline-offset: 3px; }.ddas-microscope__canvas .paper-media { padding: 14px; }.ddas-microscope__canvas .paper-media figcaption, .ddas-microscope__canvas .paper-media__source { display: none; }
++.ddas-microscope__clusters { position: absolute; inset: auto 16px 16px; display: flex; justify-content: center; gap: 8px; pointer-events: none; }.ddas-microscope__thumbnail { width: min(25%, 160px); }.ddas-microscope__thumbnail .paper-media__label, .ddas-microscope__thumbnail figcaption, .ddas-microscope__thumbnail .paper-media__source, .ddas-microscope__thumbnail .viewer-trigger { display: none; }.ddas-microscope__thumbnail .paper-crop { height: 74px; aspect-ratio: auto; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(19, 42, 69, .2); }.ddas-microscope__lens { position: absolute; width: 64px; height: 64px; border: 3px solid var(--orange, #d97706); border-radius: 50%; box-shadow: 0 0 0 999px rgba(255,255,255,.14), 0 0 0 4px rgba(255,255,255,.7); pointer-events: none; transform: translate(-50%, -50%); transition: left .12s ease, top .12s ease; }.ddas-microscope__element-overlay { position: absolute; right: 18px; bottom: 18px; padding: 9px 11px; border-radius: 9px; background: rgba(21, 38, 60, .9); color: #fff; font-size: 13px; font-weight: 800; }
++@media (prefers-reduced-motion: reduce) { .counterfactual-lane, .ddas-microscope__lens { transition: none; } }
++@media (max-width: 760px) { .data-counterfactual__header, .ddas-microscope__header { display: grid; }.ddas-microscope__header p { text-align: left; }.data-counterfactual__comparison { grid-template-columns: 1fr; }.ddas-microscope__controls { display: grid; grid-template-columns: 1fr; }.ddas-microscope__controls button { min-height: 52px; width: 100%; }.ddas-microscope__canvas { min-height: 240px; }.ddas-microscope__thumbnail .paper-crop { height: 54px; }.data-counterfactual button { flex: 1; } }
+
+## src\main.tsx
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-3-before\src\main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\main.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\main.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\main.tsx"
+index c09226f..c7463c1 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\src\\main.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\main.tsx"
+@@ -1,17 +1,18 @@
+ import React from 'react';
+ import ReactDOM from 'react-dom/client';
+ import App from './App';
+ import './styles/tokens.css';
+ import './styles/paper.css';
+ import './styles/module-motion-a.css';
+ import './styles/module-motion-b.css';
+ import './styles/paper-figures.css';
+ import './styles/experience-foundation.css';
++import './styles/experience-data.css';
+ import './styles/step-concept-visual.css';
+ import './styles/elf-inspired.css';
+ 
+ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+   <React.StrictMode>
+     <App />
+   </React.StrictMode>
+ );
+
+## docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-3-before\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md" "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+index 6e3a6ee..e1daa3a 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-3-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+@@ -1,4 +1,6 @@
+ # MinerU2.5-Pro Redesign Progress
+ 
+ - Task 1 complete: test harness, shared contracts, and media registry. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
+ - Task 2 complete: shared PaperMedia/viewer and playback timeline primitives; reviewer Major findings repaired with PaperFigureCard context/error and visibility-state regression coverage. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
++- Task 3 checkpoint: added DataCounterfactual and DdasMicroscope with real local PaperMedia crops, stable chapter-state callbacks, keyboard/pointer/mobile controls, and reduced-motion handling. Tests: `npm test -- src/experiences/DataCounterfactual.test.tsx src/experiences/DdasMicroscope.test.tsx` (5 passed); build: `npm run build` (PASS); PaperSkill validator: PASS. Browser visual QA: NOT RUN — no browser connection available.
++- Task 3 review fix: page DDAS now reports/restores `random|cluster|ddas`; Figure 3 element views are reversible; the single control group preserves text/formula/table actions on mobile as full-width 52px controls; cluster thumbnails use PaperMedia fallbacks; the 512-dimensional ViT-base fact appears once. Tests: targeted 8 passed; full suite 15 passed; build and validator PASS.

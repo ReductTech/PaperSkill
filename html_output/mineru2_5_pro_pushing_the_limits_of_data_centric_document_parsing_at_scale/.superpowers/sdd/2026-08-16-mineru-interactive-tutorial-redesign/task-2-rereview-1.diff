@@ -1,0 +1,851 @@
+# Task 2 final non-Git re-review package
+
+
+## src\components\PaperMedia.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\components\PaperMedia.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperMedia.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperMedia.test.tsx"
+index e69de29..0510e19 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperMedia.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperMedia.test.tsx"
+@@ -0,0 +1,33 @@
++import { fireEvent, render, screen } from '@testing-library/react';
++import { describe, expect, it } from 'vitest';
++import { PaperMedia } from './PaperMedia';
++
++describe('PaperMedia', () => {
++  it('renders a local crop and preserves its label when the image fails', () => {
++    render(<PaperMedia assetId="omni-layout" cropId="doubleColumn" label="论文原图节选" />);
++
++    const image = screen.getByRole('img');
++    expect(image).toHaveAttribute('src', expect.stringContaining('real-case-layout-diversity.png'));
++    expect(screen.getByText('论文原图节选')).toBeVisible();
++
++    fireEvent.error(image);
++
++    expect(screen.getByRole('status')).toHaveTextContent('图片暂时无法显示');
++    expect(screen.getByText('论文原图节选')).toBeVisible();
++    expect(screen.getByRole('link', { name: /来源/ })).toBeVisible();
++  });
++
++  it('opens a portal dialog and restores focus to its full-view trigger after Escape', () => {
++    render(<PaperMedia assetId="omni-layout" cropId="doubleColumn" label="论文原图节选" />);
++
++    const trigger = screen.getByRole('button', { name: /查看完整图片/ });
++    trigger.focus();
++    fireEvent.click(trigger);
++
++    expect(screen.getByRole('dialog')).toBeVisible();
++    fireEvent.keyDown(window, { key: 'Escape' });
++
++    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
++    expect(trigger).toHaveFocus();
++  });
++});
+
+## src\components\PaperMedia.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\components\PaperMedia.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperMedia.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperMedia.tsx"
+index e69de29..edb54c0 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperMedia.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperMedia.tsx"
+@@ -0,0 +1,46 @@
++import { useMemo, useState } from 'react';
++import { getMediaAsset, type MediaAssetId } from '../data/media';
++import type { MediaCrop } from '../types';
++import { PaperFigureViewer, type PaperFigureHotspot } from './PaperFigureCard';
++
++export interface PaperMediaProps {
++  assetId: MediaAssetId;
++  cropId?: string;
++  label: '论文原图节选' | '基于论文重绘' | '教学示意';
++  caption?: string;
++  hotspots?: readonly PaperFigureHotspot[];
++  className?: string;
++}
++
++function cropStyle(crop: MediaCrop | undefined, width?: number, height?: number): React.CSSProperties {
++  const ratio = crop && width && height
++    ? (width * (crop.width / 100)) / (height * (crop.height / 100))
++    : width && height ? width / height : 16 / 9;
++  return {
++    '--paper-crop-aspect': String(ratio),
++    '--paper-crop-image-width': `${10000 / (crop?.width ?? 100)}%`,
++    '--paper-crop-image-left': `${-((crop?.x ?? 0) / (crop?.width ?? 100)) * 100}%`,
++    '--paper-crop-image-top': `${-((crop?.y ?? 0) / (crop?.height ?? 100)) * 100}%`,
++  } as React.CSSProperties;
++}
++
++export function PaperMedia({ assetId, cropId, label, caption, hotspots, className }: PaperMediaProps) {
++  const asset = getMediaAsset(assetId);
++  const crop = cropId ? asset.crops?.[cropId] : undefined;
++  const [failed, setFailed] = useState(false);
++  const [viewerOpen, setViewerOpen] = useState(false);
++  const style = useMemo(() => cropStyle(crop, asset.width, asset.height), [asset.height, asset.width, crop]);
++
++  return <figure className={`paper-media ${className ?? ''}`.trim()}>
++    <span className="source-tag paper-media__label">{label}</span>
++    <div className={`paper-crop ${failed ? 'paper-crop--failed' : ''}`} style={style}>
++      {failed ? <div className="paper-media__fallback" role="status"><strong>图片暂时无法显示</strong><span>本地图片不可用；说明和来源链接仍然保留。</span></div> : <>
++        <img src={asset.src} alt={asset.alt} width={asset.width} height={asset.height} loading="lazy" decoding="async" onError={() => setFailed(true)} />
++        <button type="button" className="viewer-trigger" aria-label="查看完整图片" onClick={() => setViewerOpen(true)}><span>查看完整图片</span></button>
++      </>}
++    </div>
++    {caption ? <figcaption>{caption}</figcaption> : null}
++    {asset.source ? <a className="paper-media__source" href={asset.source.url} target="_blank" rel="noreferrer">来源：{asset.source.title}</a> : null}
++    <PaperFigureViewer open={viewerOpen} src={asset.src} alt={asset.alt} title={caption ?? asset.alt} width={asset.width} height={asset.height} hotspots={hotspots} onClose={() => setViewerOpen(false)} />
++  </figure>;
++}
+
+## src\hooks\usePlaybackTimeline.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\hooks\usePlaybackTimeline.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\hooks\\usePlaybackTimeline.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\hooks\\usePlaybackTimeline.test.tsx"
+index e69de29..bca2f3f 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\hooks\\usePlaybackTimeline.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\hooks\\usePlaybackTimeline.test.tsx"
+@@ -0,0 +1,42 @@
++import { act, renderHook } from '@testing-library/react';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { usePlaybackTimeline } from './usePlaybackTimeline';
++
++describe('usePlaybackTimeline', () => {
++  afterEach(() => {
++    delete (document as unknown as { hidden?: boolean }).hidden;
++    vi.useRealTimers();
++    vi.unstubAllGlobals();
++  });
++
++  it('advances through beats, seeks by progress, and pauses when visibility changes', () => {
++    vi.useFakeTimers();
++    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => setTimeout(() => callback(performance.now()), 16) as unknown as number);
++    vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
++    const timeline = renderHook(() => usePlaybackTimeline({ durationMs: 24000, beatMs: [0, 8000, 16000, 24000] }));
++
++    act(() => timeline.result.current.play());
++    act(() => vi.advanceTimersByTime(8100));
++    expect(timeline.result.current.activeBeat).toBe(1);
++
++    act(() => timeline.result.current.seek(0.75));
++    expect(timeline.result.current.currentMs).toBe(18000);
++
++    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
++    act(() => document.dispatchEvent(new Event('visibilitychange')));
++    expect(timeline.result.current.playing).toBe(false);
++  });
++
++  it('keeps playing for a visible visibilitychange and pauses only after the document becomes hidden', () => {
++    const timeline = renderHook(() => usePlaybackTimeline({ durationMs: 24000, beatMs: [0, 8000, 16000, 24000] }));
++
++    act(() => timeline.result.current.play());
++    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
++    act(() => document.dispatchEvent(new Event('visibilitychange')));
++    expect(timeline.result.current.playing).toBe(true);
++
++    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
++    act(() => document.dispatchEvent(new Event('visibilitychange')));
++    expect(timeline.result.current.playing).toBe(false);
++  });
++});
+
+## src\hooks\usePlaybackTimeline.ts
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\hooks\usePlaybackTimeline.ts', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\hooks\\usePlaybackTimeline.ts" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\hooks\\usePlaybackTimeline.ts"
+index e69de29..865ea62 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\hooks\\usePlaybackTimeline.ts"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\hooks\\usePlaybackTimeline.ts"
+@@ -0,0 +1,105 @@
++import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
++
++export interface PlaybackTimelineOptions {
++  durationMs: number;
++  beatMs: readonly number[];
++  initialMs?: number;
++}
++
++export interface PlaybackTimelineState {
++  currentMs: number;
++  progress: number;
++  activeBeat: number;
++  playing: boolean;
++  reducedMotion: boolean;
++  play(): void;
++  pause(): void;
++  toggle(): void;
++  seek(progress: number): void;
++  step(delta: -1 | 1): void;
++  replay(): void;
++}
++
++const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
++
++export function usePlaybackTimeline({ durationMs, beatMs, initialMs = 0 }: PlaybackTimelineOptions): PlaybackTimelineState {
++  const safeDuration = Math.max(0, durationMs);
++  const safeBeats = useMemo(() => [...beatMs].map((beat) => clamp(beat, 0, safeDuration)).sort((a, b) => a - b), [beatMs, safeDuration]);
++  const [currentMs, setCurrentMs] = useState(() => clamp(initialMs, 0, safeDuration));
++  const [playing, setPlaying] = useState(false);
++  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
++  const currentRef = useRef(currentMs);
++  const playingRef = useRef(false);
++  const frameRef = useRef<number | null>(null);
++  const startedAtRef = useRef(0);
++
++  const setPosition = useCallback((next: number) => {
++    const clamped = clamp(next, 0, safeDuration);
++    currentRef.current = clamped;
++    setCurrentMs(clamped);
++  }, [safeDuration]);
++
++  const pause = useCallback(() => {
++    playingRef.current = false;
++    setPlaying(false);
++    if (frameRef.current !== null) {
++      window.cancelAnimationFrame(frameRef.current);
++      frameRef.current = null;
++    }
++  }, []);
++
++  const play = useCallback(() => {
++    if (reducedMotion || safeDuration === 0 || playingRef.current) return;
++    if (currentRef.current >= safeDuration) setPosition(0);
++    startedAtRef.current = performance.now() - currentRef.current;
++    playingRef.current = true;
++    setPlaying(true);
++    const advance = (timestamp: number) => {
++      if (!playingRef.current) return;
++      const next = clamp(timestamp - startedAtRef.current, 0, safeDuration);
++      setPosition(next);
++      if (next >= safeDuration) { pause(); return; }
++      frameRef.current = window.requestAnimationFrame(advance);
++    };
++    frameRef.current = window.requestAnimationFrame(advance);
++  }, [pause, reducedMotion, safeDuration, setPosition]);
++
++  const seek = useCallback((progress: number) => {
++    setPosition(clamp(progress, 0, 1) * safeDuration);
++    if (playingRef.current) startedAtRef.current = performance.now() - currentRef.current;
++  }, [safeDuration, setPosition]);
++
++  const step = useCallback((delta: -1 | 1) => {
++    const active = safeBeats.reduce((index, beat, candidate) => (currentRef.current >= beat ? candidate : index), 0);
++    const nextIndex = clamp(active + delta, 0, Math.max(0, safeBeats.length - 1));
++    setPosition(safeBeats[nextIndex] ?? 0);
++  }, [safeBeats, setPosition]);
++
++  const toggle = useCallback(() => { if (playingRef.current) pause(); else play(); }, [pause, play]);
++  const replay = useCallback(() => { setPosition(0); play(); }, [play, setPosition]);
++
++  useEffect(() => {
++    const query = window.matchMedia?.('(prefers-reduced-motion: reduce)');
++    if (!query) return undefined;
++    const update = () => {
++      setReducedMotion(query.matches);
++      if (query.matches) pause();
++    };
++    query.addEventListener?.('change', update);
++    return () => query.removeEventListener?.('change', update);
++  }, [pause]);
++
++  useEffect(() => {
++    const pauseWhenVisibilityChanges = () => {
++      if (document.hidden) pause();
++    };
++    document.addEventListener('visibilitychange', pauseWhenVisibilityChanges);
++    return () => document.removeEventListener('visibilitychange', pauseWhenVisibilityChanges);
++  }, [pause]);
++
++  useEffect(() => () => pause(), [pause]);
++
++  const progress = safeDuration === 0 ? 0 : currentMs / safeDuration;
++  const activeBeat = safeBeats.reduce((index, beat, candidate) => (currentMs >= beat ? candidate : index), 0);
++  return { currentMs, progress, activeBeat, playing, reducedMotion, play, pause, toggle, seek, step, replay };
++}
+
+## src\styles\experience-foundation.css
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\styles\experience-foundation.css', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\styles\\experience-foundation.css" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-foundation.css"
+index e69de29..3f34363 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\styles\\experience-foundation.css"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\styles\\experience-foundation.css"
+@@ -0,0 +1,13 @@
++.source-tag { display: inline-flex; min-height: 24px; align-items: center; width: max-content; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 800; }
++.paper-media { display: grid; gap: 9px; margin: 0; }
++.paper-media__label { background: var(--blue-soft); color: var(--blue); }
++.paper-crop { position: relative; aspect-ratio: var(--paper-crop-aspect, 16 / 9); overflow: hidden; background: #f5f4f1; border: 1px solid var(--line); border-radius: 12px; }
++.paper-crop > img { position: absolute; width: var(--paper-crop-image-width, 100%); height: auto; max-width: none; left: var(--paper-crop-image-left, 0); top: var(--paper-crop-image-top, 0); }
++.viewer-trigger { position: absolute; inset: 0; display: grid; place-items: end; padding: 10px; background: transparent; border: 0; color: #fff; cursor: zoom-in; }
++.viewer-trigger > span { min-height: 44px; display: inline-grid; place-items: center; padding: 0 12px; background: rgba(10, 26, 44, .88); border-radius: 999px; font-size: 13px; font-weight: 800; }
++.viewer-trigger:focus-visible, .paper-media__source:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
++.paper-media__fallback { position: absolute; inset: 0; display: grid; place-content: center; gap: 8px; padding: 20px; color: var(--muted); text-align: center; }
++.paper-media__fallback strong { color: var(--navy); }
++.paper-media figcaption { color: var(--muted); line-height: 1.5; }
++.paper-media__source { min-height: 44px; display: inline-flex; align-items: center; color: var(--blue); font-weight: 800; }
++@media (prefers-reduced-motion: reduce) { .paper-crop *, .viewer-trigger { animation: none !important; transition: none !important; } }
+
+## src\components\PaperFigureCard.tsx
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-2-before\src\components\PaperFigureCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\components\PaperFigureCard.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperFigureCard.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperFigureCard.tsx"
+index 27f82ee..9d4db79 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperFigureCard.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperFigureCard.tsx"
+@@ -1,387 +1,160 @@
+ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+ import { createPortal } from 'react-dom';
+ import { GlossaryText } from './Glossary';
+ 
+ export type PaperFigureHotspot = {
+   id: string;
+   label: string;
+   description: string;
+-  /** Left edge as a percentage of the original figure width. */
+   x: number;
+-  /** Top edge as a percentage of the original figure height. */
+   y: number;
+-  /** Region width as a percentage of the original figure width. */
+   width: number;
+-  /** Region height as a percentage of the original figure height. */
+   height: number;
+ };
+ 
+ export type PaperFigureCardProps = {
+   src: string;
+   alt: string;
+   figure: string;
+   title: string;
+   intro: string;
+   sourceHref: string;
+   width?: number;
+   height?: number;
+   compact?: boolean;
+   hotspots?: readonly PaperFigureHotspot[];
+-  /** Defaults to an unchanged paper figure. Hotspots are always a teaching overlay. */
+   provenance?: 'paper-original' | 'paper-redraw';
+ };
+ 
+-type ViewerState = {
+-  hotspotId: string | null;
+-  showFullFigure: boolean;
+-  expanded: boolean;
+-};
++export interface PaperFigureViewerProps {
++  open: boolean;
++  src: string;
++  alt: string;
++  title: string;
++  width?: number;
++  height?: number;
++  hotspots?: readonly PaperFigureHotspot[];
++  initialHotspotId?: string;
++  /** Optional context keeps legacy PaperFigureCard viewers feature-equivalent. */
++  intro?: string;
++  figure?: string;
++  sourceHref?: string;
++  provenance?: 'paper-original' | 'paper-redraw';
++  boundaryText?: string;
++  onClose: () => void;
++}
+ 
+ function clamp(value: number, min: number, max: number) {
+   return Math.min(max, Math.max(min, value));
+ }
+ 
+ function normaliseHotspot(hotspot: PaperFigureHotspot): PaperFigureHotspot {
+   const x = clamp(Number.isFinite(hotspot.x) ? hotspot.x : 0, 0, 99.5);
+   const y = clamp(Number.isFinite(hotspot.y) ? hotspot.y : 0, 0, 99.5);
+   const width = clamp(Number.isFinite(hotspot.width) ? hotspot.width : 1, 0.5, 100 - x);
+   const height = clamp(Number.isFinite(hotspot.height) ? hotspot.height : 1, 0.5, 100 - y);
+   return { ...hotspot, x, y, width, height };
+ }
+ 
+-export function PaperFigureCard({
+-  src,
+-  alt,
+-  figure,
+-  title,
+-  intro,
+-  sourceHref,
+-  width,
+-  height,
+-  compact = false,
+-  hotspots = [],
+-  provenance = 'paper-original',
+-}: PaperFigureCardProps) {
++export function PaperFigureViewer({
++  open, src, alt, title, width, height, hotspots = [], initialHotspotId, intro,
++  figure, sourceHref, provenance = 'paper-original', boundaryText, onClose,
++}: PaperFigureViewerProps) {
+   const dialogId = useId();
+   const dialogRef = useRef<HTMLDivElement | null>(null);
+   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+   const returnFocusRef = useRef<HTMLElement | null>(null);
+-  const [viewer, setViewer] = useState<ViewerState | null>(null);
++  const [activeHotspotId, setActiveHotspotId] = useState<string | null>(initialHotspotId ?? null);
++  const [showFullFigure, setShowFullFigure] = useState(!initialHotspotId);
++  const [expanded, setExpanded] = useState(false);
+   const [imageFailed, setImageFailed] = useState(false);
+-  const [naturalSize, setNaturalSize] = useState({ width: width ?? 0, height: height ?? 0 });
+-
+-  const safeHotspots = useMemo(
+-    () => hotspots.map(normaliseHotspot),
+-    [hotspots],
+-  );
+-  const activeHotspot = viewer?.hotspotId
+-    ? safeHotspots.find((hotspot) => hotspot.id === viewer.hotspotId) ?? null
+-    : null;
+-  const figureRatio = naturalSize.width > 0 && naturalSize.height > 0
+-    ? naturalSize.width / naturalSize.height
+-    : 16 / 9;
+-  const cropRatio = activeHotspot
+-    ? figureRatio * (activeHotspot.width / activeHotspot.height)
+-    : figureRatio;
+-  const isRedraw = provenance === 'paper-redraw';
+-  const provenanceLabel = isRedraw ? `基于论文重绘 · ${figure}` : `论文原图 · ${figure}`;
+-  const boundaryText = isRedraw
+-    ? '图形依据论文机制重新绘制；数字与流程来自论文，视觉编排和中文热点属于教学表达。'
+-    : '图片及图中数据来自论文原图；彩色热点、局部裁剪与中文解释是本页添加的教学标注。';
+-  const viewerOpen = viewer !== null;
++  const safeHotspots = useMemo(() => hotspots.map(normaliseHotspot), [hotspots]);
++  const activeHotspot = safeHotspots.find((hotspot) => hotspot.id === activeHotspotId) ?? null;
++  const figureRatio = width && height ? width / height : 16 / 9;
++  const cropRatio = activeHotspot ? figureRatio * (activeHotspot.width / activeHotspot.height) : figureRatio;
+ 
+   useEffect(() => {
+-    setImageFailed(false);
+-    setNaturalSize({ width: width ?? 0, height: height ?? 0 });
+-  }, [height, src, width]);
++    if (!open) return;
++    setActiveHotspotId(initialHotspotId ?? null);
++    setShowFullFigure(!initialHotspotId);
++    setExpanded(false);
++  }, [initialHotspotId, open]);
+ 
+-  useEffect(() => {
+-    if (!viewerOpen) return undefined;
++  useEffect(() => { setImageFailed(false); }, [open, src]);
+ 
++  useEffect(() => {
++    if (!open) return undefined;
++    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+     const previousOverflow = document.body.style.overflow;
+     document.body.style.overflow = 'hidden';
+     window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+-
+     const onKeyDown = (event: KeyboardEvent) => {
+-      if (event.key === 'Escape') {
+-        event.preventDefault();
+-        setViewer(null);
+-        return;
+-      }
++      if (event.key === 'Escape') { event.preventDefault(); onClose(); return; }
+       if (event.key !== 'Tab') return;
+-
+-      const focusable = Array.from(
+-        dialogRef.current?.querySelectorAll<HTMLElement>(
+-          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+-        ) ?? [],
+-      ).filter((element) => !element.hasAttribute('hidden'));
+-      if (focusable.length === 0) return;
+-
++      const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
++        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
++      ) ?? []).filter((element) => !element.hasAttribute('hidden'));
++      if (!focusable.length) return;
+       const first = focusable[0];
+       const last = focusable[focusable.length - 1];
+-      if (event.shiftKey && document.activeElement === first) {
+-        event.preventDefault();
+-        last.focus();
+-      } else if (!event.shiftKey && document.activeElement === last) {
+-        event.preventDefault();
+-        first.focus();
+-      }
++      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
++      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+     };
+-
+     window.addEventListener('keydown', onKeyDown);
+     return () => {
+       document.body.style.overflow = previousOverflow;
+       window.removeEventListener('keydown', onKeyDown);
+       window.requestAnimationFrame(() => returnFocusRef.current?.focus());
+     };
+-  }, [viewerOpen]);
+-
+-  const rememberTrigger = (element: HTMLElement) => {
+-    returnFocusRef.current = element;
+-  };
+-
+-  const openFullFigure = (event: React.MouseEvent<HTMLButtonElement>) => {
+-    if (imageFailed) return;
+-    rememberTrigger(event.currentTarget);
+-    setViewer({ hotspotId: null, showFullFigure: true, expanded: false });
+-  };
+-
+-  const openHotspot = (hotspotId: string, event: React.MouseEvent<HTMLButtonElement>) => {
+-    if (imageFailed) return;
+-    rememberTrigger(event.currentTarget);
+-    setViewer({ hotspotId, showFullFigure: false, expanded: false });
+-  };
+-
+-  const chooseHotspotInViewer = (hotspotId: string) => {
+-    setViewer((current) => current
+-      ? { ...current, hotspotId, showFullFigure: false }
+-      : current);
+-  };
+-
+-  const mediaAspectStyle: React.CSSProperties = { aspectRatio: figureRatio };
+-  const cropImageStyle: React.CSSProperties | undefined = activeHotspot && !viewer?.showFullFigure
+-    ? {
+-        width: `${10000 / activeHotspot.width}%`,
+-        height: 'auto',
+-        maxWidth: 'none',
+-        left: `${(-activeHotspot.x / activeHotspot.width) * 100}%`,
+-        top: `${(-activeHotspot.y / activeHotspot.height) * 100}%`,
+-      }
+-    : undefined;
+-
+-  return (
+-    <figure className={`paper-figure-card ${compact ? 'paper-figure-card--compact' : ''}`}>
+-      <div className="paper-figure-card__copy">
+-        <span className={`source-tag ${isRedraw ? 'teaching' : 'paper'}`}>{provenanceLabel}</span>
+-        <h3><GlossaryText text={title} /></h3>
+-        <p><GlossaryText text={intro} /></p>
+-        <small>
+-          {safeHotspots.length > 0
+-            ? '选择图中编号查看局部与中文解释；点击图像空白处查看整图。'
+-            : '点击图像可在对话框中查看本地原尺寸图。'}
+-        </small>
++  }, [onClose, open]);
++
++  if (!open || typeof document === 'undefined') return null;
++  const cropImageStyle: React.CSSProperties | undefined = activeHotspot && !showFullFigure ? {
++    width: `${10000 / activeHotspot.width}%`, height: 'auto', maxWidth: 'none',
++    left: `${(-activeHotspot.x / activeHotspot.width) * 100}%`, top: `${(-activeHotspot.y / activeHotspot.height) * 100}%`,
++  } : undefined;
++
++  return createPortal(
++    <div className="paper-figure-viewer" role="presentation" onPointerDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
++      <div ref={dialogRef} className={`paper-figure-viewer__dialog ${expanded ? 'is-expanded' : ''}`} role="dialog" aria-modal="true" aria-labelledby={`${dialogId}-title`} aria-describedby={boundaryText ? `${dialogId}-boundary` : undefined}>
++        <header className="paper-figure-viewer__toolbar"><div><span>{provenance === 'paper-redraw' ? '基于论文重绘' : '论文原图节选'}</span><strong id={`${dialogId}-title`}>{activeHotspot && !showFullFigure ? activeHotspot.label : title}</strong></div><div>
++          <button type="button" onClick={() => setExpanded((current) => !current)}>{expanded ? '退出全屏' : '铺满窗口'}</button>
++          <button ref={closeButtonRef} type="button" className="paper-figure-viewer__close" aria-label="关闭论文图片查看器" onClick={onClose}>关闭 <span aria-hidden="true">×</span></button>
++        </div></header>
++        <div className="paper-figure-viewer__body"><div className="paper-figure-viewer__stage"><div className={`paper-figure-viewer__viewport ${activeHotspot && !showFullFigure ? 'is-cropped' : 'is-full'}`} style={{ aspectRatio: activeHotspot && !showFullFigure ? cropRatio : figureRatio }}>
++          {imageFailed ? <div className="paper-figure-card__fallback" role="status"><strong>图片暂时无法显示</strong>{sourceHref ? <a href={sourceHref} target="_blank" rel="noreferrer">打开论文出处</a> : null}</div> : <img src={src} alt={activeHotspot && !showFullFigure ? `${alt}；局部：${activeHotspot.label}` : alt} style={cropImageStyle} onError={() => setImageFailed(true)} />}
++        </div></div><aside className="paper-figure-viewer__explanation">
++          <span className={`source-tag ${provenance === 'paper-redraw' ? 'teaching' : 'paper'}`}>{activeHotspot && !showFullFigure ? '教学示意' : provenance === 'paper-redraw' ? '基于论文重绘' : '论文原图节选'}</span>
++          <h4>{activeHotspot && !showFullFigure ? activeHotspot.label : '完整图片'}</h4>
++          <p>{activeHotspot && !showFullFigure ? activeHotspot.description : intro ?? '在本地查看完整图片，或切换到图中的讲解区域。'}</p>
++          {activeHotspot ? <button type="button" className="paper-figure-viewer__view-toggle" onClick={() => setShowFullFigure((current) => !current)}>{showFullFigure ? `返回局部：${activeHotspot.label}` : '在整图中查看位置'}</button> : null}
++          {safeHotspots.length ? <div className="paper-figure-viewer__sections"><strong>切换图中模块</strong><div>{safeHotspots.map((hotspot, index) => <button type="button" key={hotspot.id} className={activeHotspot?.id === hotspot.id && !showFullFigure ? 'is-active' : ''} aria-pressed={activeHotspot?.id === hotspot.id && !showFullFigure} onClick={() => { setActiveHotspotId(hotspot.id); setShowFullFigure(false); }}><i aria-hidden="true">{index + 1}</i><span>{hotspot.label}</span></button>)}</div></div> : null}
++          {boundaryText ? <div className="paper-figure-viewer__boundary" id={`${dialogId}-boundary`}><strong>{provenance === 'paper-redraw' ? '重绘边界' : '事实与教学层的边界'}</strong><p>{boundaryText}</p></div> : null}
++          {sourceHref ? <a className="paper-figure-viewer__source" href={sourceHref} target="_blank" rel="noreferrer">在论文中核对 {figure ?? title} ↗</a> : null}
++        </aside></div>
+       </div>
+-
+-      <div className="paper-figure-card__media-column">
+-        <div
+-          className={`paper-figure-card__media ${imageFailed ? 'has-error' : ''}`}
+-          style={mediaAspectStyle}
+-        >
+-          {imageFailed ? (
+-            <div className="paper-figure-card__fallback" role="status">
+-              <span aria-hidden="true">▧</span>
+-              <strong>论文图暂时无法加载</strong>
+-              <p>教学说明仍可阅读，也可以前往论文出处核对原图。</p>
+-              <a href={sourceHref} target="_blank" rel="noreferrer">打开论文出处 ↗</a>
+-            </div>
+-          ) : (
+-            <>
+-              <img
+-                src={src}
+-                alt={alt}
+-                width={width}
+-                height={height}
+-                loading="lazy"
+-                decoding="async"
+-                onLoad={(event) => {
+-                  const image = event.currentTarget;
+-                  setImageFailed(false);
+-                  setNaturalSize({ width: image.naturalWidth, height: image.naturalHeight });
+-                }}
+-                onError={() => setImageFailed(true)}
+-              />
+-              <button
+-                type="button"
+-                className="paper-figure-card__full-trigger"
+-                aria-label={`在对话框中查看 ${figure} 整张图`}
+-                onClick={openFullFigure}
+-              >
+-                <span>查看整图 ↗</span>
+-              </button>
+-              {safeHotspots.map((hotspot, index) => (
+-                <button
+-                  type="button"
+-                  key={hotspot.id}
+-                  className="paper-figure-card__hotspot"
+-                  style={{
+-                    left: `${hotspot.x}%`,
+-                    top: `${hotspot.y}%`,
+-                    width: `${hotspot.width}%`,
+-                    height: `${hotspot.height}%`,
+-                  }}
+-                  aria-label={`放大区域 ${index + 1}：${hotspot.label}`}
+-                  data-label={hotspot.label}
+-                  onClick={(event) => openHotspot(hotspot.id, event)}
+-                >
+-                  <span aria-hidden="true">{index + 1}</span>
+-                </button>
+-              ))}
+-            </>
+-          )}
+-        </div>
+-
+-        {safeHotspots.length > 0 && !imageFailed ? (
+-          <div className="paper-figure-card__hotspot-list" aria-label={`${figure} 图中分区`}>
+-            <span>图中分区</span>
+-            <div>
+-              {safeHotspots.map((hotspot, index) => (
+-                <button
+-                  type="button"
+-                  key={hotspot.id}
+-                  onClick={(event) => openHotspot(hotspot.id, event)}
+-                >
+-                  <i aria-hidden="true">{index + 1}</i>{hotspot.label}
+-                </button>
+-              ))}
+-            </div>
+-          </div>
+-        ) : null}
+-      </div>
+-
+-      <figcaption>
+-        <span>{boundaryText}</span>
+-        <a href={sourceHref} target="_blank" rel="noreferrer">核对论文出处 ↗</a>
+-      </figcaption>
+-
+-      {viewer && typeof document !== 'undefined' ? createPortal((
+-        <div
+-          className="paper-figure-viewer"
+-          role="presentation"
+-          onPointerDown={(event) => {
+-            if (event.target === event.currentTarget) setViewer(null);
+-          }}
+-        >
+-          <div
+-            ref={dialogRef}
+-            className={`paper-figure-viewer__dialog ${viewer.expanded ? 'is-expanded' : ''}`}
+-            role="dialog"
+-            aria-modal="true"
+-            aria-labelledby={`${dialogId}-title`}
+-            aria-describedby={`${dialogId}-boundary`}
+-          >
+-            <header className="paper-figure-viewer__toolbar">
+-              <div>
+-                <span>{provenanceLabel}</span>
+-                <strong id={`${dialogId}-title`}>
+-                  {activeHotspot && !viewer.showFullFigure ? activeHotspot.label : title}
+-                </strong>
+-              </div>
+-              <div>
+-                <button
+-                  type="button"
+-                  onClick={() => setViewer((current) => current
+-                    ? { ...current, expanded: !current.expanded }
+-                    : current)}
+-                >
+-                  {viewer.expanded ? '退出铺满' : '铺满窗口'}
+-                </button>
+-                <button
+-                  ref={closeButtonRef}
+-                  type="button"
+-                  className="paper-figure-viewer__close"
+-                  aria-label="关闭论文图查看器"
+-                  onClick={() => setViewer(null)}
+-                >
+-                  关闭 <span aria-hidden="true">×</span>
+-                </button>
+-              </div>
+-            </header>
+-
+-            <div className="paper-figure-viewer__body">
+-              <div className="paper-figure-viewer__stage">
+-                <div
+-                  className={`paper-figure-viewer__viewport ${activeHotspot && !viewer.showFullFigure ? 'is-cropped' : 'is-full'}`}
+-                  style={{ aspectRatio: activeHotspot && !viewer.showFullFigure ? cropRatio : figureRatio }}
+-                >
+-                  {imageFailed ? (
+-                    <div className="paper-figure-card__fallback" role="status">
+-                      <strong>论文图暂时无法加载</strong>
+-                      <a href={sourceHref} target="_blank" rel="noreferrer">打开论文出处 ↗</a>
+-                    </div>
+-                  ) : (
+-                    <img
+-                      src={src}
+-                      alt={activeHotspot && !viewer.showFullFigure ? `${alt}；局部：${activeHotspot.label}` : alt}
+-                      style={cropImageStyle}
+-                      onError={() => setImageFailed(true)}
+-                    />
+-                  )}
+-                </div>
+-              </div>
+-
+-              <aside className="paper-figure-viewer__explanation">
+-                <span className={`source-tag ${isRedraw ? 'teaching' : 'paper'}`}>
+-                  {activeHotspot && !viewer.showFullFigure ? '教学局部讲解' : provenanceLabel}
+-                </span>
+-                <h4>{activeHotspot && !viewer.showFullFigure ? activeHotspot.label : '整图阅读顺序'}</h4>
+-                <p>{activeHotspot && !viewer.showFullFigure
+-                  ? activeHotspot.description
+-                  : intro}</p>
+-
+-                {activeHotspot ? (
+-                  <button
+-                    type="button"
+-                    className="paper-figure-viewer__view-toggle"
+-                    onClick={() => setViewer((current) => current
+-                      ? { ...current, showFullFigure: !current.showFullFigure }
+-                      : current)}
+-                  >
+-                    {viewer.showFullFigure ? `返回局部：${activeHotspot.label}` : '在整图中查看位置'}
+-                  </button>
+-                ) : null}
+-
+-                {safeHotspots.length > 0 ? (
+-                  <div className="paper-figure-viewer__sections">
+-                    <strong>切换图中模块</strong>
+-                    <div>
+-                      {safeHotspots.map((hotspot, index) => (
+-                        <button
+-                          type="button"
+-                          key={hotspot.id}
+-                          className={activeHotspot?.id === hotspot.id && !viewer.showFullFigure ? 'is-active' : ''}
+-                          aria-pressed={activeHotspot?.id === hotspot.id && !viewer.showFullFigure}
+-                          onClick={() => chooseHotspotInViewer(hotspot.id)}
+-                        >
+-                          <i aria-hidden="true">{index + 1}</i>
+-                          <span>{hotspot.label}</span>
+-                        </button>
+-                      ))}
+-                    </div>
+-                  </div>
+-                ) : null}
+-
+-                <div className="paper-figure-viewer__boundary" id={`${dialogId}-boundary`}>
+-                  <strong>{isRedraw ? '重绘边界' : '事实与教学层的边界'}</strong>
+-                  <p>{boundaryText}</p>
+-                </div>
+-                <a className="paper-figure-viewer__source" href={sourceHref} target="_blank" rel="noreferrer">
+-                  在论文中核对 {figure} ↗
+-                </a>
+-              </aside>
+-            </div>
+-          </div>
+-        </div>
+-      ), document.body) : null}
+-    </figure>
++    </div>, document.body,
+   );
+ }
++
++export function PaperFigureCard({ src, alt, figure, title, intro, sourceHref, width, height, compact = false, hotspots = [], provenance = 'paper-original' }: PaperFigureCardProps) {
++  const [viewerHotspotId, setViewerHotspotId] = useState<string | null>(null);
++  const [imageFailed, setImageFailed] = useState(false);
++  const [naturalSize, setNaturalSize] = useState({ width: width ?? 0, height: height ?? 0 });
++  const safeHotspots = useMemo(() => hotspots.map(normaliseHotspot), [hotspots]);
++  const ratio = naturalSize.width > 0 && naturalSize.height > 0 ? naturalSize.width / naturalSize.height : 16 / 9;
++  const isRedraw = provenance === 'paper-redraw';
++  const provenanceLabel = isRedraw ? `基于论文重绘 · ${figure}` : `论文原图节选 · ${figure}`;
++  const boundaryText = isRedraw ? '图形依据论文机制重新绘制；中文标注属于教学表达。' : '图片来自论文原图；彩色热点与中文解释属于教学标注。';
++  useEffect(() => { setImageFailed(false); setNaturalSize({ width: width ?? 0, height: height ?? 0 }); }, [height, src, width]);
++  return <figure className={`paper-figure-card ${compact ? 'paper-figure-card--compact' : ''}`}>
++    <div className="paper-figure-card__copy"><span className={`source-tag ${isRedraw ? 'teaching' : 'paper'}`}>{provenanceLabel}</span><h3><GlossaryText text={title} /></h3><p><GlossaryText text={intro} /></p><small>点击图片可在对话框中查看本地原尺寸图。</small></div>
++    <div className="paper-figure-card__media-column"><div className={`paper-figure-card__media ${imageFailed ? 'has-error' : ''}`} style={{ aspectRatio: ratio }}>{imageFailed ? <div className="paper-figure-card__fallback" role="status"><strong>图片暂时无法显示</strong><p>教学说明仍可阅读，也可以前往论文出处核对原图。</p><a href={sourceHref} target="_blank" rel="noreferrer">打开论文出处</a></div> : <>
++      <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })} onError={() => setImageFailed(true)} />
++      <button type="button" className="paper-figure-card__full-trigger" aria-label={`在对话框中查看 ${figure} 整张图`} onClick={() => setViewerHotspotId('')}><span>查看整图 ↗</span></button>
++      {safeHotspots.map((hotspot, index) => <button type="button" key={hotspot.id} className="paper-figure-card__hotspot" style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, width: `${hotspot.width}%`, height: `${hotspot.height}%` }} aria-label={`放大区域 ${index + 1}：${hotspot.label}`} data-label={hotspot.label} onClick={() => setViewerHotspotId(hotspot.id)}><span aria-hidden="true">{index + 1}</span></button>)}
++    </>}</div>{safeHotspots.length > 0 && !imageFailed ? <div className="paper-figure-card__hotspot-list" aria-label={`${figure} 图中分区`}><span>图中分区</span><div>{safeHotspots.map((hotspot, index) => <button type="button" key={hotspot.id} onClick={() => setViewerHotspotId(hotspot.id)}><i aria-hidden="true">{index + 1}</i>{hotspot.label}</button>)}</div></div> : null}</div>
++    <figcaption><span>{boundaryText}</span><a href={sourceHref} target="_blank" rel="noreferrer">核对论文出处 ↗</a></figcaption>
++    <PaperFigureViewer open={viewerHotspotId !== null} src={src} alt={alt} title={title} width={width} height={height} hotspots={safeHotspots} initialHotspotId={viewerHotspotId || undefined} intro={intro} figure={figure} sourceHref={sourceHref} provenance={provenance} boundaryText={boundaryText} onClose={() => setViewerHotspotId(null)} />
++  </figure>;
++}
+
+## src\styles\paper-figures.css
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-2-before\src\styles\paper-figures.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\styles\paper-figures.css', LF will be replaced by CRLF the next time Git touches it
+
+## src\main.tsx
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-2-before\src\main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\main.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\main.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\main.tsx"
+index ecf36b8..c09226f 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\main.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\main.tsx"
+@@ -1,16 +1,17 @@
+ import React from 'react';
+ import ReactDOM from 'react-dom/client';
+ import App from './App';
+ import './styles/tokens.css';
+ import './styles/paper.css';
+ import './styles/module-motion-a.css';
+ import './styles/module-motion-b.css';
+ import './styles/paper-figures.css';
++import './styles/experience-foundation.css';
+ import './styles/step-concept-visual.css';
+ import './styles/elf-inspired.css';
+ 
+ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+   <React.StrictMode>
+     <App />
+   </React.StrictMode>
+ );
+
+## docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md
+warning: in the working copy of '.superpowers\sdd\2026-08-16-mineru-interactive-tutorial-redesign\task-2-before\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\docs\superpowers\progress\2026-08-16-mineru-interactive-tutorial-redesign.md', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md" "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+index 51e4002..6e3a6ee 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\docs\\superpowers\\progress\\2026-08-16-mineru-interactive-tutorial-redesign.md"
+@@ -1,3 +1,4 @@
+ # MinerU2.5-Pro Redesign Progress
+ 
+ - Task 1 complete: test harness, shared contracts, and media registry. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
++- Task 2 complete: shared PaperMedia/viewer and playback timeline primitives; reviewer Major findings repaired with PaperFigureCard context/error and visibility-state regression coverage. Tests: `npm test`; build: `npm run build`; PaperSkill validator: PASS.
+
+## src\components\PaperFigureCard.test.tsx
+warning: in the working copy of 'D:\paperskill\mineru2_5_pro_output\src\components\PaperFigureCard.test.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperFigureCard.test.tsx" "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperFigureCard.test.tsx"
+index e69de29..55d8f9a 100644
+--- "a/.superpowers\\sdd\\2026-08-16-mineru-interactive-tutorial-redesign\\task-2-before\\src\\components\\PaperFigureCard.test.tsx"
++++ "b/D:\\paperskill\\mineru2_5_pro_output\\src\\components\\PaperFigureCard.test.tsx"
+@@ -0,0 +1,30 @@
++import { fireEvent, render, screen, within } from '@testing-library/react';
++import { describe, expect, it } from 'vitest';
++import { PaperFigureCard } from './PaperFigureCard';
++
++describe('PaperFigureCard', () => {
++  it('preserves viewer context, boundary, source link, and an image-error fallback', () => {
++    render(<PaperFigureCard
++      src="images/figure.png"
++      alt="Figure alternative text"
++      figure="Figure 2"
++      title="Figure title"
++      intro="Viewer introduction"
++      sourceHref="https://example.com/paper#figure-2"
++      width={200}
++      height={100}
++      provenance="paper-redraw"
++    />);
++
++    fireEvent.click(screen.getByRole('button', { name: /Figure 2/ }));
++
++    const dialog = screen.getByRole('dialog');
++    expect(dialog).toHaveAttribute('aria-describedby');
++    expect(within(dialog).getByText('Viewer introduction')).toBeVisible();
++    expect(within(dialog).getAllByText(/基于论文重绘/).length).toBeGreaterThan(0);
++    expect(within(dialog).getByRole('link', { name: /在论文中核对 Figure 2/ })).toHaveAttribute('href', 'https://example.com/paper#figure-2');
++
++    fireEvent.error(within(dialog).getByRole('img'));
++    expect(within(dialog).getByRole('status')).toHaveTextContent('图片暂时无法显示');
++  });
++});
