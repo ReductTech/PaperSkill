@@ -146,7 +146,8 @@ export function GeneralistResults(_: WidgetProps) {
 }
 
 export function GeneralistFactors(_: WidgetProps) {
-  return <div className="sv-panel"><figure className="paper-figure"><a href="/images/starvla-figure5.png" target="_blank" rel="noreferrer" aria-label="打开论文 Figure 5 原图"><img src="/images/starvla-figure5.png" alt="论文 Figure 5：VLA 训练中的模型大小与批大小扩展趋势" /></a><figcaption>来源：论文 Figure 5</figcaption></figure><Feedback tone="green"><b>模型规模：</b>2B 到 4B 提升明显，而 4B 到 8B 的进一步增益不足 1%。</Feedback><Feedback tone="blue"><b>批大小：</b>性能随批大小增大持续提升，说明训练多样性是通用设置中的关键因素。</Feedback></div>;
+  const figure5Url = `${import.meta.env.BASE_URL}images/starvla-figure5.png`;
+  return <div className="sv-panel"><figure className="paper-figure"><a href={figure5Url} target="_blank" rel="noreferrer" aria-label="打开论文 Figure 5 原图"><img src={figure5Url} alt="论文 Figure 5：VLA 训练中的模型大小与批大小扩展趋势" /></a><figcaption>来源：论文 Figure 5</figcaption></figure><Feedback tone="green"><b>模型规模：</b>2B 到 4B 提升明显，而 4B 到 8B 的进一步增益不足 1%。</Feedback><Feedback tone="blue"><b>批大小：</b>性能随批大小增大持续提升，说明训练多样性是通用设置中的关键因素。</Feedback></div>;
 }
 
 export function RealWorld(_: WidgetProps) {
