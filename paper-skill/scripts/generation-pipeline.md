@@ -191,7 +191,7 @@ Steps 6-8 below are applied per assigned chapter packet. After all packets retur
 
 For each chapter, specify:
 
-1. A `244x130` Canvas scene.
+1. A `560x140` Canvas scene.
 2. One primary subject and at most two static props.
 3. One action verb and one visible goal.
 4. One continuous looped motion with no handoff or station sequence.
@@ -387,13 +387,20 @@ Follow the temporary paperSkill exactly.
 7. Do NOT edit framework files: `src/components/*`, `src/lib/*`, `src/styles/{tokens,components}.css`,
    `App.tsx`, `main.tsx`, config files. Keep all visible explanatory copy in natural Simplified
    Chinese.
-8. The app renders exactly `chapterCount` (6–10) progressively revealed chapters (handled by
-   `App.tsx` + `useProgressiveChapters`). Videos (if any) appear only after the last chapter.
+8. The app renders exactly `chapterCount` (6–10) chapters in a slide layout (chapter switching
+   is owned by `App.tsx`): a fixed left sidebar TOC, one chapter per screen, and a full-width
+   bottom nav bar. Videos (if any) appear as the last slide.
 9. Give every widget one dominant operation; implement the shared Canvas drawing kit once and
    reuse it. Keep the tutorial-wide scene palette and semantic color mapping stable across chapters.
 10. Drive each module's canvas/technical evidence, values, selected controls, and feedback from its
    specified state model.
-11. Run one coordinator review across the assembled page, then run `validate-output.js <outputDir>`
+11. Minimize small-font explanatory text: each module keeps small-font explanatory text to the
+   description before the Canvas and the feedback line below the controls — no extra hint rows,
+   hint bars, or annotations. Inside the Canvas, draw at most `canvasLabelMaxCount` (2) labels of
+   `canvasLabelMaxChars` (8) chars and one legend of `canvasLegendMaxItems` (3) entries; show
+   result values as bare numbers. Express state through color and shape, not additional words
+   (per `contract.md` §3 and `references/visual-interaction-standard.md` §7).
+12. Run one coordinator review across the assembled page, then run `validate-output.js <outputDir>`
     as the hard structural gate and fix all failures. The review must check cross-chapter terminology,
     symbol meanings, evidence boundaries, transitions, duplication, theme/color consistency, module
     coverage, and desktop/mobile behavior.

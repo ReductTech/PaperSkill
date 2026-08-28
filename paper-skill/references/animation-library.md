@@ -22,8 +22,8 @@ Every analogy Canvas must satisfy all of these rules:
 4. Use no more than two static supporting props. A road and finish flag are acceptable; five stations and several machines are not.
 5. Keep only one independently moving subject. A before-versus-after comparison may use one subject per panel, synchronized on the same time basis.
 6. Use one continuous motion or one short repeated gesture. Do not chain several actions with "then", "next", or "at each station".
-7. Keep labels outside the drawing when possible. Inside the Canvas, use at most two short Simplified Chinese labels.
-8. Make the action readable at `244x130`; avoid tiny people, dense annotations, or miniature machinery.
+7. Keep labels outside the drawing. Prefer ZERO in-Canvas labels — the action itself speaks; allow at most one label of no more than 6 Simplified Chinese characters when it is truly indispensable.
+8. Make the action readable at `560x140`; avoid tiny people, dense annotations, or miniature machinery.
 
 Apply this sentence test before accepting a scene:
 

@@ -40,7 +40,7 @@ Before planning chapters:
 | --- | --- |
 | mechanism fit | Do the paper's key operations map naturally to actions in this activity? |
 | ten-action coverage | Can all 10 chapter roles use distinct, simple, related actions? |
-| visual clarity | Are subject, verb, and goal readable at `244x130`? |
+| visual clarity | Are subject, verb, and goal readable at `560x140`? |
 | technical linkability | Can life actions link cleanly to equations, features, curves, architecture, or results? |
 | thematic continuity | Can one setting, drawing kit, and prop family persist across the page? |
 | originality | Does the choice avoid copying the nearest template or repeatedly used theme? |

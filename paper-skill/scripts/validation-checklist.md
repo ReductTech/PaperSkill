@@ -88,7 +88,7 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 - [ ] `src/data/tutorial.ts` is fully filled: `meta`, `hero`, exactly `chapterCount` (`kind:"chapter"`) entries, and `bilibili` (optional). Every `module` entry has `kind:"module"` and a `componentId` registered in `src/modules/registry.tsx`.
 - [ ] The Hero (`tutorial.hero`) contains title metadata and old-vs-new contrast (each side may use a canvas widget and/or a figure).
 - [ ] `src/styles/paper.css` overrides the `:root{}` scene colors; the `__METAPHOR_CSS__` placeholder is replaced (or removed if no override is needed).
-- [ ] Every chapter reveals progressively (handled by `App.tsx` + `useProgressiveChapters`); videos (if any) appear only after the final chapter.
+- [ ] The slide layout works end to end (owned by `App.tsx`): sidebar TOC switches chapters, one chapter per screen, bottom nav bar pins to the viewport; videos (if any) appear as the last slide.
 
 ### Framework File Integrity
 
@@ -107,7 +107,7 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 ### UI and Responsive Behavior
 
 - [ ] Design tokens and component CSS load unchanged (imported by `main.tsx`); paper overrides come from `paper.css` only.
-- [ ] The DOM shell is rendered by the bundled components: Hero outside `main`, one `.hero-inner`, compact comparison-panel headers, and the original component class hierarchy (`chap`, `chap-title`, `module`, `analogy-card`, `formula`, `takeaway`, `dl-related-section`, etc.).
+- [ ] The DOM shell is rendered by the bundled components: slide layout with sidebar TOC and bottom nav, Hero as the cover slide with one `.hero-inner`, compact comparison-panel headers, and the original component class hierarchy (`chap`, `chap-title`, `module`, `analogy-card`, `formula`, `takeaway`, `dl-related-section`, etc.).
 - [ ] Chapters retain the white surface, border, radius, shadow, spacing, and numbered serif title accent from `components.css`.
 - [ ] Every `.module` retains its muted header band, white body, border, and bundled padding; paper overrides do not redesign shared components.
 - [ ] The video section uses `.dl-related-section`, is outside the chapter count, and keeps the four-item horizontal strip / two-item narrow-screen strip.
