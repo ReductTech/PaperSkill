@@ -306,7 +306,7 @@ export const MetricDirectionBoard: React.FC<WidgetProps> = ({ chapterId, moduleI
           </p>
         </section>
       )}
-      <div style={{ overflowX: 'auto' }}>
+      <div className="paper-wide-canvas-scroll">
         <canvas className="paper-wide-canvas" id={`cv-${chapterId}-${moduleId}`} ref={canvasRef} width={W} height={canvasHeight} />
       </div>
       <div className={`feedback ${view === 'transfer' ? 'good' : ''}`} aria-live="polite">
