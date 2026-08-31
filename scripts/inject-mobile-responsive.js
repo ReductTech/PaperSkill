@@ -15,8 +15,8 @@ function injectMobileResponsive(siteRoot) {
   }
 
   const assets = [
-    '  <link rel="stylesheet" href="../../mobile-responsive.css?v=20260831-8">',
-    '  <script src="../../mobile-responsive.js?v=20260831-8" defer></script>',
+    '  <link rel="stylesheet" href="../../mobile-responsive.css?v=20260831-9">',
+    '  <script src="../../mobile-responsive.js?v=20260831-9" defer></script>',
   ].join('\n');
 
   let count = 0;

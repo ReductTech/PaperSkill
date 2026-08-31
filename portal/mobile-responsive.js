@@ -43,6 +43,7 @@
 
       var style = getComputedStyle(element);
       if (style.display !== 'grid' && style.display !== 'inline-grid') return;
+      if (style.position === 'absolute' || style.position === 'fixed' || style.position === 'sticky') return;
       if (preservesHorizontalScroll(element)) return;
 
       var parent = element.parentElement;
@@ -62,6 +63,7 @@
       if (!isVisible(element) || element.classList.contains('mobile-auto-wrap')) return;
       var style = getComputedStyle(element);
       if (style.display !== 'flex' && style.display !== 'inline-flex') return;
+      if (style.position === 'absolute' || style.position === 'fixed' || style.position === 'sticky') return;
       if (style.flexWrap !== 'nowrap' || preservesHorizontalScroll(element)) return;
 
       var parent = element.parentElement;
@@ -105,6 +107,13 @@
         var layoutStyle = getComputedStyle(layout);
         var isGrid = layoutStyle.display === 'grid' || layoutStyle.display === 'inline-grid';
         var isFlex = layoutStyle.display === 'flex' || layoutStyle.display === 'inline-flex';
+        var isPositioned = layoutStyle.position === 'absolute'
+          || layoutStyle.position === 'fixed'
+          || layoutStyle.position === 'sticky';
+        if (isPositioned) {
+          layout = layout.parentElement;
+          continue;
+        }
         className = isGrid ? 'mobile-auto-stack' : isFlex ? 'mobile-auto-wrap' : '';
         if (isFlex && layout.classList.contains('mobile-auto-wrap')
           && !layout.classList.contains('mobile-squeezed-parent')) {
