@@ -2,6 +2,8 @@
 
 基于论文 *Multi-View Graph Convolutional Network for Multimedia Recommendation*，由 **paper-skill** 生成的完整 React + TypeScript + Vite 交互式中文导读项目。
 
+> 更新：补充项目说明，便于后续维护与版本追踪。
+
 ## 本地运行
 
 ```bash
