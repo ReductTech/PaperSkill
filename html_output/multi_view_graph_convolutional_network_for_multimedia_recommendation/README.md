@@ -1,6 +1,6 @@
 # 面向多媒体推荐的多视图图卷积网络 交互式教程
 
-基于论文 *Multi-View Graph Convolutional Network for Multimedia Recommendation*，由 **paper-skill** 生成的完整 React + TypeScript + Vite 网页项目。
+基于论文 *Multi-View Graph Convolutional Network for Multimedia Recommendation*，由 **paper-skill** 生成的完整 React + TypeScript + Vite 交互式中文导读项目。
 
 ## 本地运行
 
