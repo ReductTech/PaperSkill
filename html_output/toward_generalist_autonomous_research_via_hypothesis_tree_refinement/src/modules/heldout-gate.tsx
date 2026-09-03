@@ -24,7 +24,7 @@ export const HeldoutGate: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         </button>
       </div>
 
-      <div className="paper-wide-canvas-scroll">
+      <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 430 }}>
           <caption style={{ textAlign: 'left', marginBottom: 8 }}>
             Table 2 · Terminal-Bench 2.0：两个系统在开发与留出评估上的排序相反

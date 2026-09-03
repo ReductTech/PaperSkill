@@ -254,7 +254,7 @@ export const EvidenceConstraintSelector: React.FC<WidgetProps> = ({ chapterId, m
 
   return (
     <div>
-      <div className="paper-wide-canvas-scroll">
+      <div style={{ overflowX: 'auto' }}>
         <canvas
           id={`cv-${chapterId}-${moduleId}`}
           ref={canvasRef}

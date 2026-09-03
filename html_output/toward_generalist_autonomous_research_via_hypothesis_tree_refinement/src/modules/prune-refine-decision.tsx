@@ -133,7 +133,7 @@ export const PruneRefineDecision: React.FC<WidgetProps> = ({ chapterId, moduleId
 
   return (
     <div>
-      <div className="paper-wide-canvas-scroll">
+      <div style={{ overflowX: 'auto' }}>
         <canvas
           id={`cv-${chapterId}-${moduleId}`}
           ref={canvasRef}
