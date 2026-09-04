@@ -15,9 +15,9 @@
 请选择要执行的功能（建议按顺序执行）：
 1. 自动准备环境 —— 检查 Node/npm/Git/GitHub，克隆或更新仓库，安装 paper-skill
 2. 调用 paper-skill 生成网页 —— 生成 React+TS 教程并预览（npm install / npm run build / npm run dev）
-3. 给出人工修改建议 —— 列出候选问题，协助确认≥3项实质修改
+3. 人工校验网页准确性 —— 对照原论文核对网页中的事实、公式、模型结构、实验数据、结论和局限
 4. 导入主仓库 —— 将最终修改后的项目导入 html_output 并完成仓库校验
-5. 准备提交 PR —— 准备 PR 内容并推送个人分支、创建 Pull Request
+5. 准备提交 PR —— 提供最终网页预览并由参与者确认显示后，准备 PR 内容、推送个人分支并创建 Pull Request
 ```
 
 ## 1. 上下文纪律（重要）
@@ -35,7 +35,7 @@ Agent **只读取 `README.md` 与 `docs/` 下的文档**来理解「该做什么
 
 - 在同一个任务中连续推进所选功能，不把可以自动执行的命令交还给参与者；
 - 发现已有本地修改时先保留并说明，不得重置、覆盖或删除无关内容；
-- 不直接向 `main` 推送，不替参与者确认论文事实或冒充人工修改；
+- 不直接向 `main` 推送，不替参与者确认论文事实、内容准确性或网页预览结果；
 - 密码、令牌、私钥和个人隐私不得写入仓库；
 - 每个功能执行失败时先定位并修复，只有确实需要账号授权、系统权限或参与者判断时才暂停。
 
@@ -58,6 +58,6 @@ Agent **只读取 `README.md` 与 `docs/` 下的文档**来理解「该做什么
 | --- | --- | --- |
 | 1 | 自动准备环境 | agent-workflow/01-prepare-env.md |
 | 2 | 调用 paper-skill 生成网页 | agent-workflow/02-generate.md |
-| 3 | 给出人工修改建议 | agent-workflow/03-review-suggest.md |
+| 3 | 人工校验网页准确性 | agent-workflow/03-review-suggest.md |
 | 4 | 导入主仓库 | agent-workflow/04-import.md |
 | 5 | 准备提交 PR | agent-workflow/05-submit-pr.md |
