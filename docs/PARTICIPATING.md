@@ -1,6 +1,6 @@
-# 参与指南
+# 贡献指南
 
-本文只规定网页项目进入 GitHub 仓库的技术流程。参与者的完整教程项目统一提交到 `html_output/<paper-name>/`，不得放在仓库根目录或其他目录。完整自动化流程见 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md)，提交要求见 [SUBMISSION.md](SUBMISSION.md)。
+本文只规定网页项目进入 GitHub 公共仓库的技术流程。贡献者的完整教程项目统一提交到 `html_output/<paper-name>/`，不得放在仓库根目录或其他目录。完整自动化流程见 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md)，提交要求见 [SUBMISSION.md](SUBMISSION.md)。
 
 ## 1. 论文与目录标识
 
@@ -15,7 +15,7 @@ html_output/attention_is_all_you_need/
 
 ## 2. 生成项目
 
-`paper-skill/` 是共享生成规范，普通参与者不得修改。请在仓库外的独立工作目录中调用 Skill，生成：
+`paper-skill/` 是共享生成规范，普通使用者和教程贡献者不得随教程 PR 修改。请在仓库外的独立工作目录中调用 Skill，生成：
 
 ```text
 <paper-short-name>_output/
@@ -62,7 +62,7 @@ html_output/<paper-name>/
 `-- src/
 ```
 
-`paper.json` 必须符合 `schemas/paper.schema.json`，并由导入脚本自动生成。参与者无需填写或修改仓库内部追踪字段。其中：
+`paper.json` 必须符合 `schemas/paper.schema.json`，并由导入脚本自动生成。使用者无需填写或修改仓库内部追踪字段。其中：
 
 - `paperName` 必须与目录名一致；
 - 分支名为 `paper/<paper-name>`；
@@ -72,7 +72,7 @@ html_output/<paper-name>/
 
 ## 5. 本地验收
 
-创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给参与者代为执行：
+创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给使用者代为执行：
 
 ```powershell
 npm run validate
@@ -85,23 +85,23 @@ git status --short
 ```
 
 `npm run validate:pr` 在普通本地终端中没有 Pull Request 基准信息，会主动跳过；本地验收必须显式追加 `-- main`。
-`npm run build:paper` 只安装、检查并构建本次提交的教程，普通参与者不需要在本地重复构建仓库中的全部作品。`npm run build:site` 保留给管理员完整验收、共享构建逻辑修改和 GitHub Pages 正式部署。
-`npm run catalog` 用于在本地确认全部 `paper.json` 可以正常生成索引。它会修改 `catalog/papers.json`，普通参与者不得提交该文件，应在创建 Pull Request 前运行 `git restore catalog/papers.json`。索引由管理员在审核发布时基于最新 `main` 统一生成。
+`npm run build:paper` 只安装、检查并构建本次提交的教程，普通贡献者不需要在本地重复构建仓库中的全部作品。`npm run build:site` 保留给管理员完整验收、共享构建逻辑修改和 GitHub Pages 正式部署。
+`npm run catalog` 用于在本地确认全部 `paper.json` 可以正常生成索引。它会修改 `catalog/papers.json`，普通贡献者不得提交该文件，应在创建 Pull Request 前运行 `git restore catalog/papers.json`。索引由管理员在审核发布时基于最新 `main` 统一生成。
 
 Agent 必须继续检查最终差异，确认目录名称、项目结构、`paper.json`、分支范围和提交格式正确，且不包含 `node_modules/`、`dist/`、自动生成的 `catalog/papers.json`、密钥、个人隐私或本地绝对路径。任一检查失败时，必须先修复并重新运行相关检查；不得带错进入预览或 Pull Request 阶段。
 
 还应人工确认：
 
-- 参与者已逐项对照原论文，确认研究问题、方法、公式、模型结构、实验数字、结论和局限准确；
-- 已使用最终待提交源码启动网页预览，参与者实际查看并确认桌面端和移动端显示、图片、图表、资源加载与主要交互正常；
+- 使用者已逐项对照原论文，确认研究问题、方法、公式、模型结构、实验数字、结论和局限准确；
+- 已使用最终待提交源码启动网页预览，使用者实际查看并确认桌面端和移动端显示、图片、图表、资源加载与主要交互正常；
 - 图片来源和论文链接可追溯；
 - 页面中没有个人隐私、密钥或本地绝对路径。
 
-论文内容的人工核验和最终网页预览确认均未完成时，不得创建 Pull Request。截图只能作为辅助记录，不能替代参与者实际打开和操作网页。
+论文内容的人工核验和最终网页预览确认均未完成时，不得创建 Pull Request。截图只能作为辅助记录，不能替代使用者实际打开和操作网页。
 
 ## 6. 创建 Pull Request
 
-一份参与者 PR 原则上只修改：
+一份教程 PR 原则上只修改：
 
 ```text
 html_output/<paper-name>/
@@ -109,7 +109,7 @@ html_output/<paper-name>/
 
 普通参与任务不得同时修改 `paper-skill/`、管理脚本、工作流或其他论文目录。Agent 自动检查全部通过，并完成人工内容核验和网页预览确认后，方可推送个人分支并创建 Pull Request；不要直接推送 `main`。
 
-Pull Request 创建后，作品保持 `review` 状态。普通参与者 PR 不提交 `catalog/papers.json`，PR 自动检查也不要求总索引与新增作品同步。
+Pull Request 创建后，作品保持 `review` 状态。普通教程 PR 不提交 `catalog/papers.json`，PR 自动检查也不要求总索引与新增作品同步。
 
 工程和内容检查通过后，由管理员在最新的 `main` 上将作品 `paper.json` 中的 `status` 改为 `published`，运行 `npm run catalog`，并统一提交 `paper.json` 与 `catalog/papers.json`。`npm run build:site` 也会在正式部署时根据全部 `paper.json` 重新生成站点使用的目录索引。
 

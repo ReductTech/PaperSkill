@@ -11,7 +11,8 @@ const next = `${JSON.stringify(records, null, 2)}\n`;
 
 if (process.argv.includes('--check')) {
   const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
-  if (current !== next) {
+  const normalizedCurrent = current.replace(/\r\n?/g, '\n');
+  if (normalizedCurrent !== next) {
     console.error('catalog/papers.json 不是最新版本，请运行 npm run catalog。');
     process.exit(1);
   }

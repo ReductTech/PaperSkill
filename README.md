@@ -1,77 +1,67 @@
-# Paper Skill : 1分钟理解论文内核——论文交互网页生成Skill
+# Paper Skill：交互式论文教程生成工具
 
-本仓库用于组织 AI 与机器学习等交互式论文学习网页考核，并集中收录同学们制作的交互式论文学习网页。
+PaperSkill 用于把 AI 与机器学习论文制作成中文交互式教学网页。使用者可以在 Agent 协助下完成环境准备、论文解析、网页生成、人工准确性核验、本地预览，以及可选的仓库导入和 Pull Request 提交。
 
-## 📋流程
+生成结果是完整的 React + TypeScript（Vite）项目，不是单独的 HTML 文件。项目可以保留在本地使用，也可以经过检查后贡献到本仓库，由 GitHub Pages 构建为公开网页。
 
-选手打开自己的智能体应用（例如 Codex、WorkBuddy 等），输入论文并调用本仓库的 [paper-skill 技能](paper-skill) -> 生成初版待修改网页 -> 选手理解论文、打磨修改网页 -> 将成品网页提交到本仓库的 html_output。
+**在线教程集合：** https://reducttech.github.io/PaperSkill/#start
 
->注：调用 paper-skill 只是为了快速做出网页雏形方便修改，通常无法一步到位做到直观理解论文，需要共创者提供更好的创意，并且可不受 paper-skill 输出的章节结构、UI 样式等限制自由调整。
+## 快速开始
 
-最终成果必须以完整的 React + TypeScript（Vite）网页项目形式提交，禁止提交单 HTML 文件，必须包含能够安装、运行和构建的完整项目结构，仓库会将其构建为可访问的网页。
-
-## 🖼️成品示例
-
-**观看成品网页效果：** [▶️演示视频（仅供参考）](https://my.feishu.cn/file/G0akbSBtYoIBoLx0DEMcJSbunEg)
-
-`html_output` 目录当前保留一个成品示例网页：
-- `elf_embedded_language_flows`：演示视频同款网页，经过了人工修改
-
-**在线查看已提交的论文教程网页集：** 🌐https://reducttech.github.io/PaperSkill/#search
-
-## 🚀快速开始
-
-#### 方式一 · 手动命令行
-
-手动下载仓库、调用 paper-skill 生成网页、修改并提交 PR。完整的操作流程请阅读👉[完整流程](https://reducttech.github.io/PaperSkill/#start)
-
-#### 方式二 · 智能体自动下载
-
-支持智能体自动下载仓库、调用 skill、提交 PR 等。需要将论文 PDF、LaTeX 或论文链接连同下面这条完整指令发送给支持 Skill 的 Agent：
+准备一篇机器学习或人工智能论文的 PDF、LaTeX、正文或公开链接，然后把下面的指令发送给支持 Skill 的 Agent：
 
 ```text
 请访问仓库 https://github.com/ReductTech/PaperSkill，首先读取 docs/AGENT_WORKFLOW.md（菜单模式），不必读取项目中的其他源码，先向我展示功能菜单，由我选择要执行的功能。
 ```
 
-#### 📝初版完成后，你需要做什么
+Agent 应展示以下菜单：
 
-Agent 生成网页初版并完成基础检查后，这一步就结束了。接下来请你根据自己对论文的深度理解，核查和修改网页，调整故事线等，不要直接提交。
+1. 自动准备环境
+2. 调用 `paper-skill` 生成网页
+3. 人工校验网页准确性
+4. 导入主仓库
+5. 准备提交 PR
 
-你可以重点检查这些内容：
+选择功能 1 后，Agent 会检查 GitHub 登录、Node.js、npm、Git 和 Paper Skill；选择功能 2 后，Agent 会读取论文、生成网页并完成基础工程检查。每项功能结束后，Agent 都会重新显示菜单并等待下一次选择。
 
-- ✅使用者是否能高效、快速理解论文内核；
-- ✅论文内容是否准确；
-- ✅讲解顺序是否清楚；
-- ✅交互、图示和页面是否真正帮助理解。
+也可以自行下载仓库并按 [贡献指南](docs/PARTICIPATING.md) 操作，但建议让 Agent 按菜单逐步执行，以免遗漏校验和预览环节。
 
-新增内容不受限制，例如可以自由插入GIF或者Seedance/MiniMaxH3制作的小动画。
-修改完成后，继续执行导入仓库、校验和 Pull Request 准备。
+## 生成后需要确认什么
 
-具体评分要求见📌[评分标准](docs/RUBRIC.md)。
+功能 2 完成后，Agent 会提供本地预览地址和项目文件夹，并提示选择下一项功能。选择功能 3，按照原论文检查：
 
-## ⚙️系统支持
+- 研究问题、方法结构、公式、实验数字和结论是否准确；
+- 中文讲解和章节顺序是否足够清楚；
+- 交互是否真正表达论文概念，并且操作反馈正确；
+- 桌面端和手机端是否存在溢出、遮挡、空白或资源丢失；
+- 论文链接与图片等外部素材是否可追溯且允许公开使用。
 
-支持 Windows、macOS 和 Linux。本地环境需要准备 Node.js 20+、npm、Git。
+人工核验不要求固定数量的修改，也不需要编写修改说明或准备现场展示。完成后按照 Agent 的提示明确确认核验结果。只需要本地网页的使用者可以在这里结束；希望贡献到公共教程集合的使用者再选择功能 4 和功能 5。
 
->在方式二 · 智能体自动下载中，环境准备会根据当前系统自动选择对应安装方式。系统差异只影响安装过程，不影响后续生成、构建、校验和提交流程。除必要授权和确认外，其余步骤可由 Agent 自动完成。
+更完整的检查项见 [教程质量检查指南](docs/QUALITY_CHECK.md)。
 
-另外，需要一个能使用 skill 的智能体应用，例如 Codex（ChatGPT）、WorkBuddy、Claude Code、Trae Work 等。
+## 系统支持
 
-## 📂仓库结构
+环境配置会根据操作系统自动选择入口：
+
+- Windows 使用 `scripts/setup-participant.ps1` 和 PowerShell/winget；
+- macOS、Linux 使用 `scripts/setup-participant.sh`，脚本会识别 Homebrew 或当前 Linux 发行版的包管理器。
+
+两种入口都会检查 Node.js 20+、npm、Git、GitHub 连接和 Paper Skill 完整性。需要账号登录、系统授权或管理员权限时，Agent 会暂停并等待使用者处理。
+
+## 仓库结构
 
 ```text
 PaperSkill/
-|-- docs/               # 当前流程、参与、提交和评分说明
-|-- paper-skill/        # 网页生成 Skill，选手需要调用它来生成初版网页，由核心维护者维护
-|-- html_output/        # 参与者最终教程项目的统一提交目录
+|-- docs/               # 使用流程、质量检查和贡献说明
+|-- paper-skill/        # 共享生成 Skill，由核心维护者维护
+|-- html_output/        # 已导入的完整教程项目
 |-- catalog/            # 自动生成的论文索引
-|-- portal/             # GitHub Pages 集合入口
+|-- portal/             # GitHub Pages 教程集合入口
 |-- scripts/            # 环境配置、导入、验证、索引和构建工具
-`-- .github/            # PR 模板、检查和部署流程
+`-- .github/            # PR 模板、自动检查和部署流程
 ```
 
-`main` 只通过 Pull Request 合并。自动检查负责工程门槛，论文事实、教学质量和人工修改仍需人工审核。
+贡献到本仓库的教程统一放入 `html_output/<paper-name>/`。`paper-name` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`。不要把教程直接放在仓库根目录，也不要提交 `node_modules/`、`dist/`、论文 PDF、密钥、个人隐私、本地绝对路径或未获授权的素材。
 
-参与者的最终网页项目统一提交到 `html_output/<paper-name>/`。其中 `paper-name` 为论文网页目录名称：论文标题全称小写 + 下划线，例如：attention_is_all_you_need 。不要修改 `html_output/` 的目录名称，也不要将项目直接放在仓库根目录。
-
-Pull Request 检查失败时，先打开检查详情区分“项目校验失败”和“GitHub Actions 服务异常”。具体判断与重新运行步骤见 [参与指南的检查处理说明](docs/PARTICIPATING.md#7-pull-request-检查失败时)。
+`main` 只通过 Pull Request 合并。创建 Pull Request 前，Agent 必须完成提交格式、目录范围和构建检查，并提供最终网页预览；论文事实与教学质量仍须由使用者人工确认。详细流程见 [文档索引](docs/README.md)。

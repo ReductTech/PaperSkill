@@ -38,7 +38,7 @@ function validateMetadata(meta, expectedPaperName) {
   if (!['draft', 'review', 'published'].includes(meta.status)) errors.push('status 必须是 draft、review 或 published');
   if (meta.entry !== 'index.html') errors.push('entry 必须是 index.html');
   if (!Array.isArray(meta.participants) || meta.participants.length === 0) {
-    errors.push('participants 至少包含一位参与者');
+    errors.push('participants 至少包含一位创建者');
   } else {
     meta.participants.forEach((item, index) => {
       if (!item || typeof item.name !== 'string' || !item.name.trim()) errors.push(`participants[${index}].name 不能为空`);

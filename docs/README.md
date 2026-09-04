@@ -1,14 +1,14 @@
 # 文档索引
 
-以下四份文件是当前仓库的完整文档入口：
+以下文件构成 PaperSkill 的使用和贡献说明：
 
-| 文件 | 使用者 | 用途 |
+| 文件 | 主要使用者 | 用途 |
 | --- | --- | --- |
-| [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) | Agent | 菜单模式入口：展示功能菜单并逐步执行；各功能详细步骤见 [agent-workflow/](agent-workflow/) 目录 |
-| [RUBRIC.md](RUBRIC.md) | 参与者、教师 | 评分权重 |
-| [PARTICIPATING.md](PARTICIPATING.md) | Agent、参与者 | 分支、完整项目导入、本地校验、Pull Request 和失败处理 |
-| [SUBMISSION.md](SUBMISSION.md) | 参与者、教师 | GitHub 作品的提交内容和检查要求 |
+| [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) | Agent、使用者 | 菜单模式入口；各功能的详细步骤见 [agent-workflow/](agent-workflow/) |
+| [QUALITY_CHECK.md](QUALITY_CHECK.md) | 使用者、审核者 | 不计分的教程质量检查指南 |
+| [PARTICIPATING.md](PARTICIPATING.md) | 贡献者、Agent | 分支、完整项目导入、本地校验、Pull Request 和失败处理 |
+| [SUBMISSION.md](SUBMISSION.md) | 贡献者、审核者 | 公共仓库接收内容、PR 材料和安全边界 |
 
-Agent 采用菜单模式：先读取 `AGENT_WORKFLOW.md` 展示功能菜单，参与者选择功能后，Agent 读取 `docs/agent-workflow/` 下对应文件执行。
+首次使用通常只需阅读仓库根目录的 [README](../README.md)，然后让 Agent 读取 `AGENT_WORKFLOW.md` 并展示功能菜单。Agent 会根据使用者的选择读取 `docs/agent-workflow/` 下对应文件执行。
 
-参与者通常只需先看仓库根目录的 `README.md` 和 `RUBRIC.md`。其余文件由 Agent 按执行阶段读取；遇到 GitHub 提交或自动检查问题时，再查看 `PARTICIPATING.md`。
+只在准备向公共仓库贡献教程时，才需要继续阅读 `PARTICIPATING.md` 和 `SUBMISSION.md`。
