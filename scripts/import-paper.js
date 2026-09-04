@@ -70,4 +70,4 @@ const meta = {
 };
 fs.writeFileSync(path.join(target, 'paper.json'), `${JSON.stringify(meta, null, 2)}\n`, 'utf8');
 console.log(`已导入：${path.relative(ROOT, target)}`);
-console.log('下一步：核对 paper.json，然后运行 npm run validate && npm run catalog。');
+console.log('下一步：核对 paper.json，运行 npm run validate && npm run catalog，并在提交前执行 git restore catalog/papers.json。');

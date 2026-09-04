@@ -1,0 +1,250 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 素描临摹主题：画纸场景配色
+     语义色角色保持与 tokens.css 一致（蓝=引导/模型，绿=成功，红=失败，橙=强调，紫=辅助）。 */
+  --paper-scene-bg: #f5f8f0;          /* 画纸中性背景 */
+  --paper-ground: #eef2e6;            /* 画板/桌面 */
+  --paper-pencil: #d97706;            /* 铅笔（橙色强调） */
+  --paper-ink: #21324a;               /* 墨线/主文字 */
+  --paper-outline-weak: #c43f52;      /* 断裂/失败的轮廓 */
+  --paper-outline-good: #228d5c;      /* 完整/成功的轮廓 */
+  --paper-guide: #27446e;             /* 引导线/教师 */
+  --paper-support: #92400e;           /* 支撑/锚点深色 */
+  --paper-vote: #7c3aed;              /* 投票/辅助机制 */
+}
+
+/* ============ 60/40 左右布局（左直觉动画 / 右公式定义） ============ */
+.split-60-40 {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.split-left {
+  flex: 0 0 60%;
+  min-width: 320px;
+}
+.split-right {
+  flex: 1 1 0;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.split-right .chip {
+  align-self: flex-start;
+}
+
+/* 公式小卡片 */
+.mini-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.mini-eq {
+  font-family: var(--ui-font-mono);
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.mini-note {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.eq-highlight {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.eq-highlight .mini-eq {
+  color: var(--green);
+}
+
+/* Hero Reveal 按钮 */
+.hero-reveal {
+  width: 100%;
+}
+
+/* 窄屏堆叠 */
+@media (max-width: 720px) {
+  .split-left,
+  .split-right {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+/* ============ 公式符号含义默认全部展开 ============ */
+.fe-symbols {
+  margin-top: 8px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fe-symbols .fe-explain {
+  animation: none;
+  margin: 0;
+}
+.fe-symbols .fe-explain.active {
+  border-left-color: var(--orange);
+  background: var(--orange-soft);
+}
+
+/* ============ Hero 开场导览（交代“讲什么” + 背景补课） ============ */
+.hero-guide {
+  margin-top: 22px;
+  padding: 18px 20px;
+  background: var(--paper, #ffffff);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+.guide-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.guide-badge {
+  background: var(--orange);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+.guide-lead {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+.guide-lead b {
+  color: var(--blue);
+}
+.guide-bg {
+  background: var(--blue-soft);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--ui-radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+.guide-bg-title {
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.bg-chip {
+  display: inline-block;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 9px;
+  border-radius: 999px;
+  margin: 0 6px 0 0;
+  vertical-align: middle;
+}
+.guide-steps {
+  font-size: 14px;
+  color: var(--ink-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.guide-steps-label {
+  color: var(--ink);
+  font-weight: 600;
+  margin-right: 4px;
+}
+.guide-steps b {
+  color: var(--ink);
+  background: var(--green-soft);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.guide-steps i {
+  font-style: normal;
+  color: var(--slate-2);
+}
+.guide-flow {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.8;
+  background: var(--orange-soft);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--ui-radius-sm);
+  padding: 8px 14px;
+}
+.guide-flow .guide-steps-label {
+  color: var(--orange);
+}
+
+/* ============ 图块摆放整理 ============ */
+
+/* 模块内 canvas：统一显示宽度并居中，避免各模块图块宽窄不一。
+   setupCanvas 会写入内联 width/height，故用 !important 覆盖为等比缩放 */
+.module-body canvas {
+  width: min(560px, 100%) !important;
+  height: auto !important;
+  margin: 12px auto;
+}
+
+/* 模块内论文原图：限制尺寸，避免巨图占半屏；与 canvas 上下留出呼吸空间 */
+.module-body .paper-figure {
+  margin: 10px auto 12px;
+}
+.module-body .paper-figure img {
+  max-width: min(680px, 100%);
+  max-height: 380px;
+  object-fit: contain;
+}
+.module-body .paper-figure + canvas,
+.module-body canvas + .paper-figure {
+  margin-top: 16px;
+}
+
+/* analogy 卡：技术示意 canvas 保持紧凑；论文原图时加宽视觉区让图可读 */
+.analogy-card .analogy-visual {
+  width: 280px;
+}
+.analogy-card:has(.analogy-visual img) .analogy-visual {
+  width: 46%;
+  min-width: 320px;
+  background: #fff;
+}
+.analogy-card:has(.analogy-visual img) .analogy-visual img {
+  width: auto;
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  background: #fff;
+}
+.analogy-card:has(.analogy-visual img) .analogy-body {
+  padding-left: 24px;
+}
+
+/* 模块 canvas 与其下控件组合为一个图块 */
+.module-body .ctrl {
+  margin-top: 6px;
+}
+.module-body .feedback {
+  max-width: 640px;
+  margin: 6px auto 0;
+}
+

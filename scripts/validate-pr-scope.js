@@ -48,6 +48,12 @@ for (const line of statusLines) {
 const paperDirs = new Set([...added, ...deleted, ...modified]);
 const touchesSkill = files.some((file) => file.startsWith('paper-skill/'));
 const touchesPaper = paperDirs.size > 0;
+const touchesCatalog = files.includes('catalog/papers.json');
+
+if (touchesPaper && touchesCatalog) {
+  console.error('论文参与 PR 不应提交 catalog/papers.json；该索引由管理员统一生成。');
+  process.exit(1);
+}
 
 // 允许「单篇论文改名」：恰好一个目录被删除、另一个被新增，且无其他论文目录改动
 if (added.size === 1 && deleted.size === 1 && modified.size === 0) {

@@ -1,0 +1,1 @@
+import React from 'react'; import type {WidgetProps} from './registry'; import {AnalogyScene} from './yolo-shared'; export const PhotoAna6:React.FC<WidgetProps>=()=> <AnalogyScene action="shift" label="切换演习与执勤"/>;

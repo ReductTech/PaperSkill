@@ -1,0 +1,585 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --ui-bg-page: #07111f;
+  --ui-bg-page-top: #0d1b2f;
+  --ui-bg-card: #101b2c;
+  --ui-bg-soft: #17263d;
+  --ui-bg-muted: #0c1727;
+  --ui-text-main: #f4f7fb;
+  --ui-text-muted: #c6d0df;
+  --ui-text-light: #9fb0c8;
+  --ui-border: #2a3b55;
+  --ui-border-strong: #4b6384;
+  --ui-accent: #8fb8ff;
+  --ui-accent-alt: #f7ad62;
+  --ui-success: #62d29a;
+  --ui-warning: #f0b955;
+  --ui-danger: #ff7c91;
+  --ui-font-sans: "STKaiti", "华文楷体", "KaiTi", "楷体", serif;
+  --blue-soft: rgba(143, 184, 255, 0.16);
+  --green-soft: rgba(98, 210, 154, 0.16);
+  --orange-soft: rgba(247, 173, 98, 0.16);
+  --purple-soft: rgba(177, 140, 255, 0.16);
+  --red-soft: rgba(255, 124, 145, 0.15);
+  --yellow-soft: rgba(240, 185, 85, 0.16);
+  --purple: #b18cff;
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --paper-scene-bg: #0b1626;
+  --paper-road: #d19a5b;
+  --paper-route-good: #62d29a;
+  --paper-route-bad: #ff7c91;
+  --paper-route-current: #8fb8ff;
+  --paper-route-choice: #f7ad62;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+table,
+.chip,
+.feedback,
+.module-desc,
+.interaction-detail {
+  font-family: "STKaiti", "华文楷体", "KaiTi", "楷体", serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(143, 184, 255, 0.14), transparent 28%),
+    linear-gradient(180deg, var(--ui-bg-page-top) 0%, var(--ui-bg-page) 100%);
+  color: var(--ink);
+}
+
+section.hero,
+section.chap,
+.module,
+.metric,
+.dl-related-section {
+  background: rgba(16, 27, 44, 0.94);
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+
+.module-head,
+.flow-mini,
+.ctrl,
+table.paper th,
+.hero-meta a,
+.hero-meta span,
+.hero-meta .tag {
+  background: #0c1727;
+  border-color: var(--line);
+}
+
+.hero-venue,
+.bg-side,
+.inline-formula,
+.fe-formula,
+.fe-explain,
+.formula,
+.paper-figure img {
+  background: #101b2c;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.hero h1,
+.hero-sub,
+.hero-abs,
+.chap-title,
+.module-head h4,
+.interaction-detail-title,
+.et-title,
+table.paper th,
+table.paper td {
+  color: var(--ink);
+}
+
+section.chap .chap-intro,
+section.chap .module-desc,
+section.chap .note,
+section.chap p,
+section.chap li,
+.analogy-text,
+.cb-text,
+.et-desc,
+.dl-related-section > p,
+.fe-explain-desc {
+  color: var(--ink-2);
+}
+
+.chap-bridge {
+  background: linear-gradient(135deg, rgba(143, 184, 255, 0.16) 0%, rgba(98, 210, 154, 0.13) 100%);
+  border-color: var(--line);
+}
+
+.cb-icon,
+.bg-side-head,
+.bg-side-tag {
+  background: rgba(12, 23, 39, 0.78);
+}
+
+.analogy-card,
+.analogy-visual {
+  background: linear-gradient(135deg, rgba(247, 173, 98, 0.15) 0%, rgba(240, 185, 85, 0.1) 100%);
+  border-color: rgba(247, 173, 98, 0.35);
+}
+
+.analogy-visual canvas,
+canvas {
+  background: var(--paper-scene-bg);
+}
+
+.feedback {
+  background: #0c1727;
+  border-left-color: var(--line-2);
+  color: var(--ink-2);
+}
+
+.chip {
+  background: #101b2c;
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+
+.chip:hover {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--ink);
+}
+
+.chip.selected,
+button.tiny {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #07111f;
+}
+
+button.tiny:hover {
+  background: #b3ccff;
+  border-color: #b3ccff;
+}
+
+button.tiny.ghost {
+  background: #101b2c;
+  border-color: var(--line);
+  color: var(--blue);
+}
+
+button.tiny.ghost:hover {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+}
+
+table.paper {
+  background: #101b2c;
+  border-color: var(--line);
+}
+
+table.paper th,
+table.paper td {
+  border-bottom-color: var(--line);
+}
+
+table.paper tr:hover td {
+  background: rgba(143, 184, 255, 0.1);
+}
+
+.agentswing-widget canvas {
+  background: var(--paper-scene-bg);
+  width: 100% !important;
+  height: auto !important;
+  max-width: 680px;
+  aspect-ratio: 7 / 3;
+}
+
+canvas.agentswing-mini-canvas {
+  width: 244px !important;
+  height: auto !important;
+  max-width: 100%;
+  aspect-ratio: 122 / 65;
+  background: var(--paper-scene-bg);
+}
+
+.hero h1 {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: clamp(34px, 5vw, 54px);
+}
+
+.hero-abs {
+  max-width: 820px;
+  text-align: left;
+}
+
+.bg-side-canvas canvas {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  max-width: none;
+}
+
+.bg-side-tag {
+  min-height: 118px;
+  line-height: 1.7;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.agentswing-widget .chip-row {
+  margin-top: 12px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.agentswing-widget .stacked-controls {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.agentswing-widget .stacked-controls .chip-row {
+  margin-top: 0;
+}
+
+.agentswing-widget .race-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.agentswing-widget .ctrl {
+  align-items: center;
+}
+
+.agentswing-widget .ctrl label {
+  flex: 0 0 132px;
+}
+
+.agentswing-widget .ctrl input[type="range"] {
+  min-width: 0;
+}
+
+.agentswing-widget .chip {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.agentswing-widget .feedback {
+  margin-top: 10px;
+  font-style: normal;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.trajectory-example,
+.trace-block {
+  display: block;
+  margin: 10px 0 12px;
+  padding: 12px 14px;
+  max-width: 100%;
+  overflow-x: auto;
+  background: #0f172a;
+  border: 1px solid #24324a;
+  border-radius: 6px;
+  color: #e5edf7;
+  font-family: Consolas, "Cascadia Mono", "SFMono-Regular", monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.interaction-detail li:has(.trace-block) {
+  list-style: none;
+  margin-left: -1.15em;
+}
+
+.trajectory-example .te-root,
+.trace-block .te-root {
+  color: #cbd5e1;
+  font-weight: 800;
+}
+
+.trajectory-example .te-q,
+.trace-block .te-q {
+  color: #93c5fd;
+}
+
+.trajectory-example .te-turn,
+.trace-block .te-turn {
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.trajectory-example .te-thinking,
+.trace-block .te-thinking {
+  color: #c4b5fd;
+}
+
+.trajectory-example .te-call,
+.trace-block .te-call {
+  color: #fdba74;
+}
+
+.trajectory-example .te-response,
+.trace-block .te-response {
+  color: #86efac;
+}
+
+.case-trace {
+  margin: 12px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #101b2c;
+  overflow: hidden;
+}
+
+.case-trace summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  color: var(--blue);
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.case-trace summary:hover {
+  background: var(--blue-soft);
+}
+
+.case-trace-log {
+  margin: 0;
+  padding: 12px 14px;
+  max-width: 100%;
+  overflow-x: auto;
+  background: #0f172a;
+  color: #e5edf7;
+  font-family: Consolas, "Cascadia Mono", "SFMono-Regular", monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.case-trace-log .te-root {
+  color: #cbd5e1;
+  font-weight: 800;
+}
+
+.case-trace-log .te-q {
+  color: #93c5fd;
+}
+
+.case-trace-log .te-thinking {
+  color: #c4b5fd;
+}
+
+.case-trace-log .te-call {
+  color: #fdba74;
+}
+
+.case-trace-log .te-response {
+  color: #86efac;
+}
+
+.formula-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.inline-formula {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 12px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #0c1727;
+  color: var(--blue);
+  font-family: Consolas, "Cascadia Mono", "SFMono-Regular", monospace;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.formula-stack {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+.formula-stack span {
+  display: block;
+  white-space: nowrap;
+}
+
+.agentswing-widget table.paper b {
+  color: var(--green);
+}
+
+.agentswing-widget table.paper {
+  table-layout: fixed;
+}
+
+.agentswing-widget table.paper th,
+.agentswing-widget table.paper td {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.agentswing-widget table.paper th:nth-child(1),
+.agentswing-widget table.paper td:nth-child(1) {
+  width: 26%;
+}
+
+.agentswing-widget table.paper th:nth-child(2),
+.agentswing-widget table.paper td:nth-child(2),
+.agentswing-widget table.paper th:nth-child(3),
+.agentswing-widget table.paper td:nth-child(3) {
+  width: 18%;
+}
+
+.interaction-detail {
+  margin: 12px 0 14px;
+  padding: 14px 16px;
+  background: rgba(12, 23, 39, 0.92);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.interaction-detail-title {
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.interaction-detail p {
+  margin: 0 0 8px;
+}
+
+.interaction-detail ul {
+  margin: 0;
+  padding-left: 1.15em;
+}
+
+.interaction-detail li {
+  margin: 4px 0;
+  color: var(--ink-2);
+}
+
+.flow-mini {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.flow-mini .flow-step {
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 13px;
+}
+
+.flow-mini .flow-arrow {
+  display: none;
+}
+
+.embed-takeaway {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.embed-takeaway .et-item {
+  min-width: 0;
+}
+
+.embed-takeaway .et-desc {
+  overflow-wrap: anywhere;
+}
+
+.fe-symbol-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 4px;
+}
+
+.fe-symbol-row .sym {
+  border: 1px solid var(--line);
+  background: #101b2c;
+  color: var(--blue);
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 16px;
+}
+
+.fe-symbol-row .sym.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #07111f;
+}
+
+@media (max-width: 720px) {
+  .agentswing-widget canvas {
+    aspect-ratio: 7 / 3.5;
+  }
+
+  .hero-compare {
+    gap: 14px;
+  }
+
+  .bg-side-tag {
+    min-height: 0;
+    font-size: 14px;
+  }
+
+  .agentswing-widget .chip-row {
+    justify-content: stretch;
+  }
+
+  .agentswing-widget .chip {
+    flex: 1 1 120px;
+    min-height: 38px;
+  }
+
+  .agentswing-widget .ctrl label {
+    flex-basis: auto;
+  }
+
+  .interaction-detail {
+    padding: 12px 13px;
+    font-size: 14px;
+  }
+
+  .interaction-detail-title {
+    font-size: 15px;
+  }
+
+  .embed-takeaway {
+    grid-template-columns: 1fr;
+  }
+}

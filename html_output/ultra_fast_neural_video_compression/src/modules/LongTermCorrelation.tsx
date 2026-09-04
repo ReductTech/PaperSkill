@@ -1,0 +1,26 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {observeCanvas,setupCanvas} from '../lib/canvasKit';
+import type {WidgetProps} from './registry';
+
+const W=900,H=390,C={bg:'#f4fafc',ink:'#12233b',muted:'#5d7189',blue:'#176b92',green:'#20936f',red:'#d75d72',orange:'#f08b66',purple:'#7868d8',line:'#cbdce6'};
+const label=(c:CanvasRenderingContext2D,s:string,x:number,y:number,size=13,color=C.ink,weight=400,align:CanvasTextAlign='center')=>{c.fillStyle=color;c.font=`${weight} ${size}px "Segoe UI",sans-serif`;c.textAlign=align;c.fillText(s,x,y)};
+const box=(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,fill:string,stroke:string,line=2)=>{c.beginPath();c.roundRect(x,y,w,h,8);c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=line;c.stroke()};
+const arrow=(c:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number,color:string,width=2)=>{c.strokeStyle=color;c.lineWidth=width;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.fillStyle=color;c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-9,y2-5);c.lineTo(x2-9,y2+5);c.closePath();c.fill()};
+
+export const LongTermCorrelation:React.FC<WidgetProps>=()=>{
+ const ref=useRef<HTMLCanvasElement>(null);const [frames,setFrames]=useState(128);const [focus,setFocus]=useState<'short'|'long'>('long');const n=8,chunks=Math.ceil(frames/n);
+ useEffect(()=>{const canvas=ref.current;if(!canvas)return;let ctx:CanvasRenderingContext2D;try{ctx=setupCanvas(canvas,W,H)}catch{return}let raf=0,visible=true;
+  const draw=()=>{const t=(Date.now()%1600)/1600;ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);label(ctx,'同一段训练视频：两层时序相关性必须分开看',450,27,16,C.blue,700);
+   const shown=Math.min(8,chunks),gap=14,bw=(820-gap*(shown-1))/shown;
+   for(let i=0;i<shown;i++){const x=40+i*(bw+gap),on=focus==='long';box(ctx,x,65,bw,86,on?'#f2edff':'#fff',on?C.purple:C.line,on?3:2);label(ctx,`块 ${i+1}`,x+bw/2,88,12,on?C.purple:C.ink,700);for(let j=0;j<4;j++){const fw=(bw-18)/4;ctx.fillStyle=focus==='short'&&i===0?C.orange:'#cbd5e1';ctx.fillRect(x+6+j*fw,102,Math.max(5,fw-3),20)}if(i<shown-1){arrow(ctx,x+bw,108,x+bw+gap-2,108,on?C.purple:C.line,on?4:2);label(ctx,`C${sub(i+1)}`,x+bw+gap/2,98,10,on?C.purple:C.muted,600)}}
+   if(chunks>shown)label(ctx,`… 共 ${chunks} 个块`,830,150,12,C.purple,600);
+   const pulseX=40+(800*t);ctx.fillStyle=focus==='long'?C.purple:C.orange;ctx.beginPath();ctx.arc(pulseX,108,5,0,Math.PI*2);ctx.fill();
+   box(ctx,35,180,405,116,'#fff',focus==='short'?C.orange:C.line,focus==='short'?3:2);label(ctx,'短时序（块内）',60,208,15,C.orange,700,'left');label(ctx,'Chunk Encoder 一次读取块内全部 8 帧',60,236,13,C.ink,500,'left');label(ctx,'✓ 建模块内相邻帧依赖',60,265,13,C.green,600,'left');label(ctx,'逐帧模型只能顺序推进，不能一次观察整块',60,285,11,C.muted,400,'left');
+   box(ctx,460,180,405,116,'#fff',focus==='long'?C.purple:C.line,focus==='long'?3:2);label(ctx,'长时序（跨块）',485,208,15,C.purple,700,'left');label(ctx,'上下文 Cᵢ 在块之间传递历史信息',485,236,13,C.ink,500,'left');label(ctx,'✓ 观察更远距离的重复、运动与场景冗余',485,265,13,C.green,600,'left');label(ctx,'块级 latent 减少训练显存，支持更长序列',485,285,11,C.muted,400,'left');
+   label(ctx,'逐帧 latent',45,330,12,C.red,700,'left');ctx.fillStyle='#f6cbd2';ctx.fillRect(150,317,680,17);label(ctx,`${frames} 份`,845,331,12,C.red,700);
+   label(ctx,'chunk latent',45,365,12,C.green,700,'left');ctx.fillStyle='#bde8d1';ctx.fillRect(150,352,680/n,17);label(ctx,`${chunks} 份表示（示意）`,150+680/n+10,366,12,C.green,700,'left');canvas.classList.add('is-ready');if(visible)raf=requestAnimationFrame(draw)};
+  const start=()=>{visible=true;if(!raf)raf=requestAnimationFrame(draw)},stop=()=>{visible=false;cancelAnimationFrame(raf);raf=0};const off=observeCanvas(canvas,start,stop);return()=>{stop();off()}
+ },[frames,focus,chunks]);
+ return <div><div className="ctrl"><button type="button" className={focus==='short'?'active':''} onClick={()=>setFocus('short')}>块内短时序</button><button type="button" className={focus==='long'?'active':''} onClick={()=>setFocus('long')}>跨块长时序</button><label>训练序列 <span className="val">{frames} 帧</span></label><input aria-label="训练序列帧数" type="range" min="8" max="128" step="8" value={frames} onChange={e=>setFrames(Number(e.target.value))}/></div><canvas ref={ref} width={W} height={H}/><div className="feedback good">✓ {focus==='short'?'Chunk Encoder 同时观察块内 8 帧，直接学习块内相邻依赖。':`用 ${chunks} 份块级 latent 表示 ${frames} 帧，跨块上下文 Cᵢ 将历史继续传给下一块，使模型能在相同显存预算下观察更长视频。`}</div><div className="longterm-compare-wrap"><table className="longterm-compare"><caption>两种机制对压缩率的作用不同</caption><thead><tr><th>模块</th><th>作用位置</th><th>码流 / latent 是否变化</th><th>提升压缩率的原理</th></tr></thead><tbody><tr><th>帧专属解码器（3.2）</th><td>解码端末端</td><td><span className="cross">✕</span> 码流固定不变</td><td>增强从现有 latent 还原图像的能力，降低重建失真</td></tr><tr><th>长时序建模（3.3）</th><td>编码端 + 训练策略</td><td><span className="check">✓</span> 编码器生成更紧凑的 latent</td><td>让模型挖掘更远的时序冗余，源头减少需要存储的信息</td></tr></tbody></table></div><div className="longterm-note">原有 DCVC 系列具备时序建模能力，但逐帧架构下 latent 数量随帧数线性增长，显存限制了训练视频长度；本文基于块的编码方式减少 latent 总数，使模型能够在同等硬件条件下训练更长视频序列，捕捉更远距离的时序冗余，获得更好压缩性能。</div></div>;
+};
+function sub(i:number){return String(i).replace(/0/g,'₀').replace(/1/g,'₁').replace(/2/g,'₂').replace(/3/g,'₃').replace(/4/g,'₄').replace(/5/g,'₅').replace(/6/g,'₆').replace(/7/g,'₇').replace(/8/g,'₈').replace(/9/g,'₉')}

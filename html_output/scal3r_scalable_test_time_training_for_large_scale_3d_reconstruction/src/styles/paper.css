@@ -1,0 +1,77 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* Trail-mapping survey-expedition scene palette (see contract.md §5 for semantic roles). */
+  --paper-scene-bg: #f5f8f0;   /* quiet valley background */
+  --paper-env-light: #b8c9a7;  /* light rolling hill */
+  --paper-env-dark: #76906a;   /* dark rolling hill / summit */
+  --paper-trail: #92400e;      /* the recurring brown trail */
+  --paper-summit: #e0a712;     /* gold summit flag when reached */
+}
+
+/* §2 模块 2.2「为什么分块 = 线性」用的读数徽标行。
+   复用 tokens.css 的语义色：red=一次全局(旧), blue=分块, green=收益。 */
+.kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 6px 0 2px;
+}
+.kpi {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.kpi.red { color: var(--red); background: var(--red-soft); border-color: var(--red); }
+.kpi.blue { color: var(--blue); background: var(--blue-soft); border-color: var(--blue); }
+.kpi.green { color: var(--green); background: var(--green-soft); border-color: var(--green); }
+
+/* §6 模块 6.2「实验设置」规格卡片。格式参考 ELF 教程 10.2 的 compare-cell：
+   小标题 label + 大字 val + 一行 mini 说明。数据逐项摘自论文 4.3 Training。 */
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 14px 0 4px;
+}
+.spec-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  border-radius: var(--radius-sm);
+}
+.spec-label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.spec-val {
+  font-family: var(--ui-font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--green);
+  line-height: 1.2;
+}
+.spec-mini { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+@media (max-width: 640px) {
+  .spec-grid { grid-template-columns: 1fr; }
+}
+
+/* §9.3 定性结果视频 */
+.video-block { display: flex; flex-direction: column; gap: 10px; }
+.result-video {
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 16 / 9;
+  background: #0e1420;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: var(--radius-sm);
+  display: block;
+}
+.video-cap { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin: 0; }

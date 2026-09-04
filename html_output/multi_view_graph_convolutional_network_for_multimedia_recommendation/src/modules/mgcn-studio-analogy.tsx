@@ -1,0 +1,13 @@
+import React, { useEffect, useRef } from 'react';
+import { setupCanvas } from '../lib/canvasKit';
+import type { WidgetProps } from './registry';
+
+const W=244,H=130;
+const P={bg:'#f5f8f0',paper:'#b8c9a7',shadow:'#76906a',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#d97706',purple:'#7c3aed',text:'#21324a',border:'#d7deea'};
+const scenes=[
+  ['镜头噪点','偏好目标'],['商品照片','收藏历史'],['行为线索','偏好主体'],['收藏足迹','目标照片'],['候选照片','保留组'],['画面','说明'],['主任务','辅助校准'],['行为校准','最终取景'],['保留全部','拆除一项'],['同一协议','更高更好']
+];
+function rr(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,r=5){c.beginPath();c.roundRect(x,y,w,h,r);}
+function photo(c:CanvasRenderingContext2D,x:number,y:number,frame=false){c.fillStyle='#fff';c.strokeStyle=frame?P.green:P.border;c.lineWidth=frame?3:1;rr(c,x,y,48,60,5);c.fill();c.stroke();c.fillStyle=P.paper;c.fillRect(x+7,y+8,34,34);c.fillStyle=P.shadow;c.beginPath();c.arc(x+29,y+23,8,0,Math.PI*2);c.fill();}
+export const MgcnStudioAnalogy:React.FC<WidgetProps>=({chapterId})=>{const ref=useRef<HTMLCanvasElement>(null);useEffect(()=>{const cv=ref.current;if(!cv)return;let c:CanvasRenderingContext2D;try{c=setupCanvas(cv,W,H);}catch{return;}const n=Math.max(1,Math.min(10,Number(chapterId.replace(/\D/g,''))||1));const labels=scenes[n-1];let raf=0;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const started=performance.now();const draw=(now:number)=>{const t=reduced?1:((now-started)%2200)/2200;c.clearRect(0,0,W,H);c.fillStyle=P.bg;c.fillRect(0,0,W,H);c.strokeStyle=P.border;c.setLineDash([5,5]);c.beginPath();c.moveTo(18,100);c.lineTo(222,100);c.stroke();c.setLineDash([]);photo(c,174,31,n!==1&&n!==9);const x=22+Math.min(1,t*1.35)*118;c.fillStyle=n===7?P.purple:n===10?P.orange:P.blue;if([2,5,10].includes(n)){photo(c,x,42,t>.72);}else if(n===3){c.fillRect(x,45,34,12);c.fillStyle=P.red;c.globalAlpha=1-t;c.beginPath();c.arc(188,58,21,0,Math.PI*2);c.fill();c.globalAlpha=1;}else{rr(c,x,55,32,24,6);c.fill();}if(n===1){c.strokeStyle=t>.55?P.green:P.red;c.lineWidth=3;c.strokeRect(176+(1-t)*18,42,42,42);}if(n===4||n===8){c.strokeStyle=P.blue;c.lineWidth=3;c.beginPath();c.moveTo(x+30,67);c.lineTo(174,67);c.stroke();}if(n===9&&t>.55){c.strokeStyle=P.red;c.lineWidth=3;c.beginPath();c.moveTo(184,39);c.lineTo(214,82);c.stroke();}c.font='11px "Segoe UI",sans-serif';c.fillStyle=P.text;c.fillText(labels[0],14,18);c.fillText(labels[1],168,118);if(!reduced)raf=requestAnimationFrame(draw);};raf=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf);},[chapterId]);return <canvas ref={ref} width={W} height={H} aria-label={`第${chapterId.replace(/\D/g,'')}章摄影修片类比动画`} />;};
+export default MgcnStudioAnalogy;

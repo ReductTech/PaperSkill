@@ -1,0 +1,428 @@
+/* Reference-template visual adapter.
+   This file deliberately changes only presentation: the six original sections,
+   their wording, data, controls, and presenter interaction remain untouched. */
+
+:root {
+  --bg: var(--ui-bg-page);
+  --surface: var(--ui-bg-card);
+  --surface-2: var(--ui-bg-soft);
+  --surface-3: var(--ui-bg-muted);
+  --line: var(--ui-border);
+  --muted: var(--ui-text-muted);
+  --ink: var(--ui-text-main);
+  --blue: var(--ui-accent);
+  --green: var(--ui-success);
+  --red: var(--ui-danger);
+  --orange: var(--ui-accent-alt);
+  --purple: #7c3aed;
+  --cyan: var(--ui-accent);
+  --max: 1120px;
+}
+
+body {
+  background: var(--ui-bg-page);
+  color: var(--ink);
+}
+
+.site-header {
+  width: min(1120px, calc(100% - 32px));
+  min-height: 62px;
+  margin: 18px auto 0;
+  padding: 9px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.brand { color: var(--ink); }
+.brand > span { background: var(--blue-soft); border: 1px solid var(--line); color: var(--blue); }
+.brand small { color: var(--slate); }
+.site-header nav button { color: var(--slate); }
+.site-header nav button span { color: var(--slate-2); }
+.site-header nav button:hover,
+.site-header nav button.active { background: var(--blue-soft); color: var(--blue); }
+
+.presenter-button,
+.primary-button {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #fff;
+}
+
+.presenter-button:hover,
+.primary-button:hover { background: #c86435; border-color: #c86435; }
+
+.page-section {
+  width: min(1120px, calc(100% - 32px));
+  margin: 24px auto;
+  padding: 42px 30px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-soft);
+  scroll-margin-top: 98px;
+}
+
+.page-section + .page-section { border-top: 1px solid var(--line); }
+.hero-section {
+  display: grid;
+  grid-template-columns: minmax(0, .96fr) minmax(0, 1.04fr);
+  grid-template-areas:
+    "index index"
+    "copy visual";
+  gap: 18px 42px;
+  min-height: 0;
+  padding-top: 42px;
+  padding-bottom: 42px;
+}
+.hero-section .section-index { position: static; grid-area: index; align-self: start; }
+.hero-copy { grid-area: copy; align-self: center; padding-top: 0; }
+.hero-research-loop { grid-area: visual; width: 100%; max-width: none; align-self: center; }
+.section-index,
+.eyebrow { color: var(--blue); }
+
+.hero-copy h1,
+.section-heading h2 {
+  color: var(--ink);
+  font-family: Georgia, "Songti SC", serif;
+}
+
+.hero-copy h1 em { color: var(--blue); }
+.hero-copy > p:not(.eyebrow),
+.section-heading p { color: var(--ink-2); }
+.hero-copy h1 { font-size: clamp(2.8rem, 5.1vw, 4.55rem); line-height: 1.05; }
+.section-heading h2 { font-size: clamp(2rem, 4.2vw, 3rem); line-height: 1.16; }
+.paper-source { border-color: var(--line); color: var(--blue); }
+.paper-source:hover { background: var(--blue-soft); border-color: var(--blue); }
+
+.section-heading { margin-bottom: 30px; }
+.section-heading > span { color: var(--blue); font-family: Georgia, "Songti SC", serif; }
+.challenge-grid article,
+.architecture-figure,
+.method-workflow,
+.benchmark-explorer,
+.simulator-shell,
+.experiment-pair,
+.experiment-thesis,
+.takeaway-compare article {
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.challenge-grid article { border-top-color: var(--blue); }
+.challenge-grid article:nth-child(2) { border-top-color: var(--orange); }
+.challenge-grid article:nth-child(3) { border-top-color: var(--purple); }
+.challenge-grid .challenge-answer { background: var(--green-soft); border-left-color: var(--green); }
+.challenge-grid .challenge-answer strong { color: var(--green); }
+.method-transition { color: var(--ink-2); }
+.method-transition b,
+.method-transition i { color: var(--blue); }
+
+.simulator-shell,
+.experiment-thesis,
+.experiment-pair,
+.benchmark-explorer { background: var(--paper); }
+.sim-stage-rail,
+.method-workflow,
+.architecture-figure { background: var(--paper-2); }
+.sim-stage-rail button:hover,
+.sim-stage-rail button.active,
+.mechanism-control button:hover,
+.mechanism-control button.active { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+
+.presenter-bar {
+  background: var(--paper);
+  border-color: var(--line-2);
+  box-shadow: var(--ui-shadow-hover);
+}
+
+.presenter-bar b { color: var(--blue); }
+.presenter-progress { background: var(--blue-soft); }
+.presenter-progress i { background: var(--blue); }
+.presenter-bar > button { background: var(--paper-2); border-color: var(--line); color: var(--ink); }
+
+footer {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto 28px;
+  padding: 18px 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-lg);
+  color: var(--slate);
+  text-align: center;
+}
+
+/* Keep the six original sections legible as a presentation, without altering
+   their narrative order.  These overrides also remove the legacy decorative
+   gradients that competed with the evidence and interaction states. */
+.challenge-grid article,
+.method-stage,
+.experiment-pair,
+.experiment-evidence,
+.evidence-table,
+.t10-case-study,
+.critical-reading,
+.simulator-shell,
+.sim-stage-rail,
+.sim-persistent-loop,
+.method-inspector,
+.takeaway-figure {
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+.challenge-grid article:nth-child(2),
+.challenge-grid article:nth-child(3),
+.method-stage.discovery,
+.method-stage.experimentation,
+.method-stage.writing,
+.experiment-pair > header,
+.pair-q2 > header,
+.pair-q3 > header,
+.pair-design,
+.pair-result,
+.pair-q2 .pair-design,
+.pair-q2 .pair-result,
+.pair-q3 .pair-design,
+.pair-q3 .pair-result,
+.pair-takeaway,
+.pair-q2 .pair-takeaway,
+.pair-q3 .pair-takeaway,
+.overview-evolution {
+  background: var(--ui-bg-muted);
+}
+
+.challenge-grid article h3,
+.method-stage strong,
+.method-inspector b,
+.experiment-pair > header h3,
+.pair-design > b,
+.pair-result strong,
+.pair-takeaway,
+.critical-reading { color: var(--ink); }
+
+.challenge-grid article p,
+.method-stage li,
+.method-inspector p,
+.pair-design > p,
+.pair-result > p,
+.pair-takeaway,
+.critical-reading li { color: var(--ink-2); }
+
+.method-stage.discovery,
+.pair-q1 .pair-design { border-top-color: var(--blue); }
+.method-stage.experimentation,
+.pair-q2 .pair-design { border-top-color: var(--orange); }
+.method-stage.writing,
+.pair-q3 .pair-design { border-top-color: var(--purple); }
+.pair-result { border-left-color: var(--green); }
+.pair-q2 .pair-result { border-left-color: var(--red); }
+.pair-q3 .pair-result { border-left-color: var(--green); }
+
+.experiment-method-strip,
+.interaction-hint,
+.guess-feedback,
+.motion-example-note {
+  background: var(--ui-bg-soft);
+  border-color: var(--line);
+  color: var(--ink-2);
+}
+
+.experiment-method-strip b,
+.experiment-evidence > summary,
+.evidence-table > summary { color: var(--blue); }
+
+.benchmark-design-heading { padding-bottom: 14px; }
+.benchmark-design-heading h3 { margin-bottom: 6px; font-size: clamp(1.35rem, 2.4vw, 1.75rem); }
+.benchmark-quick-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 20px; background: var(--ui-bg-muted); border-top: 1px solid var(--line); color: var(--ink-2); font-size: .88rem; }
+.benchmark-quick-facts b { color: var(--blue); }
+.benchmark-quick-facts i { color: var(--line-2); font-style: normal; }
+.benchmark-details,
+.experiment-case-detail { margin: 14px 20px 20px; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); }
+.benchmark-details > summary,
+.experiment-case-detail > summary { cursor: pointer; color: var(--blue); font-size: .92rem; font-weight: 800; }
+.benchmark-details[open] > summary,
+.experiment-case-detail[open] > summary { margin-bottom: 16px; }
+.benchmark-details .experiment-design-flow { padding-right: 0; padding-left: 0; }
+.benchmark-details .benchmark-protocol { margin-right: -14px; margin-left: -14px; }
+.benchmark-details .benchmark-coverage { margin: 14px 0 0; }
+.experiment-case-detail { margin: 0 0 22px; }
+.experiment-case-detail .t10-case-study { margin: 0; }
+
+.experiment-evidence,
+.evidence-table { overflow-x: auto; }
+.evidence-table table { min-width: 560px; }
+.experiment-evidence summary,
+.evidence-table summary,
+.explore-more summary { padding: 2px 0; }
+.guess-board button.selected,
+.ablation-selector button.selected { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); }
+.guess-board .primary-button:disabled { cursor: not-allowed; filter: grayscale(.45); opacity: .58; transform: none; }
+.guess-feedback { margin: 10px 0; padding: 8px 10px; border-left: 3px solid var(--blue); font-size: .88rem; }
+.fabricated-papers i { color: var(--ink); }
+
+/* Simulator: the animated scenes are structured diagrams, with a single
+   readable action and a persistent state message for each step. */
+.motion-scene {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-md);
+}
+
+.motion-scene-heading { display: grid; gap: 3px; }
+.motion-scene-heading span,
+.motion-example-note,
+.motion-status { font-size: .82rem; }
+.motion-scene-heading span { color: var(--blue); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.motion-scene-heading b { color: var(--ink); font-size: 1.08rem; }
+.failure-canvas-scene canvas { width: 100%; height: auto; margin: 0; background: var(--paper); }
+.motion-scene-actions,
+.gate-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.motion-status { padding: 7px 10px; border-left: 3px solid var(--blue); background: var(--ui-bg-soft); color: var(--ink-2); }
+.motion-status.failure { border-left-color: var(--red); background: var(--red-soft); color: #9e2639; }
+.danger-button { background: var(--red); color: #fff; }
+.motion-example-note { margin: -6px 0 0; padding: 7px 10px; border-left: 3px solid var(--orange); }
+
+.route-map { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--ui-radius-sm); background: var(--ui-bg-muted); }
+.route-map svg { display: block; width: 100%; min-width: 660px; height: auto; }
+.route-map path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route-map .route-input { stroke: var(--line-2); stroke-width: 4; }
+.route-map .route-line { stroke: var(--line-2); stroke-width: 4; opacity: .72; transition: stroke var(--t-med) var(--ease-out), stroke-width var(--t-med) var(--ease-out), opacity var(--t-med) var(--ease-out); }
+.route-map .route-line.selected { stroke-width: 7; opacity: 1; }
+.route-map .route-line.repair.selected { stroke: var(--green); }
+.route-map .route-line.refine.selected { stroke: var(--orange); }
+.route-map .route-line.pivot.selected { stroke: var(--red); }
+.route-map #route-arrow path { fill: var(--line-2); }
+.route-node rect,
+.route-target rect { fill: var(--paper); stroke: var(--line-2); stroke-width: 2; }
+.route-node.failure rect { fill: var(--red-soft); stroke: var(--red); }
+.route-target.repair rect { fill: var(--green-soft); stroke: var(--green); }
+.route-target.refine rect { fill: var(--orange-soft); stroke: var(--orange); }
+.route-target.pivot rect { fill: var(--red-soft); stroke: var(--red); }
+.route-node text,
+.route-target text { fill: var(--ink); font-family: var(--ui-font-sans); font-size: 17px; font-weight: 700; text-anchor: middle; }
+.route-node .minor,
+.route-target .minor { fill: var(--ui-text-muted); font-size: 12px; font-weight: 500; }
+.route-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.route-controls button { display: grid; gap: 2px; min-height: 72px; padding: 11px; background: var(--paper); border: 1px solid var(--line); border-top: 4px solid var(--line-2); border-radius: var(--ui-radius-sm); color: var(--ink); text-align: left; }
+.route-controls button span { color: var(--ink-2); font-size: .84rem; }
+.route-controls button.repair { border-top-color: var(--green); }
+.route-controls button.refine { border-top-color: var(--orange); }
+.route-controls button.pivot { border-top-color: var(--red); }
+.route-controls button.active,
+.route-controls button:hover { background: var(--ui-bg-soft); border-color: var(--blue); transform: translateY(-1px); }
+.motion-conclusion { margin: 0; padding: 10px 12px; border-left: 3px solid var(--blue); background: var(--ui-bg-soft); color: var(--ink-2); }
+.motion-conclusion b { color: var(--ink); }
+
+.registry-gate { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 10px; }
+.registry-gate > i { display: grid; place-items: center; color: var(--line-2); font-style: normal; }
+.claim-token,
+.registry-door,
+.paper-slot { display: grid; gap: 6px; min-height: 88px; align-content: center; padding: 12px; background: var(--ui-bg-muted); border: 1px solid var(--line); border-radius: var(--ui-radius-sm); }
+.claim-token span,
+.registry-door span,
+.paper-slot span { color: var(--ink-2); font-size: .78rem; }
+.claim-token b,
+.registry-door b,
+.paper-slot b { color: var(--ink); font-size: .95rem; }
+.registry-door.accepted,
+.paper-slot.accepted { background: var(--green-soft); border-color: var(--green); }
+.registry-door.blocked,
+.paper-slot.blocked,
+.claim-token.blocked { background: var(--red-soft); border-color: var(--red); }
+.registry-door.accepted b,
+.paper-slot.accepted b { color: var(--green); }
+.registry-door.blocked b,
+.paper-slot.blocked b,
+.claim-token.blocked b { color: #9e2639; }
+.gate-controls button { padding: 8px 11px; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--ui-radius-sm); color: var(--ink); }
+.gate-controls button:first-child:hover { border-color: var(--green); background: var(--green-soft); }
+.gate-controls button:last-child:hover { border-color: var(--red); background: var(--red-soft); }
+.citation-pipeline { display: grid; gap: 10px; padding-top: 2px; }
+.citation-pipeline > i { justify-self: center; color: var(--line-2); font-style: normal; }
+.citation-source,
+.citation-result { display: grid; gap: 3px; justify-self: center; width: min(400px, 100%); padding: 11px; background: var(--ui-bg-muted); border: 1px solid var(--line); border-radius: var(--ui-radius-sm); text-align: center; }
+.citation-source span { color: var(--ink-2); font-size: .78rem; }
+.citation-source b,
+.citation-result b { color: var(--ink); font-size: .92rem; }
+.citation-checks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.citation-checks > div { display: grid; gap: 2px; padding: 9px; background: var(--ui-bg-muted); border: 1px solid var(--line); border-radius: var(--ui-radius-sm); }
+.citation-checks b { color: var(--blue); font-family: var(--ui-font-mono); font-size: .75rem; }
+.citation-checks span { color: var(--ink); font-weight: 700; font-size: .84rem; }
+.citation-checks small { color: var(--ink-2); }
+.citation-pipeline.verified .citation-checks > div,
+.citation-pipeline.verified .citation-result { background: var(--green-soft); border-color: var(--green); }
+.citation-pipeline.suspicious .citation-checks > div:nth-child(n + 3),
+.citation-pipeline.suspicious .citation-result { background: var(--orange-soft); border-color: var(--orange); }
+
+.memory-flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 8px; }
+.memory-flow article { display: grid; gap: 5px; align-content: start; min-height: 116px; padding: 12px; background: var(--ui-bg-muted); border: 1px solid var(--line); border-top: 4px solid var(--blue); border-radius: var(--ui-radius-sm); }
+.memory-flow article.lesson-card { border-top-color: var(--purple); }
+.memory-flow article.store-card { border-top-color: var(--orange); }
+.memory-flow article.run-two { border-top-color: var(--green); }
+.memory-flow article span,
+.prompt-preview span { color: var(--ink-2); font-size: .78rem; }
+.memory-flow article b { color: var(--ink); font-size: .94rem; }
+.memory-flow article small { color: var(--ink-2); }
+.memory-flow > i { display: grid; place-items: center; color: var(--line-2); font-style: normal; }
+.lesson-switcher { display: flex; flex-wrap: wrap; gap: 8px; }
+.lesson-switcher button { padding: 7px 10px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--ui-radius-pill); color: var(--ink-2); }
+.lesson-switcher button.active,
+.lesson-switcher button:hover { background: var(--purple-soft); border-color: var(--purple); color: #6241b0; }
+.prompt-preview { display: grid; gap: 6px; padding: 12px; background: var(--ui-bg-soft); border-left: 3px solid var(--purple); }
+.prompt-preview code { overflow-wrap: anywhere; color: var(--ink); font-size: .87rem; }
+.prompt-preview b { color: var(--ink-2); font-size: .85rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  .hero-traveller { display: none; }
+}
+
+@media (max-width: 980px) {
+  .site-header { width: min(100% - 24px, 1120px); }
+  .page-section,
+  footer { width: min(100% - 24px, 1120px); }
+  .memory-flow { grid-template-columns: 1fr; }
+  .memory-flow > i { min-height: 20px; transform: rotate(90deg); }
+}
+
+@media (max-width: 660px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .site-header nav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    width: 100%;
+  }
+  .site-header nav button { padding: 7px 6px; }
+  .presenter-button { padding: 8px 9px; white-space: nowrap; }
+  .presenter-button small,
+  .presenter-button kbd { display: none; }
+  .site-header,
+  .page-section,
+  footer { width: min(100% - 20px, 1120px); }
+
+  .page-section { padding: 28px 18px; border-radius: var(--ui-radius-md); }
+  .site-header,
+  footer { border-radius: var(--ui-radius-md); }
+  .hero-section { grid-template-columns: 1fr; grid-template-areas: "index" "copy" "visual"; gap: 18px; }
+  .hero-copy h1 { font-size: clamp(2.15rem, 10.7vw, 2.7rem); overflow-wrap: normal; }
+  .section-heading h2 { font-size: 2rem; overflow-wrap: anywhere; }
+  .route-controls,
+  .registry-gate,
+  .citation-checks { grid-template-columns: 1fr; }
+  .registry-gate > i { min-height: 20px; transform: rotate(90deg); }
+  .route-map svg { min-width: 600px; }
+  .motion-scene { padding: 15px; }
+  .benchmark-quick-facts { padding: 11px 14px; }
+  .benchmark-details,
+  .experiment-case-detail { margin-right: 13px; margin-left: 13px; }
+}

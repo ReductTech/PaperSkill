@@ -1,0 +1,50 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { ArchitectureRouteV4 } from './architecture-route';
+import { BenchmarkLensV4 } from './benchmark-lens';
+import { DarkroomAnalogy1 } from './darkroom-analogy-1';
+import { DarkroomAnalogy2 } from './darkroom-analogy-2';
+import { DarkroomAnalogy3 } from './darkroom-analogy-3';
+import { DarkroomAnalogy4 } from './darkroom-analogy-4';
+import { DarkroomAnalogy5 } from './darkroom-analogy-5';
+import { DarkroomAnalogy6 } from './darkroom-analogy-6';
+import { DecoderFigureCompareV4 } from './decoder-figure-compare';
+import { GenerationGalleryV4 } from './generation-gallery';
+import { HeroNewV4 } from './hero-new-v4';
+import { HeroOldV4 } from './hero-old-v4';
+import { InterGenLimitsV4 } from './intergen-limits';
+import { MetricsDashboardV4 } from './metrics-dashboard';
+import { SemanticTokenizerV4 } from './semantic-tokenizer';
+import { SprintLabV4 } from './sprint-lab';
+import { StoryboardFigureV4 } from './storyboard-figure';
+import { SystemContrastV4 } from './system-contrast';
+import { TaskMaskStudioV4 } from './task-mask-studio';
+import { UnifiedTokenDiffusion } from './unified-token-diffusion';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['architecture-route'] = ArchitectureRouteV4;
+widgetRegistry['benchmark-lens'] = BenchmarkLensV4;
+widgetRegistry['darkroom-analogy-1'] = DarkroomAnalogy1;
+widgetRegistry['darkroom-analogy-2'] = DarkroomAnalogy2;
+widgetRegistry['darkroom-analogy-3'] = DarkroomAnalogy3;
+widgetRegistry['darkroom-analogy-4'] = DarkroomAnalogy4;
+widgetRegistry['darkroom-analogy-5'] = DarkroomAnalogy5;
+widgetRegistry['darkroom-analogy-6'] = DarkroomAnalogy6;
+widgetRegistry['decoder-figure-compare'] = DecoderFigureCompareV4;
+widgetRegistry['generation-gallery'] = GenerationGalleryV4;
+widgetRegistry['hero-new-v4'] = HeroNewV4;
+widgetRegistry['hero-old-v4'] = HeroOldV4;
+widgetRegistry['intergen-limits'] = InterGenLimitsV4;
+widgetRegistry['metrics-dashboard'] = MetricsDashboardV4;
+widgetRegistry['semantic-tokenizer'] = SemanticTokenizerV4;
+widgetRegistry['sprint-lab'] = SprintLabV4;
+widgetRegistry['storyboard-figure'] = StoryboardFigureV4;
+widgetRegistry['system-contrast'] = SystemContrastV4;
+widgetRegistry['task-mask-studio'] = TaskMaskStudioV4;
+widgetRegistry['unified-token-diffusion'] = UnifiedTokenDiffusion;
