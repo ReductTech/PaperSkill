@@ -18,7 +18,7 @@
    npm run build:paper -- <paper-name>
    ```
 
-   普通参与任务只构建本次作品。`npm run build:site` 仅用于管理员完整验收、共享构建逻辑修改和正式 Pages 部署；`npm run catalog` 仍需生成全部作品的总索引，但不会构建网页。
+   普通参与任务只构建本次作品。`npm run build:site` 仅用于管理员完整验收、共享构建逻辑修改和正式 Pages 部署；`npm run catalog` 用于本地验证全部作品的总索引可以生成，运行后必须执行 `git restore catalog/papers.json`，不得在参与者 PR 中提交该文件。
 
-9. 检查本次分支原则上只修改目标作品目录和 `catalog/papers.json`；
+9. 检查本次分支只修改目标作品目录，且不包含 `catalog/papers.json`；
 10. 确认仓库中没有密钥、隐私、本地绝对路径或未授权素材。

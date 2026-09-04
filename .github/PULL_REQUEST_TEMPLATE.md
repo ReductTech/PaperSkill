@@ -8,13 +8,13 @@
 
 - [ ] 新增一个论文教程实现
 - [ ] 修改已有论文实现
-- [ ] 仅修改了本实现目录和自动生成的 `catalog/papers.json`
+- [ ] 仅修改了本实现目录，未提交自动生成的 `catalog/papers.json`
 - [ ] 已完成至少三项实质性人工修改
 
 ## 自检
 
 - [ ] 已运行 `npm run validate`
-- [ ] 已运行 `npm run catalog`
+- [ ] 已运行 `npm run catalog` 验证目录可生成，并在提交前恢复了 `catalog/papers.json`
 - [ ] 已运行 `npm run build:paper -- <paper-name>`
 - [ ] 页面交互、移动端布局和资源路径正常
 - [ ] 论文事实、公式和实验数字已人工核对
