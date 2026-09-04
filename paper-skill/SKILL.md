@@ -138,7 +138,7 @@ After Phase 1 passes, read **only** the generated temporary `SKILL.md` and its c
 18. Verify every formula's symbols, shapes or dimensions, sign, normalization, and surrounding assumptions before using it in prose or an interaction.
 19. Record every result's dataset, split or evaluation protocol, baseline, unit, and metric direction. Never compare values from incompatible protocols or treat lower-is-better and higher-is-better metrics alike. Cover major ablations, transfer results, and limitations when the paper reports them.
 20. Present the old-method limitation before introducing the paper's solution.
-21. Reveal chapters progressively. Do not show replay copy or next-section instructional copy inside the page.
+21. The app uses a slide layout: a fixed left sidebar TOC (collapsible), one chapter per screen, and a full-width bottom nav bar pinned to the viewport. Chapter switching is owned by `App.tsx` — do not show replay copy or next-section instructional copy inside the page.
 22. **Bilibili videos are optional** (per `contract.md` §7). Use real `bvid`s (e.g. `BV1xx...`) in `tutorial.bilibili`. If no relevant video exists at all, omit the `bilibili` array; if any relevant video is found, **always include and display it** (video + cover + views) even when Bilibili API verification fails — verification is not a gate.
 23. Continue directly from Phase 1 to Phase 2.
 24. Remove the exact task-scoped temporary root on success or failure, unless `PAPER_SKILL_DEBUG=true`. Confirm that the root, source cache, and temporary paperSkill no longer exist before responding (or, in debug mode, that the root is preserved and its path is returned).
@@ -225,8 +225,8 @@ paper-agnostic adaptation of the template tutorial reference UI. Treat them as t
 source of truth rather than as optional starter styles; the generator fills only
 `src/data/tutorial.ts`, `src/styles/paper.css`, and `src/modules/*`.
 
-1. Keep the Hero outside `main`, with one centered `.hero-inner`, restrained metadata pills, and two bordered old-versus-new panels with compact header bands.
-2. Keep `main` at the bundled width and spacing. Render every chapter as a white bordered surface with the numbered serif accent used by `.chap-title`.
+1. Keep the slide layout shell from `App.tsx`: sidebar TOC (cover + chapters + optional videos) on the left, Hero as the cover slide with one centered `.hero-inner`, restrained metadata pills, and two bordered old-versus-new panels with compact header bands.
+2. Keep the main column at the bundled `max-width` and centered spacing. Render every chapter as a white bordered surface with the numbered serif accent used by `.chap-title`.
 3. Keep each `.module` as a framed interactive tool: muted header band, white body, subtle border, and no decorative gradient or paper-specific redesign.
 4. Keep chapter bridges, analogy cards, formula explanations, takeaways, controls, tables, metrics, and feedback in the exact bundled component hierarchy.
 5. Keep the Bilibili recommendations (when present) as `.dl-related-section`, outside the chapter count, with the horizontal four-item strip that becomes a two-item strip on narrow screens.

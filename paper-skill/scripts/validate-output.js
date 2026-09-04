@@ -181,13 +181,15 @@ function main() {
     // `__METAPHOR_CSS__` placeholder intentionally lives inside a comment marker.
     const tut = stripComments(tutRaw);
     // --- 2 & 3. chapter / module / dual-module counts ---
-    const chapterCount = (tut.match(/kind:\s*["']chapter["']/g) || []).length;
-    const moduleCount = (tut.match(/kind:\s*["']module["']/g) || []).length;
+    // Quote-tolerant: tutorial.ts may be hand-written (`kind: "chapter"`) or
+    // assembled from JSON packets via JSON.stringify (`"kind": "chapter"`).
+    const chapterCount = (tut.match(/["']?kind["']?\s*:\s*["']chapter["']/g) || []).length;
+    const moduleCount = (tut.match(/["']?kind["']?\s*:\s*["']module["']/g) || []).length;
 
-    const chapterBlocks = tut.split(/kind:\s*["']chapter["']/);
+    const chapterBlocks = tut.split(/["']?kind["']?\s*:\s*["']chapter["']/);
     let dual = 0;
     for (let i = 1; i < chapterBlocks.length; i++) {
-      const m = (chapterBlocks[i].match(/kind:\s*["']module["']/g) || []).length;
+      const m = (chapterBlocks[i].match(/["']?kind["']?\s*:\s*["']module["']/g) || []).length;
       if (m >= 2) dual += 1;
     }
 
@@ -239,7 +241,7 @@ function main() {
     }
 
     // --- 5. Bilibili bvid check ---
-    const bvidRe = /bvid:\s*["']([^"']*)["']/g;
+    const bvidRe = /["']?bvid["']?\s*:\s*["']([^"']*)["']/g;
     let bm;
     let total = 0;
     let empty = 0;
@@ -262,7 +264,7 @@ function main() {
 
     // --- 6. componentId registration ---
     const registry = readSafe(path.join(dir, 'src/modules/registry.tsx')) || '';
-    const compIds = [...tut.matchAll(/componentId:\s*["']([^"']+)["']/g)].map((m) => m[1]);
+    const compIds = [...tut.matchAll(/["']?componentId["']?\s*:\s*["']([^"']+)["']/g)].map((m) => m[1]);
     const uniqueIds = [...new Set(compIds)];
     const unregistered = [];
     for (const id of uniqueIds) {

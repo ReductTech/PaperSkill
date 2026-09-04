@@ -101,6 +101,9 @@ visible sections even though it contains more fine-grained elements.
 | `p1SliderChaptersMax`          | 4     | Chapters that may use the P1 slider pattern.                         |
 | `mathOrHybridModulesMin`       | 4     | Modules using mathematical/technical **or** hybrid views.            |
 | `lifeOrHybridModulesMin`       | 4     | Modules using life-metaphor **or** hybrid views.                     |
+| `canvasLabelMaxCount`          | 2     | Max short text labels drawn inside one module Canvas (numbers only count once). |
+| `canvasLabelMaxChars`          | 8     | Max chars per in-Canvas label.                                       |
+| `canvasLegendMaxItems`         | 3     | Max entries in one in-Canvas legend.                                 |
 
 Notes:
 
@@ -120,7 +123,7 @@ Notes:
 
 | Field                | Value                       |
 | -------------------- | --------------------------- |
-| `analogyCanvasSize`  | `244 x 130`                 |
+| `analogyCanvasSize`  | `560 x 140`                 |
 | `subjects`           | exactly one primary subject |
 | `verbs`              | one physical action verb    |
 | `goals`              | one visible goal            |
@@ -149,7 +152,7 @@ pixels.
 | guidance or current state (blue)  | `#27446e` | selected path, active label, model, progress       |
 | success or paper method (green)   | `#228d5c` | repaired route, stable state, best verified result |
 | failure or old method (red)       | `#c43f52` | degradation, drift, harmful state                  |
-| emphasis / user value (orange)    | `#d97706` | selected marker, parameter emphasis, threshold     |
+| emphasis / user value (orange)    | `#f07e47` | selected marker, parameter emphasis, threshold     |
 | auxiliary mechanism (purple)      | `#7c3aed` | secondary method only, used sparingly              |
 | main Canvas text                  | `#21324a` | labels and headings                                |
 | muted Canvas text                 | `#68778f` | legend and secondary labels                        |
@@ -160,8 +163,9 @@ Invariants:
 - red never means success; green never means failure.
 - blue = guidance / current state; orange = user-controlled emphasis; purple = auxiliary.
 - Inside CSS, `--blue`, `--green`, `--red`, `--orange`, `--purple` in
-  `assets/react-template/src/styles/tokens.css` map to these roles. Do not repurpose
-  `--accent` for a different role — it aliases orange (emphasis), not blue.
+  `assets/react-template/src/styles/tokens.css` map to these roles. `--accent`
+  aliases blue (guidance / current state), matching `--ui-accent` from the Shared
+  UIKit; orange emphasis is exposed as `--orange` / `--ui-accent-alt`.
 
 ---
 
