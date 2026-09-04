@@ -14,7 +14,7 @@ Agent 可以在仓库外部新建 `PR_MATERIALS/` 目录，生成以下草稿：
 - `PR_MATERIALS/01-pr-title-and-description.md` — PR 标题和说明
 - `PR_MATERIALS/02-interactions.md` — 主要交互说明及其他
 
-使用者确认后，Agent 整合进 Pull Request 的说明；`PR_MATERIALS/` 不提交到仓库。无需准备独立的修改说明、评分材料或现场展示提纲。
+使用者确认后，Agent 整合进 Pull Request 的说明；`PR_MATERIALS/` 不提交到仓库。
 
 ## 1. Agent 提交前自动检查（必须全部通过）
 

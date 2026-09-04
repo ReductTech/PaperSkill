@@ -5,7 +5,6 @@
 | 文件 | 主要使用者 | 用途 |
 | --- | --- | --- |
 | [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) | Agent、使用者 | 菜单模式入口；各功能的详细步骤见 [agent-workflow/](agent-workflow/) |
-| [QUALITY_CHECK.md](QUALITY_CHECK.md) | 使用者、审核者 | 不计分的教程质量检查指南 |
 | [PARTICIPATING.md](PARTICIPATING.md) | 贡献者、Agent | 分支、完整项目导入、本地校验、Pull Request 和失败处理 |
 | [SUBMISSION.md](SUBMISSION.md) | 贡献者、审核者 | 公共仓库接收内容、PR 材料和安全边界 |
 
