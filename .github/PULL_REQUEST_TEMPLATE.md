@@ -12,11 +12,14 @@
 - [ ] 已由人工对照原论文核验网页内容与信息准确性
 - [ ] 创建 Pull Request 前已提供可运行的网页预览，并由使用者确认页面显示与主要交互正常
 
-## 自检
+## Agent 自动检查
 
-- [ ] 已运行 `npm run validate`
-- [ ] 已运行 `npm run catalog` 验证目录可生成，并在提交前恢复了 `catalog/papers.json`
-- [ ] 已运行 `npm run build:paper -- <paper-name>`
+- [ ] Agent 已针对最终待提交源码运行 `npm run validate`
+- [ ] Agent 已运行 `npm run catalog` 验证目录可生成，并恢复了 `catalog/papers.json`
+- [ ] Agent 已运行 `npm run validate:pr -- main`
+- [ ] Agent 已运行 `npm run build:paper -- <paper-name>`
+- [ ] Agent 已运行 `git diff --check main...HEAD`，并检查最终差异与 `git status --short`
+- [ ] 上述自动检查全部通过，项目格式、目录结构、分支范围和构建结果正确
 - [ ] 页面交互、移动端布局和资源路径已由使用者通过提交前预览确认
 - [ ] 论文事实、公式、模型结构、实验数字、结论和局限已由人工对照原文核对
 - [ ] 未提交 `node_modules/`、`dist/`、密钥或本地绝对路径

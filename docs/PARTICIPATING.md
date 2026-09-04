@@ -72,18 +72,23 @@ html_output/<paper-name>/
 
 ## 5. 本地验收
 
-在仓库根目录执行：
+创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给参与者代为执行：
 
 ```powershell
 npm run validate
 npm run catalog
+git restore catalog/papers.json
 npm run validate:pr -- main
 npm run build:paper -- <paper-name>
+git diff --check main...HEAD
+git status --short
 ```
 
 `npm run validate:pr` 在普通本地终端中没有 Pull Request 基准信息，会主动跳过；本地验收必须显式追加 `-- main`。
 `npm run build:paper` 只安装、检查并构建本次提交的教程，普通参与者不需要在本地重复构建仓库中的全部作品。`npm run build:site` 保留给管理员完整验收、共享构建逻辑修改和 GitHub Pages 正式部署。
 `npm run catalog` 用于在本地确认全部 `paper.json` 可以正常生成索引。它会修改 `catalog/papers.json`，普通参与者不得提交该文件，应在创建 Pull Request 前运行 `git restore catalog/papers.json`。索引由管理员在审核发布时基于最新 `main` 统一生成。
+
+Agent 必须继续检查最终差异，确认目录名称、项目结构、`paper.json`、分支范围和提交格式正确，且不包含 `node_modules/`、`dist/`、自动生成的 `catalog/papers.json`、密钥、个人隐私或本地绝对路径。任一检查失败时，必须先修复并重新运行相关检查；不得带错进入预览或 Pull Request 阶段。
 
 还应人工确认：
 
@@ -102,7 +107,7 @@ npm run build:paper -- <paper-name>
 html_output/<paper-name>/
 ```
 
-普通参与任务不得同时修改 `paper-skill/`、管理脚本、工作流或其他论文目录。检查通过，并完成人工内容核验和网页预览确认后，方可推送个人分支并创建 Pull Request；不要直接推送 `main`。
+普通参与任务不得同时修改 `paper-skill/`、管理脚本、工作流或其他论文目录。Agent 自动检查全部通过，并完成人工内容核验和网页预览确认后，方可推送个人分支并创建 Pull Request；不要直接推送 `main`。
 
 Pull Request 创建后，作品保持 `review` 状态。普通参与者 PR 不提交 `catalog/papers.json`，PR 自动检查也不要求总索引与新增作品同步。
 
