@@ -5,15 +5,15 @@ with the same internal order. Write all visible chapter copy in natural Simplifi
 
 ## Required Element Order
 
-In the React model, each chapter is one `ChapterDef` entry in `src/data/tutorial.ts`. The
-render order is fixed by `App.tsx` (do not reorder it); the same internal order applies to
-every chapter:
+In the React model, each chapter is one `ChapterDef` entry in `src/data/tutorial.ts`. Each
+chapter renders as one slide (one chapter per screen, ordered by `App.tsx`); the same
+internal order applies to every chapter:
 
 ```text
 ChapterDef (kind: "chapter")
 - id, title (Simplified Chinese), badge (inf | trn | both), badgeLabel
 - bridge       -> rendered as .chap-bridge ("本节作用")
-- analogy      -> AnalogyCard (244x130 canvas animation OR an optional figure)
+- analogy      -> AnalogyCard (560x140 canvas animation OR an optional figure)
 - modules[]    -> one or two ModuleDef (kind: "module"); each has title, desc, componentId
 - insight?     -> InsightBar (optional, shown after the learner experiences the limit)
 - formula?     -> Formula (Unicode, clickable symbols)
@@ -25,9 +25,10 @@ per `contract.md` §2.3: `bridge`+`analogy`(+`insight`) form the intro section, 
 (+`formula`) form the body section, and `takeaways` form the recap section. Never present a
 fourth standalone section; fold extra material into one of the three.
 
-The Hero renders outside `<main>`; the optional Bilibili strip (`.dl-related-section`) is
-outside the chapters. The app must contain exactly `chapterCount` (6–10) chapters — entries
-with `kind: "chapter"` in `src/data/tutorial.ts`. `validate-output.js` counts them.
+The Hero is the cover slide (slide 0 in `App.tsx`); the optional Bilibili strip
+(`.dl-related-section`) is the last slide. The app must contain exactly `chapterCount` (6–10)
+chapters — entries with `kind: "chapter"` in `src/data/tutorial.ts`. `validate-output.js`
+counts them.
 
 ## Element Contracts
 
@@ -39,7 +40,7 @@ with `kind: "chapter"` in `src/data/tutorial.ts`. `validate-output.js` counts th
 
 ### Analogy Card
 
-- Fix Canvas dimensions at `244x130`.
+- Fix Canvas dimensions at `560x140`.
 - Animate one recognizable everyday action selected specifically for this chapter.
 - Use one primary subject, one action verb, one visible goal, and at most two static supporting props.
 - Keep only one independently moving subject.
@@ -60,6 +61,7 @@ with `kind: "chapter"` in `src/data/tutorial.ts`. `validate-output.js` counts th
 - Avoid explaining the answer before the learner experiences the problem.
 - Specify the exact initial state, control labels and ranges, Canvas composition, state transitions, and final Simplified Chinese feedback strings in the temporary paperSkill.
 - Give the module one dominant operation and one shared state model. The operation must update the main graphic plus feedback, and a meaningful value or technical view when one exists.
+- Keep the small-font explanatory text to exactly two places: the module description before the Canvas and the feedback line below the controls. Do not add hint rows, hint bars, or extra annotations anywhere else in the module. Prefer state color over additional words.
 - Name the Canvas regions, back-to-front draw list, reusable primitives, and visual mapping from state to geometry, path, curve, distribution, values, or output.
 
 ### Insight Bar

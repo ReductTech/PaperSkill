@@ -3,7 +3,7 @@ import type { AnalogyCard as AnalogyCardDef } from '../types';
 import { widgetRegistry } from '../modules/registry';
 import { Figure } from './Figure';
 
-// Life-metaphor analogy card (244x130 canvas animation OR an optional paper figure).
+// Life-metaphor analogy card (560x140 canvas animation OR an optional paper figure).
 export function AnalogyCard({
   analogy,
   chapterId,
@@ -20,7 +20,7 @@ export function AnalogyCard({
         ) : analogy.figure ? (
           <Figure src={analogy.figure} alt={analogy.title} />
         ) : (
-          <canvas width={244} height={130} />
+          <canvas width={560} height={140} />
         )}
       </div>
       <div className="analogy-body">

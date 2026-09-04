@@ -47,7 +47,7 @@ Every chapter must follow this internal order:
 3. `Chapter role` explaining why it appears here and what question it resolves.
 4. `Animation scene` describing the life-based automatic Canvas animation.
 5. `Interaction patterns` naming P1-P8 assignments.
-6. `Analogy card (244x130)` with animation content, title, and final Simplified Chinese copy.
+6. `Analogy card (560x140)` with animation content, title, and final Simplified Chinese copy.
 7. `Interactive Module N.1` with every implementation field below.
 8. `Insight bar` after the learner experiences the limitation, when the narrative uses problem-to-solution disclosure.
 9. `Interactive Module N.2` for the paper method or a complementary judgment. At least `dualModuleChaptersMin` chapters must contain this second module (per `contract.md` §3).
