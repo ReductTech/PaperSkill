@@ -5,7 +5,6 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { ROOT } = require('./lib/repository');
-const { injectMobileResponsive } = require('./inject-mobile-responsive');
 
 function nodeScript(name, args = []) {
   const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', name), ...args], { cwd: ROOT, stdio: 'inherit' });
@@ -23,7 +22,6 @@ nodeScript('build-all.js', ['--output', 'site/papers']);
 for (const file of ['index.html', 'styles.css', 'app.js']) {
   fs.copyFileSync(path.join(ROOT, 'portal', file), path.join(site, file));
 }
-injectMobileResponsive(site);
 fs.copyFileSync(path.join(ROOT, 'catalog', 'papers.json'), path.join(site, 'papers.json'));
 fs.writeFileSync(path.join(site, '.nojekyll'), '', 'utf8');
 console.log('集合站已生成到 site/。');
