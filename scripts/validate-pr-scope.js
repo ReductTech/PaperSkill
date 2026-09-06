@@ -33,14 +33,17 @@ const files = [...new Set(statusLines.map((line) => line.split('\t')[1]).filter(
 const added = new Set();
 const deleted = new Set();
 const modified = new Set();
+const addedVersions = new Set();
 for (const line of statusLines) {
   const parts = line.split('\t');
   const status = parts[0];
   const code = status[0];
   // R/C 行格式为 "R100\t<旧路径>\t<新路径>"，目录名以新路径为准
   const file = code === 'R' || code === 'C' ? parts[2] : parts[1];
-  const dir = file && file.replace(/\\/g, '/').match(/^html_output\/([^/]+)\//)?.[1];
-  if (!dir) continue;
+  const match = file && file.replace(/\\/g, '/').match(/^html_output\/([^/]+)(?:\/([^/]+))?\//);
+  if (!match) continue;
+  const [, dir, version] = match;
+  if (version) addedVersions.add(`${dir}/${version}`);
   if (code === 'A' || code === 'R' || code === 'C') added.add(dir);
   else if (code === 'D') deleted.add(dir);
   else modified.add(dir);
@@ -68,4 +71,5 @@ if (touchesSkill && touchesPaper) {
   console.error('paper-skill 修改与论文内容参与任务必须拆成不同 Pull Request。');
   process.exit(1);
 }
-console.log(`PR 范围检查通过（${files.length} 个文件${paperDirs.size ? `，论文：${[...paperDirs][0]}` : ''}）。`);
+const versionNote = addedVersions.size ? `，版本：${[...addedVersions].join(', ')}` : '';
+console.log(`PR 范围检查通过（${files.length} 个文件${paperDirs.size ? `，论文：${[...paperDirs][0]}${versionNote}` : ''}）。`);

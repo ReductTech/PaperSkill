@@ -55,13 +55,15 @@ Agent 应展示以下菜单：
 PaperSkill/
 |-- docs/               # 使用流程、人工核验和贡献说明
 |-- paper-skill/        # 共享生成 Skill，由核心维护者维护
-|-- html_output/        # 已导入的完整教程项目
+|-- html_output/        # 已导入的完整教程项目（论文目录 / 版本目录两级）
 |-- catalog/            # 自动生成的论文索引
 |-- portal/             # GitHub Pages 教程集合入口
 |-- scripts/            # 环境配置、导入、验证、索引和构建工具
 `-- .github/            # PR 模板、自动检查和部署流程
 ```
 
-贡献到本仓库的教程统一放入 `html_output/<paper-name>/`。`paper-name` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`。不要把教程直接放在仓库根目录，也不要提交 `node_modules/`、`dist/`、论文 PDF、密钥、个人隐私、本地绝对路径或未获授权的素材。
+贡献到本仓库的教程统一放入 `html_output/<paper-name>/<version>/`。`paper-name` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`；`version` 是「姓名拼音小写 + 修改日期 MMDD」，例如 `liming0903`，同一人同一天再次提交会自动变成 `liming0903_2`。同一篇论文的每个版本都独立保留，不会互相覆盖。
+
+集合站会按论文聚合展示：一张卡片列出该论文的全部版本（作者、修改日期、状态），每个版本都有独立的打开链接。存量扁平目录可用 `npm run migrate:versions`（先预演，确认后加 `--apply`）迁移为版本结构。不要把教程直接放在仓库根目录，也不要提交 `node_modules/`、`dist/`、论文 PDF、密钥、个人隐私、本地绝对路径或未获授权的素材。
 
 `main` 只通过 Pull Request 合并。创建 Pull Request 前，Agent 必须完成提交格式、目录范围和构建检查，并提供最终网页预览；论文事实与教学质量仍须由使用者人工确认。详细流程见 [文档索引](docs/README.md)。

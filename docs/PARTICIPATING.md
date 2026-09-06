@@ -1,17 +1,20 @@
 # 贡献指南
 
-本文只规定网页项目进入 GitHub 公共仓库的技术流程。贡献者的完整教程项目统一提交到 `html_output/<paper-name>/`，不得放在仓库根目录或其他目录。完整自动化流程见 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md)，提交要求见 [SUBMISSION.md](SUBMISSION.md)。
+本文只规定网页项目进入 GitHub 公共仓库的技术流程。贡献者的完整教程项目统一提交到 `html_output/<paper-name>/<version>/`，不得放在仓库根目录或其他目录。完整自动化流程见 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md)，提交要求见 [SUBMISSION.md](SUBMISSION.md)。
 
 ## 1. 论文与目录标识
 
-当前阶段不要求预先认领论文。一篇论文对应一个作品目录，目录名是论文名称（论文全称转小写、单词间用下划线连接，例如 `attention_is_all_you_need`）：
+当前阶段不要求预先认领论文，同一篇论文可以由多位同学各自提交，每个提交保留为独立版本。一篇论文对应一个论文目录，目录名是论文名称（论文全称转小写、单词间用下划线连接，例如 `attention_is_all_you_need`）；每个版本是论文目录下的子目录，目录名是「姓名拼音小写 + 修改日期 MMDD」，例如 `liming0903`：
 
 ```text
-html_output/deep_residual_learning_for_image_recognition/
-html_output/attention_is_all_you_need/
+html_output/deep_residual_learning_for_image_recognition/liming0903/
+html_output/deep_residual_learning_for_image_recognition/zhangsan0910/
+html_output/attention_is_all_you_need/liming0903/
 ```
 
-`paperName` 表示论文名称（论文全称转小写、单词间用下划线连接，例如 `attention_is_all_you_need`），同时作为目录名与 `paper.json` 中的唯一标识。最终目录固定为 `html_output/<paper-name>/`。
+`paperName` 表示论文名称（论文全称转小写、单词间用下划线连接，例如 `attention_is_all_you_need`），同时作为论文目录名与 `paper.json` 中的唯一标识。`version` 表示版本目录名，同时写入 `paper.json` 的 `version` 字段。同一人同一天对同一篇论文重复提交时，导入脚本会自动追加序号（`liming0903_2`、`liming0903_3`）。
+
+不要覆盖或删除他人已有的版本目录；修改自己的网页请重新导入生成新版本，或使用 `--version <已有版本> --force` 覆盖自己那一个版本。
 
 ## 2. 生成项目
 
@@ -34,23 +37,25 @@ paper/<paper-name>
 在仓库根目录运行：
 
 ```powershell
-npm run import -- <生成目录> <paper-name> --title "英文论文名" --paper-url "论文链接" --participant "姓名" --github "GitHub用户名"
+npm run import -- <生成目录> <paper-name> --title "英文论文名" --paper-url "论文链接" --participant "李雷" --pinyin "lilei" --github "GitHub用户名"
 ```
+
+`--participant` 是公开展示名（可写中文），`--pinyin` 是姓名拼音小写，用于生成版本目录名；中文姓名必须显式提供 `--pinyin`。`--date 0903` 可指定修改日期（MMDD 或 YYYY-MM-DD），缺省取当天。
 
 导入后生成：
 
 ```text
-html_output/<paper-name>/
+html_output/<paper-name>/<pinyin><MMDD>/
 ```
 
-该目录就是网页项目在 GitHub 中的最终提交位置。后续修改也应在这个目录内完成，不要修改 `html_output/` 或作品目录的名称。
+例如 `html_output/attention_is_all_you_need/limei0903/`。该目录就是网页项目在 GitHub 中的最终提交位置。后续修改也应在这个版本目录内完成，不要修改 `html_output/`、论文目录或版本目录的名称。
 
 ## 4. 项目结构
 
-每篇教程必须包含：
+每个版本目录必须包含：
 
 ```text
-html_output/<paper-name>/
+html_output/<paper-name>/<version>/
 |-- paper.json
 |-- README.md
 |-- package.json
@@ -64,9 +69,11 @@ html_output/<paper-name>/
 
 `paper.json` 必须符合 `schemas/paper.schema.json`，并由导入脚本自动生成。使用者无需填写或修改仓库内部追踪字段。其中：
 
-- `paperName` 必须与目录名一致；
+- `paperName` 必须与论文目录名一致；
+- `version` 必须与版本目录名一致（姓名拼音小写加 MMDD）；
+- `versionDate` 记录该版本的修改日期（YYYY-MM-DD）；
 - 分支名为 `paper/<paper-name>`；
-- 同一 `paperUrl` 对应一个作品目录。
+- 同一 `paperUrl` 对应一个论文目录，目录下可以有多位同学的版本。
 
 不得提交 `node_modules/`、`dist/`、本地缓存、密钥、个人隐私或未获授权的素材。使用论文图片或其他外部素材时，应在项目 `README.md` 中注明来源并确认允许公开使用。
 
@@ -79,10 +86,12 @@ npm run validate
 npm run catalog
 git restore catalog/papers.json
 npm run validate:pr -- main
-npm run build:paper -- <paper-name>
+npm run build:paper -- <paper-name>/<version>
 git diff --check main...HEAD
 git status --short
 ```
+
+`npm run build:paper` 的参数支持 `<paper-name>/<version>`（只构建一个版本）或 `<paper-name>`（构建该论文的全部版本）。
 
 `npm run validate:pr` 在普通本地终端中没有 Pull Request 基准信息，会主动跳过；本地验收必须显式追加 `-- main`。
 `npm run build:paper` 只安装、检查并构建本次提交的教程，普通贡献者不需要在本地重复构建仓库中的全部作品。`npm run build:site` 保留给管理员完整验收、共享构建逻辑修改和 GitHub Pages 正式部署。
@@ -104,7 +113,7 @@ Agent 必须继续检查最终差异，确认目录名称、项目结构、`pape
 一份教程 PR 原则上只修改：
 
 ```text
-html_output/<paper-name>/
+html_output/<paper-name>/<version>/
 ```
 
 普通参与任务不得同时修改 `paper-skill/`、管理脚本、工作流或其他论文目录。Agent 自动检查全部通过，并完成人工内容核验和网页预览确认后，方可推送个人分支并创建 Pull Request；不要直接推送 `main`。

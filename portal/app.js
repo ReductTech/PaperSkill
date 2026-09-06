@@ -34,12 +34,13 @@ starterForm.addEventListener('submit', (event) => {
   const paperName = document.querySelector('#start-paper-name').value.trim();
   const githubUser = document.querySelector('#start-source').value.trim();
   const name = document.querySelector('#start-name').value.trim();
+  const pinyin = document.querySelector('#start-pinyin').value.trim().toLowerCase();
   const branch = `paper/${paperName}`;
 
-  document.querySelector('#paper-dir-name').textContent = `html_output/${paperName}`;
+  document.querySelector('#paper-dir-name').textContent = `html_output/${paperName}/<拼音><修改日期>（导入脚本自动生成，例如 html_output/${paperName}/${pinyin}0903）`;
   document.querySelector('#branch-command').textContent = `git switch main\ngit pull origin main\ngit switch -c ${branch}`;
   document.querySelector('#skill-command').textContent = `$paper-skill 请阅读并分析《${title}》（${url}），制作成完整的中文交互式论文教程。`;
-  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}" --participant "${name}" --github "${githubUser}"`;
+  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}" --participant "${name}" --pinyin "${pinyin}" --github "${githubUser}"`;
   document.querySelector('#build-paper-command').textContent = `npm run build:paper -- ${paperName}`;
   starterResult.hidden = false;
   starterResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -66,25 +67,68 @@ function titleSizeClass(title) {
   return '';
 }
 
+function statusLabel(status) {
+  if (status === 'published') return '已发布';
+  if (status === 'draft') return '草稿';
+  return '审核中';
+}
+
+/** 版本顺序：已发布优先，其次修改日期最新 */
+function sortedVersions(versions) {
+  return [...(versions || [])].sort((a, b) => {
+    if ((a.status === 'published') !== (b.status === 'published')) return a.status === 'published' ? -1 : 1;
+    if ((a.versionDate || '') !== (b.versionDate || '')) return (b.versionDate || '').localeCompare(a.versionDate || '');
+    return b.version.localeCompare(a.version);
+  });
+}
+
+function versionAuthors(version) {
+  return (version.participants || []).map((item) => item.name).join('、') || '未署名';
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const topic = topicFilter.value;
   const visible = papers.filter((paper) => {
-    const haystack = [paper.title, paper.venue, ...(paper.authors || []), ...(paper.topics || []), ...(paper.participants || []).map((item) => `${item.name} ${item.github || ''}`)].join(' ').toLowerCase();
+    const haystack = [
+      paper.title, paper.venue, ...(paper.authors || []), ...(paper.topics || []),
+      ...(paper.versions || []).flatMap((version) => [
+        version.version,
+        ...(version.participants || []).map((item) => `${item.name} ${item.github || ''}`),
+      ]),
+    ].join(' ').toLowerCase();
     return (!query || haystack.includes(query)) && (!topic || (paper.topics || []).includes(topic));
   });
 
   summary.textContent = `显示 ${visible.length} / ${papers.length} 篇教程`;
   empty.hidden = visible.length !== 0;
-  grid.innerHTML = visible.map((paper) => `
+  grid.innerHTML = visible.map((paper) => {
+    const versions = sortedVersions(paper.versions);
+    return `
     <article class="paper-card">
-      <div class="card-meta"><span>${escapeHtml([paper.venue, paper.year].filter(Boolean).join(' · ') || '论文教程')}</span><span class="status">${paper.status === 'published' ? '已发布' : '审核中'}</span></div>
+      <div class="card-meta"><span>${escapeHtml([paper.venue, paper.year].filter(Boolean).join(' · ') || '论文教程')}</span><span class="status">${statusLabel(paper.status)}</span></div>
       <h2 class="${titleSizeClass(paper.title)}">${escapeHtml(paper.title)}</h2>
       <div class="topics">${(paper.topics || []).map((item) => `<span class="topic">${escapeHtml(item)}</span>`).join('')}</div>
-      <p class="participants">分支：paper/${escapeHtml(paper.paperName)}<br />创建者：${escapeHtml((paper.participants || []).map((item) => item.name).join('、'))}</p>
-      <div class="actions"><a class="open-link" href="./${escapeHtml(paper.tutorialUrl)}">打开教程 →</a><a class="paper-link" href="${escapeHtml(paper.paperUrl)}" target="_blank" rel="noopener">查看原论文</a></div>
+      <div class="versions">
+        <p class="versions-title">网页版本 · ${versions.length}</p>
+        <ul class="version-list">
+          ${versions.map((version) => `
+          <li>
+            <span class="version-info">
+              <span class="version-name">${escapeHtml(version.version)}</span>
+              <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>
+            </span>
+            <a class="open-link" href="./${escapeHtml(version.tutorialUrl)}">打开 →</a>
+          </li>`).join('')}
+        </ul>
+      </div>
+      <div class="card-footer">
+        <a class="paper-link" href="${escapeHtml(paper.paperUrl)}" target="_blank" rel="noopener">查看原论文</a>
+        <span class="branch">分支：paper/${escapeHtml(paper.paperName)}</span>
+      </div>
     </article>
-  `).join('');
+  `;
+  }).join('');
 }
 
 fetch('./papers.json')
@@ -95,10 +139,13 @@ fetch('./papers.json')
   .then((data) => {
     papers = data;
     const topics = [...new Set(papers.flatMap((paper) => paper.topics || []))].sort();
+    const versions = papers.flatMap((paper) => paper.versions || []);
+    const participants = new Set(versions.flatMap((version) => (version.participants || []).map((item) => item.github || item.name)));
     topicFilter.insertAdjacentHTML('beforeend', topics.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join(''));
     document.querySelector('#paper-count').textContent = papers.length;
+    document.querySelector('#version-count').textContent = versions.length;
     document.querySelector('#topic-count').textContent = topics.length;
-    document.querySelector('#participant-count').textContent = new Set(papers.flatMap((paper) => (paper.participants || []).map((item) => item.github || item.name))).size;
+    document.querySelector('#participant-count').textContent = participants.size;
     render();
   })
   .catch((error) => {

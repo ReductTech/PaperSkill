@@ -25,7 +25,7 @@ npm run validate
 npm run catalog
 git restore catalog/papers.json
 npm run validate:pr -- main
-npm run build:paper -- <paper-name>
+npm run build:paper -- <paper-name>/<version>
 git diff --check main...HEAD
 git status --short
 ```
