@@ -2,9 +2,11 @@
 
 以下案例展示了如何将论文内容组织为清晰、直观且可交互的学习网页。
 
-## 完整案例
+## Mage-VL 完整案例
 
-- [Mage-VL：网页、论文讲解与设计讲解](mage_vl/)
+- [Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model](https://reducttech.github.io/PaperSkill/papers/mage_vl/)
+- [观看 Mage-VL 论文内容讲解视频（约 5 分 23 秒）](mage_vl/paper-walkthrough.mp4)
+- [观看 Mage-VL 网页设计思路与制作技巧讲解视频（约 4 分 57 秒）](mage_vl/web-design-notes.mp4)
 
 ## 论文学习网页
 
