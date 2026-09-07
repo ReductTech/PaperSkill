@@ -124,7 +124,6 @@ function render() {
       </div>
       <div class="card-footer">
         <a class="paper-link" href="${escapeHtml(paper.paperUrl)}" target="_blank" rel="noopener">查看原论文</a>
-        <span class="branch">分支：paper/${escapeHtml(paper.paperName)}</span>
       </div>
     </article>
   `;
