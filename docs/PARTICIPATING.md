@@ -1,5 +1,7 @@
 # 贡献指南
 
+本仓库不提供仅在本地生成或使用的流程；开始使用即表示同意在全部检查和网页预览确认通过后创建公开 Pull Request。
+
 本文只规定网页项目进入 GitHub 公共仓库的技术流程。贡献者的完整教程项目统一提交到 `html_output/<paper-name>/`，不得放在仓库根目录或其他目录。完整自动化流程见 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md)，提交要求见 [SUBMISSION.md](SUBMISSION.md)。
 
 ## 1. 论文与目录标识

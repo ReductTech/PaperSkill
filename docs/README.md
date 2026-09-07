@@ -10,4 +10,4 @@
 
 首次使用通常只需阅读仓库根目录的 [README](../README.md)，然后让 Agent 读取 `AGENT_WORKFLOW.md` 并展示功能菜单。Agent 会根据使用者的选择读取 `docs/agent-workflow/` 下对应文件执行。
 
-只在准备向公共仓库贡献教程时，才需要继续阅读 `PARTICIPATING.md` 和 `SUBMISSION.md`。
+完成功能 3 的人工准确性核验后，应继续按照 `PARTICIPATING.md` 和 `SUBMISSION.md` 完成仓库导入和公开 Pull Request 提交。
