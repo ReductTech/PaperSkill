@@ -1,0 +1,94 @@
+<section class="chap" id="sec4">
+  <h2 class="chap-title"><span class="num">§3.</span>线性路径：为什么加噪是可逆的<span class="badge-tag both">关键桥梁</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">↔️</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">§1 展示了加噪去噪现象，但<em>为什么能去噪？</em>因为 ELF 选择了<b>直线路径</b>（线性插值）。这一节解释：为什么简单的线性路径就能保证可逆，以及这如何导出 §4 的 Flow Matching 速度场。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-path" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">直线可逆：沿直线加噪，沿直线去噪</div>
+      <div class="analogy-text">毛笔从<b>干净字</b>直行到<b>噪声端</b>（加噪），再<b>原路折返</b>（去噪）。直线来回，路径确定——这就是线性插值可逆的道理。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">3.1</span>
+      <h4>交互：在 2D 嵌入空间看直线轨迹</h4>
+    </div>
+    <div class="module-body">
+      <p class="module-desc">加噪 = 从绿点（清晰的词）沿直线走到红点（纯噪声）；去噪 = 沿原路走回来。因为是<b>直线</b>，路上每一点的速度向量方向都一样，所以知道这个速度向量就能从噪声原路返回到词。</p>
+      <canvas id="cv-cycle" width="800" height="260"></canvas>
+      <div class="ctrl">
+        <label>🌫️ 加噪程度</label>
+        <input type="range" id="rng-t" min="0" max="100" value="30" step="1" style="flex:0 1 240px;">
+        <span class="val" id="lbl-t">30%</span>
+        <button class="tiny" id="btn-add">▶ 加噪（走过去）</button>
+        <button class="tiny ghost" id="btn-sub">◀ 去噪（走回来）</button>
+        <button class="tiny ghost" id="btn-reset-cycle">↺ 重置</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-explain">
+    <div class="fe-formula"><span class="sym" data-sym="zt">z_t</span> = (1 - <span class="sym" data-sym="t">t</span>) &middot; <span class="sym" data-sym="eps">&epsilon;</span> + <span class="sym" data-sym="t">t</span> &middot; <span class="sym" data-sym="x0">x_0</span></div>
+    <div class="fe-symbols">
+      <span class="sym-desc" data-desc="zt"><b>z_t</b> = t 时刻的中间状态（线性插值）</span>
+      <span class="sym-desc" data-desc="eps"><b>&epsilon;</b> = 纯噪声（t = 0 时）</span>
+      <span class="sym-desc" data-desc="x0"><b>x_0</b> = 清晰的文本（t = 1 时）</span>
+      <span class="sym-desc" data-desc="t"><b>t</b> = 时间步：0 = 纯噪声 → 1 = 清晰文本（ELF 约定）</span>
+    </div>
+    <div class="fe-hint">点击公式里的符号查看解释</div>
+  </div>
+
+  <div class="reversibility-takeaway">
+    <div class="rt-item">
+      <div class="rt-icon">💚</div>
+      <div class="rt-title">起点：清晰的词</div>
+      <div class="rt-desc">每个词在嵌入空间里<br>都有固定的"家"</div>
+    </div>
+    <div class="rt-arrow">→</div>
+    <div class="rt-item mid">
+      <div class="rt-icon">📏</div>
+      <div class="rt-title">路径：一条直线</div>
+      <div class="rt-desc">每一步方向都一样<br>速度是个<b>常数</b></div>
+    </div>
+    <div class="rt-arrow">→</div>
+    <div class="rt-item end">
+      <div class="rt-icon">❤️</div>
+      <div class="rt-title">终点：纯噪声</div>
+      <div class="rt-desc">知道方向和步数<br>就能<b>原路返回</b></div>
+    </div>
+  </div>
+
+</section>
