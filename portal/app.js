@@ -56,6 +56,91 @@ document.querySelectorAll('.copy-btn').forEach((button) => {
   });
 });
 
+// —— 论文搜索补全：输入标题或「小写下划线论文名」时，从已收录论文中匹配，选中即填充 ——
+const urlField = document.querySelector('#start-url');
+const suggestionList = document.querySelector('#paper-suggestions');
+let currentSuggestions = [];
+let activeSuggestion = -1;
+
+function hideSuggestions() {
+  suggestionList.hidden = true;
+  suggestionList.innerHTML = '';
+  currentSuggestions = [];
+  activeSuggestion = -1;
+}
+
+function suggestionScore(paper, query) {
+  const name = paper.paperName;
+  const lowerTitle = paper.title.toLowerCase();
+  if (name.startsWith(query)) return 0;
+  if (name.includes(query)) return 1;
+  if (lowerTitle.startsWith(query)) return 2;
+  if (lowerTitle.includes(query)) return 3;
+  return -1;
+}
+
+function showSuggestions(query) {
+  if (papers.length === 0) return;
+  currentSuggestions = papers
+    .map((paper) => ({ paper, score: suggestionScore(paper, query) }))
+    .filter((item) => item.score >= 0)
+    .sort((a, b) => a.score - b.score || a.paper.paperName.localeCompare(b.paper.paperName))
+    .slice(0, 8);
+  suggestionList.innerHTML = currentSuggestions.length
+    ? currentSuggestions.map((item) => `
+      <li><code>${escapeHtml(item.paper.paperName)}</code><span>${escapeHtml(item.paper.title)}</span></li>`).join('')
+    : '<li class="no-match">没有匹配的论文，可手动填写创建新论文</li>';
+  suggestionList.hidden = false;
+  paintActive();
+}
+
+function paintActive() {
+  const items = [...suggestionList.querySelectorAll('li')];
+  items.forEach((li, index) => li.classList.toggle('active', index === activeSuggestion));
+}
+
+function applySuggestion(paper) {
+  titleField.value = paper.title;
+  urlField.value = paper.paperUrl;
+  paperNameField.value = paper.paperName;
+  hideSuggestions();
+  starterResult.hidden = true;
+}
+
+titleField.addEventListener('input', () => {
+  const query = titleField.value.trim().toLowerCase();
+  if (query) showSuggestions(query); else hideSuggestions();
+});
+
+titleField.addEventListener('keydown', (event) => {
+  if (suggestionList.hidden) return;
+  const count = currentSuggestions.length;
+  if (event.key === 'ArrowDown' && count > 0) {
+    event.preventDefault();
+    activeSuggestion = (activeSuggestion + 1) % count;
+    paintActive();
+  } else if (event.key === 'ArrowUp' && count > 0) {
+    event.preventDefault();
+    activeSuggestion = (activeSuggestion - 1 + count) % count;
+    paintActive();
+  } else if (event.key === 'Enter' && count > 0) {
+    event.preventDefault();
+    applySuggestion(currentSuggestions[Math.max(activeSuggestion, 0)].paper);
+  } else if (event.key === 'Escape') {
+    hideSuggestions();
+  }
+});
+
+suggestionList.addEventListener('mousedown', (event) => event.preventDefault());
+suggestionList.addEventListener('click', (event) => {
+  const item = event.target.closest('li');
+  const index = item ? [...suggestionList.children].indexOf(item) : -1;
+  if (index >= 0 && currentSuggestions[index]) applySuggestion(currentSuggestions[index].paper);
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.title-field')) hideSuggestions();
+});
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 }
