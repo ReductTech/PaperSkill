@@ -7,10 +7,10 @@
 公共仓库接收能够安装、运行和构建的完整 React + TypeScript 教程项目，统一放入：
 
 ```text
-html_output/<paper-name>/
+html_output/<paper-name>/<version>/
 ```
 
-`paperName` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`，并作为目录名与 `paper.json` 中的唯一标识。
+`paperName` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`，并作为论文目录名与 `paper.json` 中的唯一标识。`version` 是版本目录名，取「姓名拼音小写 + 修改日期 MMDD」，例如 `liming0903`，同一篇论文的多个版本互不覆盖。
 
 项目应包含 `package.json`、依赖锁文件、`src/`、`public/`、`paper.json` 和项目 `README.md`，不得只提交构建后的单个 HTML 文件。分支、导入命令和本地检查见 [PARTICIPATING.md](PARTICIPATING.md)。
 
@@ -30,7 +30,7 @@ html_output/<paper-name>/
 
 Pull Request 应包含：
 
-- 论文名称、教程目录和提交分支；
+- 论文名称、版本目录（`<paper-name>/<version>`）和提交分支；
 - 本次新增或更新内容的简要说明；
 - 提交前使用的网页预览地址或预览方式，以及使用者确认结论；
 - 关键页面截图和主要交互说明；

@@ -3,18 +3,47 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, PAPER_NAME_RE } = require('./lib/repository');
+const { ROOT, PAPER_NAME_RE, VERSION_NAME_RE, findPaper, listVersions, catalogRecords } = require('./lib/repository');
 
-const paperName = process.argv[2];
-if (!paperName || !PAPER_NAME_RE.test(paperName)) {
-  console.error('用法：npm run export:paper -- <paper-name>');
+function usage() {
+  console.error('用法：npm run export:paper -- <paper-name>[/<version>]');
   process.exit(1);
 }
 
-const sourceDir = path.join(ROOT, 'site', 'papers', paperName);
+const target = process.argv[2];
+if (!target) usage();
+const [paperName, requestedVersion] = target.split('/');
+if (!PAPER_NAME_RE.test(paperName)) usage();
+if (requestedVersion && !VERSION_NAME_RE.test(requestedVersion)) usage();
+
+const paper = findPaper(paperName);
+if (!paper) {
+  console.error(`论文目录不存在：html_output/${paperName}`);
+  process.exit(1);
+}
+const versions = listVersions(paper);
+if (versions.length === 0) {
+  console.error(`论文 ${paperName} 下没有版本目录`);
+  process.exit(1);
+}
+
+// 未指定版本时导出集合站使用的主版本（已发布优先，其次修改日期最新）
+let version = requestedVersion;
+if (!version) {
+  const record = catalogRecords().find((item) => item.paperName === paperName);
+  const primary = record?.versions?.slice().sort((a, b) => {
+    if ((a.status === 'published') !== (b.status === 'published')) return a.status === 'published' ? -1 : 1;
+    if ((a.versionDate || '') !== (b.versionDate || '')) return (b.versionDate || '').localeCompare(a.versionDate || '');
+    return b.version.localeCompare(a.version);
+  })[0];
+  version = primary?.version || versions[versions.length - 1].version;
+  console.log(`未指定版本，导出主版本：${version}`);
+}
+
+const sourceDir = path.join(ROOT, 'site', 'papers', paperName, version);
 const sourceHtml = path.join(sourceDir, 'index.html');
 if (!fs.existsSync(sourceHtml)) {
-  console.error(`尚未找到构建产物，请先运行：npm run build:paper -- ${paperName}`);
+  console.error(`尚未找到构建产物，请先运行：npm run build:paper -- ${paperName}/${version}`);
   process.exit(1);
 }
 
@@ -46,8 +75,8 @@ if (inlineScripts.length > 0) {
   html = html.replace(/<\/body>/i, () => scriptsAtEnd);
 }
 
-const outputDir = path.join(ROOT, 'exports');
-const output = path.join(outputDir, `${paperName}.html`);
+const outputDir = path.join(ROOT, 'exports', paperName);
+const output = path.join(outputDir, `${version}.html`);
 fs.mkdirSync(outputDir, { recursive: true });
 fs.writeFileSync(output, html, 'utf8');
 console.log(`已生成单文件网页：${path.relative(ROOT, output)}`);
