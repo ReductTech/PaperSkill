@@ -2,13 +2,13 @@
 
 以下案例展示了如何将论文内容组织为清晰、直观且可交互的学习网页。
 
-## Mage-VL 完整案例
+## Mage-VL 示例网页与配套讲解
 
 - [Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model](https://reducttech.github.io/PaperSkill/papers/mage_vl/)
 - [观看 Mage-VL 论文内容讲解视频（约 4 分 54 秒）](mage_vl/paper-walkthrough.mp4)
 - [观看 Mage-VL 网页设计思路与制作技巧讲解视频（约 4 分 57 秒）](mage_vl/web-design-notes.mp4)
 
-## 论文学习网页
+## 更多论文学习网页
 
 1. [ClawGUI: A Unified Framework for Training, Evaluating, and Deploying GUI Agents](https://reducttech.github.io/PaperSkill/papers/clawgui_a_unified_framework_for_training_evaluating_and_deploying_gui_agents/)
 2. [StarVLA: A Lego-like Codebase for Vision-Language-Action Model Developing](https://reducttech.github.io/PaperSkill/papers/starvla_a_lego_like_codebase_for_vision_language_action_model_developing/)
