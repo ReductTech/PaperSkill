@@ -5,7 +5,7 @@
 ## Mage-VL 完整案例
 
 - [Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model](https://reducttech.github.io/PaperSkill/papers/mage_vl/)
-- [观看 Mage-VL 论文内容讲解视频（约 5 分 23 秒）](mage_vl/paper-walkthrough.mp4)
+- [观看 Mage-VL 论文内容讲解视频（约 4 分 54 秒）](mage_vl/paper-walkthrough.mp4)
 - [观看 Mage-VL 网页设计思路与制作技巧讲解视频（约 4 分 57 秒）](mage_vl/web-design-notes.mp4)
 
 ## 论文学习网页
