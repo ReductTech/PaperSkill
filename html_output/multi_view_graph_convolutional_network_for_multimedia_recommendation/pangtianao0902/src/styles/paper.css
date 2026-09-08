@@ -1,0 +1,89 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-surface: #b8c9a7;
+  --paper-shadow: #76906a;
+  --paper-support: #92400e;
+  --paper-current: #27446e;
+  --paper-success: #228d5c;
+  --paper-failure: #c43f52;
+  --paper-control: #d97706;
+  --paper-auxiliary: #7c3aed;
+  --paper-ink: #21324a;
+  --paper-muted: #68778f;
+  --paper-border: #d7deea;
+}
+
+/* Generated paper widgets draw synchronously in their effects.  The framework's
+   opt-in fade class is therefore unnecessary here; keep every authored Canvas visible. */
+canvas {
+  opacity: 1;
+}
+
+.mgcn-widget canvas,
+canvas[aria-label*="摄影"],
+canvas[aria-label*="模态"],
+canvas[aria-label*="MGCN"] {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+  margin-inline: auto;
+  border-radius: 14px;
+  background: var(--paper-scene-bg);
+}
+
+.mgcn-buttons,
+.mgcn-judgment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+  align-items: center;
+}
+
+.mgcn-buttons button,
+.mgcn-judgment button {
+  min-height: 44px;
+}
+
+.mgcn-buttons button[aria-pressed="true"] {
+  border-color: var(--paper-current);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--paper-current) 24%, transparent);
+}
+
+.mgcn-judgment {
+  margin-top: .9rem;
+  color: var(--paper-ink);
+}
+
+.mgcn-judgment p {
+  flex-basis: 100%;
+  margin: .25rem 0 0;
+}
+
+@media (max-width: 720px) {
+  .mgcn-widget .ctrl,
+  .mgcn-buttons,
+  .mgcn-judgment {
+    align-items: stretch;
+  }
+
+  .mgcn-buttons button,
+  .mgcn-judgment button {
+    flex: 1 1 10rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgcn-widget *,
+  .mgcn-widget *::before,
+  .mgcn-widget *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

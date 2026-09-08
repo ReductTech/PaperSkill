@@ -6,8 +6,8 @@ import type { WidgetProps } from './registry';
 // One slider drives a Canvas bar; feedback color follows the value (red/green per
 // contract.md §5). Each widget owns its own canvas + controls + feedback.
 
-const W = 560;
-const H = 240;
+const W = 1080;
+const H = 280;
 
 export const ExampleSlider: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,12 +28,12 @@ export const ExampleSlider: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
 
     const render = (s: { value: number }) => {
       ctx.clearRect(0, 0, W, H);
-      const h = clamp(s.value, 0, 1) * (H - 50);
+      const h = clamp(s.value, 0, 1) * (H - 40);
       ctx.fillStyle = s.value > 0.7 ? '#228d5c' : s.value < 0.3 ? '#c43f52' : '#27446e';
-      ctx.fillRect(40, H - 24 - h, W - 80, h);
+      ctx.fillRect(40, H - 20 - h, W - 80, h);
       ctx.fillStyle = '#21324a';
-      ctx.font = '16px "Segoe UI", sans-serif';
-      ctx.fillText('value = ' + s.value.toFixed(2), 40, 30);
+      ctx.font = '22px "Segoe UI", sans-serif';
+      ctx.fillText('value = ' + s.value.toFixed(2), 40, 32);
     };
 
     const tick = () => {

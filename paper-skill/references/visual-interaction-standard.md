@@ -76,7 +76,7 @@ one immediate feedback bar
 optional evidence table or metrics below the interaction
 ```
 
-Prefer one `560 x 220-280` intrinsic Canvas. Use two equal smaller Canvases only for a true synchronized comparison. Keep the `244 x 130` analogy Canvas separate from the primary module.
+Prefer one `1080 x 280` intrinsic Canvas. Use two equal smaller Canvases only for a true synchronized comparison. Keep the `560 x 140` analogy Canvas separate from the primary module.
 
 Do not turn a module into a dashboard. Avoid several unrelated charts, nested cards, floating annotations, or multiple control clusters. One operation may update several linked views, but the learner should still be able to name that operation with one verb: adjust, choose, click, step, drag, compare, or start.
 
@@ -182,6 +182,14 @@ Draw in this back-to-front order unless the scene requires another explicit orde
 5. recurring protagonist or manipulated object;
 6. target and current value;
 7. at most two short in-Canvas labels and one compact legend.
+
+**In-Canvas text limits (per `contract.md` §3):** a module Canvas carries at most
+`canvasLabelMaxCount` (2) short labels of at most `canvasLabelMaxChars` (8) chars each, plus at
+most one legend of `canvasLegendMaxItems` (3) entries. Show the result value as a bare number
+(`0.87`), never with a prefix (`value = 0.87`). Explanatory prose NEVER lives inside the Canvas:
+it belongs in the DOM (`.module-desc` before the Canvas, `.feedback` below the controls). If a
+fact cannot be shown by color, shape, size, position, or one number, state it in the feedback
+line instead of drawing it.
 
 Keep labels away from moving objects and dense curves. Use a stable white inset with a `#d7deea` border when detailed technical marks need their own area. Preserve margins around the drawing. The active state should be visible through at least two cues, such as color plus stroke width, fill plus outline, or position plus label.
 

@@ -71,7 +71,7 @@ The standalone HTML cannot maintain a full learner model, so personalize through
 - Use `.inf` for inference or foundation chapters that everyone should read.
 - Use `.trn` for training details that beginners may defer.
 - Use `.both` when both audiences benefit.
-- Reveal chapters only when the learner chooses to continue.
+- Reveal one chapter per screen via the slide layout; the learner continues with the bottom nav bar or the sidebar TOC.
 - Update feedback immediately when the learner manipulates a control.
 - Change feedback color and wording according to the current state.
 - Let learners repeat interactions without an exam or account system.

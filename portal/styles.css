@@ -33,7 +33,17 @@ main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 80
 .starter-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 24px; background: #f5f7f1; }
 .starter-form label { display: grid; gap: 7px; color: #46566d; font-size: 13px; font-weight: 700; }
 .starter-form .wide { grid-column: 1 / -1; }
+.starter-form .name-row { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.starter-form .name-row label { align-content: start; }
 .starter-form small { color: #7b8798; font-weight: 400; }
+.starter-form .title-field { min-width: 0; }
+.starter-form .title-autocomplete { position: relative; min-width: 0; }
+.paper-suggestions { position: absolute; top: calc(100% + 2px); left: 0; z-index: 30; width: min(430px, 60vw); min-width: 300px; margin: 0; padding: 6px; list-style: none; background: #fff; border: 1px solid #cbd4df; box-shadow: 0 14px 34px rgba(28, 48, 43, .16); max-height: 320px; overflow-y: auto; }
+.paper-suggestions li { display: grid; gap: 2px; padding: 9px 11px; cursor: pointer; border-left: 3px solid transparent; }
+.paper-suggestions li:hover, .paper-suggestions li.active { background: #edf3e8; border-left-color: #27446e; }
+.paper-suggestions code { font: 700 13px/1.35 ui-monospace, monospace; color: #27446e; overflow-wrap: anywhere; }
+.paper-suggestions span { color: #68778f; font-size: 12px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.paper-suggestions .no-match { display: block; padding: 9px 11px; color: #7b8798; font-size: 13px; cursor: default; }
 .starter-form button { min-height: 46px; align-self: end; border: 0; background: #27446e; color: #fff; font: 700 15px/1 inherit; cursor: pointer; }
 .starter-form button:hover { background: #1b355b; }
 .starter-result { display: grid; gap: 14px; margin-top: 24px; }
@@ -72,6 +82,15 @@ input:focus, select:focus { border-color: #27446e; box-shadow: 0 0 0 3px rgba(39
 .topics { display: flex; flex-wrap: wrap; gap: 7px; margin: 24px 0; }
 .topic { padding: 5px 9px; background: #edf3e8; color: #47613c; font-size: 12px; }
 .participants { min-width: 0; margin: auto 0 18px; color: #68778f; font-size: 13px; overflow-wrap: anywhere; word-break: break-word; }
+.versions { margin: auto 0 16px; }
+.versions-title { margin: 0 0 8px; color: #46566d; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.version-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; max-height: 208px; overflow-y: auto; }
+.version-list li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f5f7f1; border: 1px solid #e2e8dc; }
+.version-info { display: grid; gap: 3px; min-width: 0; }
+.version-name { font: 700 13px/1.35 ui-monospace, monospace; color: #27446e; overflow-wrap: anywhere; }
+.version-meta { color: #68778f; font-size: 12px; overflow-wrap: anywhere; }
+.version-list .open-link { flex: 0 0 auto; min-height: 34px; padding: 0 13px; font-size: 13px; }
+.card-footer { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
 .open-link { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 18px; background: #27446e; color: #fff; text-decoration: none; font-weight: 700; }
 .paper-link { color: #27446e; text-decoration: none; font-size: 13px; }
