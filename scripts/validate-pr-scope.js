@@ -16,7 +16,11 @@ const baseRef = base.startsWith('origin/') ? base : `origin/${base}`;
 function readGitFiles(args) {
   const result = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });
   if (result.status !== 0) {
-    console.error(result.stderr || '无法读取 Pull Request 变更范围。');
+    const stderr = (result.stderr || '').trim();
+    console.error(stderr || '无法读取 Pull Request 变更范围。');
+    if (!stderr || /unknown revision|no such ref|couldn't find remote ref/i.test(stderr)) {
+      console.error(`提示：CI 需要先获取基准分支，例如 git fetch --no-tags origin "+refs/heads/${pullRequestBase || 'main'}:refs/remotes/origin/${pullRequestBase || 'main'}"，再运行 npm run validate:pr。`);
+    }
     process.exit(1);
   }
   return result.stdout.split(/\r?\n/).filter(Boolean);
