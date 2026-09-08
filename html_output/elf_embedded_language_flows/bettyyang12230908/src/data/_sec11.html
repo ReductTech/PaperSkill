@@ -1,0 +1,76 @@
+<section class="chap" id="sec11">
+  <h2 class="chap-title"><span class="num">§8.</span>共享权重 + 双 loss 训练<span class="badge-tag trn">核心创新</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🔗</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">这是<b>ELF的核心创新！</b>同一个 Transformer 兼任两职：t&lt;1 时<b>denoise</b>（在连续空间去噪，MSE 损失，服务 ODE 采样），t=1 时切 <b>decode</b>（输出离散 token，CE 损失，服务最终选词）。两者由 mode token 切换、<b>共享同一网络权重</b>——而不是两个独立模型。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-share" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">一个网络干两件事：去噪+选词</div>
+      <div class="analogy-text">同一支笔（共享网络），既能<b>修正笔画</b>（MSE，t&lt;1）又能<b>写出正字</b>（CE，t=1）。去噪和选词<b>共享权重</b>，就像同一支毛笔写完一整幅字。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">8.1</span>
+      <h4>同一个网络，两种工作模式</h4>
+    </div>
+    <div class="module-body">
+      <canvas id="cv-mode" width="800" height="260"></canvas>
+      <div class="ctrl">
+        <label>时间步 t</label>
+        <input type="range" id="rng-mode" min="0" max="100" value="30" style="flex:0 1 200px;">
+        <span class="val" id="lbl-mode" style="min-width:70px;">0.30</span>
+        <span class="val" id="lbl-mode-output" style="margin-left:auto; color:var(--olive);">denoise 模式</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">8.2</span>
+      <h4>双 loss 训练：MSE + CE</h4>
+    </div>
+    <div class="module-body">
+      <canvas id="cv-loss-mix" width="800" height="280"></canvas>
+      <div class="ctrl">
+        <label>CE 比例</label>
+        <input type="range" id="rng-loss-mix" min="0" max="100" value="20" style="flex:0 1 200px;">
+        <span class="val" id="lbl-loss-mix" style="min-width:50px;">20%</span>
+        <span class="val" id="lbl-loss-bleu" style="margin-left:auto; color:var(--blue);">论文固定：80% MSE + 20% CE</span>
+      </div>
+    </div>
+  </div>
+
+</section>
