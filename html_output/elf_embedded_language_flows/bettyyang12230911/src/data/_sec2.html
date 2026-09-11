@@ -1,0 +1,93 @@
+<section class="chap" id="sec2">
+  <h2 class="chap-title"><span class="num">§1.</span>噪声：扩散的起点<span class="badge-tag inf">推理基础</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step active">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🎯</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">扩散模型的核心思想：<b>训练时学会"去噪"</b>，推理时从纯噪声出发一步步"去噪"生成文本。这一节展示<em>加噪-去噪的完整循环</em>，是理解后续所有章节的基础。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-noise" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">涂黑的字还能认回来</div>
+      <div class="analogy-text">左边动画：先写好字→<b>慢慢涂黑</b>（加噪）→再<b>擦回来</b>（去噪）。扩散模型看千万张"涂黑→还原"的配对学会擦字。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">1.1</span>
+      <h4>亲手体验：写字→涂黑→擦干净</h4>
+    </div>
+    <div class="module-body">
+
+      <div class="three-col-demo">
+        <div class="three-col-panel clean">
+          <div class="three-col-label">✍️ 写好字</div>
+          <div class="three-col-canvas-wrap">
+            <canvas id="cv-clean" width="220" height="120"></canvas>
+          </div>
+          <div class="three-col-eq" style="background:#dcfce7;color:#166534;">原始文本 = 训练目标</div>
+        </div>
+        <div class="three-col-panel noisy">
+          <div class="three-col-label">✏️ 涂黑（加噪）</div>
+          <div class="three-col-canvas-wrap">
+            <canvas id="cv-noisy" width="220" height="120"></canvas>
+          </div>
+          <div class="three-col-eq" style="background:#fee2e2;color:#991b1b;">加了噪声 = 字被涂黑</div>
+        </div>
+        <div class="three-col-panel recover">
+          <div class="three-col-label">🧹 擦干净（去噪）</div>
+          <div class="three-col-canvas-wrap">
+            <canvas id="cv-recover" width="220" height="120"></canvas>
+          </div>
+          <div class="three-col-eq" style="background:#dbeafe;color:#1e40af;">扩散模型 = 学会擦字</div>
+        </div>
+      </div>
+
+      <div class="ctrl" style="flex-wrap:wrap; gap:12px; margin-top:16px;">
+        <span style="display:inline-flex;align-items:center;gap:6px;flex:1;min-width:200px;">
+          <label style="font-weight:600;color:var(--red);">✏️ 加噪</label>
+          <input type="range" id="rng-noise" min="0" max="100" value="40" step="1" style="flex:1;">
+          <span class="val" id="lbl-noise" style="color:var(--red);min-width:42px;">0.40</span>
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:6px;flex:1;min-width:200px;">
+          <label style="font-weight:600;color:var(--blue);">🧹 去噪</label>
+          <input type="range" id="rng-train" min="0" max="100" value="60" step="1" style="flex:1;">
+          <span class="val" id="lbl-train" style="color:var(--blue);min-width:42px;">60%</span>
+        </span>
+        <button class="tiny" id="btn-noise-anim">▶ 演示涂黑</button>
+        <button class="tiny" id="btn-train-anim">▶ 演示擦字</button>
+      </div>
+
+    </div>
+  </div>
+
+</section>
