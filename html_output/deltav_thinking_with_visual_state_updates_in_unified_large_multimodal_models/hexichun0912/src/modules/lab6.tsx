@@ -1,0 +1,10 @@
+import {useState} from 'react';
+import {Scene, colors, clearScene, drawBoard} from './drawing';
+export function Lab6(){
+ const [mode,setMode]=useState<'train'|'infer'>('train'); const [step,setStep]=useState(0);
+ const captions=mode==='train'?['已知中间图像：离线构造训练目标。','TSIM 与校准映射：为更新分配长度。','以离散索引作为视觉预测目标。','在视觉目标尾部附加 <|vision_end|>。']:['已有文本与视觉历史：未来目标图不可见。','自回归预测视觉索引，继续生成。','继续预测索引；长度由学到的停止行为决定。','预测到 <|vision_end|>，转回后续文本推理。'];
+ return <div onKeyDown={e=>e.stopPropagation()}><div className="chip-row">{(['train','infer'] as const).map(m=><button className={'chip '+(mode===m?'selected':'')} aria-pressed={mode===m} style={{minHeight:44}} key={m} onClick={()=>{setMode(m);setStep(0)}}>{m==='train'?'训练':'推理'}</button>)}</div>
+ <Scene ariaLabel={`${mode==='train'?'训练':'推理'}第${step+1}步：${captions[step]}`} draw={(c,w,h)=>{clearScene(c,w,h);c.fillStyle=colors.blue;c.fillRect(65,110,125,60);c.strokeStyle=colors.border;c.lineWidth=3;c.beginPath();c.moveTo(190,140);c.lineTo(980,140);c.stroke();if(mode==='train')drawBoard(c,55,20,145,65,step,colors.blue);const n=step>=2?9:(mode==='infer'&&step===1?3:0);for(let i=0;i<9;i++){c.fillStyle=i<n?colors.green:colors.light;c.fillRect(230+i*65,110,48,60);if(i<n){c.fillStyle='#fff';c.beginPath();c.arc(254+i*65,140,5+(i%3)*2,0,Math.PI*2);c.fill()}}if(mode==='train'&&step===1){c.strokeStyle=colors.orange;c.strokeRect(223,99,578,82)}c.fillStyle=step===3?colors.green:colors.light;c.fillRect(865,110,140,60);c.fillStyle=colors.text;c.font='22px sans-serif';c.fillText(mode==='train'?'训练':'推理',80,210);c.fillText('END',908,149);}}/>
+ <p>左：文本上下文　中：视觉索引序列　右：视觉结束标记</p><div className="chip-row"><button className="chip" style={{minHeight:44}} disabled={step===0} onClick={()=>setStep(s=>s-1)}>上一步</button><button className="chip" style={{minHeight:44}} disabled={step===3} onClick={()=>setStep(s=>s+1)}>下一步</button><button className="chip" style={{minHeight:44}} onClick={()=>setStep(0)}>重置</button></div>
+ <div className={'feedback '+(step===3?'good':'')} role="status">步骤 {step+1}/4 · {captions[step]} {mode==='infer'?'推理时不计算未来目标图的 TSIM。':''}</div><p>槽位数量与圆点均为教学示意，不是实际 token 输出。训练使用变长监督；推理无需在线运行 TSIM 分配或图像重建解码器。</p></div>
+}
