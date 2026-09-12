@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Ana1 } from './ana-1';
+import { Ana10 } from './ana-10';
+import { Ana2 } from './ana-2';
+import { Ana3 } from './ana-3';
+import { Ana4 } from './ana-4';
+import { Ana5 } from './ana-5';
+import { Ana6 } from './ana-6';
+import { Ana7 } from './ana-7';
+import { Ana8 } from './ana-8';
+import { Ana9 } from './ana-9';
+import { Ch1Drift } from './ch1-drift';
+import { Ch10Race } from './ch10-race';
+import { Ch2Kf } from './ch2-kf';
+import { Ch3Sim3 } from './ch3-sim3';
+import { Ch4Residual } from './ch4-residual';
+import { Ch5Variants } from './ch5-variants';
+import { Ch6Steps } from './ch6-steps';
+import { Ch7Crl } from './ch7-crl';
+import { Ch8Anchor } from './ch8-anchor';
+import { Ch8Graph } from './ch8-graph';
+import { Ch9Robust } from './ch9-robust';
+import { HeroCompare } from './hero-compare';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ana-1'] = Ana1;
+widgetRegistry['ana-10'] = Ana10;
+widgetRegistry['ana-2'] = Ana2;
+widgetRegistry['ana-3'] = Ana3;
+widgetRegistry['ana-4'] = Ana4;
+widgetRegistry['ana-5'] = Ana5;
+widgetRegistry['ana-6'] = Ana6;
+widgetRegistry['ana-7'] = Ana7;
+widgetRegistry['ana-8'] = Ana8;
+widgetRegistry['ana-9'] = Ana9;
+widgetRegistry['ch1-drift'] = Ch1Drift;
+widgetRegistry['ch10-race'] = Ch10Race;
+widgetRegistry['ch2-kf'] = Ch2Kf;
+widgetRegistry['ch3-sim3'] = Ch3Sim3;
+widgetRegistry['ch4-residual'] = Ch4Residual;
+widgetRegistry['ch5-variants'] = Ch5Variants;
+widgetRegistry['ch6-steps'] = Ch6Steps;
+widgetRegistry['ch7-crl'] = Ch7Crl;
+widgetRegistry['ch8-anchor'] = Ch8Anchor;
+widgetRegistry['ch8-graph'] = Ch8Graph;
+widgetRegistry['ch9-robust'] = Ch9Robust;
+widgetRegistry['hero-compare'] = HeroCompare;
