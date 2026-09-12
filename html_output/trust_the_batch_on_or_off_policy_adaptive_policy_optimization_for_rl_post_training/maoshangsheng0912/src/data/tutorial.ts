@@ -331,7 +331,7 @@ export const tutorial: TutorialData = {
           },
           {
             "sym": "ρₜ",
-            "desc": "第 t 个 token 的重要性采样比 π_θ(yₜ|c_<t) / π_old(yₜ|c_<t)"
+            "desc": "第 t 个 token 的重要性采样比 π_θ(yₜ|c_&lt;t) / π_old(yₜ|c_&lt;t)"
           }
         ]
       },
