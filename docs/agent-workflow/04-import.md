@@ -22,3 +22,14 @@
 
 9. 检查本次分支只修改目标作品目录，且不包含 `catalog/papers.json`；
 10. 确认仓库中没有密钥、隐私、本地绝对路径或未授权素材。
+
+导入完成并确认实际的 `<paper-name>/<version>` 后，Agent 必须按最终目录名计算并仅在当前对话中展示：
+
+```text
+预计发布地址：
+https://reducttech.github.io/PaperSkill/papers/<paper-name>/<version>/
+
+这是预计发布地址，PR 合并并且 GitHub Pages 部署成功后才能访问，也可待邮件提示merged之后在网页进行自己的论文名搜索，确认最终网页。
+```
+
+不得为了保存或展示该地址而修改教程项目、`paper.json`、项目 `README.md`、本地状态文件、PR 材料或 `catalog/papers.json`。

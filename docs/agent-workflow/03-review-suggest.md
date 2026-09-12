@@ -24,3 +24,14 @@ Agent 应根据原论文和实际网页，向使用者列出核验结果与候�
 本流程不再要求固定数量的修改。没有发现错误时，也必须记录人工核验范围和结论；发现不准确内容时，应先修正并重新核验，再进入导入和提交阶段。
 
 完成前，Agent 必须向使用者展示核验结论，并由使用者明确确认网页信息与论文一致，或指出仍需修正的内容。
+
+使用者明确完成人工校验确认后，Agent 必须根据当前已确认的 `paperName` 和 `version`，仅在当前对话中展示：
+
+```text
+预计发布地址：
+https://reducttech.github.io/PaperSkill/papers/<paperName>/<version>/
+
+这是预计发布地址，PR 合并并且 GitHub Pages 部署成功后才能访问，也可待邮件提示merged之后在网页进行自己的论文名搜索，确认最终网页。
+```
+
+预计发布地址不得写入教程项目、`paper.json`、项目 `README.md`、本地状态文件、PR 材料或 `catalog/papers.json`。

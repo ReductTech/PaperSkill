@@ -38,9 +38,12 @@ Agent 还必须检查最终差异，确认目录名称、项目结构、`paper.j
 
 - 使用最终待提交源码完成构建并启动可运行的本地网页预览；
 - 将可直接打开的预览地址提供给使用者，请使用者实际查看关键页面并操作主要交互；
+- 同时根据最终的 `<paper-name>/<version>`，在当前对话中展示预计发布地址 `https://reducttech.github.io/PaperSkill/papers/<paper-name>/<version>/`，并提示“这是预计发布地址，PR 合并并且 GitHub Pages 部署成功后才能访问。”；
 - 请使用者确认桌面端和移动端页面显示、文字、图片、图表、资源加载与主要交互正常；
 - 截图可以作为辅助记录，但不能代替使用者打开网页进行预览；
 - 未获得使用者明确确认前，不得推送分支或创建 Pull Request。
+
+预计发布地址仅在 Agent 与当前使用者的对话中展示，不写入教程项目、`paper.json`、项目 `README.md`、本地状态文件、PR 材料或 `catalog/papers.json`。
 
 ## 3. 技术步骤（Agent 自动执行）
 
