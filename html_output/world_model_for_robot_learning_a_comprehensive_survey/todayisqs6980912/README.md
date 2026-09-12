@@ -2,6 +2,11 @@
 
 基于论文 *World Model for Robot Learning: A Comprehensive Survey*，由 **paper-skill** 生成的完整 React + TypeScript + Vite 网页项目。
 
+## 素材来源
+
+- **论文原图**（`public/images/figure-1/3/5/6.png`）：由论文 PDF（[arXiv:2605.00080](https://arxiv.org/abs/2605.00080)）页面渲染裁剪提取，仅用于教学讲解，版权归原作者所有。
+- **B 站延伸视频与封面**：封面为哔哩哔哩平台外链图片（`i*.hdslb.com`），视频以嵌入链接形式引用，均来自对应 UP 主公开发布内容，版权归原作者所有。
+
 ## 本地运行
 
 ```bash
