@@ -1,5 +1,9 @@
 import type { TutorialData } from '../types';
 
+// 论文原图统一走 Vite 基址前缀。部署到 GitHub Pages 的子路径
+// （/PaperSkill/papers/<paper>/<version>/）时绝对路径 /images/... 会指向域名根而失效。
+const fig = (name: string) => `${import.meta.env.BASE_URL}images/${name}`;
+
 // ============================================================================
 //  DAME-Net Tutorial Data
 //  Paper: Compositional-Degradation UAV Image Restoration: Conditional Decoupled MoE Network and A Benchmark
@@ -21,12 +25,12 @@ export const tutorial: TutorialData = {
   hero: {
     oldMethod: {
       desc: '隐式统一修复：将多种退化压缩为单一整体条件，导致因子间干扰和修复质量下降',
-      figure: '/images/blind_restoration.png',
+      figure: fig('blind_restoration.png'),
       componentId: 'example-slider'
     },
     newMethod: {
       desc: 'DAME-Net显式解耦：显式感知每种退化因子，条件引导选择性修复，避免干扰',
-      figure: '/images/framework.png',
+      figure: fig('framework.png'),
       componentId: 'example-slider'
     },
   },
@@ -50,7 +54,7 @@ export const tutorial: TutorialData = {
           id: '1.1',
           title: '退化识别器',
           desc: '通过滑块控制不同的退化类型和强度，观察它们对图像的影响。红色标记表示检测到的退化类型，帮助理解组合退化的复杂性。',
-          figure: '/images/wrong_detect.png',
+          figure: fig('wrong_detect.png'),
           componentId: 'degradation-inspector'
         }
       ],
@@ -157,7 +161,7 @@ export const tutorial: TutorialData = {
           id: '4.1',
           title: 'FDPM检测器',
           desc: '使用CLIP视觉编码器和多标签头检测退化。点击选择退化类型，调整阈值观察检测结果。',
-          figure: '/images/sgdp_semantic.png',
+          figure: fig('sgdp_semantic.png'),
           componentId: 'fdpm-detector'
         }
       ],
@@ -235,7 +239,7 @@ export const tutorial: TutorialData = {
           id: '6.1',
           title: 'CDCB处理器',
           desc: '频率分支处理频谱特征（模糊、噪声），空间分支处理局部结构（雨条纹）。调整频率-空间门控权重观察效果。',
-          figure: '/images/CDCB.png',
+          figure: fig('CDCB.png'),
           componentId: 'cdcb-processor'
         }
       ],
@@ -320,7 +324,7 @@ export const tutorial: TutorialData = {
           id: '8.2',
           title: 'DC-MoE路由器',
           desc: '演示全局专家和空间专家的路由机制。切换退化类型观察哪些专家被激活。',
-          figure: '/images/DCMOE.png',
+          figure: fig('DCMOE.png'),
           componentId: 'dcmoe-router'
         }
       ],
@@ -389,7 +393,7 @@ export const tutorial: TutorialData = {
           id: '10.1',
           title: '结果竞赛器',
           desc: '对比DAME-Net与基线方法（AirNet, DehazeFormer, Restormer, PromptIR, AdaIR）的性能。',
-          figure: '/images/qualitative_analysis.jpg',
+          figure: fig('qualitative_analysis.jpg'),
           componentId: 'result-comparison'
         }
       ],
