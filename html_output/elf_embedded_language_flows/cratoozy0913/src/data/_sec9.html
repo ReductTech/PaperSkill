@@ -1,0 +1,79 @@
+<section class="chap" id="sec9">
+  <h2 class="chap-title"><span class="num">§7.</span>训练目标：x₀-prediction<span class="badge-tag trn">训练核心</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🏋️</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">前面讲的都是<b>推理</b>（怎么生成），但网络 f_θ 怎么学会预测方向？这就是训练——让网络看大量"加噪-去噪"样本，学会预测速度 v̂。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-train" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">练字：越写越准</div>
+      <div class="analogy-text">一开始下笔飘、笔画偏散，每次对照<b>目标字帖（x₀）</b>调整运笔（反向传播），练多了每次写都更准。ELF选了<b>"猜最终字形"</b>（x₀-prediction）作为训练目标，比猜噪声更稳。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">7.1</span>
+      <h4>三种训练目标：网络猜什么？</h4>
+          </div>
+    <div class="module-body">
+
+      <canvas id="cv-target" width="800" height="280"></canvas>
+      <div class="ctrl">
+        <label>噪声量 t</label>
+        <input type="range" id="rng-target-t" min="0" max="100" value="50" step="1">
+        <span class="val" id="lbl-target-t">0.50</span>
+        <span class="val" id="lbl-target-loss" style="margin-left:auto; font-size:13px; color:var(--slate);">★ ELF选 x₀</span>
+      </div>
+          </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">7.2</span>
+      <h4>猜中终点 → 自动知道方向</h4>
+    </div>
+    <div class="module-body">
+      <canvas id="cv-guess-dir" width="800" height="240" data-lazy="1"></canvas>
+      <div class="ctrl">
+        <label>走到哪 t</label>
+        <input type="range" id="rng-guess-t" min="5" max="95" value="50" step="1" style="flex:0 1 180px;">
+        <span class="val" id="lbl-guess-t" style="color:var(--blue);">0.50</span>
+        <label style="margin-left:8px;">猜得准不准</label>
+        <input type="range" id="rng-guess-err" min="0" max="100" value="20" step="5" style="flex:0 1 140px;">
+        <span class="val" id="lbl-guess-err" style="color:var(--rust);">准</span>
+      </div>
+    </div>
+  </div>
+
+</section>

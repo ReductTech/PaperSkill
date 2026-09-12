@@ -1,0 +1,97 @@
+<section class="chap" id="sec13">
+  <h2 class="chap-title"><span class="num">§10.</span>结果：ELF 真实成绩<span class="badge-tag inf">实验</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">⑩ 结果</span>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-result" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">书法比赛：看谁写得好</div>
+      <div class="analogy-text">一幅幅字挂出来<b>比高下</b>——ELF在翻译/摘要任务上和其他方法比成绩。前面所有设计（噪声→嵌入→可逆→Flow→CFG→训练）是否有用，最终看BLEU/ROUGE分数说话。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">10.1</span>
+      <h4>成绩表：翻译 BLEU + 摘要 ROUGE</h4>
+          </div>
+    <div class="module-body">
+
+        <table class="paper" id="result-table">
+          <thead><tr><th>模型</th><th>类型</th><th>De-En BLEU↑</th><th>XSum ROUGE-1↑</th><th>参数</th></tr></thead>
+          <tbody>
+            <tr data-detail="自回归基线 AR，WMT14 De-En BLEU 25.2。"><td>AR</td><td>自回归</td><td>25.2</td><td>30.5</td><td>99M</td></tr>
+            <tr data-detail="离散扩散基线 MDLM，翻译弱（18.4）但摘要 ROUGE-1 最高（33.4）。"><td>MDLM</td><td>离散扩散</td><td>18.4</td><td>33.4</td><td>99M</td></tr>
+            <tr data-detail="离散扩散 Duo（170M，含 35M 冻结编码器），BLEU 21.3。"><td>Duo</td><td>离散扩散</td><td>21.3</td><td>31.4</td><td>170M (+35M)</td></tr>
+            <tr data-detail="连续扩散 E2D2，BLEU 24.8。"><td>E2D2</td><td>扩散</td><td>24.8</td><td>28.4</td><td>99M</td></tr>
+            <tr data-detail="SeqDiffuSeq，BLEU 21.3，摘要较弱。"><td>SeqDiffuSeq</td><td>扩散</td><td>21.3</td><td>19.3</td><td>–</td></tr>
+            <tr data-detail="CDCD，BLEU 24.9（无摘要数据）。"><td>CDCD</td><td>扩散</td><td>24.9</td><td>–</td><td>–</td></tr>
+            <tr class="row-target" data-detail="ELF-B（105M，含 35M 冻结编码器）：De-En BLEU 26.4，XSum ROUGE-1 36.0，均超越所有同规模基线。"><td><strong>Ours (ELF-B)</strong> ⭐</td><td>扩散</td><td class="hl">26.4</td><td class="hl">36.0</td><td>105M (+35M)</td></tr>
+          </tbody>
+        </table>
+
+      <div class="feedback" id="lbl-result-detail">点行查看说明（数据来自论文 §4.3 Table 1）</div>
+      <p style="font-size:15px;color:#8a8a7a;margin:8px 0 0;">指标：BLEU↑ 越高越好（WMT14 德→英翻译）；ROUGE-1↑ 越高越好（XSum 摘要）。参数栏 “(+35M)” 为冻结编码器。</p>
+
+          </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">10.2</span>
+      <h4>核心结论</h4>
+          </div>
+    <div class="module-body">
+      <div class="compare-row">
+        <div class="compare-cell good">
+          <div class="label">① 翻译 BLEU（同规模 SOTA）</div>
+          <div class="val" style="color:var(--olive); font-size:26px;">26.4</div>
+          <div class="mini">ELF-B 超过 AR 基线 25.2 及所有同规模扩散模型（WMT14 De-En）</div>
+        </div>
+        <div class="compare-cell good">
+          <div class="label">② 共享权重解码</div>
+          <div class="val" style="color:var(--olive); font-size:16px;">优于两阶段</div>
+          <div class="mini">共享权重（20% CE）在 OWT 生成 PPL–熵权衡上延伸更好（§4.1 Fig 5b）</div>
+        </div>
+        <div class="compare-cell good">
+          <div class="label">③ CFG 引导</div>
+          <div class="val" style="color:var(--olive); font-size:16px;">scale 1+2</div>
+          <div class="mini">主结果固定 self=1 / input=2；CFG 消融见 §4.1 Fig 4（OWT PPL–熵）</div>
+        </div>
+        <div class="compare-cell good">
+          <div class="label">④ 并行解码</div>
+          <div class="val" style="color:var(--olive); font-size:16px;">计算量更低</div>
+          <div class="mini">扩散式并行解码；32 步即达 PPL 24。论文未给具体 tps / 加速倍数</div>
+        </div>
+      </div>
+      <p style="font-size:15px;color:#8a8a7a;margin:6px 0 0;">注：②③④ 为论文定性 / 消融结论（多基于 OWT 无条件生成评测）；论文未报告 tokens-per-second 或具体加速倍数。① 来自 §4.3 Table 1。</p>
+
+
+
+          </div>
+  </div>
+
+  </section>
