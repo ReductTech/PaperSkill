@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Ch1Ana } from './ch1-ana';
+import { Ch1Mod1 } from './ch1-mod1';
+import { Ch1Mod2 } from './ch1-mod2';
+import { Ch10Ana } from './ch10-ana';
+import { Ch10Mod1 } from './ch10-mod1';
+import { Ch2Ana } from './ch2-ana';
+import { Ch2Mod1 } from './ch2-mod1';
+import { Ch3Ana } from './ch3-ana';
+import { Ch3Mod1 } from './ch3-mod1';
+import { Ch4Ana } from './ch4-ana';
+import { Ch4Mod1 } from './ch4-mod1';
+import { Ch5Ana } from './ch5-ana';
+import { Ch5Mod1 } from './ch5-mod1';
+import { Ch6Ana } from './ch6-ana';
+import { Ch6Mod1 } from './ch6-mod1';
+import { Ch7Ana } from './ch7-ana';
+import { Ch7Mod1 } from './ch7-mod1';
+import { Ch8Ana } from './ch8-ana';
+import { Ch8Mod1 } from './ch8-mod1';
+import { Ch9Ana } from './ch9-ana';
+import { Ch9Mod1 } from './ch9-mod1';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ch1-ana'] = Ch1Ana;
+widgetRegistry['ch1-mod1'] = Ch1Mod1;
+widgetRegistry['ch1-mod2'] = Ch1Mod2;
+widgetRegistry['ch10-ana'] = Ch10Ana;
+widgetRegistry['ch10-mod1'] = Ch10Mod1;
+widgetRegistry['ch2-ana'] = Ch2Ana;
+widgetRegistry['ch2-mod1'] = Ch2Mod1;
+widgetRegistry['ch3-ana'] = Ch3Ana;
+widgetRegistry['ch3-mod1'] = Ch3Mod1;
+widgetRegistry['ch4-ana'] = Ch4Ana;
+widgetRegistry['ch4-mod1'] = Ch4Mod1;
+widgetRegistry['ch5-ana'] = Ch5Ana;
+widgetRegistry['ch5-mod1'] = Ch5Mod1;
+widgetRegistry['ch6-ana'] = Ch6Ana;
+widgetRegistry['ch6-mod1'] = Ch6Mod1;
+widgetRegistry['ch7-ana'] = Ch7Ana;
+widgetRegistry['ch7-mod1'] = Ch7Mod1;
+widgetRegistry['ch8-ana'] = Ch8Ana;
+widgetRegistry['ch8-mod1'] = Ch8Mod1;
+widgetRegistry['ch9-ana'] = Ch9Ana;
+widgetRegistry['ch9-mod1'] = Ch9Mod1;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
