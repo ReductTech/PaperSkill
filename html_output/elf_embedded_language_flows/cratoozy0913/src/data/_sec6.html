@@ -1,0 +1,125 @@
+<section class="chap" id="sec6">
+  <h2 class="chap-title"><span class="num">§4.</span>Flow Matching：沿速度场积分回到清晰的词<span class="badge-tag inf">推理核心</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🌊</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">§3 知道速度 v 是常数就能回到清晰的词，但<b>实际中我们不知道 v</b>！Flow Matching 的核心：<b>训练一个神经网络 f_θ 来预测任意点 z_t 的速度方向 v̂</b>。推理时沿网络预测的方向一步步积分，就能从噪声 ε 走回文本 x₀。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-flow" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">笔势引路：散字归位</div>
+      <div class="analogy-text">散开的墨滴在<b>笔势方向场</b>中，每落一笔都看"该往哪走"（箭头方向），沿笔势从散墨区一步步回到米字格里该在的位置。网络f_θ就是这个<b>笔势指引</b>。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">4.1</span>
+      <h4>网络"修"散点：拖散点看网络如何拉回</h4>
+          </div>
+    <div class="module-body">
+      <canvas id="cv-repair" width="800" height="320"></canvas>
+      <div class="ctrl">
+        <button class="tiny" id="btn-repair-reset" data-tip="把蓝点放回起点">↺ 重置</button>
+        <button class="tiny ghost" id="btn-repair-train" data-tip="手动让蓝点按网络预测方向移动 5 步">▶ 训练几步</button>
+        <button class="tiny ghost" id="btn-repair-release" data-tip="物理模拟：松手后球会沿梯度自动滚到目标">🚀 释放（自动滚）</button>
+        <span style="margin-left:auto; font-size:15px; color:var(--slate-2);" id="lbl-repair">误差: —</span>
+      </div>
+      <div class="physics-ctrl">
+        <label>物理参数</label>
+        <span>摩擦:</span>
+        <input type="range" id="rng-physics-friction" min="0" max="100" value="30" data-tip="摩擦越大球越快停下；0 = 永远在振荡">
+        <span style="font-size:13px; color:var(--slate); min-width:50px;" id="lbl-friction">0.30</span>
+        <span style="margin-left:6px;">步长:</span>
+        <input type="range" id="rng-physics-step" min="1" max="50" value="20" data-tip="每步移动距离占当前距离的比例 (0.01-0.5)">
+        <span style="font-size:13px; color:var(--slate); min-width:50px;" id="lbl-step">0.20</span>
+      </div>
+
+          </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">4.2</span>
+      <h4>交互：拖球看流场，点按钮看自动回家</h4>
+          </div>
+    <div class="module-body">
+
+      <canvas id="cv-flow-unified" width="800" height="340"></canvas>
+      <div class="ctrl">
+        <button class="tiny" id="btn-flow-go">▶ 自动回家</button>
+        <button class="tiny ghost" id="btn-flow-reset2">↺ 重置</button>
+        <label style="margin-left:8px;">流场强度</label>
+        <input type="range" id="rng-flow2" min="10" max="100" value="70" style="flex:0 1 140px;">
+        <span class="val" id="lbl-flow2">0.70</span>
+        <span class="val" id="lbl-flow-err2" style="margin-left:auto;">误差: —</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">4.3</span>
+      <h4>训练前后对比：网络学的就是让 v&#770; 对齐真值 v</h4>
+    </div>
+    <div class="module-body">
+
+      <canvas id="cv-align-loss" width="800" height="100"></canvas>
+      <div class="val" id="lbl-align-loss" style="text-align:center; margin-top:4px;">当前 Loss: —</div>
+
+      <div class="align-grid" style="margin-top:10px;">
+        <div class="align-cell">
+          <div class="align-cell-head" style="color:var(--bad);">训练前</div>
+          <canvas id="cv-align-before" width="380" height="180"></canvas>
+          <div class="align-stat" id="align-stat-before">MSE: — | 角度偏差: —</div>
+        </div>
+        <div class="align-arrow" style="align-self:center; font-size:20px; color:var(--slate);">→</div>
+        <div class="align-cell">
+          <div class="align-cell-head" style="color:var(--olive);">训练后</div>
+          <canvas id="cv-align-after" width="380" height="180"></canvas>
+          <div class="align-stat" id="align-stat-after">MSE: — | 角度偏差: —</div>
+        </div>
+      </div>
+
+      <div class="ctrl" style="margin-top:10px;">
+        <button class="tiny" id="btn-align-play">▶ 开始训练</button>
+        <button class="tiny ghost" id="btn-align-prev">⏮ 上一步</button>
+        <button class="tiny ghost" id="btn-align-next">⏭ 下一步</button>
+        <button class="tiny ghost" id="btn-align-reset">↺ 重置</button>
+        <span class="val" id="lbl-align-step" style="margin-left:auto;">步: 0 / 100</span>
+      </div>
+
+    </div>
+  </div>
+
+</section>
