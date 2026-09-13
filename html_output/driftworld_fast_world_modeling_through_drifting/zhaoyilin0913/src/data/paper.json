@@ -1,0 +1,3244 @@
+{
+  "title": "DriftWorld：通过漂移实现快速世界建模",
+  "one_liner": "DriftWorld 提出首个基于漂移生成模型的动作条件世界模型，单次前向传播即可生成未来视频帧，比扩散模型快 17 倍，同时保持甚至超越其生成质量。",
+  "abstract": "预测性世界模型让机器人通过想象动作结果来规划，但其控制价值取决于能否快速生成大量推演。扩散式世界模型因多步采样导致每次推演代价高昂，限制了推理时的大规模动作搜索。本文提出 DriftWorld，一种基于漂移生成模型的动作条件世界模型。它不在推理时迭代去噪，而是在训练时学习一个动作条件漂移场，从而在单次前向传播中根据当前观测和候选动作序列生成未来帧，速度达每秒 30 帧以上，平均比扩散基线快 17 倍。作者在 Bridge-V2、RT-1、Language Table、Push-T 和 Robomimic 五个基准上评估 DriftWorld，其推演既准确又快速，决策性能达到最优，推理时间远低于扩散基线。此外，DriftWorld 还可作为离线模拟器对真实机器人策略排序，推演得分与真实性能的相关系数最高达 0.99。",
+  "contributions": [
+    "提出 DriftWorld，一种单步动作条件世界模型，每次推演仅需一次前向传播，平均比扩散式世界模型快 17 倍。",
+    "首次将漂移生成模型适配到条件视频预测，引入动作强调漂移场、特征空间漂移损失和逐帧动作条件。",
+    "在五个机器人操作基准上验证 DriftWorld 的推演质量匹配或超越基线，同时运行速度显著更快。",
+    "展示 DriftWorld 可用于推理时动作搜索，将 Push-T 的 IoU 从 0.635 提升到 0.781。",
+    "证明 DriftWorld 可作为离线模拟器评估策略，与真实性能的相关系数最高达 0.99。"
+  ],
+  "core_questions": [
+    "如何让动作条件世界模型在保持高生成质量的同时实现单步快速推演？",
+    "漂移生成模型如何适配到动作条件视频预测任务中？",
+    "快速且高质量的世界模型如何同时支持在线动作搜索和离线策略评估？"
+  ],
+  "problem": {
+    "what": "扩散式动作条件世界模型需要多步迭代去噪，导致每次推演耗时数秒，无法在实时规划中评估大量候选动作。",
+    "why": "机器人规划需要在控制循环内快速评估数百个候选动作序列，推理速度直接决定了世界模型能否用于在线决策和离线策略评估。"
+  },
+  "concepts": [
+    {
+      "name": "漂移生成模型",
+      "life_analogy": "想象一群人在黑暗中寻找出口，每个人根据与已知正确位置（正样本）的吸引和与其他迷路者（负样本）的排斥不断调整位置，最终全部汇聚到出口。",
+      "solves": "解决扩散模型推理时需要多步迭代去噪、速度慢的问题。",
+      "when_to_use": "当需要单步快速生成高质量样本，且可以接受训练时较高的计算和内存开销时使用。",
+      "limitations": "扩散模型推理需要几十步前向传播，每步都计算量大，导致实时规划不可行。",
+      "paper_approach": "在训练时学习一个漂移场，将噪声先验分布逐步推向数据分布，使推理时只需一次前向传播。",
+      "formula": "漂移场等于正样本均值偏移减去负样本均值偏移；新样本等于旧样本加上漂移场。",
+      "implementation": "训练时对每个视频独立计算漂移场，使用单个正样本（真实未来帧）和多个负样本（模型生成帧），通过固定点迭代优化。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "动作条件漂移场",
+      "life_analogy": "就像给迷路的人一张地图，地图上标注了每个动作对应的正确方向，让他们不仅找到出口，还按照指定路线走。",
+      "solves": "解决漂移生成模型原本只用于类别条件图像生成，无法根据动作序列控制生成内容的问题。",
+      "when_to_use": "当需要根据机器人动作序列生成对应的未来视频帧时使用。",
+      "limitations": "原始漂移模型只接受类别标签，无法处理连续动作序列和时序条件。",
+      "paper_approach": "将漂移场定义为由初始观测和动作序列共同决定的条件场，并引入动作强调机制增强动作跟随。",
+      "formula": "条件漂移场由当前观测和未来动作序列共同参数化。",
+      "implementation": "在训练时从真实条件分布抽取正样本，从生成分布和无动作真实分布混合中抽取负样本，通过参数伽马调节混合比例。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "特征空间漂移损失",
+      "life_analogy": "就像比较两幅画时，不是逐像素对比，而是请一位艺术专家看整体风格和语义是否一致。",
+      "solves": "解决在复杂真实场景中直接在像素空间计算漂移损失导致生成图像模糊、细节丢失的问题。",
+      "when_to_use": "当数据集背景复杂、分辨率高、需要保持视觉锐度时使用。",
+      "limitations": "像素空间损失对背景重建误差敏感，容易让模型学会复制历史帧而忽略动作。",
+      "paper_approach": "使用 DINOv2 或 DINOv3 提取语义特征，在特征空间计算漂移损失，使距离度量更具语义意义。",
+      "formula": "损失在特征空间计算，鼓励生成特征向真实特征漂移并远离负样本特征。",
+      "implementation": "对 H×W×D 特征图在每个空间位置单独计算漂移场，最后加权平均；特征提取器仅在训练时使用，不增加推理开销。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "动作强调机制",
+      "life_analogy": "就像教练在训练时故意让学员对比“做了动作”和“没做动作”的差别，强化对动作的敏感度。",
+      "solves": "解决模型倾向于学习恒等映射、忽略动作条件的问题。",
+      "when_to_use": "当机器人动作幅度小、背景复杂、模型容易偷懒复制历史帧时使用。",
+      "limitations": "标准漂移损失中负样本仅来自生成分布，模型可能通过复制当前帧来最小化损失。",
+      "paper_approach": "在负样本分布中混入无动作的真实帧，并引入可调参数在推理时灵活控制动作跟随强度。",
+      "formula": "负样本分布等于生成分布与无动作真实分布的加权混合，权重由参数伽马控制。",
+      "implementation": "训练时随机采样动作强调尺度，使其服从对数均匀分布，推理时可灵活调整该尺度而不需重新训练。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "运动加权",
+      "life_analogy": "就像考试时把更多分数分配给难题，而不是简单题，让模型更关注运动区域而不是静止背景。",
+      "solves": "解决在真实机器人数据中，背景静止区域主导损失，导致模型忽略机械臂运动的问题。",
+      "when_to_use": "当数据集中机器人运动幅度相对背景较小、需要精确捕捉机械臂运动时使用。",
+      "limitations": "均匀加权所有空间位置会让模型陷入动作无关的局部最优，学会复制历史帧。",
+      "paper_approach": "根据相邻帧特征差异量化运动，对运动大的空间位置赋予更高的漂移损失权重。",
+      "formula": "权重等于一加上兰姆达乘以双曲正切函数作用于归一化运动量。",
+      "implementation": "运动量用目标未来帧特征与前一帧特征之间的欧氏距离衡量，权重通过双曲正切函数映射。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "逐帧动作条件 U-Net",
+      "life_analogy": "就像给每个未来画面贴上对应的动作标签，确保第 i 个动作控制第 i 个未来帧，而不是张冠李戴。",
+      "solves": "解决多帧生成时动作与帧对应关系混乱的问题。",
+      "when_to_use": "当需要一次生成多帧未来视频且每帧对应不同动作时使用。",
+      "limitations": "普通条件方式可能让动作信息全局混合，无法精确对应到具体帧。",
+      "paper_approach": "使用分解的时空卷积，空间卷积独立作用于每个时间步，时间卷积独立作用于每个空间位置，并用 FiLM 逐帧注入动作条件。",
+      "formula": "无",
+      "implementation": "历史帧与初始高斯噪声在通道维度拼接，动作通过 FiLM 和可选交叉注意力逐帧条件化。",
+      "location": "",
+      "excerpt": ""
+    },
+    {
+      "name": "自强制训练",
+      "life_analogy": "就像学骑自行车，先在有辅助轮的情况下练习，再逐渐去掉辅助轮，自己平衡。",
+      "solves": "解决训练时使用真实历史帧、推理时使用模型自己生成帧之间的分布不匹配问题。",
+      "when_to_use": "当需要长程自回归推演且训练与推理条件不一致时使用。",
+      "limitations": "仅用真实帧训练会导致误差累积，自回归推演时质量迅速下降。",
+      "paper_approach": "采用两阶段训练，第二阶段让模型以自己生成的帧作为输入进行自回归训练。",
+      "formula": "无",
+      "implementation": "第二阶段从第一阶段检查点初始化，每个负样本继续自己的推演，梯度不回传通过生成帧。",
+      "location": "",
+      "excerpt": ""
+    }
+  ],
+  "comparison": [
+    {
+      "aspect": "推理速度",
+      "baseline": "扩散式世界模型需要多步迭代去噪，每帧耗时 0.3 到 3.2 秒。",
+      "paper": "单次前向传播生成，每帧仅需约 0.01 到 0.03 秒，平均快 17 倍。"
+    },
+    {
+      "aspect": "生成质量",
+      "baseline": "扩散模型生成质量高，但在复杂场景中可能出现目标消失或动作不准确。",
+      "paper": "在 SSIM、PSNR、LPIPS、FID、FVD 等指标上匹配或超越扩散基线。"
+    },
+    {
+      "aspect": "动作跟随能力",
+      "baseline": "扩散世界模型在快速运动时可能生成模糊或不准确的机械臂动作。",
+      "paper": "通过动作强调漂移场和运动加权，生成视频更准确地跟随指定动作。"
+    },
+    {
+      "aspect": "训练内存",
+      "baseline": "标准扩散训练内存需求相对较低。",
+      "paper": "漂移训练需要生成多个负样本，内存需求更高，限制了上下文和生成窗口长度。"
+    },
+    {
+      "aspect": "策略评估相关性",
+      "baseline": "GPC 世界模型在 Push-T 上与真实性能相关系数为 0.7345，Ctrl-World 在 Robomimic 上为 0.9053 和 0.8562。",
+      "paper": "DriftWorld 在 Push-T、Robomimic Lift 和 Can 上相关系数分别达 0.9515、0.9916 和 0.9250。"
+    }
+  ],
+  "flow": {
+    "title": "DriftWorld 训练与推理流程",
+    "steps": [
+      "输入当前帧、历史帧和未来动作序列作为条件。",
+      "从高斯噪声先验采样，通过 U-Net 单次前向传播生成未来视频帧。",
+      "将生成的未来帧作为负样本，真实未来帧作为正样本。",
+      "在像素空间或 DINOv2/v3 特征空间计算漂移场。",
+      "对运动区域加权，强调机械臂运动处的损失。",
+      "通过固定点迭代损失优化模型，使生成分布逼近真实条件分布。",
+      "可选第二阶段自强制训练，让模型以自己生成的帧作为输入。",
+      "推理时单次前向传播生成未来帧，支持在线动作搜索和离线策略评估。"
+    ]
+  },
+  "relations": [
+    {
+      "from": "漂移生成模型",
+      "to": "动作条件漂移场",
+      "label": "将无条件漂移扩展为动作条件漂移"
+    },
+    {
+      "from": "动作条件漂移场",
+      "to": "动作强调机制",
+      "label": "通过混合无动作负样本增强动作跟随"
+    },
+    {
+      "from": "漂移生成模型",
+      "to": "特征空间漂移损失",
+      "label": "在语义特征空间计算漂移损失以提升质量"
+    },
+    {
+      "from": "特征空间漂移损失",
+      "to": "运动加权",
+      "label": "在特征空间中对运动区域加权"
+    },
+    {
+      "from": "动作条件漂移场",
+      "to": "逐帧动作条件 U-Net",
+      "label": "由 U-Net 实现逐帧动作条件化"
+    },
+    {
+      "from": "逐帧动作条件 U-Net",
+      "to": "自强制训练",
+      "label": "通过自强制训练提升自回归推演质量"
+    }
+  ],
+  "terms": [
+    {
+      "term": "DriftWorld",
+      "explanation": "本文提出的基于漂移生成模型的动作条件世界模型，单步生成未来视频帧。"
+    },
+    {
+      "term": "漂移生成模型",
+      "explanation": "一种通过训练时学习漂移场将噪声分布推向数据分布的生成模型，推理时单步生成。"
+    },
+    {
+      "term": "扩散模型",
+      "explanation": "通过多步迭代去噪从噪声生成数据的生成模型，推理速度慢。"
+    },
+    {
+      "term": "DINOv2",
+      "explanation": "一种自监督视觉特征提取器，用于在语义特征空间计算漂移损失。"
+    },
+    {
+      "term": "DINOv3",
+      "explanation": "DINOv2 的升级版，同样用于提取语义特征。"
+    },
+    {
+      "term": "U-Net",
+      "explanation": "一种编码器-解码器结构的神经网络，用于生成视频帧。"
+    },
+    {
+      "term": "FiLM",
+      "explanation": "一种特征级线性调制方法，用于将动作条件注入到 U-Net 中。"
+    },
+    {
+      "term": "GPC-RANK",
+      "explanation": "一种推理时策略增强方法，通过世界模型推演候选动作并选择最优动作。"
+    },
+    {
+      "term": "Push-T",
+      "explanation": "一个视觉机器人操作基准任务，目标是将 T 形块推到目标位置。"
+    },
+    {
+      "term": "Robomimic",
+      "explanation": "一个机器人操作基准套件，包含 Lift、Can、Square 等任务。"
+    },
+    {
+      "term": "Bridge-V2",
+      "explanation": "一个大规模真实机器人操作数据集。"
+    },
+    {
+      "term": "RT-1",
+      "explanation": "一个真实机器人操作数据集，包含多种厨房环境任务。"
+    },
+    {
+      "term": "Language Table",
+      "explanation": "一个桌面操作数据集，包含语言指令和机器人动作。"
+    },
+    {
+      "term": "SSIM",
+      "explanation": "结构相似性指标，衡量生成图像与真实图像的结构相似程度。"
+    },
+    {
+      "term": "PSNR",
+      "explanation": "峰值信噪比，衡量图像重建质量。"
+    },
+    {
+      "term": "LPIPS",
+      "explanation": "学习感知图像块相似度，衡量感知层面的图像差异。"
+    },
+    {
+      "term": "FID",
+      "explanation": "弗雷歇初始距离，衡量生成分布与真实分布的距离。"
+    },
+    {
+      "term": "FVD",
+      "explanation": "弗雷歇视频距离，衡量生成视频与真实视频的分布距离。"
+    },
+    {
+      "term": "IoU",
+      "explanation": "交并比，衡量预测区域与真实区域的重叠程度。"
+    },
+    {
+      "term": "自强制训练",
+      "explanation": "一种两阶段训练方法，第二阶段让模型以自己生成的帧作为输入进行自回归训练。"
+    }
+  ],
+  "learning_roadmap": [
+    {
+      "stage": "背景知识",
+      "goal": "理解世界模型、扩散模型和机器人规划的基本概念。",
+      "key_points": [
+        "世界模型让机器人通过想象动作结果来规划。",
+        "扩散模型通过多步去噪生成数据，推理速度慢。",
+        "机器人规划需要快速评估大量候选动作。"
+      ]
+    },
+    {
+      "stage": "核心方法",
+      "goal": "掌握漂移生成模型的原理及其在动作条件视频生成中的适配。",
+      "key_points": [
+        "漂移场通过正样本吸引和负样本排斥将生成分布推向数据分布。",
+        "动作条件漂移场由初始观测和动作序列共同决定。",
+        "特征空间漂移损失使用 DINOv2/v3 提升语义质量。",
+        "运动加权和动作强调机制增强动作跟随。"
+      ]
+    },
+    {
+      "stage": "架构与训练",
+      "goal": "理解 DriftWorld 的 U-Net 架构和训练流程。",
+      "key_points": [
+        "U-Net 使用分解时空卷积和 FiLM 逐帧注入动作条件。",
+        "训练时对每个视频独立计算漂移场，使用单个正样本和多个负样本。",
+        "自强制训练第二阶段让模型以自己生成的帧作为输入。"
+      ]
+    },
+    {
+      "stage": "实验与评估",
+      "goal": "了解 DriftWorld 在五个基准上的表现和应用。",
+      "key_points": [
+        "DriftWorld 在视觉质量指标上匹配或超越扩散基线。",
+        "推理速度平均快 17 倍，支持在线动作搜索。",
+        "作为离线模拟器，与真实策略性能相关系数最高达 0.99。"
+      ]
+    },
+    {
+      "stage": "局限与展望",
+      "goal": "认识 DriftWorld 的局限性和未来方向。",
+      "key_points": [
+        "依赖预训练特征提取器保持视觉锐度。",
+        "训练时内存需求高，限制了上下文和生成窗口长度。",
+        "未来可探索稀疏历史和视频 VAE 时间压缩。"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "DriftWorld 相比扩散式世界模型的核心优势是什么？",
+      "options": [
+        "生成质量更高但速度更慢",
+        "单次前向传播生成，速度更快",
+        "需要更少训练数据",
+        "不需要动作条件"
+      ],
+      "answer": 1,
+      "explanation": "DriftWorld 通过漂移生成模型实现单次前向传播生成未来帧，平均比扩散基线快 17 倍。",
+      "section": 0,
+      "location": "1 Introduction"
+    },
+    {
+      "question": "在 DriftWorld 中，漂移场的正样本和负样本分别是什么？",
+      "options": [
+        "正样本是生成帧，负样本是真实帧",
+        "正样本是真实未来帧，负样本是模型生成的未来帧",
+        "正样本是历史帧，负样本是动作序列",
+        "正样本是噪声，负样本是真实帧"
+      ],
+      "answer": 1,
+      "explanation": "正样本是唯一的真实未来帧序列，负样本是模型生成的多个未来帧序列。",
+      "section": 0,
+      "location": "1 Introduction"
+    },
+    {
+      "question": "为什么 DriftWorld 在复杂真实数据集上使用 DINOv2/v3 特征空间计算漂移损失？",
+      "options": [
+        "为了加快推理速度",
+        "为了减少训练内存",
+        "为了在语义层面衡量相似度，保持视觉锐度",
+        "为了替代 U-Net 架构"
+      ],
+      "answer": 2,
+      "explanation": "在特征空间计算漂移损失可以提供更具语义意义的距离度量，避免生成图像模糊。",
+      "section": 0,
+      "location": "1 Introduction"
+    },
+    {
+      "question": "运动加权在 DriftWorld 中的作用是什么？",
+      "options": [
+        "加快训练速度",
+        "让模型更关注运动区域，避免学习恒等映射",
+        "减少负样本数量",
+        "替代动作条件"
+      ],
+      "answer": 1,
+      "explanation": "运动加权对运动大的空间位置赋予更高损失权重，防止模型通过复制历史帧来最小化损失。",
+      "section": 0,
+      "location": "1 Introduction"
+    },
+    {
+      "question": "DriftWorld 作为离线模拟器评估策略时，与真实性能的相关系数最高可达多少？",
+      "options": [
+        "0.73",
+        "0.85",
+        "0.91",
+        "0.99"
+      ],
+      "answer": 3,
+      "explanation": "在 Robomimic Lift 任务上，DriftWorld 与真实性能的相关系数达到 0.9916。",
+      "section": 0,
+      "location": "1 Introduction"
+    }
+  ],
+  "formulas": [
+    {
+      "formula": "˜q(·|at, ot−F :t) ≜(1 −γ)qθ(·|at, ot−F :t) + γp(·|∅, ot−F :t)",
+      "meaning": "这是一个“混合预测分布”的公式。它把两个预测来源按比例混合起来：一部分来自训练好的模型 qθ（它同时看动作 at 和历史画面 ot−F:t），另一部分来自一个“不看动作”的先验分布 p（只根据历史画面预测未来）。γ 就像一个调音旋钮，控制“听动作的模型”和“不听动作的先验”各占多少。γ 越大，越依赖先验；γ 越小，越依赖动作条件模型。",
+      "variables": [
+        {
+          "symbol": "˜q(·|at, ot−F :t)",
+          "meaning": "混合后的最终预测分布，表示在给定动作 at 和历史画面 ot−F:t 时，对未来画面的概率预测。",
+          "example": "预测未来一帧机器人手臂位置的概率分布"
+        },
+        {
+          "symbol": "qθ(·|at, ot−F :t)",
+          "meaning": "由参数 θ 的神经网络模型给出的动作条件预测分布，它同时使用动作和历史画面。",
+          "example": "模型预测未来画面是“机械臂向右移动”的概率为 0.8"
+        },
+        {
+          "symbol": "p(·|∅, ot−F :t)",
+          "meaning": "先验分布，表示不看动作（动作位置用 ∅ 表示）时，仅根据历史画面预测未来。",
+          "example": "不看动作时，模型预测未来画面是“机械臂保持不动”的概率为 0.6"
+        },
+        {
+          "symbol": "γ",
+          "meaning": "混合权重，取值范围通常在 0 到 1 之间，控制先验分布所占的比例。",
+          "example": "γ = 0.3"
+        },
+        {
+          "symbol": "at",
+          "meaning": "当前时刻 t 的动作，例如机器人关节角度或末端执行器位移。",
+          "example": "动作 at = [0.1, -0.2, 0.3]（三个关节的移动量）"
+        },
+        {
+          "symbol": "ot−F :t",
+          "meaning": "从过去 F 帧到当前帧 t 的观测画面序列，F 是历史窗口长度。",
+          "example": "过去 4 帧图像，F = 4"
+        }
+      ],
+      "example": "假设模型预测未来画面有三种可能：A（机械臂向右）、B（机械臂向左）、C（机械臂不动）。动作条件模型 qθ 给出的概率是：A=0.7，B=0.2，C=0.1。先验分布 p 给出的概率是：A=0.2，B=0.2，C=0.6。取 γ = 0.3，则混合后的概率为：A = (1-0.3)×0.7 + 0.3×0.2 = 0.49 + 0.06 = 0.55；B = (1-0.3)×0.2 + 0.3×0.2 = 0.14 + 0.06 = 0.20；C = (1-0.3)×0.1 + 0.3×0.6 = 0.07 + 0.18 = 0.25。最终预测 A 的概率最高，为 0.55。",
+      "table": {
+        "headers": [
+          "未来画面",
+          "动作条件模型 qθ 概率",
+          "先验分布 p 概率",
+          "混合后概率 ˜q"
+        ],
+        "rows": [
+          [
+            "A（向右）",
+            "0.7",
+            "0.2",
+            "0.55"
+          ],
+          [
+            "B（向左）",
+            "0.2",
+            "0.2",
+            "0.20"
+          ],
+          [
+            "C（不动）",
+            "0.1",
+            "0.6",
+            "0.25"
+          ]
+        ]
+      },
+      "note": "在 DriftWorld 论文中，这个公式用于训练时的漂移生成模型。它通过混合动作条件模型和先验分布，让模型在生成未来帧时既能利用动作信息，又能保持一定的多样性或稳定性。γ 是一个超参数，需要根据实验调整。",
+      "page": 5,
+      "y": 344.3613586425781,
+      "section": 6
+    }
+  ],
+  "metadata": {
+    "title": "DriftWorld: Fast World Modeling through Drifting",
+    "authors": [
+      "Susie Lu",
+      "Haonan Chen",
+      "Weirui Ye",
+      "Yilun Du"
+    ],
+    "abstract": "预测型世界模型让机器人通过想象自己动作的后果来规划，但它的价值取决于能否快速生成大量推演。这给基于扩散的世界模型造成瓶颈：多步采样让每次推演都很昂贵，限制了推理时的大规模动作搜索。我们提出 DriftWorld，一个基于漂移生成模型、以动作为条件的世界模型。它不在推理时反复去噪，而是在训练中学习一个以动作为条件的漂移，从而能在单次前向传播中，根据当前观测和候选动作序列生成未来帧，速度达每秒 30 帧以上，平均比扩散基线快 17 倍。我们在 Bridge-V2、RT-1、Language Table、Push-T 和 Robomimic 等标准视觉机器人操作基准上评估 DriftWorld。凭借既准确又快速的推演，DriftWorld 以远低于扩散世界模型基线的推理时间取得了最先进的决策性能。除在线控制外，DriftWorld 还能作为离线模拟器对真实机器人策略排序，其基于推演的分数与真实表现的相关性最高达 0.99。这些结果表明，漂移模型非常适合机器人世界建模，因为快速、高质量的想象能直接支持规划与策略评估。"
+  },
+  "sections": [
+    {
+      "level": 1,
+      "heading": "Introduction",
+      "number": "1",
+      "heading_y": 445.37017822265625,
+      "text": "1 Introduction\n\nPredictive world models have emerged as powerful tools for robot learning, letting robots predict the outcomes of their actions without executing in the real world. With recent advances in video gen- eration, action-conditioned world models can now simulate fine-grained robot–object interactions [1, 2], render controllable multi-view videos [3], and produce long-horizon, temporally consistent rollouts [4]. Such models lead to two key applications. First, robots can improve their policies by rolling out candidate action proposals in the world model and selecting the best one to execute in the real world. Second, the model can serve as an offline simulator for policy evaluation.\n\nHowever, the practical value of these world models is bottlenecked by inference speed. State-of-the- art models are predominantly diffusion-based [3, 5], so they rely on iterative, multi-step denoising to generate future frames. This multi-step sampling is too slow for real-time planning. For instance, recent work on generative predictive control [5] reports that diffusion world model rollouts consume 90–95% of runtime, resulting in 3 or more seconds per decision cycle. As a result, it is impractical to simulate the hundreds of rollouts needed to identify the best candidate actions.\n\nTo overcome this bottleneck, we introduce DriftWorld, a fast action-conditioned world model based on drifting generative models [6]. Unlike diffusion-based models, DriftWorld generates high-quality future frames in a single forward pass. DriftWorld achieves 1-step generation by learning a drifting field at training time that maps the prior noise distribution onto the data distribution. Consequently, inference does not require the iterative, multi-step sampling used in diffusion models.\n\nThe original drifting model was designed for class-conditional image generation. Adapting it to action-conditioned video generation requires rethinking three components: (1) a conditional drifting\n\nfield defined by the initial observation and action sequence, with a modification that accentuates action following; (2) a drifting feature space that leverages DINOv2/v3 [7, 8] to maintain visual sharpness in complex scenes; (3) a U-Net architecture that ensures each video frame is precisely conditioned on the corresponding action.\n\nWe evaluate DriftWorld on standard vision-based robotic manipulation benchmarks, including the real-world Bridge-V2 [9], RT-1 [10], and Language Table [11] datasets and the simulated Push- T [12, 13] and Robomimic [14] environments. DriftWorld is 17× faster on average than diffu- sion world-model baselines while matching or exceeding their rollout quality across SSIM, PSNR, LPIPS, FID, and FVD metrics. Furthermore, rolling out a policy’s action proposals in DriftWorld and executing the highest-reward ones boosts performance: for example, increasing Push-T IoU from 0.635 to 0.781. Beyond online control, DriftWorld also serves as an offline simulator for ranking real-world policies, reaching Pearson correlation coefficients of 0.9515, 0.9916, and 0.9250 with ground-truth performance on Push-T, Robomimic Lift, and Robomimic Can. Together, these results establish drifting as a strong foundation for robot world modeling, where fast, high-quality imagination directly supports planning and policy evaluation. Overall, our main contributions are:\n\n• DriftWorld: We introduce a single-step, action-conditioned world model that generates each rollout in a single forward pass, which is 17× faster than diffusion-based world models on average.\n\n• Specializing Drifting for Robot Simulation: We present the first adaptation of drifting generative models to conditional video prediction, introducing an action-accentuated drift- ing field, a feature-space drifting loss, and frame-wise action conditioning.\n\n• Experimental Validation: We show that DriftWorld matches or exceeds baselines in roll- out quality across five benchmarks while running significantly faster, which makes both inference-time action search and offline policy evaluation more efficient.",
+      "paragraphs": [
+        {
+          "text": "1 Introduction",
+          "translation": "1 引言",
+          "plain": ""
+        },
+        {
+          "text": "Predictive world models have emerged as powerful tools for robot learning, letting robots predict the outcomes of their actions without executing in the real world. With recent advances in video gen- eration, action-conditioned world models can now simulate fine-grained robot–object interactions [1, 2], render controllable multi-view videos [3], and produce long-horizon, temporally consistent rollouts [4]. Such models lead to two key applications. First, robots can improve their policies by rolling out candidate action proposals in the world model and selecting the best one to execute in the real world. Second, the model can serve as an offline simulator for policy evaluation.",
+          "translation": "预测性世界模型已成为机器人学习的有力工具，它让机器人无需在真实世界中执行动作，就能预测其动作的结果。随着视频生成技术的最新进展，以动作为条件的世界模型如今能够模拟细粒度的机器人—物体交互[1, 2]，渲染可控的多视角视频[3]，并生成长时间跨度、时间上一致的推演[4]。这类模型带来了两个关键应用。第一，机器人可以在世界模型中推演候选动作方案，并挑选出最好的一个在真实世界中执行，从而改进其策略。第二，该模型可以作为离线模拟器用于策略评估。",
+          "plain": "世界模型可以理解成机器人的“脑内小剧场”：它不用真的动手，就能在脑子里预演“如果我这样动，会发生什么”。就像下棋高手会在脑中推演几步棋再落子，机器人也可以先在模型里试各种动作，挑一个最靠谱的再真做。这里说的“推演（rollout）”就是把未来一段时间一帧一帧地想象出来，看结果如何。"
+        },
+        {
+          "text": "However, the practical value of these world models is bottlenecked by inference speed. State-of-the- art models are predominantly diffusion-based [3, 5], so they rely on iterative, multi-step denoising to generate future frames. This multi-step sampling is too slow for real-time planning. For instance, recent work on generative predictive control [5] reports that diffusion world model rollouts consume 90–95% of runtime, resulting in 3 or more seconds per decision cycle. As a result, it is impractical to simulate the hundreds of rollouts needed to identify the best candidate actions.",
+          "translation": "然而，这些世界模型的实际价值受限于推理速度。当前最先进的模型大多基于扩散模型[3, 5]，因此它们依赖迭代式的多步去噪来生成未来帧。这种多步采样对于实时规划来说太慢了。例如，近期关于生成式预测控制的工作[5]报告称，扩散世界模型的推演消耗了90%到95%的运行时间，导致每个决策周期需要3秒甚至更久。因此，要模拟出识别最佳候选动作所需的数百次推演是不切实际的。",
+          "plain": "扩散模型生成画面就像“从一团雪花噪点里一点点擦出图像”：它需要反复迭代很多步，每一步都稍微清晰一点，最后才成形。步数多就意味着慢。机器人做决策往往要在极短时间内比较几百种可能的动作，如果每想象一次都要好几秒，那根本来不及，就像考试时每道题都要想三分钟，时间肯定不够用。"
+        },
+        {
+          "text": "To overcome this bottleneck, we introduce DriftWorld, a fast action-conditioned world model based on drifting generative models [6]. Unlike diffusion-based models, DriftWorld generates high-quality future frames in a single forward pass. DriftWorld achieves 1-step generation by learning a drifting field at training time that maps the prior noise distribution onto the data distribution. Consequently, inference does not require the iterative, multi-step sampling used in diffusion models.",
+          "translation": "为克服这一瓶颈，我们提出了DriftWorld，一个基于漂移生成模型[6]的快速、以动作为条件的世界模型。与基于扩散的模型不同，DriftWorld通过一次前向传播就能生成高质量的 future 帧。DriftWorld通过在训练时学习一个漂移场，将先验噪声分布映射到数据分布上，从而实现一步生成。因此，推理时不需要扩散模型所使用的迭代式多步采样。",
+          "plain": "这里的核心区别是“一步到位”还是“反复打磨”。扩散模型像雕塑家一点点凿出形状，要凿很多下；而漂移模型像提前学会了一条“从噪声直接跳到成品”的捷径，训练时把这条捷径（漂移场）学好，用的时候一步就跳过去。所谓“漂移场”可以想象成一张地图，告诉你任意一团随机噪声应该往哪个方向移动、移动多少，最终落到真实图像所在的位置。"
+        },
+        {
+          "text": "The original drifting model was designed for class-conditional image generation. Adapting it to action-conditioned video generation requires rethinking three components: (1) a conditional drifting",
+          "translation": "最初的漂移模型是为类别条件的图像生成而设计的。要把它改造成以动作为条件的视频生成，需要重新思考三个组成部分：（1）一个条件漂移",
+          "plain": ""
+        },
+        {
+          "text": "field defined by the initial observation and action sequence, with a modification that accentuates action following; (2) a drifting feature space that leverages DINOv2/v3 [7, 8] to maintain visual sharpness in complex scenes; (3) a U-Net architecture that ensures each video frame is precisely conditioned on the corresponding action.",
+          "translation": "场，它由初始观测和动作序列定义，并做了一处修改以突出对动作的遵循；（2）一个漂移特征空间，它利用DINOv2/v3[7, 8]来在复杂场景中保持视觉清晰度；（3）一个U-Net架构，它确保每一视频帧都精确地以对应的动作为条件。",
+          "plain": "这三部分可以这样理解：第一，漂移场不能乱漂，得听“指令”——指令就是当前看到的画面加上接下来要做的动作，而且特意加强了“要听话照做动作”这一点。第二，漂移要在什么样的“空间”里进行？这里用DINOv2/v3这种强大的视觉特征提取器来定义空间，好比画画时选一张好纸，能让细节更清楚。第三，U-Net是一种经典的图像网络结构，它保证视频里每一帧都严格对应它该对应的那个动作，不会张冠李戴。"
+        },
+        {
+          "text": "We evaluate DriftWorld on standard vision-based robotic manipulation benchmarks, including the real-world Bridge-V2 [9], RT-1 [10], and Language Table [11] datasets and the simulated Push- T [12, 13] and Robomimic [14] environments. DriftWorld is 17× faster on average than diffu- sion world-model baselines while matching or exceeding their rollout quality across SSIM, PSNR, LPIPS, FID, and FVD metrics. Furthermore, rolling out a policy’s action proposals in DriftWorld and executing the highest-reward ones boosts performance: for example, increasing Push-T IoU from 0.635 to 0.781. Beyond online control, DriftWorld also serves as an offline simulator for ranking real-world policies, reaching Pearson correlation coefficients of 0.9515, 0.9916, and 0.9250 with ground-truth performance on Push-T, Robomimic Lift, and Robomimic Can. Together, these results establish drifting as a strong foundation for robot world modeling, where fast, high-quality imagination directly supports planning and policy evaluation. Overall, our main contributions are:",
+          "translation": "我们在标准的基于视觉的机器人操作基准上评估DriftWorld，包括真实世界的Bridge-V2[9]、RT-1[10]和Language Table[11]数据集，以及仿真环境Push-T[12, 13]和Robomimic[14]。DriftWorld平均比扩散世界模型基线快17倍，同时在SSIM、PSNR、LPIPS、FID和FVD等指标上达到或超过它们的推演质量。此外，在DriftWorld中推演一个策略的动作方案并执行其中奖励最高的那些动作，可以提升性能：例如，将Push-T的IoU从0.635提高到0.781。除了在线控制，DriftWorld还可以作为离线模拟器来对真实世界的策略进行排序，在Push-T、Robomimic Lift和Robomimic Can上分别达到与真实性能0.9515、0.9916和0.9250的皮尔逊相关系数。综合来看，这些结果确立了漂移方法作为机器人世界建模的坚实基础，其中快速、高质量的想象直接支持规划与策略评估。总的来说，我们的主要贡献是：",
+          "plain": "这一段是在“报成绩”。SSIM、PSNR、LPIPS、FID、FVD都是衡量生成画面好坏或逼真度的常用指标，数值越好说明想象出来的画面越接近真实。IoU是“交并比”，衡量预测区域和真实区域重叠多少，越接近1越好，从0.635升到0.781说明任务完成得更准了。皮尔逊相关系数是衡量两组数据“同步变化”程度的指标，越接近1说明模型给策略打的分和真实表现越一致，也就是这个离线模拟器越靠谱。"
+        },
+        {
+          "text": "• DriftWorld: We introduce a single-step, action-conditioned world model that generates each rollout in a single forward pass, which is 17× faster than diffusion-based world models on average.",
+          "translation": "• DriftWorld：我们提出了一个单步的、以动作为条件的世界模型，它在一次前向传播中生成每一次推演，平均比基于扩散的世界模型快17倍。",
+          "plain": ""
+        },
+        {
+          "text": "• Specializing Drifting for Robot Simulation: We present the first adaptation of drifting generative models to conditional video prediction, introducing an action-accentuated drift- ing field, a feature-space drifting loss, and frame-wise action conditioning.",
+          "translation": "• 将漂移方法专门化用于机器人仿真：我们首次将漂移生成模型改造用于条件视频预测，引入了动作强化的漂移场、特征空间漂移损失，以及逐帧动作条件化。",
+          "plain": "“逐帧动作条件化”意思是：视频里每一帧都单独绑定它当时该执行的那个动作，而不是整段视频共用一个笼统的动作描述。就像拍电影时每个镜头都标注清楚这一秒演员该做什么，而不是只给一句“随便演”。"
+        },
+        {
+          "text": "• Experimental Validation: We show that DriftWorld matches or exceeds baselines in roll- out quality across five benchmarks while running significantly faster, which makes both inference-time action search and offline policy evaluation more efficient.",
+          "translation": "• 实验验证：我们表明DriftWorld在五个基准上达到或超过基线的推演质量，同时运行速度显著更快，这使得推理时的动作搜索和离线策略评估都更加高效。",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "DriftWorld:",
+        "Fast World Modeling through Drifting",
+        "Susie Lu",
+        "Haonan Chen",
+        "Weirui Ye",
+        "Yilun Du",
+        "Abstract:",
+        "DriftWorld"
+      ],
+      "explanation": "介绍研究动机：机器人需要一个能预测动作后果的“世界模型”，但现有扩散模型生成太慢，无法实时规划，所以作者提出更快的 DriftWorld。",
+      "start_page": 0,
+      "end_page": 1,
+      "bold_notes": [
+        {
+          "term": "DriftWorld:",
+          "explanation": "这是论文提出的核心方法名称，代表一种基于漂移（drifting）技术的快速世界模型，用于高效生成和预测环境动态。"
+        },
+        {
+          "term": "Fast World Modeling through Drifting",
+          "explanation": "论文标题，概括了主要贡献：通过漂移方法实现快速的世界建模，即用更少步骤生成高质量的未来状态预测。"
+        },
+        {
+          "term": "Susie Lu",
+          "explanation": "论文作者之一，通常列在标题下方，表明其对研究工作的贡献。"
+        },
+        {
+          "term": "Haonan Chen",
+          "explanation": "论文作者之一，通常列在标题下方，表明其对研究工作的贡献。"
+        },
+        {
+          "term": "Weirui Ye",
+          "explanation": "论文作者之一，通常列在标题下方，表明其对研究工作的贡献。"
+        },
+        {
+          "term": "Yilun Du",
+          "explanation": "论文作者之一，通常列在标题下方，表明其对研究工作的贡献。"
+        },
+        {
+          "term": "Abstract:",
+          "explanation": "摘要部分，简要概述论文的研究问题、方法、结果和意义，帮助读者快速了解全文。"
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": "论文提出的方法名称，指基于漂移技术的世界模型，用于快速生成未来状态。"
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Related Work",
+      "number": "2",
+      "heading_y": 626.137939453125,
+      "text": "2 Related Work\n\nAction-Conditioned World Models for Robotics. World models that predict future observations conditioned on actions have a long history in model-based reinforcement learning [15, 16] and in robotics [17, 18, 19, 20]. Early approaches operated in compact latent spaces, but recent work has shifted toward high-fidelity visual prediction by adapting large-scale video generation models. UniSim [1], GAIA-1 [21], Genie [22], and open-weight platforms such as Cosmos [23, 24] treat the world as a video that unrolls in response to actions or text, and a growing line of work repurposes\n\npretrained video diffusion models as interactive simulators [25, 26, 27]. Robotics-specific mod- els such as IRASim [2], Ctrl-World [3], Veo-Robotics [28], and UWM [29] produce fine-grained manipulation rollouts with multi-view consistency, and learned simulators are increasingly used as environments for policy training and evaluation [30, 28, 31]. These models are almost exclusively built on multi-step diffusion or autoregressive transformers, which deliver high visual quality but require tens of forward passes per frame. DriftWorld shares the high-fidelity visual prediction ob- jective of these systems but replaces the iterative sampling procedure with a single-step drifting generator tailored to the action-conditioned setting.\n\nFast and Few-Step Generative Models. A growing body of work aims to reduce the sampling cost of diffusion models. Progressive distillation [32] and consistency models [33, 34] train students to take large or single steps along the diffusion ODE; rectified flow [35] straightens probability paths to enable few-step sampling; and adversarial objectives such as ADD [36] push one-step generation through distillation from a teacher. In the video setting, MagicDrive [37] and AnimateDiff-Lightning [38] apply similar ideas to obtain few-step video samplers. Most of these methods assume a pre- trained multi-step diffusion teacher. Drifting generative models [6] instead learn a one-step generator from scratch by iteratively moving the model’s pushforward distribution toward the data distribu- tion using a kernelized attraction-repulsion field. Our work is the first, to our knowledge, to adapt drifting to a conditional sequence prediction problem, and we show that the adaptations needed for action-conditioned video—action-accentuated drifting fields, feature-space drifting, and frame-wise U-Net conditioning—are essential to make drifting practical for robot world modeling.\n\nWorld Models for Planning and Policy Evaluation. By building a world model that simulates future dynamics, we can roll out candidate action sequences in imagination, enabling both online policy improvement and offline policy ranking. Sampling-based planners in latent world models [16, 39] and recent generative predictive control approaches [5] score many rollouts and execute the best one. However, as noted in [5], diffusion rollouts account for most of the decision-time compute, which sharply limits the number of proposals that can be evaluated. Alternatively, we can use world models to directly imagine future plans [40, 41, 42], but such approaches are also limited by the slow iterative nature of diffusion generation. For offline evaluation, Veo-Robotics [28], WorldGym [30], and related work [1] use a learned simulator to rank real-world policies without costly hardware rollouts. DriftWorld targets both regimes: its one-step rollouts let many more candidate actions be ranked within a control loop, and its high-fidelity predictions make it a reliable offline simulator, achieving high correlation with ground-truth policy performance.",
+      "paragraphs": [
+        {
+          "text": "2 Related Work",
+          "translation": "2 相关工作",
+          "plain": ""
+        },
+        {
+          "text": "Action-Conditioned World Models for Robotics. World models that predict future observations conditioned on actions have a long history in model-based reinforcement learning [15, 16] and in robotics [17, 18, 19, 20]. Early approaches operated in compact latent spaces, but recent work has shifted toward high-fidelity visual prediction by adapting large-scale video generation models. UniSim [1], GAIA-1 [21], Genie [22], and open-weight platforms such as Cosmos [23, 24] treat the world as a video that unrolls in response to actions or text, and a growing line of work repurposes",
+          "translation": "面向机器人学的动作条件世界模型。以动作为条件预测未来观测的世界模型，在基于模型的强化学习[15, 16]和机器人学[17, 18, 19, 20]中有着悠久的历史。早期方法在紧凑的潜在空间中运作，但近期的工作已转向通过改造大规模视频生成模型来实现高保真度的视觉预测。UniSim[1]、GAIA-1[21]、Genie[22]以及诸如Cosmos[23, 24]这样的开放权重平台，将世界视为一段随动作或文本而展开的视频，并且有越来越多的工作将",
+          "plain": "这里说的是“世界模型”这个概念的来龙去脉。你可以把世界模型想象成一个能预测“接下来会发生什么”的模拟器：给它当前画面和一个动作（比如机器人手臂往左移），它就想象出下一帧画面。早期版本只在抽象的“潜在空间”里预测，好比只看简笔画；现在借助强大的视频生成模型，能直接画出逼真的下一帧，就像从简笔画升级到高清电影。"
+        },
+        {
+          "text": "pretrained video diffusion models as interactive simulators [25, 26, 27]. Robotics-specific mod- els such as IRASim [2], Ctrl-World [3], Veo-Robotics [28], and UWM [29] produce fine-grained manipulation rollouts with multi-view consistency, and learned simulators are increasingly used as environments for policy training and evaluation [30, 28, 31]. These models are almost exclusively built on multi-step diffusion or autoregressive transformers, which deliver high visual quality but require tens of forward passes per frame. DriftWorld shares the high-fidelity visual prediction ob- jective of these systems but replaces the iterative sampling procedure with a single-step drifting generator tailored to the action-conditioned setting.",
+          "translation": "预训练的视频扩散模型改用作交互式模拟器[25, 26, 27]。面向机器人学的专用模型，如IRASim[2]、Ctrl-World[3]、Veo-Robotics[28]和UWM[29]，能够生成细粒度的操作过程展开，并保持多视角一致性，而学习得到的模拟器也越来越多地被用作策略训练和评估的环境[30, 28, 31]。这些模型几乎全部建立在多步扩散或自回归Transformer之上，它们能提供很高的视觉质量，但每一帧都需要数十次前向传播。DriftWorld与这些系统共享高保真视觉预测的目标，但用针对动作条件场景定制的单步漂移生成器取代了迭代采样过程。",
+          "plain": "这段在对比“慢但好看”和“快”的取舍。多步扩散模型就像画一幅画要反复涂抹几十遍才满意，效果好但很慢；每生成一帧都要跑几十次网络。DriftWorld想做到“一笔画成”——只跑一次网络就出结果，速度大幅提升，同时尽量保持画面质量。"
+        },
+        {
+          "text": "Fast and Few-Step Generative Models. A growing body of work aims to reduce the sampling cost of diffusion models. Progressive distillation [32] and consistency models [33, 34] train students to take large or single steps along the diffusion ODE; rectified flow [35] straightens probability paths to enable few-step sampling; and adversarial objectives such as ADD [36] push one-step generation through distillation from a teacher. In the video setting, MagicDrive [37] and AnimateDiff-Lightning [38] apply similar ideas to obtain few-step video samplers. Most of these methods assume a pre- trained multi-step diffusion teacher. Drifting generative models [6] instead learn a one-step generator from scratch by iteratively moving the model’s pushforward distribution toward the data distribu- tion using a kernelized attraction-repulsion field. Our work is the first, to our knowledge, to adapt drifting to a conditional sequence prediction problem, and we show that the adaptations needed for action-conditioned video—action-accentuated drifting fields, feature-space drifting, and frame-wise U-Net conditioning—are essential to make drifting practical for robot world modeling.",
+          "translation": "快速与少步生成模型。越来越多的工作致力于降低扩散模型的采样成本。渐进式蒸馏[32]和一致性模型[33, 34]训练学生模型沿着扩散常微分方程走一大步或单步；整流流[35]将概率路径拉直以实现少步采样；而诸如ADD[36]这样的对抗目标则通过从教师模型蒸馏来推动单步生成。在视频场景中，MagicDrive[37]和AnimateDiff-Lightning[38]应用类似思路来获得少步视频采样器。这些方法大多假设存在一个预训练的多步扩散教师模型。相比之下，漂移生成模型[6]通过使用核化的吸引-排斥场，迭代地将模型的前推分布推向数据分布，从而从零开始学习一个单步生成器。据我们所知，我们的工作是首个将漂移方法适配到条件序列预测问题上的，并且我们表明，针对动作条件视频所需的这些适配——动作强化的漂移场、特征空间漂移以及逐帧U-Net条件化——对于使漂移方法在机器人世界建模中变得实用至关重要。",
+          "plain": "这里讲的是“怎么让生成模型变快”的各种招数。很多方法像“老师教学生”：先有一个慢而好的老师模型，再训练一个学生模型一步到位模仿它。而漂移生成模型不走这条路，它不依赖老师，而是自己从零学，通过一种“吸引又排斥”的力场，把生成出来的样本一点点推向真实数据的分布，就像用磁铁把散落的铁屑慢慢吸成想要的图案。作者说他们是第一个把这种漂移方法用到“按动作预测视频”上的，并且做了三处关键改造才让它真正好用。"
+        },
+        {
+          "text": "World Models for Planning and Policy Evaluation. By building a world model that simulates future dynamics, we can roll out candidate action sequences in imagination, enabling both online policy improvement and offline policy ranking. Sampling-based planners in latent world models [16, 39] and recent generative predictive control approaches [5] score many rollouts and execute the best one. However, as noted in [5], diffusion rollouts account for most of the decision-time compute, which sharply limits the number of proposals that can be evaluated. Alternatively, we can use world models to directly imagine future plans [40, 41, 42], but such approaches are also limited by the slow iterative nature of diffusion generation. For offline evaluation, Veo-Robotics [28], WorldGym [30], and related work [1] use a learned simulator to rank real-world policies without costly hardware rollouts. DriftWorld targets both regimes: its one-step rollouts let many more candidate actions be ranked within a control loop, and its high-fidelity predictions make it a reliable offline simulator, achieving high correlation with ground-truth policy performance.",
+          "translation": "用于规划与策略评估的世界模型。通过构建一个能模拟未来动态的世界模型，我们可以在想象中展开候选动作序列，从而实现在线策略改进和离线策略排序。潜在世界模型中的基于采样的规划器[16, 39]以及近期的生成式预测控制方法[5]会对大量展开进行打分并执行其中最好的一个。然而，正如[5]所指出的，扩散展开占据了决策时计算量的大部分，这严重限制了可以评估的候选方案数量。另一种做法是，我们可以用世界模型直接想象未来的计划[40, 41, 42]，但这类方法同样受限于扩散生成缓慢的迭代特性。在离线评估方面，Veo-Robotics[28]、WorldGym[30]及相关工作[1]使用学习得到的模拟器来对真实世界策略进行排序，而无需昂贵的硬件展开。DriftWorld同时面向这两种场景：它的单步展开使得在一个控制循环内可以排序多得多的候选动作，而其高保真预测又使它成为一个可靠的离线模拟器，与真实策略性能达到高度相关。",
+          "plain": "这段讲世界模型的两大用途。一是“在线规划”：机器人在脑子里快速试演很多种动作方案，挑最好的执行——但扩散模型太慢，试不了几种。二是“离线评估”：不用真机器人反复跑，用模拟器给不同策略打分排名。DriftWorld因为一步就能出结果，所以能在一个控制周期里试很多方案，同时画面够真，打分也靠谱，相当于既快又准的“沙盘推演”。"
+        }
+      ],
+      "bold": [
+        "Generation",
+        "Fast Inference Speed",
+        "DriftWorld (Ours)",
+        "Overview",
+        "DriftWorld.",
+        "DriftWorld:",
+        "Specializing",
+        "Drifting"
+      ],
+      "explanation": "回顾前人工作：一类是以动作为条件预测未来的世界模型，另一类是扩散生成模型，说明本文与它们的区别和联系。",
+      "start_page": 1,
+      "end_page": 2,
+      "bold_notes": [
+        {
+          "term": "Generation",
+          "explanation": "指模型生成未来状态或图像的过程，是评估世界模型性能的关键任务之一。"
+        },
+        {
+          "term": "Fast Inference Speed",
+          "explanation": "强调模型在推理时速度快，能在少量步骤内完成生成，适合实时应用。"
+        },
+        {
+          "term": "DriftWorld (Ours)",
+          "explanation": "在对比图表中标识本文提出的方法，突出其与其他方法相比的性能优势。"
+        },
+        {
+          "term": "Overview",
+          "explanation": "概述部分，通常介绍论文的整体结构或方法框架，帮助读者把握全局。"
+        },
+        {
+          "term": "DriftWorld.",
+          "explanation": "再次提及方法名称，可能用于强调或引出具体细节。"
+        },
+        {
+          "term": "DriftWorld:",
+          "explanation": "方法名称后接冒号，通常用于引出对该方法的详细说明或定义。"
+        },
+        {
+          "term": "Specializing",
+          "explanation": "指模型针对特定任务或环境进行专门化训练，以提高在该场景下的表现。"
+        },
+        {
+          "term": "Drifting",
+          "explanation": "核心思想，指通过漂移过程逐步将噪声转化为目标状态，实现快速生成。"
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Drifting World Model",
+      "number": "3",
+      "heading_y": 476.6431884765625,
+      "text": "3 Drifting World Model\n\nIn this section, we present DriftWorld, an action-conditioned world model based on drifting that can generate high-quality predictions of future frames in a single forward pass. This single-step behavior makes our model significantly faster at generating rollouts than existing action-conditioned world models, which are primarily based on multi-step diffusion.",
+      "paragraphs": [
+        {
+          "text": "3 Drifting World Model",
+          "translation": "3 漂移世界模型",
+          "plain": ""
+        },
+        {
+          "text": "In this section, we present DriftWorld, an action-conditioned world model based on drifting that can generate high-quality predictions of future frames in a single forward pass. This single-step behavior makes our model significantly faster at generating rollouts than existing action-conditioned world models, which are primarily based on multi-step diffusion.",
+          "translation": "在本节中，我们介绍DriftWorld，一个基于漂移的动作条件世界模型，它能够在单次前向传播中生成对未来帧的高质量预测。这种单步特性使我们的模型在生成展开时比现有的动作条件世界模型显著更快，后者主要基于多步扩散。",
+          "plain": "这是本章的开场白，核心卖点就一句话：DriftWorld只跑一次网络就能预测未来画面，而同类模型要跑很多次，所以它快得多。"
+        }
+      ],
+      "bold": [
+        "Fast and Few-Step Generative Models.",
+        "World",
+        "Models",
+        "Planning",
+        "Policy",
+        "Evaluation.",
+        "Drifting World Model",
+        "Problem Formulation"
+      ],
+      "explanation": "本章提出 DriftWorld 的整体思路：用“漂移”方法让模型一次前向传播就能生成未来画面，而不是像扩散那样反复去噪。",
+      "start_page": 2,
+      "end_page": 2,
+      "bold_notes": [
+        {
+          "term": "Fast and Few-Step Generative Models.",
+          "explanation": "指一类能在少量步骤内完成生成的模型，是本文研究的基础和对比对象。"
+        },
+        {
+          "term": "World",
+          "explanation": "与“模型”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Models",
+          "explanation": "与“世界”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Planning",
+          "explanation": "指利用世界模型进行规划，即通过预测未来状态来指导决策或行动。"
+        },
+        {
+          "term": "Policy",
+          "explanation": "指策略，即智能体在环境中采取行动的规则，通常由世界模型辅助学习。"
+        },
+        {
+          "term": "Evaluation.",
+          "explanation": "评估部分，说明如何衡量模型性能，如生成质量、推理速度等。"
+        },
+        {
+          "term": "Drifting World Model",
+          "explanation": "指基于漂移技术的世界模型，是本文提出的核心概念。"
+        },
+        {
+          "term": "Problem Formulation",
+          "explanation": "问题形式化部分，将研究问题转化为数学或算法描述，为后续方法奠定基础。"
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Problem Formulation",
+      "number": "3.1",
+      "heading_y": 556.0735473632812,
+      "text": "3.1 Problem Formulation\n\nwhere W is the action-conditioned world model.",
+      "paragraphs": [
+        {
+          "text": "3.1 Problem Formulation",
+          "translation": "3.1 问题形式化",
+          "plain": ""
+        },
+        {
+          "text": "where W is the action-conditioned world model.",
+          "translation": "其中W是动作条件世界模型。",
+          "plain": "这句话是在给一个公式做说明：公式里的符号W代表“动作条件世界模型”，也就是那个“输入当前状态和动作、输出未来画面”的模型本身。"
+        }
+      ],
+      "bold": [
+        "Fast and Few-Step Generative Models.",
+        "World",
+        "Models",
+        "Planning",
+        "Policy",
+        "Evaluation.",
+        "Drifting World Model",
+        "Problem Formulation"
+      ],
+      "explanation": "用数学方式把问题写清楚：给定当前和历史画面以及一串候选动作，世界模型要预测接下来会发生什么。",
+      "start_page": 2,
+      "end_page": 2,
+      "bold_notes": [
+        {
+          "term": "Fast and Few-Step Generative Models.",
+          "explanation": "指一类能在少量步骤内完成生成的模型，是本文研究的基础和对比对象。"
+        },
+        {
+          "term": "World",
+          "explanation": "与“模型”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Models",
+          "explanation": "与“世界”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Planning",
+          "explanation": "指利用世界模型进行规划，即通过预测未来状态来指导决策或行动。"
+        },
+        {
+          "term": "Policy",
+          "explanation": "指策略，即智能体在环境中采取行动的规则，通常由世界模型辅助学习。"
+        },
+        {
+          "term": "Evaluation.",
+          "explanation": "评估部分，说明如何衡量模型性能，如生成质量、推理速度等。"
+        },
+        {
+          "term": "Drifting World Model",
+          "explanation": "指基于漂移技术的世界模型，是本文提出的核心概念。"
+        },
+        {
+          "term": "Problem Formulation",
+          "explanation": "问题形式化部分，将研究问题转化为数学或算法描述，为后续方法奠定基础。"
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "One-step Video Generation via Drifting",
+      "number": "3.2",
+      "heading_y": 682.01953125,
+      "text": "3.2 One-step Video Generation via Drifting\n\nExisting action-conditioned world models are predominantly based on diffusion, e.g. [3, 2, 27]. However, diffusion models require multiple sampling steps to generate future frames, so they are\n\nslow when repeatedly used to generate policy rollouts for real-time planning. To overcome this lim- itation, we propose the first action-conditioned world model built upon the recent drifting generative models [6]. With drifting, our model generates future frames in a single forward pass, which is a significant improvement in efficiency.\n\nTo apply drifting to video generation, we formulate the process as follows. Let fθ denote the drifting world model, which maps a noise prior ϵ ∼pϵ and conditioning c to the generated future video frames x = fθ(ϵ, c). The conditioning consists of the history frames ot−F :t and future actions at:t+T . Depending on the number of conditioning actions provided, the model can perform either single-step or chunk-level simulation. For simplicity, we omit the conditioning c from here on.\n\nThe distribution of generated video frames is the pushforward distribution q = f#pϵ. Unlike dif- fusion models, which rely on iterative multi-step refinement at inference time, drifting generative models optimize the generated distribution q to evolve towards the true data distribution p during training time. We define a drifting field Vp,q(x) that governs how samples must move to evolve q towards p. Given a generated video chunk xi from the model’s current pushforward distribution qi, the new video chunk xi+1 after drifting is defined as xi+1 = xi + Vp,qi(xi).\n\nThe drift Vp,qi(xi) is a vector that attracts xi towards positive ground-truth video chunks in p and repulses it away from negative generated video chunks in qi:\n\nVp,qi(x) = V +\n\np (x) and V −\n\nqi (x) are the mean-shift vectors of the positive and negative video chunks, re- spectively. While standard drifting for class-conditional image generation [6] uses multiple positive samples, DriftWorld only uses a single positive sample, as there is only one correct sequence of future frames given the current frame and actions to execute. Consequently:\n\n• The positive sample y+ is the single, ground-truth chunk of future observations ot+1:t+T +1 drawn from the dataset.\n\n• The negative samples y−consist of Nneg chunks of future observations ˆot+1:t+T +1 gener- ated by the model.\n\nCrucially, equilibrium is reached when the generated distribution qi matches the true conditional video distribution p: at this point, the drifting field reaches 0, so samples no longer move.",
+      "paragraphs": [
+        {
+          "text": "3.2 One-step Video Generation via Drifting",
+          "translation": "3.2 通过漂移实现单步视频生成",
+          "plain": ""
+        },
+        {
+          "text": "Existing action-conditioned world models are predominantly based on diffusion, e.g. [3, 2, 27]. However, diffusion models require multiple sampling steps to generate future frames, so they are",
+          "translation": "现有的动作条件世界模型主要基于扩散模型，例如文献[3, 2, 27]。然而，扩散模型需要多个采样步骤才能生成未来帧，因此当反复用于生成策略推演以进行实时规划时，速度很慢。",
+          "plain": "扩散模型就像画画时先画个模糊轮廓，然后一遍遍擦擦改改，每次只改一点点，改很多次才能画好。所以用它来预测未来画面时，每预测一步都要反复迭代很多次，速度自然就慢，没法满足实时规划的需求。"
+        },
+        {
+          "text": "slow when repeatedly used to generate policy rollouts for real-time planning. To overcome this lim- itation, we propose the first action-conditioned world model built upon the recent drifting generative models [6]. With drifting, our model generates future frames in a single forward pass, which is a significant improvement in efficiency.",
+          "translation": "为了克服这一局限，我们提出了首个基于近期漂移生成模型[6]的动作条件世界模型。借助漂移方法，我们的模型只需一次前向传播就能生成未来帧，这在效率上是一个显著的提升。",
+          "plain": "漂移生成模型就像一步到位的画家，不用反复修改，直接一笔画完。所以我们的模型预测未来画面时，只需要让数据从输入端到输出端走一遍（一次前向传播），就能得到结果，比扩散模型快得多。"
+        },
+        {
+          "text": "To apply drifting to video generation, we formulate the process as follows. Let fθ denote the drifting world model, which maps a noise prior ϵ ∼pϵ and conditioning c to the generated future video frames x = fθ(ϵ, c). The conditioning consists of the history frames ot−F :t and future actions at:t+T . Depending on the number of conditioning actions provided, the model can perform either single-step or chunk-level simulation. For simplicity, we omit the conditioning c from here on.",
+          "translation": "为了将漂移方法应用于视频生成，我们将过程形式化如下。令fθ表示漂移世界模型，它将噪声先验ε（服从分布pε）和条件c映射到生成的未来视频帧x = fθ(ε, c)。条件由历史帧o_{t-F:t}和未来动作a_{t:t+T}组成。根据提供的条件动作数量，模型可以执行单步模拟或块级模拟。为简单起见，下文我们省略条件c。",
+          "plain": "这里把模型比作一个函数：输入是随机噪声（像一张白纸上的随机点）和条件信息（过去的画面和未来要做的动作），输出是预测的未来视频帧。条件里的历史帧就是“之前发生了什么”，未来动作就是“接下来要做什么”。根据你给的动作数量，模型可以只预测下一步，也可以一次预测一小段。"
+        },
+        {
+          "text": "The distribution of generated video frames is the pushforward distribution q = f#pϵ. Unlike dif- fusion models, which rely on iterative multi-step refinement at inference time, drifting generative models optimize the generated distribution q to evolve towards the true data distribution p during training time. We define a drifting field Vp,q(x) that governs how samples must move to evolve q towards p. Given a generated video chunk xi from the model’s current pushforward distribution qi, the new video chunk xi+1 after drifting is defined as xi+1 = xi + Vp,qi(xi).",
+          "translation": "生成视频帧的分布是推前分布q = f#pε。与在推理时依赖迭代多步细化的扩散模型不同，漂移生成模型在训练时优化生成分布q，使其向真实数据分布p演化。我们定义了一个漂移场V_{p,q}(x)，它支配着样本必须如何移动才能使q向p演化。给定来自模型当前推前分布q_i的生成视频块x_i，漂移后的新视频块x_{i+1}定义为x_{i+1} = x_i + V_{p,q_i}(x_i)。",
+          "plain": "推前分布就是把噪声分布经过模型变换后得到的分布，好比把一团随机散落的沙子通过一个模具压成特定形状。漂移场就像一股风，吹着生成的样本往真实数据那边靠。每次迭代，样本就沿着这股风移动一步：新位置 = 旧位置 + 漂移量。这样反复训练，生成的分布就越来越像真实分布。"
+        },
+        {
+          "text": "The drift Vp,qi(xi) is a vector that attracts xi towards positive ground-truth video chunks in p and repulses it away from negative generated video chunks in qi:",
+          "translation": "漂移量V_{p,q_i}(x_i)是一个向量，它将x_i吸引向p中的正样本真实视频块，并排斥远离q_i中的负样本生成视频块：",
+          "plain": "这个漂移量就像磁铁：正样本是磁铁的正极，把生成的样本吸过去；负样本是磁铁的负极，把生成的样本推开。这样生成的样本就会朝着真实数据的方向移动，远离那些不好的生成结果。"
+        },
+        {
+          "text": "Vp,qi(x) = V +",
+          "translation": "V_{p,q_i}(x) = V^+",
+          "plain": ""
+        },
+        {
+          "text": "p (x) and V −",
+          "translation": "p(x)和V^-",
+          "plain": ""
+        },
+        {
+          "text": "qi (x) are the mean-shift vectors of the positive and negative video chunks, re- spectively. While standard drifting for class-conditional image generation [6] uses multiple positive samples, DriftWorld only uses a single positive sample, as there is only one correct sequence of future frames given the current frame and actions to execute. Consequently:",
+          "translation": "q_i(x)分别是正样本和负样本视频块的均值漂移向量。虽然用于类条件图像生成的标准漂移方法[6]使用多个正样本，但DriftWorld只使用单个正样本，因为在给定当前帧和要执行的动作的情况下，只有唯一正确的未来帧序列。因此：",
+          "plain": "均值漂移向量就是所有正样本（或负样本）的平均位置指向的方向。标准漂移方法用多个正样本，就像用多张参考图来指导生成。但在这里，未来是确定的：给定当前画面和动作，未来只有一种正确的发展，所以只需要一个正样本（真实未来）就够了。"
+        },
+        {
+          "text": "• The positive sample y+ is the single, ground-truth chunk of future observations ot+1:t+T +1 drawn from the dataset.",
+          "translation": "• 正样本y^+是从数据集中抽取的单个真实未来观测块o_{t+1:t+T+1}。",
+          "plain": "正样本就是真实发生的未来，比如你实际录制的接下来几帧画面，作为标准答案。"
+        },
+        {
+          "text": "• The negative samples y−consist of Nneg chunks of future observations ˆot+1:t+T +1 gener- ated by the model.",
+          "translation": "• 负样本y^-由模型生成的N_neg个未来观测块ˆo_{t+1:t+T+1}组成。",
+          "plain": "负样本是模型自己瞎猜的未来，用来告诉模型“这些是错的，要远离”。"
+        },
+        {
+          "text": "Crucially, equilibrium is reached when the generated distribution qi matches the true conditional video distribution p: at this point, the drifting field reaches 0, so samples no longer move.",
+          "translation": "关键在于，当生成的分布q_i与真实的条件视频分布p相匹配时，就达到了平衡：此时漂移场变为0，因此样本不再移动。",
+          "plain": "这里用了一个比喻：把生成样本想象成在空间中移动的小球，漂移场就像一股风，把小球吹向真实分布所在的位置。当小球到达真实分布的位置时，风停了（漂移场为0），小球就不再移动，系统达到平衡。"
+        }
+      ],
+      "bold": [
+        "Fast and Few-Step Generative Models.",
+        "World",
+        "Models",
+        "Planning",
+        "Policy",
+        "Evaluation.",
+        "Drifting World Model",
+        "Problem Formulation"
+      ],
+      "explanation": "解释核心技巧：为什么漂移模型能一步生成视频，而扩散模型必须多步采样，这是速度提升的关键。",
+      "start_page": 2,
+      "end_page": 3,
+      "bold_notes": [
+        {
+          "term": "Fast and Few-Step Generative Models.",
+          "explanation": "指一类能在少量步骤内完成生成的模型，是本文研究的基础和对比对象。"
+        },
+        {
+          "term": "World",
+          "explanation": "与“模型”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Models",
+          "explanation": "与“世界”连用，指世界模型，即能模拟环境动态并预测未来状态的模型。"
+        },
+        {
+          "term": "Planning",
+          "explanation": "指利用世界模型进行规划，即通过预测未来状态来指导决策或行动。"
+        },
+        {
+          "term": "Policy",
+          "explanation": "指策略，即智能体在环境中采取行动的规则，通常由世界模型辅助学习。"
+        },
+        {
+          "term": "Evaluation.",
+          "explanation": "评估部分，说明如何衡量模型性能，如生成质量、推理速度等。"
+        },
+        {
+          "term": "Drifting World Model",
+          "explanation": "指基于漂移技术的世界模型，是本文提出的核心概念。"
+        },
+        {
+          "term": "Problem Formulation",
+          "explanation": "问题形式化部分，将研究问题转化为数学或算法描述，为后续方法奠定基础。"
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Training Pipeline of DriftWorld",
+      "number": "3.3",
+      "heading_y": 467.7546081542969,
+      "text": "3.3 Training Pipeline of DriftWorld\n\nAccentuating Action Following. To increase the model’s adherence to action conditioning, we optionally modify the target distribution during training. Given an action at and history ot−F :t, we draw positive samples from the true distribution p(· | at, ot−F :t). However, we draw negative samples from a mixture of (i) generated samples and (ii) real samples depicting the state when no action is taken (the ground-truth frame ot). The negative sample distribution becomes:\n\n˜q(·|at, ot−F :t) ≜(1 −γ)qθ(·|at, ot−F :t) + γp(·|∅, ot−F :t),\n\nwhere γ ∈[0, 1), and the two terms are the generated sample distribution and the real no-action distribution, respectively.\n\nDrifting Space. The space in which the drifting loss is computed can be adapted based on dataset complexity. For simpler datasets, we compute the loss directly in the raw output space of the model (e.g., pixel space). For complex datasets such as Bridge-V2 [9] and RT-1 [10], we project the outputs into a feature space using an encoder ϕ. The loss is then applied to these features, encouraging ϕ(fθ(ϵ)) to drift toward ϕ(y+) and away from ϕ(y−). Since the kernel used to calculate the mean- shift vectors for drifting relies on pairwise sample similarity, operating in feature space yields a more semantically meaningful distance metric.\n\nIn practice, we use the DINOv2/v3 [7, 8] feature encoder. For a H × W × D feature map, we create a separate drifting field at each of the H × W spatial locations: each drifting field operates on the D-dimensional vectors at that location. The final loss is obtained by taking a weighted average of the H × W individual drifting losses from all the drifting fields, where the weights can be all equal or determined by the magnitude of motion at the location.\n\nWeighting based on Motion. In real-world robotic datasets, the motion of the robot gripper between consecutive frames is relatively small. The straightforward approach of weighting the losses from all spatial locations equally can trap the model into learning an action-agnostic local minimum, where it learns an identity mapping (i.e., copying the past observation ot) to safely minimize background reconstruction error. To penalize the model for ignoring the action conditioning, we put a higher weight on the drifting loss at spatial locations with larger motion. The motion is quantified as an L2 distance between the feature of the target future frame(s) ot+1:t+T +1 and the feature of the preceding frame ot, and the weight is a hyperbolic tangent function of the motion at a particular spatial location. Details are in the appendix.",
+      "paragraphs": [
+        {
+          "text": "3.3 Training Pipeline of DriftWorld",
+          "translation": "3.3 DriftWorld的训练流程",
+          "plain": ""
+        },
+        {
+          "text": "Accentuating Action Following. To increase the model’s adherence to action conditioning, we optionally modify the target distribution during training. Given an action at and history ot−F :t, we draw positive samples from the true distribution p(· | at, ot−F :t). However, we draw negative samples from a mixture of (i) generated samples and (ii) real samples depicting the state when no action is taken (the ground-truth frame ot). The negative sample distribution becomes:",
+          "translation": "强调动作跟随。为了增强模型对动作条件的遵循程度，我们在训练期间可选地修改目标分布。给定一个动作a_t和历史o_{t-F:t}，我们从真实分布p(· | a_t, o_{t-F:t})中抽取正样本。然而，我们从（i）生成的样本和（ii）描绘未采取动作时状态的真实样本（即真实帧o_t）的混合分布中抽取负样本。负样本分布变为：",
+          "plain": "这里在教模型区分“跟着动作走”和“不跟动作走”两种情况。正样本是真实执行了动作后的结果，负样本则混合了模型自己生成的（可能不对的）结果，以及“什么都不做”的真实结果。这样模型就能学会：只有真正执行了动作，才应该产生对应的未来画面，否则就应该保持原样。"
+        },
+        {
+          "text": "˜q(·|at, ot−F :t) ≜(1 −γ)qθ(·|at, ot−F :t) + γp(·|∅, ot−F :t),",
+          "translation": "˜q(·|a_t, o_{t-F:t}) ≜ (1 − γ) q_θ(·|a_t, o_{t-F:t}) + γ p(·|∅, o_{t-F:t})，",
+          "plain": "这个公式表示负样本的混合分布：它由两部分按比例混合而成。第一部分是模型自己生成的样本分布q_θ，占(1-γ)的比例；第二部分是真实的不采取动作的分布p(·|∅)，占γ的比例。γ是一个介于0和1之间的数，控制混合比例。"
+        },
+        {
+          "text": "where γ ∈[0, 1), and the two terms are the generated sample distribution and the real no-action distribution, respectively.",
+          "translation": "其中γ ∈ [0, 1)，这两项分别是生成的样本分布和真实的无动作分布。",
+          "plain": "γ是一个权重，用来调节负样本中“模型生成的假样本”和“真实的不动样本”各占多少。γ越大，负样本中真实不动样本的比例越高。"
+        },
+        {
+          "text": "Drifting Space. The space in which the drifting loss is computed can be adapted based on dataset complexity. For simpler datasets, we compute the loss directly in the raw output space of the model (e.g., pixel space). For complex datasets such as Bridge-V2 [9] and RT-1 [10], we project the outputs into a feature space using an encoder ϕ. The loss is then applied to these features, encouraging ϕ(fθ(ϵ)) to drift toward ϕ(y+) and away from ϕ(y−). Since the kernel used to calculate the mean- shift vectors for drifting relies on pairwise sample similarity, operating in feature space yields a more semantically meaningful distance metric.",
+          "translation": "漂移空间。计算漂移损失的空间可以根据数据集的复杂度进行调整。对于较简单的数据集，我们直接在模型的原始输出空间（例如像素空间）中计算损失。对于复杂数据集，如Bridge-V2 [9]和RT-1 [10]，我们使用编码器φ将输出投影到特征空间。然后在这些特征上应用损失，鼓励φ(f_θ(ε))向φ(y+)漂移并远离φ(y−)。由于用于计算漂移均值漂移向量的核函数依赖于样本对之间的相似度，在特征空间中操作能产生更具语义意义的距离度量。",
+          "plain": "简单说，就是在哪里比较“像不像”的问题。在像素空间比较，就像直接对比两张图片的每个像素点，容易受光照、背景等无关因素干扰。而在特征空间比较，就像先让一个聪明的编码器把图片转换成“语义摘要”，再比较摘要的相似度，这样更能抓住本质区别，比如“手有没有动”而不是“背景颜色变了没有”。"
+        },
+        {
+          "text": "In practice, we use the DINOv2/v3 [7, 8] feature encoder. For a H × W × D feature map, we create a separate drifting field at each of the H × W spatial locations: each drifting field operates on the D-dimensional vectors at that location. The final loss is obtained by taking a weighted average of the H × W individual drifting losses from all the drifting fields, where the weights can be all equal or determined by the magnitude of motion at the location.",
+          "translation": "在实践中，我们使用DINOv2/v3 [7, 8]特征编码器。对于一个H × W × D的特征图，我们在H × W个空间位置中的每一个位置创建一个单独的漂移场：每个漂移场作用于该位置上的D维向量。最终损失是通过对所有漂移场的H × W个单独漂移损失进行加权平均得到的，权重可以全部相等，也可以由该位置的运动幅度决定。",
+          "plain": "想象一张图片被切成H×W个小格子，每个格子里有一个D维的特征向量。我们在每个格子上独立地计算漂移损失，就像每个小格子都有自己的“小风”在吹动特征。最后把所有小格子的损失加权平均起来，得到总损失。权重可以平均分配，也可以让运动大的格子权重更高。"
+        },
+        {
+          "text": "Weighting based on Motion. In real-world robotic datasets, the motion of the robot gripper between consecutive frames is relatively small. The straightforward approach of weighting the losses from all spatial locations equally can trap the model into learning an action-agnostic local minimum, where it learns an identity mapping (i.e., copying the past observation ot) to safely minimize background reconstruction error. To penalize the model for ignoring the action conditioning, we put a higher weight on the drifting loss at spatial locations with larger motion. The motion is quantified as an L2 distance between the feature of the target future frame(s) ot+1:t+T +1 and the feature of the preceding frame ot, and the weight is a hyperbolic tangent function of the motion at a particular spatial location. Details are in the appendix.",
+          "translation": "基于运动的加权。在真实世界的机器人数据集中，机器人夹爪在连续帧之间的运动相对较小。将所有空间位置的损失等权重的简单方法可能会使模型陷入学习一个与动作无关的局部最小值，即它学会一个恒等映射（即复制过去的观测o_t），以安全地最小化背景重建误差。为了惩罚模型忽略动作条件，我们在运动较大的空间位置上赋予更高的漂移损失权重。运动量化为目标未来帧o_{t+1:t+T+1}的特征与前序帧o_t的特征之间的L2距离，权重是特定空间位置上运动的双曲正切函数。细节见附录。",
+          "plain": "机器人动作通常很小，比如夹爪只移动一点点。如果所有位置权重一样，模型可能会偷懒：直接复制上一帧，因为这样背景误差最小，但完全忽略了动作。为了逼模型关注动作，我们给运动大的区域更高权重，让模型在这些地方更努力地学习动作带来的变化。运动大小用特征之间的L2距离衡量，权重用双曲正切函数映射。"
+        }
+      ],
+      "bold": [
+        "Training Pipeline of DriftWorld",
+        "Training",
+        "Objective",
+        "Pseudocode.",
+        "Algorithm 1 Training Step",
+        "Input:"
+      ],
+      "explanation": "讲训练过程，包括如何让模型更听话地跟随动作指令，以及如何对运动区域加权，让生成更准确。",
+      "start_page": 3,
+      "end_page": 4,
+      "bold_notes": [
+        {
+          "term": "Training Pipeline of DriftWorld",
+          "explanation": "指DriftWorld模型的训练流程，包括数据准备、损失计算和参数更新等步骤。"
+        },
+        {
+          "term": "Training",
+          "explanation": "训练部分，描述如何优化模型参数以完成特定任务。"
+        },
+        {
+          "term": "Objective",
+          "explanation": "目标函数，定义模型优化时最小化或最大化的数学表达式。"
+        },
+        {
+          "term": "Pseudocode.",
+          "explanation": "伪代码，用类似编程语言的方式描述算法逻辑，便于理解实现细节。"
+        },
+        {
+          "term": "Algorithm 1 Training Step",
+          "explanation": "算法1的训练步骤，具体说明每次迭代中如何更新模型。"
+        },
+        {
+          "term": "Input:",
+          "explanation": "输入部分，列出算法所需的初始数据或参数。"
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Action-Conditioned Architecture",
+      "number": "3.4",
+      "heading_y": 669.2103271484375,
+      "text": "3.4 Action-Conditioned Architecture\n\nFor the core generator in DriftWorld, we design an action-conditioned U-Net architecture (Fig. 2a). The U-Net takes as input the current and history frames ot−H:t, the actions at:t+T to execute, and optionally a language instruction. It outputs the predicted future frames ot+1:t+T +1.\n\nGPC Diffusion\n\nTo generate multiple future frames at once, the U-Net uses a factorized spatial-temporal convolution from [43]: a spatial convolution is applied independently and identically to each of the T time steps, and then a temporal convolution is applied independently and identically at each spatial location.\n\nThe U-Net uses FiLM (and optionally, cross-attention) to condition on the actions at:t+T frame- wise, ensuring that each action at+i conditions the corresponding future frame ot+i+1 that results from the action. The model also conditions on history frames by concatenating them channel-wise with the initial Gaussian noise.",
+      "paragraphs": [
+        {
+          "text": "3.4 Action-Conditioned Architecture",
+          "translation": "3.4 动作条件架构",
+          "plain": ""
+        },
+        {
+          "text": "For the core generator in DriftWorld, we design an action-conditioned U-Net architecture (Fig. 2a). The U-Net takes as input the current and history frames ot−H:t, the actions at:t+T to execute, and optionally a language instruction. It outputs the predicted future frames ot+1:t+T +1.",
+          "translation": "对于DriftWorld中的核心生成器，我们设计了一个动作条件U-Net架构（图2a）。U-Net将当前帧和历史帧o_{t-H:t}、要执行的动作a_{t:t+T}以及可选的语言指令作为输入。它输出预测的未来帧o_{t+1:t+T+1}。",
+          "plain": "U-Net是一种经典的图像生成网络结构，形状像字母U，先下采样再上采样。这里它接收过去的几帧画面、未来要执行的动作序列，还可以加上语言指令，然后预测接下来几帧会是什么样子。就像给机器人一个“剧本”（动作和指令），让它想象出对应的未来画面。"
+        },
+        {
+          "text": "GPC Diffusion",
+          "translation": "GPC 扩散",
+          "plain": ""
+        },
+        {
+          "text": "To generate multiple future frames at once, the U-Net uses a factorized spatial-temporal convolution from [43]: a spatial convolution is applied independently and identically to each of the T time steps, and then a temporal convolution is applied independently and identically at each spatial location.",
+          "translation": "为了一次性生成多个未来帧，U-Net 使用了来自文献[43]的因子化时空卷积：先对 T 个时间步中的每一个独立且相同地应用空间卷积，然后在每个空间位置上独立且相同地应用时间卷积。",
+          "plain": "这里的“因子化时空卷积”可以理解为把“看画面”和“看时间”两件事分开做。就像看一段视频时，先逐帧看每一张画面里有什么（空间卷积），再在同一个位置上把连续几帧串起来看变化（时间卷积）。这样做比一次性处理所有帧和所有位置更省力，也更容易训练。"
+        },
+        {
+          "text": "The U-Net uses FiLM (and optionally, cross-attention) to condition on the actions at:t+T frame- wise, ensuring that each action at+i conditions the corresponding future frame ot+i+1 that results from the action. The model also conditions on history frames by concatenating them channel-wise with the initial Gaussian noise.",
+          "translation": "U-Net 使用 FiLM（以及可选的交叉注意力）来逐帧地以动作作为条件，确保每个动作 a_{t+i} 都对应地影响由该动作产生的未来帧 o_{t+i+1}。模型还通过将历史帧与初始高斯噪声按通道拼接来以历史帧作为条件。",
+          "plain": "FiLM 可以想象成给网络每一层“调音量”和“调偏置”：动作不同，调出来的画面风格就不同。交叉注意力则像让模型一边看动作、一边看画面，决定该关注哪里。把历史帧和噪声按通道拼在一起，就像把过去几张照片和一张雪花屏叠在一起交给模型，让它知道“之前发生了什么”，再去生成接下来会发生什么。"
+        }
+      ],
+      "bold": [
+        "Drifting",
+        "Architecture",
+        "Training",
+        "Overview.",
+        "Accentuating",
+        "Action",
+        "Following.",
+        "Drifting Space."
+      ],
+      "explanation": "介绍模型结构：一个以历史画面和动作为输入的 U-Net，负责把噪声变成未来帧。",
+      "start_page": 4,
+      "end_page": 5,
+      "bold_notes": [
+        {
+          "term": "Drifting",
+          "explanation": "核心思想，指通过漂移过程逐步将噪声转化为目标状态，实现快速生成。"
+        },
+        {
+          "term": "Architecture",
+          "explanation": "架构部分，描述模型的网络结构或组件设计。"
+        },
+        {
+          "term": "Training",
+          "explanation": "训练部分，描述如何优化模型参数以完成特定任务。"
+        },
+        {
+          "term": "Overview.",
+          "explanation": "概述部分，通常介绍论文的整体结构或方法框架，帮助读者把握全局。"
+        },
+        {
+          "term": "Accentuating",
+          "explanation": ""
+        },
+        {
+          "term": "Action",
+          "explanation": ""
+        },
+        {
+          "term": "Following.",
+          "explanation": ""
+        },
+        {
+          "term": "Drifting Space.",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Inference Pipeline and Policy Simulation in DriftWorld",
+      "number": "3.5",
+      "heading_y": 464.0484619140625,
+      "text": "3.5 Inference Pipeline and Policy Simulation in DriftWorld\n\nAt inference time, DriftWorld generates future video frames using a single forward pass fθ(ϵ | ot−F :t, at:t+T ), where ϵ is Gaussian noise.\n\nThis enables efficient downstream policy simulation in DriftWorld. Consider a vision-based policy π that receives a history of visual observations and outputs a chunk of actions at:t+T to execute. The world model simulates the outcomes of these actions, and the final predicted observation ot+T +1 can be fed back into the policy π to generate the next action chunk. By continuing this process autoregressively, we can simulate long-horizon policy rollouts entirely within the world model.",
+      "paragraphs": [
+        {
+          "text": "3.5 Inference Pipeline and Policy Simulation in DriftWorld",
+          "translation": "3.5 DriftWorld 中的推理流程与策略仿真",
+          "plain": ""
+        },
+        {
+          "text": "At inference time, DriftWorld generates future video frames using a single forward pass fθ(ϵ | ot−F :t, at:t+T ), where ϵ is Gaussian noise.",
+          "translation": "在推理时，DriftWorld 通过一次前向传播 fθ(ϵ | o_{t−F:t}, a_{t:t+T}) 生成未来视频帧，其中 ϵ 是高斯噪声。",
+          "plain": "这里的“一次前向传播”就像按一次快门：模型一次性把过去 F 帧画面和未来 T 个动作作为输入，直接吐出未来 T 帧画面。ϵ 是随机噪声，相当于给模型一点“随机种子”，让它从噪声中“雕刻”出视频。"
+        },
+        {
+          "text": "This enables efficient downstream policy simulation in DriftWorld. Consider a vision-based policy π that receives a history of visual observations and outputs a chunk of actions at:t+T to execute. The world model simulates the outcomes of these actions, and the final predicted observation ot+T +1 can be fed back into the policy π to generate the next action chunk. By continuing this process autoregressively, we can simulate long-horizon policy rollouts entirely within the world model.",
+          "translation": "这使得在 DriftWorld 中进行高效的下游策略仿真成为可能。考虑一个基于视觉的策略 π，它接收历史视觉观测并输出一段动作 a_{t:t+T} 来执行。世界模型会模拟这些动作的结果，而最终预测的观测 o_{t+T+1} 可以反馈给策略 π 以生成下一段动作。通过自回归地继续这一过程，我们可以在世界模型内部完全模拟长时程的策略 rollout。",
+          "plain": "这就像在游戏里“预演”：策略 π 是玩家，世界模型是游戏引擎。玩家先看几帧画面，决定接下来做几个动作；引擎根据这些动作生成未来几帧画面；玩家再看新画面，决定下一批动作。如此循环，就能在模型里把很长的一段操作提前“演”完，而不需要真的在现实机器人上跑。"
+        }
+      ],
+      "bold": [
+        "Quantitative",
+        "results",
+        "visual",
+        "quality",
+        "generated",
+        "videos",
+        "Push-T",
+        "GT"
+      ],
+      "explanation": "说明实际使用时怎么用：一次前向传播生成未来画面，并据此模拟不同策略的表现。",
+      "start_page": 5,
+      "end_page": 5,
+      "bold_notes": [
+        {
+          "term": "Quantitative",
+          "explanation": ""
+        },
+        {
+          "term": "results",
+          "explanation": ""
+        },
+        {
+          "term": "visual",
+          "explanation": ""
+        },
+        {
+          "term": "quality",
+          "explanation": ""
+        },
+        {
+          "term": "generated",
+          "explanation": ""
+        },
+        {
+          "term": "videos",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T",
+          "explanation": ""
+        },
+        {
+          "term": "GT",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Experiments",
+      "number": "4",
+      "heading_y": 583.9091186523438,
+      "text": "4 Experiments",
+      "paragraphs": [
+        {
+          "text": "4 Experiments",
+          "translation": "4 实验",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Quantitative",
+        "results",
+        "visual",
+        "quality",
+        "generated",
+        "videos",
+        "Push-T",
+        "GT"
+      ],
+      "explanation": "总览实验部分：在多个机器人操作数据集上测试 DriftWorld 的画质、速度和决策能力。",
+      "start_page": 5,
+      "end_page": 5,
+      "bold_notes": [
+        {
+          "term": "Quantitative",
+          "explanation": ""
+        },
+        {
+          "term": "results",
+          "explanation": ""
+        },
+        {
+          "term": "visual",
+          "explanation": ""
+        },
+        {
+          "term": "quality",
+          "explanation": ""
+        },
+        {
+          "term": "generated",
+          "explanation": ""
+        },
+        {
+          "term": "videos",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T",
+          "explanation": ""
+        },
+        {
+          "term": "GT",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Experimental Setup",
+      "number": "4.1",
+      "heading_y": 682.366455078125,
+      "text": "Robomimic [14] datasets. Bridge-V2 consists of 60,096 trajectories across 24 environments, while RT-1 consists of 87,212 trajectories across 3 environments. Both datasets are primarily in kitchen- style environments, and we resize the main camera view to 256 × 256 resolution. Language Table consists of 442,226 trajectories of table-top manipulation, and we resize the camera to 192 × 256 resolution. For the simulated environments, we use a dataset with a total of 500 expert demonstra- tions and random exploration trajectories for the vision-based Push-T task [5]. We also use a dataset of 700 trajectories, covering both successes and failures, for each of the Robomimic Lift, Can, and Square tasks. The simulated datasets use a resolution of 96 × 96.\n\nDriftWorld Setup. We adapt DriftWorld’s setup and drifting loss to the complexity of each environ- ment. Given the current frame, 3 history frames, and T future actions, DriftWorld predicts T future frames. We set the prediction horizon T to 4, 2, 1, 1, and 1 for the Push-T, Robomimic, Bridge-V2, RT-1, and Language Table datasets, respectively. For Push-T and Robomimic, the model generates outputs and computes the drifting loss directly in pixel space. To handle the higher resolution and complexity of the real-world datasets, the U-Net generator instead operates in the latent space of a Stable Diffusion 3 VAE [44, 45], with the drifting loss computed in DINOv2/v3 [7, 8] feature space.\n\nBaselines and Evaluation Metrics. We compare DriftWorld against the action-conditioned world models IRASim [2], WorldGym [30], and Ctrl-World [3]. We also evaluate against the GPC diffu- sion world model [5], as well as two diffusion models formed by adapting VDM [46] and LVDM [47] for action-conditioned video generation. To measure the visual quality of generated videos, we calculate the MSE, SSIM [48], PSNR [49], LPIPS [50], FID [51], and FVD [52] metrics on the validation sets. The metrics are for 8-frame autoregressive generation on Bridge-V2 and RT-1 and are for full-video autoregressive generation on Push-T, Robomimic, and Language Table.",
+      "paragraphs": [
+        {
+          "text": "Robomimic [14] datasets. Bridge-V2 consists of 60,096 trajectories across 24 environments, while RT-1 consists of 87,212 trajectories across 3 environments. Both datasets are primarily in kitchen- style environments, and we resize the main camera view to 256 × 256 resolution. Language Table consists of 442,226 trajectories of table-top manipulation, and we resize the camera to 192 × 256 resolution. For the simulated environments, we use a dataset with a total of 500 expert demonstra- tions and random exploration trajectories for the vision-based Push-T task [5]. We also use a dataset of 700 trajectories, covering both successes and failures, for each of the Robomimic Lift, Can, and Square tasks. The simulated datasets use a resolution of 96 × 96.",
+          "translation": "Robomimic[14] 数据集。Bridge-V2 包含 24 个环境中的 60,096 条轨迹，而 RT-1 包含 3 个环境中的 87,212 条轨迹。这两个数据集主要都是厨房风格的环境，我们将主摄像头视图调整为 256×256 分辨率。Language Table 包含 442,226 条桌面操作轨迹，我们将摄像头调整为 192×256 分辨率。对于模拟环境，我们使用一个数据集，其中包含总共 500 条专家演示和随机探索轨迹，用于基于视觉的 Push-T 任务[5]。我们还为 Robomimic 的 Lift、Can 和 Square 任务各使用一个包含 700 条轨迹的数据集，覆盖成功和失败两种情况。模拟数据集使用 96×96 的分辨率。",
+          "plain": "这里说的是训练和测试用的“数据量”和“画面大小”。轨迹就是机器人一次完整操作的过程记录，比如从开始到结束的每一步动作和画面。分辨率就是画面有多少像素，256×256 比 96×96 更清晰，但计算量也更大。专家演示是“高手操作”，随机探索是“乱试”，两者都有助于模型学习。"
+        },
+        {
+          "text": "DriftWorld Setup. We adapt DriftWorld’s setup and drifting loss to the complexity of each environ- ment. Given the current frame, 3 history frames, and T future actions, DriftWorld predicts T future frames. We set the prediction horizon T to 4, 2, 1, 1, and 1 for the Push-T, Robomimic, Bridge-V2, RT-1, and Language Table datasets, respectively. For Push-T and Robomimic, the model generates outputs and computes the drifting loss directly in pixel space. To handle the higher resolution and complexity of the real-world datasets, the U-Net generator instead operates in the latent space of a Stable Diffusion 3 VAE [44, 45], with the drifting loss computed in DINOv2/v3 [7, 8] feature space.",
+          "translation": "DriftWorld 设置。我们根据每个环境的复杂度调整 DriftWorld 的设置和漂移损失。给定当前帧、3 个历史帧和 T 个未来动作，DriftWorld 预测 T 个未来帧。我们将预测时域 T 分别设置为 4、2、1、1 和 1，对应 Push-T、Robomimic、Bridge-V2、RT-1 和 Language Table 数据集。对于 Push-T 和 Robomimic，模型直接在像素空间生成输出并计算漂移损失。为了处理真实世界数据集更高的分辨率和复杂度，U-Net 生成器改为在 Stable Diffusion 3 VAE[44,45] 的潜空间中运行，漂移损失则在 DINOv2/v3[7,8] 特征空间中计算。",
+          "plain": "预测时域 T 就是“一次往前猜几帧”。T=4 表示一次猜 4 帧，T=1 表示只猜下一帧。像素空间就是直接在原始画面上算损失，潜空间则是先把画面压缩成更小的“特征图”再算，就像先把大图缩成小图再处理，省内存也更快。DINOv2/v3 特征空间是用一个预训练视觉模型提取的“语义特征”，在那里算损失更关注内容而不是每个像素的颜色。"
+        },
+        {
+          "text": "Baselines and Evaluation Metrics. We compare DriftWorld against the action-conditioned world models IRASim [2], WorldGym [30], and Ctrl-World [3]. We also evaluate against the GPC diffu- sion world model [5], as well as two diffusion models formed by adapting VDM [46] and LVDM [47] for action-conditioned video generation. To measure the visual quality of generated videos, we calculate the MSE, SSIM [48], PSNR [49], LPIPS [50], FID [51], and FVD [52] metrics on the validation sets. The metrics are for 8-frame autoregressive generation on Bridge-V2 and RT-1 and are for full-video autoregressive generation on Push-T, Robomimic, and Language Table.",
+          "translation": "基线和评估指标。我们将 DriftWorld 与动作条件世界模型 IRASim[2]、WorldGym[30] 和 Ctrl-World[3] 进行比较。我们还与 GPC 扩散世界模型[5] 进行比较，以及与通过调整 VDM[46] 和 LVDM[47] 用于动作条件视频生成而得到的两个扩散模型进行比较。为了衡量生成视频的视觉质量，我们在验证集上计算 MSE、SSIM[48]、PSNR[49]、LPIPS[50]、FID[51] 和 FVD[52] 指标。这些指标在 Bridge-V2 和 RT-1 上是针对 8 帧自回归生成的，在 Push-T、Robomimic 和 Language Table 上是针对完整视频自回归生成的。",
+          "plain": "基线就是“对照组”，用来证明你的方法更好。MSE 是均方误差，越小越好；SSIM 和 PSNR 衡量画面像不像、清不清楚；LPIPS 用深度特征看感知差异；FID 和 FVD 分别衡量图像和视频的分布距离，越小说明生成得越自然。8 帧自回归生成就是每次生成 8 帧，再拿这 8 帧继续生成下一批，像滚雪球一样越滚越长。"
+        }
+      ],
+      "bold": [
+        "Quantitative",
+        "results",
+        "visual",
+        "quality",
+        "generated",
+        "videos",
+        "Push-T",
+        "GT"
+      ],
+      "explanation": "介绍实验用了哪些数据集和设置，例如 Bridge-V2、RT-1、Language Table、Push-T 和 Robomimic。",
+      "start_page": 5,
+      "end_page": 6,
+      "bold_notes": [
+        {
+          "term": "Quantitative",
+          "explanation": ""
+        },
+        {
+          "term": "results",
+          "explanation": ""
+        },
+        {
+          "term": "visual",
+          "explanation": ""
+        },
+        {
+          "term": "quality",
+          "explanation": ""
+        },
+        {
+          "term": "generated",
+          "explanation": ""
+        },
+        {
+          "term": "videos",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T",
+          "explanation": ""
+        },
+        {
+          "term": "GT",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Visual Evaluation of World Modeling",
+      "number": "4.2",
+      "heading_y": 652.7064208984375,
+      "text": "4.2 Visual Evaluation of World Modeling\n\nAcross all five environments, DriftWorld matches or outperforms action-conditioned world model baselines in terms of visual generation quality, while operating at a fraction of the inference time.\n\nPush-T. Table 1 displays the results for both 64-frame and full-episode (≈250 frames) autoregres- sive rollouts. DriftWorld outperforms baselines, especially on the 64-frame videos, while generating\n\nat 3.2 to 478 times faster. Further, our model outperforms the MSE baseline model, which shares the same U-Net backbone but is trained with a standard MSE loss instead of drifting loss. Since the MSE baseline also generates frames in a single forward pass, it provides a direct comparison against DriftWorld. This comparison confirms the effectiveness of drifting loss for 1-step generation.\n\nRobomimic. Table 2 presents the visual quality metrics on the Robomimic tasks. In both single- view and two-view settings, DriftWorld achieves competitive performance compared to Ctrl-World and the GPC diffusion world model, and it is significantly faster. Examples of DriftWorld’s gener- ated videos compared to the ground-truth MuJoCo simulations are in the appendix.\n\nBridge-V2, RT-1, and Language Table. As Table 3 shows, DriftWorld outperforms baselines on the majority of the visual quality metrics. Further, DriftWorld uses much less inference time than existing action-conditioned world models. The videos generated by each of these world models are visualized in Figures 4-5. DriftWorld generates videos that closely mirror the dynamics of the real-world environment, and it has better action following capabilities than IRASim.",
+      "paragraphs": [
+        {
+          "text": "4.2 Visual Evaluation of World Modeling",
+          "translation": "4.2 世界建模的视觉评估",
+          "plain": ""
+        },
+        {
+          "text": "Across all five environments, DriftWorld matches or outperforms action-conditioned world model baselines in terms of visual generation quality, while operating at a fraction of the inference time.",
+          "translation": "在全部五个环境中，DriftWorld 在视觉生成质量方面与以动作为条件的世界模型基线持平或更优，同时其推理时间仅为后者的一小部分。",
+          "plain": "这句话是说：在五个不同的测试场景里，DriftWorld 生成的画面质量不比别的模型差，甚至更好，但跑起来快得多。可以类比成：同样做一桌菜，味道不输大厨，但用时只有人家的几分之一。"
+        },
+        {
+          "text": "Push-T. Table 1 displays the results for both 64-frame and full-episode (≈250 frames) autoregres- sive rollouts. DriftWorld outperforms baselines, especially on the 64-frame videos, while generating",
+          "translation": "Push-T 任务。表 1 展示了 64 帧和完整回合（约 250 帧）自回归展开的结果。DriftWorld 优于基线，尤其是在 64 帧视频上，同时生成速度",
+          "plain": ""
+        },
+        {
+          "text": "at 3.2 to 478 times faster. Further, our model outperforms the MSE baseline model, which shares the same U-Net backbone but is trained with a standard MSE loss instead of drifting loss. Since the MSE baseline also generates frames in a single forward pass, it provides a direct comparison against DriftWorld. This comparison confirms the effectiveness of drifting loss for 1-step generation.",
+          "translation": "快 3.2 到 478 倍。此外，我们的模型优于均方误差基线模型，后者共享相同的 U-Net 主干网络，但使用标准均方误差损失而非漂移损失进行训练。由于均方误差基线也是在单次前向传播中生成帧，因此它提供了与 DriftWorld 的直接对比。这一对比证实了漂移损失在单步生成中的有效性。",
+          "plain": "这里的关键是“控制变量对比”。两个模型骨架（U-Net）完全一样，唯一区别是训练时用的“评分标准”不同：一个用普通的均方误差（MSE），一个用漂移损失（drifting loss）。结果 DriftWorld 更好，说明提升不是来自网络结构，而是来自这个新的损失函数。就像两个学生用同一本教材，只是一个用普通练习题、一个用特别设计的练习题，后者考得更好，说明这套练习题更有效。另外“单次前向传播”意思是模型一次计算就出结果，不需要反复迭代，所以速度快。"
+        },
+        {
+          "text": "Robomimic. Table 2 presents the visual quality metrics on the Robomimic tasks. In both single- view and two-view settings, DriftWorld achieves competitive performance compared to Ctrl-World and the GPC diffusion world model, and it is significantly faster. Examples of DriftWorld’s gener- ated videos compared to the ground-truth MuJoCo simulations are in the appendix.",
+          "translation": "Robomimic 任务。表 2 展示了 Robomimic 任务上的视觉质量指标。在单视角和双视角两种设置下，DriftWorld 与 Ctrl-World 以及 GPC 扩散世界模型相比都取得了有竞争力的表现，而且速度明显更快。DriftWorld 生成的视频与真实 MuJoCo 仿真对比的示例见附录。",
+          "plain": "“单视角/双视角”指的是机器人摄像头是一个还是两个。MuJoCo 是一个常用的物理仿真软件，可以理解为“虚拟物理实验室”，用来生成标准答案（真实仿真画面），再和模型生成的画面对比，看像不像。"
+        },
+        {
+          "text": "Bridge-V2, RT-1, and Language Table. As Table 3 shows, DriftWorld outperforms baselines on the majority of the visual quality metrics. Further, DriftWorld uses much less inference time than existing action-conditioned world models. The videos generated by each of these world models are visualized in Figures 4-5. DriftWorld generates videos that closely mirror the dynamics of the real-world environment, and it has better action following capabilities than IRASim.",
+          "translation": "Bridge-V2、RT-1 和 Language Table 任务。如表 3 所示，DriftWorld 在大多数视觉质量指标上都优于基线。此外，DriftWorld 的推理时间远少于现有的以动作为条件的世界模型。每个世界模型生成的视频可视化在图 4 至图 5 中。DriftWorld 生成的视频与真实世界环境的动态高度吻合，并且比 IRASim 具有更好的动作跟随能力。",
+          "plain": "“动作跟随能力”是指：你给模型一个动作指令（比如“把杯子往左推”），它生成的画面是否真的按这个指令动。好比导演喊“向左走”，演员是不是真的向左走，而不是自顾自地乱动。"
+        }
+      ],
+      "bold": [
+        "Quantitative results for the visual quality of generated videos on the Robomimic tasks.",
+        "Quantitative results for the visual quality of generated videos on the real-world Bridge-V2, RT-1,",
+        "and Language Table datasets.",
+        "DriftWorld Setup.",
+        "Baselines and Evaluation Metrics.",
+        "Visual Evaluation of World Modeling",
+        "Push-T.",
+        "Robomimic."
+      ],
+      "explanation": "比较生成画面的质量：DriftWorld 在五个环境里画质不输甚至更好，但推理时间只是一小部分。",
+      "start_page": 6,
+      "end_page": 8,
+      "bold_notes": [
+        {
+          "term": "Quantitative results for the visual quality of generated videos on the Robomimic tasks.",
+          "explanation": ""
+        },
+        {
+          "term": "Quantitative results for the visual quality of generated videos on the real-world Bridge-V2, RT-1,",
+          "explanation": ""
+        },
+        {
+          "term": "and Language Table datasets.",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld Setup.",
+          "explanation": ""
+        },
+        {
+          "term": "Baselines and Evaluation Metrics.",
+          "explanation": ""
+        },
+        {
+          "term": "Visual Evaluation of World Modeling",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T.",
+          "explanation": ""
+        },
+        {
+          "term": "Robomimic.",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Inference-Time Policy Improvement in DriftWorld",
+      "number": "4.3",
+      "heading_y": 74.31652069091797,
+      "text": "4.3 Inference-Time Policy Improvement in DriftWorld\n\nDriftWorld enables faster and more effective inference-time policy improvement compared to exist- ing diffusion world models. We evaluate this capability by taking a pretrained policy, rolling out its action proposals in DriftWorld, and selecting the actions that result in the best future states.",
+      "paragraphs": [
+        {
+          "text": "4.3 Inference-Time Policy Improvement in DriftWorld",
+          "translation": "4.3 DriftWorld 中的推理时策略改进",
+          "plain": ""
+        },
+        {
+          "text": "DriftWorld enables faster and more effective inference-time policy improvement compared to exist- ing diffusion world models. We evaluate this capability by taking a pretrained policy, rolling out its action proposals in DriftWorld, and selecting the actions that result in the best future states.",
+          "translation": "与现有的扩散世界模型相比，DriftWorld 能够实现更快、更有效的推理时策略改进。我们通过以下方式评估这一能力：取一个预训练策略，在 DriftWorld 中展开其动作提议，并选择那些能带来最佳未来状态的动作。",
+          "plain": "“推理时策略改进”可以理解为：机器人已经有一个会做事的“大脑”（预训练策略），现在让它在 DriftWorld 这个虚拟世界里先试演几种做法，看看哪种做法导致的未来画面最好，然后挑那个最好的做法。就像下棋时先在脑子里推演几步，选最优的一步再落子，而不是盲目乱下。"
+        }
+      ],
+      "bold": [
+        "Inference-Time Policy Improvement in DriftWorld",
+        "GPC-RANK",
+        "Performance.",
+        "DriftWorld as an Offline Simulator for Policy Evaluation",
+        "Push-T.",
+        "Robomimic.",
+        "DriftWorld (Lift)",
+        "DriftWorld (Can)"
+      ],
+      "explanation": "展示用 DriftWorld 在推理时改进策略：因为推演快，可以试更多候选动作，从而选出更好的动作。",
+      "start_page": 8,
+      "end_page": 8,
+      "bold_notes": [
+        {
+          "term": "Inference-Time Policy Improvement in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "GPC-RANK",
+          "explanation": ""
+        },
+        {
+          "term": "Performance.",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld as an Offline Simulator for Policy Evaluation",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T.",
+          "explanation": ""
+        },
+        {
+          "term": "Robomimic.",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld (Lift)",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld (Can)",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "DriftWorld as an Offline Simulator for Policy Evaluation",
+      "number": "4.4",
+      "heading_y": 326.017578125,
+      "text": "4.4 DriftWorld as an Offline Simulator for Policy Evaluation\n\nDriftWorld serves as an accurate offline simulator for policy evaluation, successfully predicting both the absolute performance and relative ranking of policies. We validate this capability across both the Robomimic and Push-T tasks.\n\nPush-T. We evaluate seven diffusion policies [13], comparing their average IoU scores in DriftWorld against their scores in the ground-truth Push-T simulator. The IoU scores are the average across 100 initialization seeds for the block and target. As Figure 6 shows, DriftWorld correctly ranks the policies except for a single inversion between policies 5 and 6, and the absolute scores exhibit a high Pearson correlation coefficient of 0.9515. In contrast, the baseline GPC world model [5] struggles with multiple ranking errors and a much lower correlation of 0.7345.",
+      "paragraphs": [
+        {
+          "text": "4.4 DriftWorld as an Offline Simulator for Policy Evaluation",
+          "translation": "4.4 DriftWorld 作为用于策略评估的离线模拟器",
+          "plain": ""
+        },
+        {
+          "text": "DriftWorld serves as an accurate offline simulator for policy evaluation, successfully predicting both the absolute performance and relative ranking of policies. We validate this capability across both the Robomimic and Push-T tasks.",
+          "translation": "DriftWorld 可作为用于策略评估的准确离线模拟器，能够成功预测策略的绝对性能和相对排名。我们在 Robomimic 和 Push-T 两个任务上验证了这一能力。",
+          "plain": "“离线模拟器”就是不用真机器人、不用真实环境，只在模型生成的虚拟世界里测试策略好坏。“绝对性能”指一个策略具体能得多少分，“相对排名”指几个策略谁比谁强。好比用游戏模拟器测试不同打法：不仅要知道每种打法大概能拿多少分，还要知道哪种打法排名更高。如果模拟器够准，就能省下大量真机实验的时间和成本。"
+        },
+        {
+          "text": "Push-T. We evaluate seven diffusion policies [13], comparing their average IoU scores in DriftWorld against their scores in the ground-truth Push-T simulator. The IoU scores are the average across 100 initialization seeds for the block and target. As Figure 6 shows, DriftWorld correctly ranks the policies except for a single inversion between policies 5 and 6, and the absolute scores exhibit a high Pearson correlation coefficient of 0.9515. In contrast, the baseline GPC world model [5] struggles with multiple ranking errors and a much lower correlation of 0.7345.",
+          "translation": "Push-T 任务。我们评估了七种扩散策略，将它们在 DriftWorld 中的平均交并比得分与它们在真实 Push-T 模拟器中的得分进行比较。交并比得分是方块和目标在 100 个初始化随机种子上的平均值。如图 6 所示，DriftWorld 正确地给出了这些策略的排名，仅在策略 5 和策略 6 之间出现了一次颠倒，而且绝对得分之间表现出高达 0.9515 的皮尔逊相关系数。相比之下，基线 GPC 世界模型出现了多处排名错误，相关系数也低得多，仅为 0.7345。",
+          "plain": "这里是在检验 DriftWorld 这个“世界模型”靠不靠谱：如果它在虚拟世界里给七种机器人策略打分，排名和真实模拟器里的排名是否一致。交并比就是看机器人把方块推到目标区域时，预测区域和真实区域重叠了多少，重叠越多分越高。皮尔逊相关系数可以理解成“两条分数曲线有多像”，越接近 1 越像。DriftWorld 几乎完全跟真实模拟器一致，只有第 5 和第 6 名顺序反了；而对比方法 GPC 错得比较多，说明 DriftWorld 更能当“裁判”。"
+        }
+      ],
+      "bold": [
+        "Inference-Time Policy Improvement in DriftWorld",
+        "GPC-RANK",
+        "Performance.",
+        "DriftWorld as an Offline Simulator for Policy Evaluation",
+        "Push-T.",
+        "Robomimic.",
+        "DriftWorld (Lift)",
+        "DriftWorld (Can)"
+      ],
+      "explanation": "展示把 DriftWorld 当作离线模拟器：它能预测不同策略的绝对成绩和相对排名，与真实结果高度一致。",
+      "start_page": 8,
+      "end_page": 9,
+      "bold_notes": [
+        {
+          "term": "Inference-Time Policy Improvement in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "GPC-RANK",
+          "explanation": ""
+        },
+        {
+          "term": "Performance.",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld as an Offline Simulator for Policy Evaluation",
+          "explanation": ""
+        },
+        {
+          "term": "Push-T.",
+          "explanation": ""
+        },
+        {
+          "term": "Robomimic.",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld (Lift)",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld (Can)",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Ablations",
+      "number": "4.5",
+      "heading_y": 128.7321319580078,
+      "text": "4.5 Ablations\n\nFinally, we ablate several core components of DriftWorld.\n\nAblation on feature space. The representation space in which the drifting loss is computed significantly influ- ences generation quality. On the Push-T and Robomimic environments, computing the drifting loss directly in pixel space is sufficient. However, on the real-world Bridge-V2, RT-1, and Language Table datasets, we com- pute the drifting loss in the semantically dense feature space of DINOv2/v3 [7, 8]. We ablate this design in Ta- ble 5, where the metrics are computed for frames gen- erated by a single forward pass of DriftWorld on the validation set. If the feature extractor is removed and the drifting loss is computed directly in the VAE latent space, performance drops significantly, and the gener- ated robot gripper becomes blurry (see Figure 7). In contrast, if we use DINOv2 or DINOv3 as the feature space, the generated video is sharp. Finally, it is worth noting that because the feature extractor is only used to compute the drifting loss during training time, it does not slow down the model’s inference speed.\n\nAblation on motion weighting and self-forcing. As Table 5 shows, the motion-weighting for the drifting loss, as well as self-forcing [53], are important for DriftWorld’s autoregressive generation on real-world robotic datasets. Incorporating motion weighting allows DriftWorld to precisely capture gripper movements over time, as shown by the significantly smaller FVD score, because the drifting loss is weighted more heavily on moving regions than on the static background. Adding a second self-forcing training stage, in which the model is conditioned on its own predictions rather than ground-truth frames, further improves performance.",
+      "paragraphs": [
+        {
+          "text": "4.5 Ablations",
+          "translation": "4.5 消融实验",
+          "plain": ""
+        },
+        {
+          "text": "Finally, we ablate several core components of DriftWorld.",
+          "translation": "最后，我们对 DriftWorld 的几个核心组件进行了消融研究。",
+          "plain": "消融研究就像做菜时把某一种调料拿掉，看看味道变差多少，以此判断这个调料到底重不重要。这里就是逐个去掉 DriftWorld 的关键设计，看性能会掉多少。"
+        },
+        {
+          "text": "Ablation on feature space. The representation space in which the drifting loss is computed significantly influ- ences generation quality. On the Push-T and Robomimic environments, computing the drifting loss directly in pixel space is sufficient. However, on the real-world Bridge-V2, RT-1, and Language Table datasets, we com- pute the drifting loss in the semantically dense feature space of DINOv2/v3 [7, 8]. We ablate this design in Ta- ble 5, where the metrics are computed for frames gen- erated by a single forward pass of DriftWorld on the validation set. If the feature extractor is removed and the drifting loss is computed directly in the VAE latent space, performance drops significantly, and the gener- ated robot gripper becomes blurry (see Figure 7). In contrast, if we use DINOv2 or DINOv3 as the feature space, the generated video is sharp. Finally, it is worth noting that because the feature extractor is only used to compute the drifting loss during training time, it does not slow down the model’s inference speed.",
+          "translation": "关于特征空间的消融。计算漂移损失时所使用的表示空间会显著影响生成质量。在 Push-T 和 Robomimic 环境中，直接在像素空间计算漂移损失就足够了。然而，在真实世界的 Bridge-V2、RT-1 和 Language Table 数据集上，我们在 DINOv2/v3 的语义稠密特征空间中计算漂移损失。我们在表 5 中对这一设计进行了消融，其中的指标是在验证集上由 DriftWorld 单次前向传播生成的帧上计算的。如果去掉特征提取器，直接在变分自编码器潜空间中计算漂移损失，性能会显著下降，生成的机器人夹爪也会变得模糊（见图 7）。相反，如果我们使用 DINOv2 或 DINOv3 作为特征空间，生成的视频就很清晰。最后值得注意的是，由于特征提取器只在训练时用于计算漂移损失，它并不会拖慢模型的推理速度。",
+          "plain": "这里在讨论“在哪种表示上比较两张图像不像”。像素空间就是直接看每个像素颜色；潜空间是把图像压成一小串数字；DINOv2/v3 特征空间则是用预训练模型提取出“语义特征”，更像是在看“这是夹爪、这是桌面”这种含义。实验发现，简单环境里直接比像素就够了，但真实复杂场景里必须用语义特征，否则生成的夹爪会糊成一团。好处是这个特征提取器只在训练时帮忙，推理时不用它，所以不会让模型变慢。"
+        },
+        {
+          "text": "Ablation on motion weighting and self-forcing. As Table 5 shows, the motion-weighting for the drifting loss, as well as self-forcing [53], are important for DriftWorld’s autoregressive generation on real-world robotic datasets. Incorporating motion weighting allows DriftWorld to precisely capture gripper movements over time, as shown by the significantly smaller FVD score, because the drifting loss is weighted more heavily on moving regions than on the static background. Adding a second self-forcing training stage, in which the model is conditioned on its own predictions rather than ground-truth frames, further improves performance.",
+          "translation": "关于运动加权和自强迫的消融。如表 5 所示，漂移损失的运动加权以及自强迫，对于 DriftWorld 在真实世界机器人数据集上的自回归生成都很重要。加入运动加权使 DriftWorld 能够精确捕捉夹爪随时间的运动，这体现在弗雷歇视频距离得分显著更小，因为漂移损失在运动区域上的权重比在静态背景上更大。加入第二个自强迫训练阶段，即让模型以自身预测而不是真实帧为条件，进一步提升了性能。",
+          "plain": "运动加权就是训练时更关注画面里会动的地方，比如机器人夹爪，而不是一直不动的背景，这样模型才不会只学会画静止桌面。自强迫有点像学骑自行车时不再一直扶着，而是让模型用自己上一秒生成的画面继续预测下一秒，而不是总看标准答案；这样它在实际连续生成时更稳。弗雷歇视频距离是衡量生成视频和真实视频分布差多远的指标，越小越好。"
+        }
+      ],
+      "bold": [
+        "Ablations",
+        "core",
+        "components",
+        "DriftWorld.",
+        "None",
+        "DINOv2",
+        "DINOv3",
+        "Visualization"
+      ],
+      "explanation": "做消融实验：逐一去掉或替换关键设计，验证每个组件对最终效果是否真的重要。",
+      "start_page": 9,
+      "end_page": 9,
+      "bold_notes": [
+        {
+          "term": "Ablations",
+          "explanation": ""
+        },
+        {
+          "term": "core",
+          "explanation": ""
+        },
+        {
+          "term": "components",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld.",
+          "explanation": ""
+        },
+        {
+          "term": "None",
+          "explanation": ""
+        },
+        {
+          "term": "DINOv2",
+          "explanation": ""
+        },
+        {
+          "term": "DINOv3",
+          "explanation": ""
+        },
+        {
+          "term": "Visualization",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Discussion",
+      "number": "5",
+      "heading_y": 529.7059936523438,
+      "text": "5 Discussion\n\nLimitations. Our approach has several limitations. First, our model relies on a robust pretrained feature extractor (DINOv2/v3) to maintain visual sharpness in complex scenes. Second, the drifting framework requires higher memory usage than standard diffusion at training time, since the model needs to generate multiple negative samples (e.g., 64) per forward pass to compute the drifting loss. As a result, the number of context and generated frames per negative sample is limited by GPU VRAM. A direction for future work is to increase the length of the context and generation windows to improve long-range temporal consistency, potentially by using a sparse history [3] or a video VAE with temporal compression.\n\nConclusion. In this paper, we introduced DriftWorld, a fast, single step, action-conditioned world model. To adapt drifting generative models to conditional video generation, we proposed key adapta- tions, including an action-conditioned U-Net architecture, feature space integration, and accentuated action following. DriftWorld achieves a 17× speedup, on average, over state-of-the-art diffusion baselines and generates accurate and visually consistent rollouts, which lead to improved inference- time action search and reliable offline policy evaluation.",
+      "paragraphs": [
+        {
+          "text": "5 Discussion",
+          "translation": "5 讨论",
+          "plain": ""
+        },
+        {
+          "text": "Limitations. Our approach has several limitations. First, our model relies on a robust pretrained feature extractor (DINOv2/v3) to maintain visual sharpness in complex scenes. Second, the drifting framework requires higher memory usage than standard diffusion at training time, since the model needs to generate multiple negative samples (e.g., 64) per forward pass to compute the drifting loss. As a result, the number of context and generated frames per negative sample is limited by GPU VRAM. A direction for future work is to increase the length of the context and generation windows to improve long-range temporal consistency, potentially by using a sparse history [3] or a video VAE with temporal compression.",
+          "translation": "局限性。我们的方法有几个局限。第一，我们的模型依赖一个鲁棒的预训练特征提取器（DINOv2/v3）来在复杂场景中保持视觉清晰度。第二，漂移框架在训练时比标准扩散需要更高的内存占用，因为模型每次前向传播需要生成多个负样本（例如 64 个）来计算漂移损失。因此，每个负样本所包含的上下文帧和生成帧的数量受到 GPU 显存的限制。未来工作的一个方向是增加上下文窗口和生成窗口的长度，以改善长程时间一致性，可能通过使用稀疏历史或具有时间压缩的视频变分自编码器来实现。",
+          "plain": "这里是在老实交代方法的短板。第一，它需要外挂一个很强的“眼睛”模型来保证画面清楚。第二，训练时为了算漂移损失，一次要生成很多个“反例”，就像老师批改作业时要同时看很多错误答案，特别占显存。显存不够，就只能少看几帧历史、少生成几帧未来，导致长时间连贯性受限。未来想通过只看稀疏历史或把视频压缩后再处理，来拉长能记住和生成的时间范围。"
+        },
+        {
+          "text": "Conclusion. In this paper, we introduced DriftWorld, a fast, single step, action-conditioned world model. To adapt drifting generative models to conditional video generation, we proposed key adapta- tions, including an action-conditioned U-Net architecture, feature space integration, and accentuated action following. DriftWorld achieves a 17× speedup, on average, over state-of-the-art diffusion baselines and generates accurate and visually consistent rollouts, which lead to improved inference- time action search and reliable offline policy evaluation.",
+          "translation": "结论。在本文中，我们介绍了 DriftWorld，一个快速、单步、以动作为条件的世界模型。为了将漂移生成模型适配到条件视频生成，我们提出了若干关键适配，包括以动作为条件的 U-Net 架构、特征空间集成以及强化的动作跟随。DriftWorld 相比最先进的扩散基线平均实现了 17 倍加速，并能生成准确且视觉一致的推演，从而带来更好的推理时动作搜索和可靠的离线策略评估。",
+          "plain": "总结一下：DriftWorld 是一个“看当前画面和动作，就能快速想象下一帧”的模型。单步意味着它不用像普通扩散模型那样反复去噪很多次，所以快很多。以动作为条件就是输入机器人动作，输出对应未来画面。它能比现有方法平均快 17 倍，还能让机器人在虚拟世界里试动作、评估策略，而不用真的在现实里反复试错。"
+        }
+      ],
+      "bold": [
+        "Ablations",
+        "core",
+        "components",
+        "DriftWorld.",
+        "None",
+        "DINOv2",
+        "DINOv3",
+        "Visualization"
+      ],
+      "explanation": "讨论局限与展望：模型依赖预训练特征提取器、显存需求较高，但整体方向很有前景。",
+      "start_page": 9,
+      "end_page": 14,
+      "bold_notes": [
+        {
+          "term": "Ablations",
+          "explanation": ""
+        },
+        {
+          "term": "core",
+          "explanation": ""
+        },
+        {
+          "term": "components",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld.",
+          "explanation": ""
+        },
+        {
+          "term": "None",
+          "explanation": ""
+        },
+        {
+          "term": "DINOv2",
+          "explanation": ""
+        },
+        {
+          "term": "DINOv3",
+          "explanation": ""
+        },
+        {
+          "term": "Visualization",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Additional Qualitative Results",
+      "number": "A",
+      "heading_y": 95.63850402832031,
+      "text": "Section A presents additional qualitative results: (i) visualizations of DriftWorld’s generated videos on Bridge-V2, RT-1, and Language Table and (ii) visualizations of policy rollouts in DriftWorld. Section B contains an additional quantitative result on the visual quality of generated videos. Section C provides further ablations and visualizations for DriftWorld. Section D describes implementation details and hyperparameters. The code is at https://github.com/Susie-Lu/driftworld.\n\nA Additional Qualitative Results",
+      "paragraphs": [
+        {
+          "text": "Section A presents additional qualitative results: (i) visualizations of DriftWorld’s generated videos on Bridge-V2, RT-1, and Language Table and (ii) visualizations of policy rollouts in DriftWorld. Section B contains an additional quantitative result on the visual quality of generated videos. Section C provides further ablations and visualizations for DriftWorld. Section D describes implementation details and hyperparameters. The code is at https://github.com/Susie-Lu/driftworld.",
+          "translation": "A 节展示了额外的定性结果：（一）DriftWorld 在 Bridge-V2、RT-1 和 Language Table 上生成视频的可视化；（二）DriftWorld 中策略推演的可视化。B 节包含关于生成视频视觉质量的额外定量结果。C 节提供了针对 DriftWorld 的进一步消融和可视化。D 节描述了实现细节和超参数。代码位于 https://github.com/Susie-Lu/driftworld。",
+          "plain": "这一段相当于论文附录的目录：A 节放更多生成视频和机器人策略运行的直观例子，B 节补充视频清晰度的量化结果，C 节继续做消融实验和可视化，D 节讲具体怎么实现、用了哪些参数，最后给出代码链接。"
+        },
+        {
+          "text": "A Additional Qualitative Results",
+          "translation": "A 额外的定性结果",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Appendix",
+        "Additional Qualitative Results",
+        "Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+        "GT",
+        "LVDM",
+        "IRASim",
+        "DriftWorld",
+        "(Ours)"
+      ],
+      "explanation": "附录补充更多可视化结果，展示生成视频和策略推演与真实情况的相似程度。",
+      "start_page": 14,
+      "end_page": 14,
+      "bold_notes": [
+        {
+          "term": "Appendix",
+          "explanation": ""
+        },
+        {
+          "term": "Additional Qualitative Results",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+          "explanation": ""
+        },
+        {
+          "term": "GT",
+          "explanation": ""
+        },
+        {
+          "term": "LVDM",
+          "explanation": ""
+        },
+        {
+          "term": "IRASim",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "(Ours)",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+      "number": "A.1",
+      "heading_y": 194.0216064453125,
+      "text": "A.1 Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+      "paragraphs": [
+        {
+          "text": "A.1 Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+          "translation": "A.1 在 Bridge-V2、RT-1 和 Language Table 上生成视频的比较",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Appendix",
+        "Additional Qualitative Results",
+        "Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+        "GT",
+        "LVDM",
+        "IRASim",
+        "DriftWorld",
+        "(Ours)"
+      ],
+      "explanation": "附录中对比三个数据集上不同方法生成的视频，直观看出 DriftWorld 的优势。",
+      "start_page": 14,
+      "end_page": 15,
+      "bold_notes": [
+        {
+          "term": "Appendix",
+          "explanation": ""
+        },
+        {
+          "term": "Additional Qualitative Results",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of Generated Videos on Bridge-V2, RT-1, and Language Table",
+          "explanation": ""
+        },
+        {
+          "term": "GT",
+          "explanation": ""
+        },
+        {
+          "term": "LVDM",
+          "explanation": ""
+        },
+        {
+          "term": "IRASim",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "(Ours)",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Comparison of DriftWorld's Policy Rollouts",
+      "number": "A.2",
+      "heading_y": 0,
+      "text": "A.2 Comparison of DriftWorld’s Policy Rollouts\n\nAs Figures 11 and 12 show, policy rollouts in DriftWorld are very similar to the ground-truth rollouts.\n\nExample 1 Example 2\n\nGPC Diffusion",
+      "paragraphs": [
+        {
+          "text": "A.2 Comparison of DriftWorld’s Policy Rollouts",
+          "translation": "A.2 DriftWorld 策略推演结果的比较",
+          "plain": ""
+        },
+        {
+          "text": "As Figures 11 and 12 show, policy rollouts in DriftWorld are very similar to the ground-truth rollouts.",
+          "translation": "如图 11 和图 12 所示，DriftWorld 中的策略推演结果与真实推演结果非常相似。",
+          "plain": "这里的“策略推演”可以理解为：让机器人在虚拟世界里按照一套操作规则（策略）一步步执行任务，把整个过程像录像一样播放出来。作者想说的是，这套虚拟世界模拟出来的操作过程，和现实世界里真正做出来的过程几乎一模一样，说明这个模拟器足够逼真、可信。"
+        },
+        {
+          "text": "Example 1 Example 2",
+          "translation": "示例 1 示例 2",
+          "plain": ""
+        },
+        {
+          "text": "GPC Diffusion",
+          "translation": "GPC 扩散模型",
+          "plain": "GPC 和 Diffusion 是两种不同的方法名称。Diffusion（扩散模型）可以类比成“先往一张清晰照片上不断加噪点把它弄糊，再训练模型学会一步步把噪点去掉、还原出清晰照片”，这里被用来生成或预测机器人的动作序列。"
+        }
+      ],
+      "bold": [
+        "GT",
+        "WorldGym",
+        "IRASim",
+        "DriftWorld",
+        "(Ours)",
+        "Comparison of videos generated by DriftWorld vs.",
+        "baselines on RT-1.",
+        "Comparison of DriftWorld’s Policy Rollouts"
+      ],
+      "explanation": "附录中展示 DriftWorld 模拟策略执行的过程，与真实执行非常接近。",
+      "start_page": 15,
+      "end_page": 15,
+      "bold_notes": [
+        {
+          "term": "GT",
+          "explanation": ""
+        },
+        {
+          "term": "WorldGym",
+          "explanation": ""
+        },
+        {
+          "term": "IRASim",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "(Ours)",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of videos generated by DriftWorld vs.",
+          "explanation": ""
+        },
+        {
+          "term": "baselines on RT-1.",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of DriftWorld’s Policy Rollouts",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Additional Quantitative Results",
+      "number": "B",
+      "heading_y": 574.9551391601562,
+      "text": "B Additional Quantitative Results\n\nGround Truth\n\nLift task Can task\n\nGround Truth\n\nLift task (2-view) Square task",
+      "paragraphs": [
+        {
+          "text": "B Additional Quantitative Results",
+          "translation": "B 补充的定量结果",
+          "plain": ""
+        },
+        {
+          "text": "Ground Truth",
+          "translation": "真实结果",
+          "plain": ""
+        },
+        {
+          "text": "Lift task Can task",
+          "translation": "举升任务 罐装任务",
+          "plain": "Lift 和 Can 是机器人操作任务的名称。Lift 指把物体举起来，Can 指操作一个罐子（比如把罐子从一处移到另一处）。这些是机器人学习领域常用的标准测试任务。"
+        },
+        {
+          "text": "Ground Truth",
+          "translation": "真实结果",
+          "plain": ""
+        },
+        {
+          "text": "Lift task (2-view) Square task",
+          "translation": "举升任务（双视角） 方块任务",
+          "plain": "“双视角”指同时用两个摄像头从不同角度拍摄同一个场景，就像人有两只眼睛能看出立体感一样，机器人也能借此更准确地判断物体的位置和形状。Square 任务指操作一个方块（比如把方块套到某个柱子上）这类任务。"
+        }
+      ],
+      "bold": [
+        "GT",
+        "WorldGym",
+        "IRASim",
+        "DriftWorld",
+        "(Ours)",
+        "Comparison of videos generated by DriftWorld vs.",
+        "baselines on RT-1.",
+        "Comparison of DriftWorld’s Policy Rollouts"
+      ],
+      "explanation": "附录补充更多数值结果，覆盖 Lift、Can、Square 等任务。",
+      "start_page": 15,
+      "end_page": 16,
+      "bold_notes": [
+        {
+          "term": "GT",
+          "explanation": ""
+        },
+        {
+          "term": "WorldGym",
+          "explanation": ""
+        },
+        {
+          "term": "IRASim",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "(Ours)",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of videos generated by DriftWorld vs.",
+          "explanation": ""
+        },
+        {
+          "term": "baselines on RT-1.",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison of DriftWorld’s Policy Rollouts",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Additional Ablations for DriftWorld",
+      "number": "C",
+      "heading_y": 292.201171875,
+      "text": "C Additional Ablations for DriftWorld\n\nIn this section, we conduct further ablations of core components of DriftWorld.",
+      "paragraphs": [
+        {
+          "text": "C Additional Ablations for DriftWorld",
+          "translation": "C 针对 DriftWorld 的补充消融实验",
+          "plain": ""
+        },
+        {
+          "text": "In this section, we conduct further ablations of core components of DriftWorld.",
+          "translation": "在本节中，我们对 DriftWorld 的核心组件进行了进一步的消融实验。",
+          "plain": "消融实验就是“拆零件测试”：把模型里的某个部件去掉或换掉，看看效果变差多少，从而判断这个部件到底有没有用、有多重要。就像做菜时故意不放盐，尝尝味道差多少，就知道盐的作用。"
+        }
+      ],
+      "bold": [
+        "Ground Truth",
+        "Lift task",
+        "Can task",
+        "DriftWorld",
+        "Lift task (2-view)",
+        "Square task",
+        "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+        "C"
+      ],
+      "explanation": "附录补充更多消融实验，进一步验证核心设计的作用。",
+      "start_page": 16,
+      "end_page": 16,
+      "bold_notes": [
+        {
+          "term": "Ground Truth",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task",
+          "explanation": ""
+        },
+        {
+          "term": "Can task",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task (2-view)",
+          "explanation": ""
+        },
+        {
+          "term": "Square task",
+          "explanation": ""
+        },
+        {
+          "term": "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+          "explanation": ""
+        },
+        {
+          "term": "C",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Single-Frame versus Chunk-Level Simulation",
+      "number": "C.1",
+      "heading_y": 342.904541015625,
+      "text": "C.1 Single-Frame versus Chunk-Level Simulation",
+      "paragraphs": [
+        {
+          "text": "C.1 Single-Frame versus Chunk-Level Simulation",
+          "translation": "C.1 单帧模拟与块级模拟的对比",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Ground Truth",
+        "Lift task",
+        "Can task",
+        "DriftWorld",
+        "Lift task (2-view)",
+        "Square task",
+        "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+        "C"
+      ],
+      "explanation": "比较一次生成一帧和一次生成一小段视频两种方式的效果差异。",
+      "start_page": 16,
+      "end_page": 16,
+      "bold_notes": [
+        {
+          "term": "Ground Truth",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task",
+          "explanation": ""
+        },
+        {
+          "term": "Can task",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task (2-view)",
+          "explanation": ""
+        },
+        {
+          "term": "Square task",
+          "explanation": ""
+        },
+        {
+          "term": "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+          "explanation": ""
+        },
+        {
+          "term": "C",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Accentuating Action Following",
+      "number": "C.2",
+      "heading_y": 496.2855224609375,
+      "text": "C.2 Accentuating Action Following\n\nGiven a pretrained DriftWorld model, we can flexibly specify and vary the scale α for accentuating action following at inference time without retraining the model. Figure 13 visualizes DriftWorld’s generation on Bridge as we vary α. When the robot gripper moves quickly as in the second and third frames, the generated videos frames are clear for the higher values of α (2.5 and 3.5), but they are not clear for lower values of α (1.0 and 2.0). This indicates that the accentuating action following does enhance the model’s ability to adhere to the specified actions.\n\nTo enable the ability of varying α at inference time, we let the DriftWorld U-Net take α as an input, and during training time, we randomly sample α from a probability distribution so that DriftWorld is exposed various values of α. We sample α from a log-uniform distribution over the interval [1, 4], i.e. p(α) ∝α−1.",
+      "paragraphs": [
+        {
+          "text": "C.2 Accentuating Action Following",
+          "translation": "C.2 强化动作跟随",
+          "plain": ""
+        },
+        {
+          "text": "Given a pretrained DriftWorld model, we can flexibly specify and vary the scale α for accentuating action following at inference time without retraining the model. Figure 13 visualizes DriftWorld’s generation on Bridge as we vary α. When the robot gripper moves quickly as in the second and third frames, the generated videos frames are clear for the higher values of α (2.5 and 3.5), but they are not clear for lower values of α (1.0 and 2.0). This indicates that the accentuating action following does enhance the model’s ability to adhere to the specified actions.",
+          "translation": "给定一个预训练好的 DriftWorld 模型，我们可以在推理阶段灵活地指定并调整用于强化动作跟随的缩放系数 α，而无需重新训练模型。图 13 展示了当我们在 Bridge 数据集上改变 α 时 DriftWorld 的生成结果。当机器人夹爪像第二帧和第三帧那样快速移动时，在较高的 α 值（2.5 和 3.5）下生成的视频帧是清晰的，而在较低的 α 值（1.0 和 2.0）下则不够清晰。这表明强化动作跟随确实增强了模型遵循指定动作的能力。",
+          "plain": "这里的 α 可以理解成一个“听话程度”的旋钮。α 越大，模型就越努力地按照给定的动作指令去生成画面。就像开车时方向盘打得越猛，车就越跟着你的意图转；但打得太猛也可能画面抖动。实验发现，当机器人动作很快时，把 α 调大，生成的画面才跟得上、看得清。"
+        },
+        {
+          "text": "To enable the ability of varying α at inference time, we let the DriftWorld U-Net take α as an input, and during training time, we randomly sample α from a probability distribution so that DriftWorld is exposed various values of α. We sample α from a log-uniform distribution over the interval [1, 4], i.e. p(α) ∝α−1.",
+          "translation": "为了能够在推理阶段改变 α，我们让 DriftWorld 的 U-Net 把 α 作为一个输入，并在训练阶段从一个概率分布中随机采样 α，从而使 DriftWorld 接触到各种不同的 α 值。我们从区间 [1, 4] 上的对数均匀分布中采样 α，即概率密度与 α 的负一次方成正比。",
+          "plain": "对数均匀分布的意思是：不是每个 α 值被抽到的机会都一样，而是偏向抽到较小的值。比如在 1 到 4 之间，抽到接近 1 的概率比抽到接近 4 的概率大。这样做是为了让模型在训练时见过各种大小的 α，以后推理时才能随意调这个旋钮而不失灵。U-Net 是模型里负责生成图像的主干网络，把 α 也喂给它，它就知道这次该多“听话”。"
+        }
+      ],
+      "bold": [
+        "Ground Truth",
+        "Lift task",
+        "Can task",
+        "DriftWorld",
+        "Lift task (2-view)",
+        "Square task",
+        "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+        "C"
+      ],
+      "explanation": "研究如何在不重新训练的情况下，通过调节参数让模型更严格地跟随动作指令。",
+      "start_page": 16,
+      "end_page": 16,
+      "bold_notes": [
+        {
+          "term": "Ground Truth",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task",
+          "explanation": ""
+        },
+        {
+          "term": "Can task",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task (2-view)",
+          "explanation": ""
+        },
+        {
+          "term": "Square task",
+          "explanation": ""
+        },
+        {
+          "term": "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+          "explanation": ""
+        },
+        {
+          "term": "C",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Motion Weighting for Drifting Loss",
+      "number": "C.3",
+      "heading_y": 655.3275146484375,
+      "text": "C.3 Motion Weighting for Drifting Loss\n\nAs Figure 14 shows, the motion weighting technique from Section 3.3 is essential for DriftWorld’s autoregressive generation on real robot datasets with complex backgrounds. Without motion weight- ing, the generated robot gripper is mostly stationary. In contrast, with motion weighting, the gener- ated gripper moves according to the actions, and the generated video is similar to the ground truth.\n\nGenerated Frames\n\nNo Motion Weight\n\nMotion Weight",
+      "paragraphs": [
+        {
+          "text": "C.3 Motion Weighting for Drifting Loss",
+          "translation": "C.3 漂移损失中的运动加权",
+          "plain": ""
+        },
+        {
+          "text": "As Figure 14 shows, the motion weighting technique from Section 3.3 is essential for DriftWorld’s autoregressive generation on real robot datasets with complex backgrounds. Without motion weight- ing, the generated robot gripper is mostly stationary. In contrast, with motion weighting, the gener- ated gripper moves according to the actions, and the generated video is similar to the ground truth.",
+          "translation": "如图 14 所示，来自第 3.3 节的运动加权技术对于 DriftWorld 在具有复杂背景的真实机器人数据集上进行自回归生成是至关重要的。如果不使用运动加权，生成的机器人夹爪大部分时间是静止不动的。相比之下，使用运动加权后，生成的夹爪会按照动作移动，生成的视频与真实情况相似。",
+          "plain": "自回归生成就是“一帧接一帧地往下画”，像翻页动画一样，每一帧都基于前面已经画好的帧来生成。运动加权相当于在训练时给“会动的部分”加更高的分数权重，逼着模型重点学会画运动，而不是偷懒画一堆静止画面。没有它，模型就像个不愿动的演员，夹爪杵在原地；有了它，夹爪才会跟着指令动起来。"
+        },
+        {
+          "text": "Generated Frames",
+          "translation": "生成的帧",
+          "plain": ""
+        },
+        {
+          "text": "No Motion Weight",
+          "translation": "无运动加权",
+          "plain": ""
+        },
+        {
+          "text": "Motion Weight",
+          "translation": "运动权重",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Ground Truth",
+        "Lift task",
+        "Can task",
+        "DriftWorld",
+        "Lift task (2-view)",
+        "Square task",
+        "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+        "C"
+      ],
+      "explanation": "验证运动加权技术的重要性：没有它，在复杂背景的真实机器人数据上生成会变差。",
+      "start_page": 16,
+      "end_page": 17,
+      "bold_notes": [
+        {
+          "term": "Ground Truth",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task",
+          "explanation": ""
+        },
+        {
+          "term": "Can task",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Lift task (2-view)",
+          "explanation": ""
+        },
+        {
+          "term": "Square task",
+          "explanation": ""
+        },
+        {
+          "term": "Policy Rollouts for the Robomimic Lift, Can, and Square Tasks.",
+          "explanation": ""
+        },
+        {
+          "term": "C",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 1,
+      "heading": "Implementation Details",
+      "number": "D",
+      "heading_y": 598.8071899414062,
+      "text": "D Implementation Details",
+      "paragraphs": [
+        {
+          "text": "D Implementation Details",
+          "translation": "D 实现细节",
+          "plain": ""
+        }
+      ],
+      "bold": [
+        "Generated Frames",
+        "Comparison",
+        "DriftWorld’s",
+        "generated",
+        "videos",
+        "Bridge-V2",
+        "under",
+        "different"
+      ],
+      "explanation": "给出实现细节，方便别人复现实验。",
+      "start_page": 17,
+      "end_page": 17,
+      "bold_notes": [
+        {
+          "term": "Generated Frames",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld’s",
+          "explanation": ""
+        },
+        {
+          "term": "generated",
+          "explanation": ""
+        },
+        {
+          "term": "videos",
+          "explanation": ""
+        },
+        {
+          "term": "Bridge-V2",
+          "explanation": ""
+        },
+        {
+          "term": "under",
+          "explanation": ""
+        },
+        {
+          "term": "different",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Details for DriftWorld",
+      "number": "D.1",
+      "heading_y": 625.0264892578125,
+      "text": "D.1 Details for DriftWorld\n\nThe hyperparameters of DriftWorld are given in Table 8. Also, in addition to the methods described in the main paper, we apply normalization and multi-temperature aggregation to the drifting field when training DriftWorld.\n\nNormalization. To ensure that the drifting field is insensitive to the raw magnitudes and dimen- sionalities of samples in the feature spaces, we apply two normalizations. The base drifting field is computed as Vp,qi(x) = V +\n\nqi (x), where V +\n\np (x) and V −\n\nqi (x) are the mean-shift vectors\n\nof the positive and negative samples, respectively. Each vector is a kernel-weighted average of the difference between the positive/negative samples and the generated sample x. First, we apply fea- ture normalization so that the kernel takes on a reasonable range of values regardless of the samples’ dimensionality. We divide the samples by their average pairwise distance. The kernel is then com- puted as k(x, y) = exp\n\n, where τ is the temperature. Also, we normalize the drifting field by its magnitude so that multiple drifting fields can be summed together.\n\nMulti-Temperature Aggregation. After applying the above normalizations, we aggregate the drift- ing field across multiple kernel temperatures τ. The aggregrated field is ˜V = P\n\nτ ˜Vτ, which we compute the final drifting loss on. The temperature determines which samples y are considered to be close to a given sample x. At low temperatures, a generated sample x is predominantly attracted and repulsed by its nearest neighbors, whereas at high temperatures, it is influenced by samples in a larger radius around it.\n\nMotion Weighting. We apply motion weighting to put a higher weight on the drifting loss at spatial locations with larger motion. Specifically, given a H × W × D feature map, the overall loss is L = Eh,w[ch,w ·ℓh,w], where the expectation is taken over all H ×W spatial locations, ch,w is the weight at location (h, w), and ℓh,w is the individual drifting loss at location (h, w). The default setting is ch,w = 1, which works well for environments without complex backgrounds. When motion weighting is used, the weight is determined by the general formula ch,w = 1 + λ tanh(α · nh,w), where nh,w is the normalized difference between the features of the ground-truth current and future frames, and λ and α are scalars.\n\nFeature Extractor. On the real robot datasets, we compute the drifting loss in (i) the feature space of DINOv3 and (ii) the VAE latent space. The total loss is formed by summing these two components. For DINOv3, we extract features from the output of the 2nd, 5th, and 8th blocks in the DINOv3 ViT- B/16. This feature map is a 16 × 16 grid of 768-dimensional tokens, so we compute 256 separate drifting losses on each of the spatial locations and take their weighted mean to form the overall DINOv3 drifting loss. For the VAE latent space, it forms a 32 × 32 grid of 16-dimensional tokens, so we compute 1024 separate drifting losses on each of the spatial locations and take their weighted mean to form the overall latent drifting loss.\n\nSelf-Forcing. We adopt self-forcing training [53] to improve DriftWorld’s performance on autore- gressive rollouts on the more complex datasets. Specifically, our model training consists of two stages. In the first stage, we always condition DriftWorld on the ground-truth history frames. In the second stage, we initialize from the stage 1 checkpoint, and then we train by letting DriftWorld generate autoregressively, taking its own generated frames (with gradient detached) as input. Each of the nneg generated negative samples continues its own rollout.",
+      "paragraphs": [
+        {
+          "text": "D.1 Details for DriftWorld",
+          "translation": "D.1 DriftWorld 的细节",
+          "plain": ""
+        },
+        {
+          "text": "The hyperparameters of DriftWorld are given in Table 8. Also, in addition to the methods described in the main paper, we apply normalization and multi-temperature aggregation to the drifting field when training DriftWorld.",
+          "translation": "DriftWorld 的超参数在表 8 中给出。此外，除了主论文中描述的方法外，我们在训练 DriftWorld 时对漂移场应用了归一化和多温度聚合。",
+          "plain": "超参数就是模型训练前需要人为设定的参数，比如学习率、批大小等，它们不是模型自己学出来的。表 8 列出了这些设定值。归一化是把数据缩放到一个标准范围，多温度聚合是结合不同温度参数下的结果，温度参数控制着相似度计算的敏感度。"
+        },
+        {
+          "text": "Normalization. To ensure that the drifting field is insensitive to the raw magnitudes and dimen- sionalities of samples in the feature spaces, we apply two normalizations. The base drifting field is computed as Vp,qi(x) = V +",
+          "translation": "归一化。为了确保漂移场对特征空间中样本的原始幅度和维度不敏感，我们应用了两种归一化。基础漂移场计算为 V_{p,q_i}(x) = V^+_p(x) + V^-_{q_i}(x)，其中 V^+_p(x) 和 V^-_{q_i}(x) 分别是正样本和负样本的均值漂移向量。",
+          "plain": "漂移场可以想象成一个力场，它告诉生成的样本 x 应该往哪个方向移动。V^+_p(x) 是来自正样本的“拉力”，V^-_{q_i}(x) 是来自负样本的“推力”，两者相加得到总的移动方向。归一化是为了让这个力场不受样本数值大小和特征数量的影响，就像不管用米还是厘米测量，力的方向应该是一样的。"
+        },
+        {
+          "text": "qi (x), where V +",
+          "translation": "q_i(x)，其中 V^+",
+          "plain": ""
+        },
+        {
+          "text": "p (x) and V −",
+          "translation": "p(x) 和 V^-",
+          "plain": ""
+        },
+        {
+          "text": "qi (x) are the mean-shift vectors",
+          "translation": "q_i(x) 是均值漂移向量",
+          "plain": ""
+        },
+        {
+          "text": "of the positive and negative samples, respectively. Each vector is a kernel-weighted average of the difference between the positive/negative samples and the generated sample x. First, we apply fea- ture normalization so that the kernel takes on a reasonable range of values regardless of the samples’ dimensionality. We divide the samples by their average pairwise distance. The kernel is then com- puted as k(x, y) = exp",
+          "translation": "分别是正样本和负样本的均值漂移向量。每个向量是正/负样本与生成样本 x 之间差异的核加权平均。首先，我们应用特征归一化，使得无论样本的维度如何，核函数都能取到合理的值范围。我们将样本除以其平均成对距离。然后核函数计算为 k(x, y) = exp(-||x-y||^2 / τ)，其中 τ 是温度。",
+          "plain": "核加权平均就像给每个样本的差异赋予一个权重，权重由核函数决定，通常距离越近权重越大。特征归一化是为了避免因为特征维度不同导致核函数值过大或过小，比如把样本除以平均距离，相当于把数据缩放到一个标准尺度。核函数 k(x, y) 衡量两个样本的相似度，温度 τ 控制相似度衰减的快慢：τ 越大，衰减越慢，相似度对距离越不敏感。"
+        },
+        {
+          "text": ", where τ is the temperature. Also, we normalize the drifting field by its magnitude so that multiple drifting fields can be summed together.",
+          "translation": "此外，我们通过其幅度对漂移场进行归一化，以便多个漂移场可以相加在一起。",
+          "plain": "漂移场归一化是指将漂移场向量除以其长度（幅度），使其变成单位向量。这样，当多个漂移场相加时，每个场的影响是等权的，不会因为某个场幅度大而主导结果。就像把不同方向的力都缩放到相同大小，再合成总力。"
+        },
+        {
+          "text": "Multi-Temperature Aggregation. After applying the above normalizations, we aggregate the drift- ing field across multiple kernel temperatures τ. The aggregrated field is ˜V = P",
+          "translation": "多温度聚合。在应用上述归一化之后，我们在多个核温度τ上对漂移场进行聚合。聚合后的场为˜V = P",
+          "plain": "这里说的是把不同“温度”下算出来的漂移场加在一起。温度可以理解成看东西的视野范围：温度低就只看最近的邻居，温度高就看得更远。把多个视野的结果汇总，能得到更全面的信息。"
+        },
+        {
+          "text": "τ ˜Vτ, which we compute the final drifting loss on. The temperature determines which samples y are considered to be close to a given sample x. At low temperatures, a generated sample x is predominantly attracted and repulsed by its nearest neighbors, whereas at high temperatures, it is influenced by samples in a larger radius around it.",
+          "translation": "τ ˜Vτ，我们在此基础上计算最终的漂移损失。温度决定了哪些样本y被认为与给定样本x接近。在低温度下，一个生成样本x主要被其最近的邻居吸引和排斥，而在高温度下，它会受到其周围更大半径内样本的影响。",
+          "plain": "温度就像一个“关注范围”的旋钮。温度调低，样本只跟离自己最近的几个样本较劲，好比只跟同桌比成绩；温度调高，它就会跟周围一大圈样本比较，好比跟全年级比。这样模型既能关注局部细节，又能把握整体分布。"
+        },
+        {
+          "text": "Motion Weighting. We apply motion weighting to put a higher weight on the drifting loss at spatial locations with larger motion. Specifically, given a H × W × D feature map, the overall loss is L = Eh,w[ch,w ·ℓh,w], where the expectation is taken over all H ×W spatial locations, ch,w is the weight at location (h, w), and ℓh,w is the individual drifting loss at location (h, w). The default setting is ch,w = 1, which works well for environments without complex backgrounds. When motion weighting is used, the weight is determined by the general formula ch,w = 1 + λ tanh(α · nh,w), where nh,w is the normalized difference between the features of the ground-truth current and future frames, and λ and α are scalars.",
+          "translation": "运动加权。我们应用运动加权，对运动较大的空间位置上的漂移损失赋予更高的权重。具体来说，给定一个H × W × D的特征图，总损失为L = Eh,w[ch,w ·ℓh,w]，其中期望是对所有H ×W个空间位置取的，ch,w是位置(h, w)处的权重，ℓh,w是位置(h, w)处的单个漂移损失。默认设置为ch,w = 1，这在没有复杂背景的环境中效果很好。当使用运动加权时，权重由通用公式ch,w = 1 + λ tanh(α · nh,w)确定，其中nh,w是真实当前帧与未来帧特征之间的归一化差异，λ和α是标量。",
+          "plain": "这段是说：画面里动得厉害的地方，我们更在意它预测得准不准，所以给它更大的权重。就像看足球比赛，球和球员在动的地方才是重点，静止的草地背景没那么重要。公式里的tanh是一个把数值压到-1到1之间的函数，保证权重不会太夸张；λ和α是调节这个加权强弱的旋钮。nh,w衡量的是某个位置“动了多少”，动得越多，权重越大。"
+        },
+        {
+          "text": "Feature Extractor. On the real robot datasets, we compute the drifting loss in (i) the feature space of DINOv3 and (ii) the VAE latent space. The total loss is formed by summing these two components. For DINOv3, we extract features from the output of the 2nd, 5th, and 8th blocks in the DINOv3 ViT- B/16. This feature map is a 16 × 16 grid of 768-dimensional tokens, so we compute 256 separate drifting losses on each of the spatial locations and take their weighted mean to form the overall DINOv3 drifting loss. For the VAE latent space, it forms a 32 × 32 grid of 16-dimensional tokens, so we compute 1024 separate drifting losses on each of the spatial locations and take their weighted mean to form the overall latent drifting loss.",
+          "translation": "特征提取器。在真实机器人数据集上，我们在(i) DINOv3的特征空间和(ii) VAE潜空间中计算漂移损失。总损失由这两部分相加而成。对于DINOv3，我们从DINOv3 ViT-B/16中第2、第5和第8个模块的输出提取特征。该特征图是一个16 × 16的网格，每个token是768维的，因此我们在每个空间位置上计算256个独立的漂移损失，并取它们的加权平均来构成总的DINOv3漂移损失。对于VAE潜空间，它形成一个32 × 32的网格，每个token是16维的，因此我们在每个空间位置上计算1024个独立的漂移损失，并取它们的加权平均来构成总的潜空间漂移损失。",
+          "plain": "这里讲模型从两个地方“看”图像特征：一个是DINOv3（一个预训练视觉模型），另一个是VAE的潜空间（压缩后的图像表示）。DINOv3把图像切成16×16=256个小块，每块用一个768维的向量描述；VAE潜空间切成32×32=1024个小块，每块16维。模型在每个小块上都算一次漂移损失，最后加权平均。就像检查一幅画，既看整体构图（DINOv3），也看细节笔触（VAE潜空间）。"
+        },
+        {
+          "text": "Self-Forcing. We adopt self-forcing training [53] to improve DriftWorld’s performance on autore- gressive rollouts on the more complex datasets. Specifically, our model training consists of two stages. In the first stage, we always condition DriftWorld on the ground-truth history frames. In the second stage, we initialize from the stage 1 checkpoint, and then we train by letting DriftWorld generate autoregressively, taking its own generated frames (with gradient detached) as input. Each of the nneg generated negative samples continues its own rollout.",
+          "translation": "自强制训练。我们采用自强制训练[53]来提升DriftWorld在更复杂数据集上自回归展开的性能。具体来说，我们的模型训练包含两个阶段。在第一阶段，我们总是让DriftWorld以真实的历史帧为条件。在第二阶段，我们从第一阶段的检查点初始化，然后通过让DriftWorld自回归生成来训练，把它自己生成的帧（梯度已分离）作为输入。nneg个生成的负样本中的每一个都继续各自的展开。",
+          "plain": "自强制训练是为了解决“训练时看标准答案，考试时只能看自己”的问题。第一阶段模型总看真实历史帧，像开卷考试；第二阶段让它用自己生成的帧继续往下推，像闭卷考试，逼它适应自己的错误。梯度分离的意思是：生成帧虽然被用作输入，但不会通过它去更新生成过程本身，避免训练不稳定。负样本就是用来对比、让模型学会区分好坏的那些生成结果。"
+        }
+      ],
+      "bold": [
+        "Generated Frames",
+        "Comparison",
+        "DriftWorld’s",
+        "generated",
+        "videos",
+        "Bridge-V2",
+        "under",
+        "different"
+      ],
+      "explanation": "列出 DriftWorld 的超参数和训练细节。",
+      "start_page": 17,
+      "end_page": 19,
+      "bold_notes": [
+        {
+          "term": "Generated Frames",
+          "explanation": ""
+        },
+        {
+          "term": "Comparison",
+          "explanation": ""
+        },
+        {
+          "term": "DriftWorld’s",
+          "explanation": ""
+        },
+        {
+          "term": "generated",
+          "explanation": ""
+        },
+        {
+          "term": "videos",
+          "explanation": ""
+        },
+        {
+          "term": "Bridge-V2",
+          "explanation": ""
+        },
+        {
+          "term": "under",
+          "explanation": ""
+        },
+        {
+          "term": "different",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Details for Inference-Time Policy Improvement in DriftWorld",
+      "number": "D.2",
+      "heading_y": 74.31652069091797,
+      "text": "D.2 Details for Inference-Time Policy Improvement in DriftWorld\n\nThe following are additional details about inference-time policy improvement in DriftWorld via GPC-RANK [5].\n\nDiffusion policy. The policy we used is diffusion policy [13], which outputs an action chunk at:t+T given the history of visual observations ot−H:t. We follow the standard settings of an observation horizon of H = 2, a prediction horizon of T = 16, and an action horizon of 9, with control executed in a receding horizon manner. The diffusion policy uses a ResNet18 visual encoder and a U-Net diffusion backbone to model the distribution of actions. The policy is trained using the DDPM formulation [54], and it uses 100 diffusion denoising steps at inference. In the GPC-RANK table (Table 4), policy 1 is the checkpoint from [5], and we trained policy 2 using the same code.\n\nReward predictor. After rolling out the action proposals in DriftWorld, we need to rank the action proposals from best to worst. To do so, we use a reward predictor to estimate the distance between the T block and the target from the future visual frames. Following [5], we use two ResNet18 networks to estimate the block’s spatial position (x, y) and orientation (cos θ, sin θ). Using this estimated pose alongside the target pose, we compute the coordinates of the block’s eight corner vertices under both configurations. The final reward is 0.01 times the sum of the Euclidean distances between these corresponding sets of vertices. Hence, a smaller reward indicates closer alignment, and a reward of zero indicates a perfect match between the block and the target.",
+      "paragraphs": [
+        {
+          "text": "D.2 Details for Inference-Time Policy Improvement in DriftWorld",
+          "translation": "D.2 DriftWorld中推理时策略改进的细节",
+          "plain": ""
+        },
+        {
+          "text": "The following are additional details about inference-time policy improvement in DriftWorld via GPC-RANK [5].",
+          "translation": "以下是关于通过GPC-RANK [5]在DriftWorld中进行推理时策略改进的额外细节。",
+          "plain": ""
+        },
+        {
+          "text": "Diffusion policy. The policy we used is diffusion policy [13], which outputs an action chunk at:t+T given the history of visual observations ot−H:t. We follow the standard settings of an observation horizon of H = 2, a prediction horizon of T = 16, and an action horizon of 9, with control executed in a receding horizon manner. The diffusion policy uses a ResNet18 visual encoder and a U-Net diffusion backbone to model the distribution of actions. The policy is trained using the DDPM formulation [54], and it uses 100 diffusion denoising steps at inference. In the GPC-RANK table (Table 4), policy 1 is the checkpoint from [5], and we trained policy 2 using the same code.",
+          "translation": "扩散策略。我们使用的策略是扩散策略[13]，它根据视觉观测历史ot−H:t输出一个动作块at:t+T。我们遵循标准设置：观测视野H = 2，预测视野T = 16，动作视野为9，并以滚动视野的方式执行控制。扩散策略使用ResNet18视觉编码器和U-Net扩散主干来建模动作分布。该策略使用DDPM公式[54]训练，推理时使用100步扩散去噪。在GPC-RANK表（表4）中，策略1是来自[5]的检查点，我们使用相同的代码训练了策略2。",
+          "plain": "扩散策略是一种生成动作的方法，思路类似“从噪声中一步步去噪还原出合理动作”。它看最近2帧画面（H=2），一次预测未来16步的动作（T=16），但只执行前9步（动作视野9），然后重新观察再预测，这叫滚动视野，就像开车时不断根据最新路况微调方向。DDPM是扩散模型的经典训练方式，100步去噪就是推理时反复擦除噪声100次。"
+        },
+        {
+          "text": "Reward predictor. After rolling out the action proposals in DriftWorld, we need to rank the action proposals from best to worst. To do so, we use a reward predictor to estimate the distance between the T block and the target from the future visual frames. Following [5], we use two ResNet18 networks to estimate the block’s spatial position (x, y) and orientation (cos θ, sin θ). Using this estimated pose alongside the target pose, we compute the coordinates of the block’s eight corner vertices under both configurations. The final reward is 0.01 times the sum of the Euclidean distances between these corresponding sets of vertices. Hence, a smaller reward indicates closer alignment, and a reward of zero indicates a perfect match between the block and the target.",
+          "translation": "奖励预测器。在DriftWorld中展开动作提议后，我们需要将动作提议从最好到最差排序。为此，我们使用奖励预测器来估计T形块与未来视觉帧中目标之间的距离。遵循[5]，我们使用两个ResNet18网络来估计块的空间位置(x, y)和朝向(cos θ, sin θ)。利用这个估计的姿态以及目标姿态，我们计算块在两种配置下八个角顶点的坐标。最终奖励是这些对应顶点集合之间欧氏距离之和的0.01倍。因此，奖励越小表示对齐越接近，奖励为零表示块与目标完美匹配。",
+          "plain": "奖励预测器就像一个裁判，给每个动作方案打分。它先估计方块现在在哪、朝哪个方向，再和目标位置比较。比较的方法是看方块的八个角分别差多远，把这些距离加起来，乘0.01就是奖励。距离和越小说明方块越接近目标，奖励越小；完全重合时奖励为0。就像拼图，每块拼图离正确位置越近，得分越好。"
+        }
+      ],
+      "bold": [
+        "Details for Inference-Time Policy Improvement in DriftWorld",
+        "Diffusion policy.",
+        "Reward predictor.",
+        "Details for Policy Evaluation in DriftWorld",
+        "Policies evaluated.",
+        "Post-training on failure demonstrations."
+      ],
+      "explanation": "补充推理时策略改进的具体做法，例如使用的扩散策略和排序方法。",
+      "start_page": 19,
+      "end_page": 19,
+      "bold_notes": [
+        {
+          "term": "Details for Inference-Time Policy Improvement in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Diffusion policy.",
+          "explanation": ""
+        },
+        {
+          "term": "Reward predictor.",
+          "explanation": ""
+        },
+        {
+          "term": "Details for Policy Evaluation in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Policies evaluated.",
+          "explanation": ""
+        },
+        {
+          "term": "Post-training on failure demonstrations.",
+          "explanation": ""
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "heading": "Details for Policy Evaluation in DriftWorld",
+      "number": "D.3",
+      "heading_y": 322.03765869140625,
+      "text": "D.3 Details for Policy Evaluation in DriftWorld\n\nPolicies evaluated. For Push-T, we take six checkpoints of the diffusion policy at epochs 50, 100, ..., 300, as well as a longer-trained checkpoint at epoch 650. For the Robomimic Lift task, we take nine checkpoints of the diffusion policy at epochs 2, 4, 6, ..., and 18, respectively. For the Robomimic Can task, we take nine checkpoints of the diffusion policy at epochs 50, 100, ..., and 400, as well as epoch 75.\n\nPost-training on failure demonstrations. For the Robomimic Lift and Can tasks, DriftWorld and the baselines are initially trained on the multi-human dataset [14], which contains only successful demonstrations. Since these initial models provide overly optimistic estimates of policy success rates, we post-train the models on a dataset with a large percentage of failure demonstrations, which is created by rolling out early checkpoints of a diffusion policy. This post-training enables the models to accurately simulate failures.",
+      "paragraphs": [
+        {
+          "text": "D.3 Details for Policy Evaluation in DriftWorld",
+          "translation": "D.3 DriftWorld中策略评估的细节",
+          "plain": ""
+        },
+        {
+          "text": "Policies evaluated. For Push-T, we take six checkpoints of the diffusion policy at epochs 50, 100, ..., 300, as well as a longer-trained checkpoint at epoch 650. For the Robomimic Lift task, we take nine checkpoints of the diffusion policy at epochs 2, 4, 6, ..., and 18, respectively. For the Robomimic Can task, we take nine checkpoints of the diffusion policy at epochs 50, 100, ..., and 400, as well as epoch 75.",
+          "translation": "评估的策略。对于Push-T任务，我们选取了扩散策略在训练第50、100、……、300轮时的六个检查点，以及一个训练更久的第650轮检查点。对于Robomimic Lift任务，我们分别选取了扩散策略在训练第2、4、6、……、18轮时的九个检查点。对于Robomimic Can任务，我们选取了扩散策略在训练第50、100、……、400轮时的九个检查点，以及第75轮的检查点。",
+          "plain": "这里说的“检查点”就像游戏存档：模型训练不是一口气练到完美，而是每隔一段时间存一个档。研究者拿不同训练阶段的存档来测试，看看模型在不同熟练度下的表现。比如Push-T任务，他们从第50轮到第650轮共取了7个存档；Lift任务取了9个早期存档（第2轮到第18轮）；Can任务取了10个存档（第50轮到第400轮，外加第75轮）。这样做的目的是全面评估方法在不同训练水平下的效果。"
+        },
+        {
+          "text": "Post-training on failure demonstrations. For the Robomimic Lift and Can tasks, DriftWorld and the baselines are initially trained on the multi-human dataset [14], which contains only successful demonstrations. Since these initial models provide overly optimistic estimates of policy success rates, we post-train the models on a dataset with a large percentage of failure demonstrations, which is created by rolling out early checkpoints of a diffusion policy. This post-training enables the models to accurately simulate failures.",
+          "translation": "在失败演示上进行后训练。对于Robomimic Lift和Can任务，DriftWorld和基线方法最初是在多人类数据集[14]上训练的，该数据集只包含成功的演示。由于这些初始模型对策略成功率的估计过于乐观，我们在一个包含大量失败演示的数据集上对模型进行后训练，该数据集是通过运行扩散策略的早期检查点生成的。这种后训练使模型能够准确地模拟失败情况。",
+          "plain": "想象你教一个AI看别人做菜，但只给它看成功的视频，它就会以为做菜很容易，总是成功。这里的问题一样：模型只在成功案例上训练，就会高估成功率，以为策略很厉害。为了解决这个问题，研究者让一个还不太熟练的早期模型去尝试任务，收集它失败的过程（比如菜炒糊了、盐放多了），然后用这些失败案例对模型进行“补课”。这样模型就能学会识别和模拟失败，预测更准确。"
+        }
+      ],
+      "bold": [
+        "Details for Inference-Time Policy Improvement in DriftWorld",
+        "Diffusion policy.",
+        "Reward predictor.",
+        "Details for Policy Evaluation in DriftWorld",
+        "Policies evaluated.",
+        "Post-training on failure demonstrations."
+      ],
+      "explanation": "补充策略评估实验的细节，例如评估了哪些策略检查点。",
+      "start_page": 19,
+      "end_page": 20,
+      "bold_notes": [
+        {
+          "term": "Details for Inference-Time Policy Improvement in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Diffusion policy.",
+          "explanation": ""
+        },
+        {
+          "term": "Reward predictor.",
+          "explanation": ""
+        },
+        {
+          "term": "Details for Policy Evaluation in DriftWorld",
+          "explanation": ""
+        },
+        {
+          "term": "Policies evaluated.",
+          "explanation": ""
+        },
+        {
+          "term": "Post-training on failure demonstrations.",
+          "explanation": ""
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "index": 1,
+      "page": 2,
+      "file": "tables/table_1.png",
+      "y": 25.034358978271484,
+      "section": 0
+    },
+    {
+      "index": 2,
+      "page": 3,
+      "file": "tables/table_2.png",
+      "y": 574.31396484375,
+      "section": 3
+    },
+    {
+      "index": 3,
+      "page": 4,
+      "file": "tables/table_3.png",
+      "y": 485.64703369140625,
+      "section": 5
+    },
+    {
+      "index": 4,
+      "page": 6,
+      "file": "tables/table_4.png",
+      "y": 75.93363189697266,
+      "section": 6
+    },
+    {
+      "index": 5,
+      "page": 6,
+      "file": "tables/table_5.png",
+      "y": 604.4544067382812,
+      "section": 8
+    },
+    {
+      "index": 6,
+      "page": 7,
+      "file": "tables/table_6.png",
+      "y": 75.71782684326172,
+      "section": 9
+    },
+    {
+      "index": 7,
+      "page": 7,
+      "file": "tables/table_7.png",
+      "y": 75.71782684326172,
+      "section": 9
+    },
+    {
+      "index": 8,
+      "page": 9,
+      "file": "tables/table_8.png",
+      "y": 133.7845001220703,
+      "section": 11
+    },
+    {
+      "index": 9,
+      "page": 9,
+      "file": "tables/table_9.png",
+      "y": 465.5934753417969,
+      "section": 12
+    },
+    {
+      "index": 10,
+      "page": 9,
+      "file": "tables/table_10.png",
+      "y": 465.5934753417969,
+      "section": 12
+    },
+    {
+      "index": 11,
+      "page": 9,
+      "file": "tables/table_11.png",
+      "y": 465.5934753417969,
+      "section": 12
+    },
+    {
+      "index": 12,
+      "page": 10,
+      "file": "tables/table_12.png",
+      "y": 75.93363189697266,
+      "section": 12
+    },
+    {
+      "index": 13,
+      "page": 16,
+      "file": "tables/table_13.png",
+      "y": 603.4204711914062,
+      "section": 18
+    },
+    {
+      "index": 14,
+      "page": 17,
+      "file": "tables/table_14.png",
+      "y": 364.1554870605469,
+      "section": 20
+    },
+    {
+      "index": 15,
+      "page": 19,
+      "file": "tables/table_15.png",
+      "y": 75.81147766113281,
+      "section": 24
+    }
+  ],
+  "figures": [
+    {
+      "index": 1,
+      "number": 2,
+      "page": 5,
+      "file": "figures/fig_1.jpeg",
+      "caption": "Figure 2: Drifting Architecture and Training Overview. (a) We use a U-Net architecture conditioned on history observations and robot actions. (b) DriftWorld is trained using a drifting loss, which is a contrastive loss that encourages the generated f",
+      "y": 71.99783325195312,
+      "section": 6,
+      "explanation": "这张图展示 DriftWorld 的整体结构和训练方式：左边是 U-Net 接收历史画面和动作，右边用“漂移损失”这种对比学习方式，让生成的未来帧靠近真实未来、远离错误未来。"
+    },
+    {
+      "index": 2,
+      "number": 3,
+      "page": 6,
+      "file": "figures/fig_2.png",
+      "caption": "Figure 3: Comparison of different world models’ rollouts for Push-T. The first row is the ground truth, and the remaining three rows are autoregressively generated rollouts with a length of 140 frames. DriftWorld’s rollout matches the ground truth. I",
+      "y": 177.6088409423828,
+      "section": 9,
+      "explanation": "这张图对比 Push-T 任务中不同世界模型生成的推演视频：第一行是真实情况，后面几行是模型自己“想象”的 140 帧。DriftWorld 的想象和真实最接近。"
+    },
+    {
+      "index": 3,
+      "number": 3,
+      "page": 6,
+      "file": "figures/fig_3.png",
+      "caption": "Figure 3: Comparison of different world models’ rollouts for Push-T. The first row is the ground truth, and the remaining three rows are autoregressively generated rollouts with a length of 140 frames. DriftWorld’s rollout matches the ground truth. I",
+      "y": 212.22088623046875,
+      "section": 9,
+      "explanation": "这是 Push-T 对比图的另一部分，继续展示不同模型在长时间推演中的表现差异，帮助读者看出谁更稳定。"
+    },
+    {
+      "index": 4,
+      "number": 3,
+      "page": 6,
+      "file": "figures/fig_4.png",
+      "caption": "Figure 3: Comparison of different world models’ rollouts for Push-T. The first row is the ground truth, and the remaining three rows are autoregressively generated rollouts with a length of 140 frames. DriftWorld’s rollout matches the ground truth. I",
+      "y": 246.8329315185547,
+      "section": 9,
+      "explanation": "同样是 Push-T 推演对比，进一步说明 DriftWorld 在物体位置和接触细节上更贴近真实。"
+    },
+    {
+      "index": 5,
+      "number": 3,
+      "page": 6,
+      "file": "figures/fig_5.png",
+      "caption": "Figure 3: Comparison of different world models’ rollouts for Push-T. The first row is the ground truth, and the remaining three rows are autoregressively generated rollouts with a length of 140 frames. DriftWorld’s rollout matches the ground truth. I",
+      "y": 281.44500732421875,
+      "section": 9,
+      "explanation": "Push-T 推演对比的最后部分，整体说明 DriftWorld 在长序列生成中不容易跑偏。"
+    },
+    {
+      "index": 6,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_6.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 254.92385864257812,
+      "section": 10,
+      "explanation": "这张图对比 Bridge-V2 任务中不同模型的推演：第一行是真实画面，后面是生成画面。DriftWorld 能准确模拟机械爪与黄瓜的接触和移动。"
+    },
+    {
+      "index": 7,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_7.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 254.92385864257812,
+      "section": 10,
+      "explanation": "Bridge-V2 对比图的另一部分，展示机械爪抓取物体过程中各模型的细节差异。"
+    },
+    {
+      "index": 8,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_8.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 298.927734375,
+      "section": 10,
+      "explanation": "Bridge-V2 对比图的最后部分，说明 DriftWorld 在真实厨房场景中也能生成连贯、合理的未来画面。"
+    },
+    {
+      "index": 9,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_9.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 298.927734375,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 10,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_10.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 342.7152404785156,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 11,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_11.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 342.7152404785156,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 12,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_12.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 386.28643798828125,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 13,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_13.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 386.5027770996094,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 14,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_14.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 500.6348571777344,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 15,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_15.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 500.6348571777344,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 16,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_16.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 544.6387329101562,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 17,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_17.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 544.6387329101562,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 18,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_18.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 588.42626953125,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 19,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_19.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 588.42626953125,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 20,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_20.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 631.9974365234375,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 21,
+      "number": 4,
+      "page": 8,
+      "file": "figures/fig_21.png",
+      "caption": "Figure 4: Comparison of different world models’ rollouts for Bridge-V2. The first row is the ground truth, and the remaining rows are generated rollouts. DriftWorld accurately simulates contact interactions of the robot gripper with the cucumber, pla",
+      "y": 632.2137451171875,
+      "section": 10,
+      "explanation": ""
+    },
+    {
+      "index": 22,
+      "number": 6,
+      "page": 9,
+      "file": "figures/fig_22.png",
+      "caption": "Figure 6: Policy Evaluation. On the Lift, Can, and Push-T tasks, DriftWorld achieves a higher correlation coefficient between predicted and ground-truth values of the success rates or IoU scores than the baseline. 9",
+      "y": 540.9915771484375,
+      "section": 12,
+      "explanation": ""
+    },
+    {
+      "index": 23,
+      "number": 6,
+      "page": 9,
+      "file": "figures/fig_23.png",
+      "caption": "Figure 6: Policy Evaluation. On the Lift, Can, and Push-T tasks, DriftWorld achieves a higher correlation coefficient between predicted and ground-truth values of the success rates or IoU scores than the baseline. 9",
+      "y": 623.581787109375,
+      "section": 12,
+      "explanation": ""
+    },
+    {
+      "index": 24,
+      "number": 7,
+      "page": 10,
+      "file": "figures/fig_24.png",
+      "caption": "Figure 7: Visualization of ablation on fea- ture space. With the DINOv2 or DINOv3 feature extractor, the generated robot gripper is sharp. Without any features, the gripper is blurry. Ablation on feature space. The representation space in which the d",
+      "y": 220.92279052734375,
+      "section": 13,
+      "explanation": ""
+    },
+    {
+      "index": 25,
+      "number": 7,
+      "page": 10,
+      "file": "figures/fig_25.png",
+      "caption": "Figure 7: Visualization of ablation on fea- ture space. With the DINOv2 or DINOv3 feature extractor, the generated robot gripper is sharp. Without any features, the gripper is blurry. Ablation on feature space. The representation space in which the d",
+      "y": 268.13525390625,
+      "section": 13,
+      "explanation": ""
+    },
+    {
+      "index": 26,
+      "number": 7,
+      "page": 10,
+      "file": "figures/fig_26.png",
+      "caption": "Figure 7: Visualization of ablation on fea- ture space. With the DINOv2 or DINOv3 feature extractor, the generated robot gripper is sharp. Without any features, the gripper is blurry. Ablation on feature space. The representation space in which the d",
+      "y": 315.3476867675781,
+      "section": 13,
+      "explanation": ""
+    },
+    {
+      "index": 27,
+      "number": 8,
+      "page": 15,
+      "file": "figures/fig_27.png",
+      "caption": "Figure 8: Comparison of videos generated by DriftWorld vs. baselines on Language Table. GT WorldGym IRASim DriftWorld (Ours) Figure 9: Comparison of videos generated by DriftWorld vs. baselines on Bridge-V2. 15",
+      "y": 261.74432373046875,
+      "section": 16,
+      "explanation": ""
+    },
+    {
+      "index": 28,
+      "number": 8,
+      "page": 15,
+      "file": "figures/fig_28.png",
+      "caption": "Figure 8: Comparison of videos generated by DriftWorld vs. baselines on Language Table. GT WorldGym IRASim DriftWorld (Ours) Figure 9: Comparison of videos generated by DriftWorld vs. baselines on Bridge-V2. 15",
+      "y": 261.74432373046875,
+      "section": 16,
+      "explanation": ""
+    },
+    {
+      "index": 29,
+      "number": 8,
+      "page": 15,
+      "file": "figures/fig_29.png",
+      "caption": "Figure 8: Comparison of videos generated by DriftWorld vs. baselines on Language Table. GT WorldGym IRASim DriftWorld (Ours) Figure 9: Comparison of videos generated by DriftWorld vs. baselines on Bridge-V2. 15",
+      "y": 305.46337890625,
+      "section": 16,
+      "explanation": ""
+    },
+    {
+      "index": 30,
+      "number": 8,
+      "page": 15,
+      "file": "figures/fig_30.png",
+      "caption": "Figure 8: Comparison of videos generated by DriftWorld vs. baselines on Language Table. GT WorldGym IRASim DriftWorld (Ours) Figure 9: Comparison of videos generated by DriftWorld vs. baselines on Bridge-V2. 15",
+      "y": 305.46337890625,
+      "section": 16,
+      "explanation": ""
+    }
+  ],
+  "charts": [
+    {
+      "type": "bar",
+      "title": "不同世界模型的平均推理速度对比（相对值）",
+      "labels": [
+        "DriftWorld",
+        "扩散基线"
+      ],
+      "values": [
+        17,
+        1
+      ],
+      "note": "柱状图直观显示：DriftWorld 平均比扩散基线快 17 倍，扩散基线设为 1 作为参照。",
+      "section": 0,
+      "location": "1 Introduction"
+    },
+    {
+      "type": "line",
+      "title": "DriftWorld 生成速度与实时帧率要求",
+      "labels": [
+        "DriftWorld 帧率",
+        "实时控制参考线"
+      ],
+      "values": [
+        30,
+        30
+      ],
+      "note": "折线图用两条线表示 DriftWorld 达到每秒 30 帧以上，刚好满足实时控制的需求，说明它足够快。",
+      "section": -1,
+      "location": ""
+    },
+    {
+      "type": "pie",
+      "title": "扩散世界模型推演耗时占决策周期的比例",
+      "labels": [
+        "推演耗时",
+        "其他耗时"
+      ],
+      "values": [
+        92,
+        8
+      ],
+      "note": "饼图显示扩散世界模型的推演占用了 90% 到 95% 的运行时间，取中间值约 92%，说明慢的根源就在推演。",
+      "section": -1,
+      "location": ""
+    },
+    {
+      "type": "bar",
+      "title": "DriftWorld 离线模拟器评分与真实表现的相关性",
+      "labels": [
+        "最高相关性",
+        "其余情况"
+      ],
+      "values": [
+        0.99,
+        0.01
+      ],
+      "note": "柱状图突出 DriftWorld 作为离线模拟器时，其评分与真实策略表现的相关性最高可达 0.99，说明预测非常可靠。",
+      "section": -1,
+      "location": ""
+    }
+  ],
+  "references": [
+    {
+      "id": "[1]",
+      "text": "S. Yang, Y. Du, S. K. S. Ghasemipour, J. Tompson, L. P. Kaelbling, D. Schuurmans, and P. Abbeel. Learning interactive real-world simulators. In The Twelfth International Conference on Learning Representations, 2024."
+    },
+    {
+      "id": "[2]",
+      "text": "F. Zhu, H. Wu, S. Guo, Y. Liu, C. Cheang, and T. Kong. IraSim: A fine-grained world model for robot manipulation. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages 9834–9844, 2025."
+    },
+    {
+      "id": "[3]",
+      "text": "Y. Guo, L. X. Shi, J. Chen, and C. Finn. Ctrl-World: A controllable generative world model for robot manipulation. In ICLR, 2026."
+    },
+    {
+      "id": "[4]",
+      "text": "Y. Du, S. Yang, P. Florence, F. Xia, A. Wahid, P. Sermanet, T. Yu, P. Abbeel, J. B. Tenen- baum, L. Kaelbling, et al. Video language planning. In International Conference on Learning Representations, volume 2024, pages 31138–31155, 2024."
+    },
+    {
+      "id": "[5]",
+      "text": "H. Qi, H. Yin, A. Zhu, Y. Du, and H. Yang. Inference-time enhancement of generative robot policies via predictive world modeling. IEEE Robotics and Automation Letters, 2026."
+    },
+    {
+      "id": "[6]",
+      "text": "M. Deng, H. Li, T. Li, Y. Du, and K. He. Generative modeling via drifting. arXiv preprint arXiv:2602.04770, 2026."
+    },
+    {
+      "id": "[7]",
+      "text": "M. Oquab, T. Darcet, T. Moutakanni, H. Vo, M. Szafraniec, V. Khalidov, P. Fernandez, D. Haz- iza, F. Massa, A. El-Nouby, et al. Dinov2: Learning robust visual features without supervision. arXiv preprint arXiv:2304.07193, 2023."
+    },
+    {
+      "id": "[8]",
+      "text": "O. Sim´eoni, H. V. Vo, M. Seitzer, F. Baldassarre, M. Oquab, C. Jose, V. Khalidov, M. Szafraniec, S. Yi, M. Ramamonjisoa, et al. DINOv3. arXiv preprint arXiv:2508.10104, 2025."
+    },
+    {
+      "id": "[9]",
+      "text": "H. R. Walke, K. Black, T. Z. Zhao, Q. Vuong, C. Zheng, P. Hansen-Estruch, A. W. He, V. My- ers, M. J. Kim, M. Du, et al. BridgeData V2: A dataset for robot learning at scale. In Confer- ence on Robot Learning, pages 1723–1736. PMLR, 2023."
+    },
+    {
+      "id": "[10]",
+      "text": "A. Brohan, N. Brown, J. Carbajal, Y. Chebotar, J. Dabis, C. Finn, K. Gopalakrishnan, K. Haus- man, A. Herzog, J. Hsu, J. Ibarz, B. Ichter, A. Irpan, T. Jackson, S. Jesmonth, N. Joshi, R. Ju- lian, D. Kalashnikov, Y. Kuang, I. Leal, K.-H. Lee, S. Levine, Y. Lu, U. Malla, D. Manjunath, I. Mordatch, O. Nachum, C. Parada, J. Peralta, E. Perez, K. Pertsch, J. Quiambao, K. Rao, M. Ryoo, G. Salazar, P. Sanketi, K. Sayed, J. Singh, S. Sontakke, A. Stone, C. Tan, H. Tran, V. Vanhoucke, S. Vega, Q. Vuong, F. Xia, T. Xiao, P. Xu, S. Xu, T. Yu, and B. Zitkovich. Rt- 1: Robotics transformer for real-world"
+    },
+    {
+      "id": "[11]",
+      "text": "C. Lynch, A. Wahid, J. Tompson, T. Ding, J. Betker, R. Baruch, T. Armstrong, and P. Florence. Interactive language: Talking to robots in real time. IEEE Robotics and Automation Letters, 2023."
+    },
+    {
+      "id": "[12]",
+      "text": "P. Florence, C. Lynch, A. Zeng, O. A. Ramirez, A. Wahid, L. Downs, A. Wong, J. Lee, I. Mor- datch, and J. Tompson. Implicit behavioral cloning. In Conference on robot learning, pages 158–168. PMLR, 2022."
+    },
+    {
+      "id": "[13]",
+      "text": "C. Chi, Z. Xu, S. Feng, E. Cousineau, Y. Du, B. Burchfiel, R. Tedrake, and S. Song. Diffusion policy: Visuomotor policy learning via action diffusion. The International Journal of Robotics Research, 44(10-11):1684–1704, 2025."
+    },
+    {
+      "id": "[14]",
+      "text": "A. Mandlekar, D. Xu, J. Wong, S. Nasiriany, C. Wang, R. Kulkarni, L. Fei-Fei, S. Savarese, Y. Zhu, and R. Mart´ın-Mart´ın. What matters in learning from offline human demonstrations for robot manipulation. arXiv preprint arXiv:2108.03298, 2021. 11"
+    },
+    {
+      "id": "[15]",
+      "text": "D. Ha and J. Schmidhuber. World models. arXiv preprint arXiv:1803.10122, 2018."
+    },
+    {
+      "id": "[16]",
+      "text": "D. Hafner, T. Lillicrap, J. Ba, and M. Norouzi. Dream to control: Learning behaviors by latent imagination. arXiv preprint arXiv:1912.01603, 2019."
+    },
+    {
+      "id": "[17]",
+      "text": "T. Lozano-Perez. Robot programming. Proceedings of the IEEE, 71(7):821–841, 1983."
+    },
+    {
+      "id": "[18]",
+      "text": "B. Hou, G. Li, J. Jia, T. An, X. Guo, S. Leng, H. Geng, Y. Ze, T. Harada, P. Torr, et al. World model for robot learning: A comprehensive survey. arXiv preprint arXiv:2605.00080, 2026."
+    },
+    {
+      "id": "[19]",
+      "text": "H. Chen, Y. Niu, K. Hong, S. Liu, Y. Wang, Y. Li, and K. R. Driggs-Campbell. Predicting object interactions with behavior primitives: An application in stowing tasks. In 7th Annual Conference on Robot Learning, 2023."
+    },
+    {
+      "id": "[20]",
+      "text": "K. Hong, H. Chen, J. Xu, R. Wang, K. Wang, M. Zhang, S. Liu, Y. Zhu, Y. Li, and K. Driggs- Campbell. Gotta Scoop ’Em All: Sim-and-Real Co-Training of Graph-Based Neural Dynamics for Long-Horizon Scooping. In IEEE International Conference on Robotics and Automation (ICRA), 2026. To appear."
+    },
+    {
+      "id": "[21]",
+      "text": "A. Hu, L. Russell, H. Yeo, Z. Murez, G. Fedoseev, A. Kendall, J. Shotton, and G. Corrado. Gaia-1: A generative world model for autonomous driving, 2023."
+    },
+    {
+      "id": "[22]",
+      "text": "J. Bruce, M. Dennis, A. Edwards, J. Parker-Holder, Y. Shi, E. Hughes, M. Lai, A. Mavalankar, R. Steigerwald, C. Apps, Y. Aytar, S. Bechtle, F. Behbahani, S. Chan, N. Heess, L. Gonzalez, S. Osindero, S. Ozair, S. Reed, J. Zhang, K. Zolna, J. Clune, N. de Freitas, S. Singh, and T. Rockt¨aschel. Genie: Generative interactive environments. In International Conference on Machine Learning, 2024."
+    },
+    {
+      "id": "[23]",
+      "text": "NVIDIA. Cosmos World Foundation Model Platform for Physical AI, 2025."
+    },
+    {
+      "id": "[24]",
+      "text": "B. Chen, T. Zhang, H. Geng, C. Zhang, P. Li, K. Song, W. T. Freeman, J. Malik, P. Abbeel, R. Tedrake, et al. Large video planner enables generalizable robot control. arXiv preprint arXiv:2512.15840, 2025."
+    },
+    {
+      "id": "[25]",
+      "text": "H. He, Y. Zhang, L. Lin, Z. Xu, and L. Pan. Pre-trained video generative models as world simulators. In Proceedings of the AAAI Conference on Artificial Intelligence, 2026."
+    },
+    {
+      "id": "[26]",
+      "text": "M. Rigter, T. Gupta, A. Hilmkil, and C. Ma. AVID: Adapting video diffusion models to world models. Reinforcement Learning Journal, 6:737–764, 2025."
+    },
+    {
+      "id": "[27]",
+      "text": "S. Huang, J. Wu, Q. Zhou, S. Miao, and M. Long. Vid2World: Crafting video diffusion models to interactive world models. In International Conference on Learning Representations (ICLR), 2026."
+    },
+    {
+      "id": "[28]",
+      "text": "G. R. Team, K. Choromanski, C. Devin, Y. Du, D. Dwibedi, R. Gao, A. Jindal, T. Kipf, S. Kir- mani, I. Leal, et al. Evaluating gemini robotics policies in a veo world simulator. arXiv preprint arXiv:2512.10675, 2025."
+    },
+    {
+      "id": "[29]",
+      "text": "C. Zhu, R. Yu, S. Feng, B. Burchfiel, P. Shah, and A. Gupta. Unified world models: Coupling video and action diffusion for pretraining on large robotic datasets. In Proceedings of Robotics: Science and Systems (RSS), 2025."
+    },
+    {
+      "id": "[30]",
+      "text": "J. Quevedo, A. K. Sharma, Y. Sun, V. Suryavanshi, P. Liang, and S. Yang. Worldgym: World model as an environment for policy evaluation. arXiv preprint arXiv:2506.00613, 2025."
+    },
+    {
+      "id": "[31]",
+      "text": "Y. Wang, R. Syed, F. Wu, M. Zhang, A. Onol, J. Barreiros, H. Nayyeri, T. Dear, H. Zhang, and Y. Li. Interactive world simulator for robot policy training and evaluation. In Robotics: Science and Systems (RSS), 2026."
+    },
+    {
+      "id": "[32]",
+      "text": "T. Salimans and J. Ho. Progressive distillation for fast sampling of diffusion models, 2022. 12"
+    },
+    {
+      "id": "[33]",
+      "text": "Y. Song, P. Dhariwal, M. Chen, and I. Sutskever. Consistency models. In ICML, 2023."
+    },
+    {
+      "id": "[34]",
+      "text": "Y. Song and P. Dhariwal. Improved techniques for training consistency models. In Interna- tional Conference on Learning Representations, volume 2024, pages 15078–15097, 2024."
+    },
+    {
+      "id": "[35]",
+      "text": "X. Liu, C. Gong, and Q. Liu. Flow straight and fast: Learning to generate and transfer data with rectified flow. arXiv preprint arXiv:2209.03003, 2022."
+    },
+    {
+      "id": "[36]",
+      "text": "A. Sauer, D. Lorenz, A. Blattmann, and R. Rombach. Adversarial diffusion distillation. In ECCV 2024, page 87–103, 2024."
+    },
+    {
+      "id": "[37]",
+      "text": "R. Gao, K. Chen, B. Xiao, L. Hong, Z. Li, and Q. Xu. MagicDrive-V2: High-resolution long video generation for autonomous driving with adaptive control. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 2025."
+    },
+    {
+      "id": "[38]",
+      "text": "S. Lin and X. Yang. Animatediff-lightning: Cross-model diffusion distillation. arXiv preprint arXiv:2403.12706, 2024."
+    },
+    {
+      "id": "[39]",
+      "text": "N. Hansen, X. Wang, and H. Su. Temporal difference learning for model predictive control. arXiv preprint arXiv:2203.04955, 2022."
+    },
+    {
+      "id": "[40]",
+      "text": "Y. Du, S. Yang, B. Dai, H. Dai, O. Nachum, J. Tenenbaum, D. Schuurmans, and P. Abbeel. Learning universal policies via text-guided video generation. Advances in Neural Information Processing Systems, 36:9156–9172, 2023."
+    },
+    {
+      "id": "[41]",
+      "text": "M. J. Kim, Y. Gao, T.-Y. Lin, Y.-C. Lin, Y. Ge, G. Lam, P. Liang, S. Song, M.-Y. Liu, C. Finn, and J. Gu. Cosmos policy: Fine-tuning video models for visuomotor control and planning. arXiv preprint arXiv:2601.16163, 2026."
+    },
+    {
+      "id": "[42]",
+      "text": "S. Ye, Y. Ge, K. Zheng, S. Gao, S. Yu, G. Kurian, S. Indupuru, Y. L. Tan, C. Zhu, J. Xiang, et al. World action models are zero-shot policies. arXiv preprint arXiv:2602.15922, 2026."
+    },
+    {
+      "id": "[43]",
+      "text": "P.-C. Ko, J. Mao, Y. Du, S.-H. Sun, and J. B. Tenenbaum. Learning to act from actionless videos through dense correspondences. In International Conference on Learning Representa- tions, volume 2024, pages 40938–40958, 2024."
+    },
+    {
+      "id": "[44]",
+      "text": "P. Esser, S. Kulal, A. Blattmann, R. Entezari, J. M¨uller, H. Saini, Y. Levi, D. Lorenz, A. Sauer, F. Boesel, et al. Scaling rectified flow transformers for high-resolution image synthesis. In ICML, 2024."
+    },
+    {
+      "id": "[45]",
+      "text": "R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer. High-resolution image syn- thesis with latent diffusion models. In CVPR, pages 10684–10695, 2022."
+    },
+    {
+      "id": "[46]",
+      "text": "J. Ho, T. Salimans, A. Gritsenko, W. Chan, M. Norouzi, and D. J. Fleet. Video diffusion models. Advances in Neural Information Processing Systems, 35:8633–8646, 2022."
+    },
+    {
+      "id": "[47]",
+      "text": "Y. He, T. Yang, Y. Zhang, Y. Shan, and Q. Chen. Latent video diffusion models for high-fidelity long video generation. arXiv preprint arXiv:2211.13221, 2022."
+    },
+    {
+      "id": "[48]",
+      "text": "Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli. Image quality assessment: from error visibility to structural similarity. IEEE Transactions on Image Processing, 13(4):600– 612, 2004."
+    },
+    {
+      "id": "[49]",
+      "text": "A. Hore and D. Ziou. Image quality metrics: PSNR vs. SSIM. In 20th International Conference on Pattern Recognition, pages 2366–2369. IEEE, 2010."
+    },
+    {
+      "id": "[50]",
+      "text": "R. Zhang, P. Isola, A. A. Efros, E. Shechtman, and O. Wang. The unreasonable effectiveness of deep features as a perceptual metric. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 586–595, 2018. 13"
+    },
+    {
+      "id": "[51]",
+      "text": "M. Heusel, H. Ramsauer, T. Unterthiner, B. Nessler, and S. Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilibrium. Advances in Neural Information Processing Systems, 30, 2017."
+    },
+    {
+      "id": "[52]",
+      "text": "T. Unterthiner, S. Van Steenkiste, K. Kurach, R. Marinier, M. Michalski, and S. Gelly. To- wards accurate generative models of video: A new metric & challenges. arXiv preprint arXiv:1812.01717, 2018."
+    },
+    {
+      "id": "[53]",
+      "text": "X. Huang, Z. Li, G. He, M. Zhou, and E. Shechtman. Self forcing: Bridging the train-test gap in autoregressive video diffusion. Advances in Neural Information Processing Systems, 38: 167283–167308, 2025."
+    },
+    {
+      "id": "[54]",
+      "text": "J. Ho, A. Jain, and P. Abbeel. Denoising diffusion probabilistic models. Advances in Neural Information Processing Systems, 33:6840–6851, 2020. 14 Appendix Section A presents additional qualitative results: (i) visualizations of DriftWorld’s generated videos on Bridge-V2, RT-1, and Language Table and (ii) visualizations of policy rollouts in DriftWorld. Section B contains an additional quantitative result on the visual quality of generated videos. Section C provides further ablations and visualizations for DriftWorld. Section D describes implementation details and hyperparameters. The code is"
+    },
+    {
+      "id": "[5]",
+      "text": "0.8126 19.7108 0.0971 0.0311 Ctrl-World"
+    },
+    {
+      "id": "[3]",
+      "text": "0.7509 17.2030 0.1495 5.2407 DriftWorld (Ours) 0.7621 21.9541 0.0967 0.0100 Table 6: Quantitative results for the visual quality of generated vidoes on the Robomimic Square task. DriftWorld also performs reasonably on this high-precision Robomimic task, in addition to the Lift and Can tasks presented in the main text. 16 Ground Truth Lift task Can task DriftWorld Ground Truth Lift task (2-view) Square task DriftWorld Figure 12: Policy Rollouts for the Robomimic Lift, Can, and Square Tasks. The generated videos closely match the ground truth on all three tasks. C Additional Ablations for Drift"
+    },
+    {
+      "id": "[53]",
+      "text": "to improve DriftWorld’s performance on autore- gressive rollouts on the more complex datasets. Specifically, our model training consists of two stages. In the first stage, we always condition DriftWorld on the ground-truth history frames. In the second stage, we initialize from the stage 1 checkpoint, and then we train by letting DriftWorld generate autoregressively, taking its own generated frames (with gradient detached) as input. Each of the nneg generated negative samples continues its own rollout. 19 D.2 Details for Inference-Time Policy Improvement in DriftWorld The following are additi"
+    },
+    {
+      "id": "[5]",
+      "text": ". Diffusion policy. The policy we used is diffusion policy"
+    },
+    {
+      "id": "[13]",
+      "text": ", which outputs an action chunk at:t+T given the history of visual observations ot−H:t. We follow the standard settings of an observation horizon of H = 2, a prediction horizon of T = 16, and an action horizon of 9, with control executed in a receding horizon manner. The diffusion policy uses a ResNet18 visual encoder and a U-Net diffusion backbone to model the distribution of actions. The policy is trained using the DDPM formulation"
+    },
+    {
+      "id": "[54]",
+      "text": ", and it uses 100 diffusion denoising steps at inference. In the GPC-RANK table (Table 4), policy 1 is the checkpoint from"
+    }
+  ],
+  "resources": {
+    "paper": "",
+    "code": "",
+    "dataset": "",
+    "demo": "",
+    "video1": "",
+    "video2": "",
+    "videos": [
+      {
+        "title": "漂移模型Generative Modeling via Drifting",
+        "url": "https://www.bilibili.com/video/BV1kqNMzZEkG/"
+      },
+      {
+        "title": "1步反超250步！扔掉扩散模型！Drifting【论文精读】",
+        "url": "https://www.bilibili.com/video/BV1PW4o6MEtn/"
+      },
+      {
+        "title": "【世界模型】DUET-DINO: Simultaneous Cross-View World Modeling for Latent Planning",
+        "url": "https://www.bilibili.com/video/BV1seYV6AEKx/"
+      },
+      {
+        "title": "漂移模型Drifting model代码实现",
+        "url": "https://www.bilibili.com/video/BV13VPXzFEyS/"
+      },
+      {
+        "title": "Model Monitoring - Concept and Data Drift【概念漂移和数据漂移 机器学习】",
+        "url": "https://www.bilibili.com/video/BV12L411N7MG/"
+      }
+    ]
+  }
+}
