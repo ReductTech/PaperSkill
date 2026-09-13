@@ -1,0 +1,27 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Semantic colour roles from tokens.css stay untouched (contract.md §5):
+   --blue = guidance/current state, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only this tutorial's own scene colours
+   (the "铺地砖" theme) are added below. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* quiet floor field used by every Canvas (dTileGround) */
+  --paper-scene-bg: #f5f8f0;
+  /* recurring tile faces / edges / mortar props of the analogy world */
+  --paper-tile-face: #e8e2d4;
+  --paper-tile-edge: #c9bfa8;
+  --paper-mortar: #b8c9a7;
+  /* straightedge (datum line) and trowel-handle support colour */
+  --paper-datum: #92400e;
+}
+
+/* Mobile fix: setupCanvas() pins an inline pixel height on every Canvas and the
+   bundled `canvas { max-width: 100% }` only shrinks the width, which would
+   squeeze the drawing horizontally on narrow screens. Letting the height follow
+   the scaled width keeps the intrinsic aspect ratio. At full desktop width the
+   Canvas already fits its container, so nothing changes there. */
+.module canvas,
+.analogy-visual canvas,
+.bg-side-canvas canvas {
+  height: auto !important;
+}
