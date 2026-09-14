@@ -13,6 +13,12 @@ npm run preview   # 预览构建结果
 
 最终提交应保留整个项目目录，不要只复制 `index.html` 或 `dist/`。
 
+## 素材来源
+
+- `public/images/phebe.jpg` 与 `public/images/nuonuo.jpg` 由本教程贡献者提供；`public/images/characters/` 中的透明立绘和 GIF 均由这两张原图衍生，仅用于本论文教程。
+- `public/audio/` 中的四段背景音乐为本项目生成的原创纯音乐资源，未引用外部音频采样。
+- 论文来源：[LARY: A Latent Action Representation Yielding Benchmark for Generalizable Vision-to-Action Alignment](https://arxiv.org/abs/2604.11689)。
+
 ## 目录结构
 
 | 路径 | 说明 | 是否生成器（Agent）修改 |
