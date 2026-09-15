@@ -1,7 +1,7 @@
 # GNM Head 交互式论文教程
 
-> 作业编号：101　学生：刘通  
-> 论文：*GNM Head: A Generative aNthropometric Model of the human head*  
+> 作业编号：101　学生：刘通
+> 论文：*GNM Head: A Generative aNthropometric Model of the human head*
 > 技术栈：React 18 + TypeScript + Vite + Canvas
 
 ## 项目说明
