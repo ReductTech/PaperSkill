@@ -20,15 +20,15 @@ export const tutorial: TutorialData = {
   "hero": {
     "oldMethod": {
       "desc": "先把每张模糊图单独恢复，再喂给重建模型——单视角修复丢失了跨视角一致性，VAE 潜空间又抹除了细节。",
-      "figure": "/images/fig2a_pixel.png"
+      "figure": "./images/fig2a_pixel.png"
     },
     "pointCloud": {
       "desc": "<b>核心思想</b>：把去噪放在前馈重建器内部的<em>几何感知特征空间</em>（左：清晰原图；右：模型实际「看见」的几何特征激活热区）",
-      "figure": "/images/hero_feature_block.png"
+      "figure": "./images/hero_feature_block.png"
     },
     "newMethod": {
       "desc": "与论文 Teaser 一致：从退化输入恢复出<em>清晰多视角图像、稠密点云与深度图</em>，三维几何与外观同步重建（点云对比效果）",
-      "figure": "/images/teaser_pointcloud.jpg"
+      "figure": "./images/teaser_pointcloud.jpg"
     }
   },
   "darkroom": {
@@ -57,7 +57,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "糊掉的照片",
         "text": "相机一晃，照片就糊了。真实拍摄中，运动模糊是最常见的退化之一。",
-        "figure": "/images/analogy_blur_car.png"
+        "figure": "./images/analogy_blur_car.png"
       },
       "modules": [
         {
@@ -66,7 +66,7 @@ export const tutorial: TutorialData = {
           "title": "模糊强度与位姿精度的关系",
           "desc": "默认自动演示：模糊强度来回扫描，观察前馈重建模型的位姿估计精度如何一路下滑；拖动滑块可切为手动。数值来自论文 Table 1（HiRoom 基准）。",
           "componentId": "ch1mod1",
-          "figure": "/images/fig1_teaser.png"
+          "figure": "./images/fig1_teaser.png"
         }
       ],
       "insight": "退化会顺着前馈重建模型一路传播，最终让三维重建彻底崩坏——恢复不是可选项，而是鲁棒重建的前提。",
@@ -99,7 +99,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "叠放对齐的底片",
         "text": "把同一场景的几张底片叠在一起对齐，细节互补，场景才完整。",
-        "figure": "/images/analogy_film.png"
+        "figure": "./images/analogy_film.png"
       },
       "modules": [
         {
@@ -108,7 +108,7 @@ export const tutorial: TutorialData = {
           "title": "点击不同视角，看特征如何编码几何",
           "desc": "前馈重建器把多视角图像编码成几何感知的特征表示。点击不同视角，观察每个视角如何贡献互补的几何信息。",
           "componentId": "ch2mod1",
-          "figure": "/images/fig_attn_maps.png"
+          "figure": "./images/fig_attn_maps.png"
         }
       ],
       "insight": "前馈重建器内部有一个由多视角 Transformer 注意力编码出来的几何感知特征空间，这正是 GARD 要去做去噪的地方。",
@@ -159,7 +159,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "在哪里修复最有效",
         "text": "同一张画面，修表面、修小样、还是修底片原版——修错地方，细节就丢了。<span class=\"analogy-map\">对应三种去噪空间：像素空间 → VAE 潜空间 → 几何感知特征空间</span>",
-        "figure": "/images/analogy_repair_levels.png"
+        "figure": "./images/analogy_repair_levels.png"
       },
       "modules": [
         {
@@ -207,7 +207,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "显影中的相纸",
         "text": "相纸在显影液里，图像一点点浮现——去噪也是逐步逼近。",
-        "figure": "/images/analogy_developing.png"
+        "figure": "./images/analogy_developing.png"
       },
       "modules": [
         {
@@ -216,7 +216,7 @@ export const tutorial: TutorialData = {
           "title": "拖动流匹配进度，看表示如何从退化走向干净",
           "desc": "流匹配学一个速度场，把退化表示沿直线路径搬运到干净表示。拖动进度 t，观察插值路径和速度场方向。",
           "componentId": "ch4mod1",
-          "figure": "/images/fig3b_training.png"
+          "figure": "./images/fig3b_training.png"
         }
       ],
       "insight": "流匹配不是从纯噪声开始，而是从退化表示（加一点扰动）出发——这样保留了结构先验，去噪更有效。",
@@ -322,7 +322,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "暗房的设备布局",
         "text": "放大机、显影盘、灯箱各司其职，流程才跑得通。",
-        "figure": "/images/analogy_enlarger.png"
+        "figure": "./images/analogy_enlarger.png"
       },
       "modules": [
         {
@@ -331,7 +331,7 @@ export const tutorial: TutorialData = {
           "title": "点击架构组件，理解数据流",
           "desc": "GARD 去噪器插在多视角编码器第 18 层。点击每个组件，查看它的作用与维度信息。",
           "componentId": "ch8mod1",
-          "figure": "/images/fig3_framework.png"
+          "figure": "./images/fig3_framework.png"
         },
         {
           "kind": "module",
@@ -421,7 +421,7 @@ export const tutorial: TutorialData = {
           "title": "拖动插入层位置，看特征相似度变化",
           "desc": "拖动滑块选择去噪器的插入层，观察跨层特征相似度曲线：退化表示（红）在深层下降，恢复表示（蓝）保持接近干净。",
           "componentId": "ch9mod1",
-          "figure": "/images/fig8_similarity.png"
+          "figure": "./images/fig8_similarity.png"
         }
       ],
       "insight": "在较早的层应用 GARD，能在退化传播前纠正特征，让恢复表示在深层保持高保真——这正是特征相似性分析证明的。",
@@ -481,7 +481,7 @@ export const tutorial: TutorialData = {
           "title": "点击开始，看 GARD 的对比结果",
           "desc": "点击「开始对比」，看 GARD 在 ETH3D 基准上如何领先基线。可切换指标（位姿 AUC30 / 重建 F-score / 图像 PSNR）。数值来自论文 Table 1/2/3。",
           "componentId": "ch10mod1",
-          "figure": "/images/table1_pose.png"
+          "figure": "./images/table1_pose.png"
         },
         {
           "kind": "module",
@@ -521,7 +521,7 @@ export const tutorial: TutorialData = {
       "analogy": {
         "title": "校准冲洗参数",
         "text": "冲洗参数要一项项校准，缺一不可。",
-        "figure": "/images/analogy_calibrate.png"
+        "figure": "./images/analogy_calibrate.png"
       },
       "modules": [
         {

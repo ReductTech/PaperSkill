@@ -51,7 +51,7 @@ export const Ch7Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const a = new Image();
-    a.src = '/images/table45_ablation.png';
+    a.src = './images/table45_ablation.png';
     a.onload = () => { tableRef.current = a; };
   }, []);
 

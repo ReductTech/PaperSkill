@@ -27,10 +27,10 @@ export const Ch3Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const a = new Image();
-    a.src = '/images/fig4_pck.png';
+    a.src = './images/fig4_pck.png';
     a.onload = () => { fig4Ref.current = a; };
     const b = new Image();
-    b.src = '/images/fig9_correspondence.png';
+    b.src = './images/fig9_correspondence.png';
     b.onload = () => { fig9Ref.current = b; };
     // Some browsers fire onload after image is in cache — set immediately too.
     if (a.complete) fig4Ref.current = a;
