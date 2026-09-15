@@ -28,7 +28,7 @@ export const Ch9Ana: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = '/images/analogy_lens.png';
+    img.src = './images/analogy_lens.png';
     img.onload = () => { imgRef.current = img; };
   }, []);
 

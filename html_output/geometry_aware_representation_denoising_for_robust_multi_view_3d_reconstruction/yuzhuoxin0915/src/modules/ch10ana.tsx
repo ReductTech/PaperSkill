@@ -18,7 +18,7 @@ export const Ch10Ana: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = '/images/fig_pointcloud_compare.png';
+    img.src = './images/fig_pointcloud_compare.png';
     img.onload = () => { imgRef.current = img; };
   }, []);
 
