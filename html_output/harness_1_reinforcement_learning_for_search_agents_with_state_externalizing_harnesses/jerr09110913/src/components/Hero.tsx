@@ -34,7 +34,7 @@ export function Hero({
         <div className="hero-compare">
           <div className="bg-side old">
             <div className="bg-side-head">传统方法</div>
-            <div className="bg-side-canvas">
+            <div className="bg-side-canvas" style={!OldWidget && !hero.oldMethod.figure ? {display:'none'} : undefined}>
               {OldWidget ? <OldWidget chapterId="hero" moduleId="old" /> : null}
               {hero.oldMethod.figure ? (
                 <img src={hero.oldMethod.figure} alt="传统方法" className="bg-side-img" />
@@ -44,7 +44,7 @@ export function Hero({
           </div>
           <div className="bg-side new">
             <div className="bg-side-head">本文方法</div>
-            <div className="bg-side-canvas">
+            <div className="bg-side-canvas" style={!NewWidget && !hero.newMethod.figure ? {display:'none'} : undefined}>
               {NewWidget ? <NewWidget chapterId="hero" moduleId="new" /> : null}
               {hero.newMethod.figure ? (
                 <img src={hero.newMethod.figure} alt="本文方法" className="bg-side-img" />

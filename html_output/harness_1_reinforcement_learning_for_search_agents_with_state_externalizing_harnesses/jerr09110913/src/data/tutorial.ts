@@ -3,28 +3,29 @@ import type { TutorialData, FormulaDef } from '../types';
 export const tutorial: TutorialData = {
   "meta": {
     "titleEn": "Harness-1",
-    "titleZh": "搜索智能体的状态、决策与学习",
+    "titleZh": "让搜索进展成为下一轮的决策依据",
     "venue": "arXiv · 2026 · v1",
-    "authors": "Pengcheng Jiang 等",
+    "authors": "Pengcheng Jiang, Zhiyi Shi, Kelly Hong, Xueqiang Xu, Jiashuo Sun, Jimeng Sun, Hammad Bashir, Jiawei Han",
     "affiliation": "UIUC · UC Berkeley · Chroma",
-    "domain": "搜索智能体与强化学习",
-    "coreProblem": "搜索时找到的资料，怎样才能留到最后、交给回答模型？",
-    "coreInsight": "搜索越往后，模型越要反复确认：<b>查过什么、选了什么、还缺什么</b>。Harness-1 把这些进展保存在模型之外，每轮提供给模型，并通过示范和奖励训练模型使用这些记录。",
+    "domain": "搜索智能体",
+    "coreProblem": "搜到过的资料，怎样变成下一轮可用、最后能提交的证据？",
+    "coreInsight": "一次检索不难，难的是在多轮搜索中持续判断：哪些资料已经找到，哪些证据值得保留，下一步还缺什么。先看传统搜索，再拆解 Harness-1 如何维护状态，以及训练怎样利用这些状态改善决策。",
     "keywords": [
       "多轮搜索",
       "外部状态",
-      "证据核验",
-      "SFT 与 RL"
+      "证据筛选",
+      "工具学习",
+      "强化学习"
     ]
   },
   "hero": {
     "oldMethod": {
       "componentId": "hero-old",
-      "desc": "从之前的搜索和阅读记录里，重新找出有用资料。"
+      "desc": "传统搜索把检索结果、阅读内容和历次操作累积在历史记录中。模型每轮从这些记录里重新判断：已经找到什么、哪些证据有用、还需要继续查什么。"
     },
     "newMethod": {
       "componentId": "hero-new",
-      "desc": "每轮直接看到已选文档等搜索进展，需要细节时再调出原文。"
+      "desc": "Harness-1 将候选文档、保存原文、精选证据与核验记录维护为外部状态，每轮向模型提供紧凑进展。模型负责决定下一步，框架负责执行动作、更新状态；需要细节时可以回看原文。"
     }
   },
   "bilibili": [
@@ -382,8 +383,8 @@ export const tutorial: TutorialData = {
         {
           "kind": "module",
           "id": "8.1",
-          "title": "模型根据新证据修正判断，并调整后续查询与文档选择",
-          "desc": "点击蓝色“查看下一片段”，按顺序浏览论文公开的关键阶段。 跟踪人物与游戏的关系何时得到支持、模型如何修正选择、查询如何转向正确游戏的发行日期。",
+          "title": "沿公开轨迹，连接人物、游戏与发行日期",
+          "desc": "逐步查看公开节点，观察两段证据关系何时成立；点击关系旁的按钮核对原文依据，明确哪些返回仍然未知。",
           "componentId": "c8"
         }
       ],
