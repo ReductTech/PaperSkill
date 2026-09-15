@@ -32,7 +32,7 @@ export const Ch1Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = './images/analogy_blur_car.png';
+    img.src = './images/analogy_blur_car.webp';
     img.onload = () => { imgRef.current = img; };
   }, []);
 

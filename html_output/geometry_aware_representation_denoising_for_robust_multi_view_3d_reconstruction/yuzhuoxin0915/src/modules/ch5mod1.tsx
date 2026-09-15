@@ -39,10 +39,10 @@ export const Ch5Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const a = new Image();
-    a.src = './images/fig11_alignment.jpg';
+    a.src = './images/fig11_alignment.webp';
     a.onload = () => { fig11Ref.current = a; };
     const b = new Image();
-    b.src = './images/analogy_multiview.png';
+    b.src = './images/analogy_multiview.webp';
     b.onload = () => { mvRef.current = b; };
   }, []);
 
