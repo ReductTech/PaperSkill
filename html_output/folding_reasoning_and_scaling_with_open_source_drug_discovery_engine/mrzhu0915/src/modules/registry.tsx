@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { PhotoDistance } from './analogy-distance';
+import { PhotoExposure } from './analogy-exposure';
+import { PhotoFocus } from './analogy-focus';
+import { PhotoFrame } from './analogy-frame';
+import { PhotoLight } from './analogy-light';
+import { PhotoRoute } from './analogy-route';
+import { PhotoSelect } from './analogy-select';
+import { PhotoZoom } from './analogy-zoom';
+import { BenchmarkEvidenceWidget } from './benchmark-evidence';
+import { CandidateOrbitWidget } from './candidate-orbit';
+import { DiffusionStudioWidget } from './diffusion-studio';
+import { GeometryLabWidget } from './geometry-lab';
+import { HeroChallenge } from './hero-challenge';
+import { HeroSolution } from './hero-solution';
+import { PipelineOverviewWidget } from './pipeline-overview';
+import { ResidueRelationsWidget } from './residue-relations';
+import { RoleMicroscopeWidget } from './role-microscope';
+import { ScalingMatrixWidget } from './scaling-matrix';
+import { SharedVisual } from './shared-visual';
+import { SurfaceChallengeWidget } from './surface-challenge';
+import { TorsionLabWidget } from './torsion-lab';
+import { TrainingTimelineWidget } from './training-timeline';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-distance'] = PhotoDistance;
+widgetRegistry['analogy-exposure'] = PhotoExposure;
+widgetRegistry['analogy-focus'] = PhotoFocus;
+widgetRegistry['analogy-frame'] = PhotoFrame;
+widgetRegistry['analogy-light'] = PhotoLight;
+widgetRegistry['analogy-route'] = PhotoRoute;
+widgetRegistry['analogy-select'] = PhotoSelect;
+widgetRegistry['analogy-zoom'] = PhotoZoom;
+widgetRegistry['benchmark-evidence'] = BenchmarkEvidenceWidget;
+widgetRegistry['candidate-orbit'] = CandidateOrbitWidget;
+widgetRegistry['diffusion-studio'] = DiffusionStudioWidget;
+widgetRegistry['geometry-lab'] = GeometryLabWidget;
+widgetRegistry['hero-challenge'] = HeroChallenge;
+widgetRegistry['hero-solution'] = HeroSolution;
+widgetRegistry['pipeline-overview'] = PipelineOverviewWidget;
+widgetRegistry['residue-relations'] = ResidueRelationsWidget;
+widgetRegistry['role-microscope'] = RoleMicroscopeWidget;
+widgetRegistry['scaling-matrix'] = ScalingMatrixWidget;
+widgetRegistry['shared-visual'] = SharedVisual;
+widgetRegistry['surface-challenge'] = SurfaceChallengeWidget;
+widgetRegistry['torsion-lab'] = TorsionLabWidget;
+widgetRegistry['training-timeline'] = TrainingTimelineWidget;
