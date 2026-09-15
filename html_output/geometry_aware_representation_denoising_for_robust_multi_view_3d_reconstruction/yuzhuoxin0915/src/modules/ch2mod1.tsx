@@ -23,7 +23,7 @@ export const Ch2Mod1: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = './images/analogy_multiview.png';
+    img.src = './images/analogy_multiview.webp';
     img.onload = () => { imgRef.current = img; };
   }, []);
 

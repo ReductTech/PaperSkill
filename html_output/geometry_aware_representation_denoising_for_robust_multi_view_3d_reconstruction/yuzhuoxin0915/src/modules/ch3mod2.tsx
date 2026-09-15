@@ -45,7 +45,7 @@ export const Ch3Mod2: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = './images/fig9_correspondence.png';
+    img.src = './images/fig9_correspondence.webp';
     img.onload = () => { fig9Ref.current = img; };
   }, []);
 

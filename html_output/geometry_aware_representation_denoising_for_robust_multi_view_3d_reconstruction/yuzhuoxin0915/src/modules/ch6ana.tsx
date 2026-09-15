@@ -13,19 +13,19 @@ const H = 160;
 const STAGES = [
   {
     name: '刚进入显影液',
-    img: './images/develop_tulip_t1.png',
+    img: './images/develop_tulip_t1.webp',
     desc: '朦胧虚影',
     cls: 't1',
   },
   {
     name: '逐渐浮现',
-    img: './images/develop_tulip_t2.png',
+    img: './images/develop_tulip_t2.webp',
     desc: '灰度柔和',
     cls: 't2',
   },
   {
     name: '最终清晰',
-    img: './images/develop_tulip_t3.png',
+    img: './images/develop_tulip_t3.webp',
     desc: '细节全开',
     cls: 't3',
   },
