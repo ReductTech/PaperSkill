@@ -1,0 +1,116 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-clay: #27446e;
+  --paper-clay-light: #8aa5c6;
+  --paper-bench: #b8c9a7;
+  --paper-bench-dark: #76906a;
+  --paper-tool: #92400e;
+  --paper-target: #228d5c;
+  --paper-warning: #c43f52;
+  --paper-control: #f07e47;
+  --paper-aux: #7c3aed;
+}
+
+/* Paper-specific responsive guard: wide Canvas scenes must shrink with the
+   tutorial card instead of contributing their intrinsic width to flex/grid. */
+.slide-main,
+.slide-content,
+.hero-inner,
+.hero-compare,
+.bg-side,
+.module,
+.canvas-wrap {
+  min-width: 0;
+}
+
+.slide-content canvas {
+  width: 100%;
+  height: auto;
+}
+
+.hero-meme-board {
+  margin: 0 0 34px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper-2);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-meme-board img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+}
+
+.hero-meme-board figcaption {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 14px 14px;
+  color: var(--slate);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.hero-meme-board figcaption b { color: var(--ink); }
+
+.video-open-tip {
+  padding: 10px 14px;
+  border-left: 4px solid var(--orange);
+  border-radius: 8px;
+  background: var(--orange-soft);
+}
+
+.dl-video-reason {
+  margin: 6px 0 4px;
+  color: var(--slate);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.video-open-label {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .slide-content > section.hero {
+    width: 100%;
+    padding: 36px 18px 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.75rem, 9vw, 2.2rem);
+    line-height: 1.08;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-abs {
+    font-size: 0.98rem;
+  }
+
+  .hero-meta {
+    margin-bottom: 26px;
+  }
+
+  .hero-meme-board figcaption {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-nav-btn {
+    white-space: nowrap;
+  }
+}
