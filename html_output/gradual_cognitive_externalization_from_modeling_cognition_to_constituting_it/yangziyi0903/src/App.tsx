@@ -9,6 +9,7 @@ import { Formula } from './components/Formula';
 import { PaperBoundaryNote } from './components/PaperBoundaryNote';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 const coreSceneIds = new Set(['chap-3', 'chap-6', 'chap-7', 'chap-8', 'chap-10']);
 
@@ -70,6 +71,14 @@ export default function App() {
           );
         })}
       </main>
+      <PptBars
+        chapters={tutorial.chapters}
+        revealed={revealed}
+        onRevealNext={revealNext}
+        visible={revealed > 0}
+        venue="Interactive Tutorial"
+        title="渐进式认知外化：从认知建模到认知构成 · 交互式教程"
+      />
     </>
   );
 }

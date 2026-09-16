@@ -10,6 +10,7 @@ import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { EvidencePanel } from './components/EvidencePanel';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -146,6 +147,14 @@ export default function App() {
           <EvidencePanel chapterIndex={activeChapter} mode="side" />
         </div>
       ) : null}
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="JoyAI-Image：统一多模态理解与生成 · 交互式教程"
+    />
     </>
   );
 }

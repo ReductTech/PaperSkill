@@ -10,6 +10,7 @@ import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { ChapterNav } from './components/ChapterNav';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 function preferredScrollBehavior(): ScrollBehavior {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
@@ -123,6 +124,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="GCT · 交互式论文教程"
+    />
     </>
   );
 }

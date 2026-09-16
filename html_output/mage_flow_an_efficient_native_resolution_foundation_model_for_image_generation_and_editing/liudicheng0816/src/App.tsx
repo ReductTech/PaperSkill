@@ -9,6 +9,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { ChapterQuiz } from './components/ChapterQuiz';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const [revealedPart, setRevealedPart] = useState(-1);
@@ -117,6 +118,22 @@ export default function App() {
           );
         })}
       </main>
+      <PptBars
+        sections={tutorial.parts.map((part) => ({ id: part.id, label: `§${part.number}`, text: part.title }))}
+        active={revealedPart}
+        onSelect={(index) => {
+          const part = tutorial.parts[index];
+          if (!part) return;
+          if (index <= revealedPart) {
+            document.getElementById(part.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            setRevealedPart(index);
+          }
+        }}
+        visible={revealedPart >= 0}
+        venue="Mage-Flow"
+        title="Mage-Flow：高效原生分辨率图像生成与编辑基础模型 · 交互式教程"
+      />
     </>
   );
 }

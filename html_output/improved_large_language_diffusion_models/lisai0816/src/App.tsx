@@ -6,6 +6,7 @@ import { Module } from './components/Module';
 import { InsightBar } from './components/InsightBar';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const chapterTotal = tutorial.chapters.length;
@@ -65,6 +66,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="改进的大语言扩散模型 · 交互式教程"
+    />
     </>
   );
 }

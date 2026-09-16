@@ -7,6 +7,7 @@ import './styles/paper.css';
 import './styles/mechanism.css';
 import './styles/innovation-two.css';
 import './styles/evidence.css';
+import './styles/ppt-mode.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

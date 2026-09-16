@@ -9,6 +9,7 @@ import { Formula } from './components/Formula';
 import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 import { PresentationMode } from './modules/presentation-mode';
 
 export default function App() {
@@ -105,6 +106,14 @@ export default function App() {
           );
         })}
       </main> : null}
+      <PptBars
+        chapters={tutorial.chapters}
+        revealed={revealed}
+        onRevealNext={revealNext}
+        visible={view !== 'landing'}
+        venue="Interactive Tutorial"
+        title={tutorial.meta.titleZh}
+      />
     </>
   );
 }

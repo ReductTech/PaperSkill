@@ -10,6 +10,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 const chapterStageLabels = ['① 痕迹', '② 定义', '③ 构造', '④ 演化', '⑤ 部署', '⑥ 总结'];
 
@@ -74,6 +75,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="COLLEAGUE.SKILL：通过专家知识蒸馏自动生成 AI 技能 · 交互式教程"
+    />
     </>
   );
 }
