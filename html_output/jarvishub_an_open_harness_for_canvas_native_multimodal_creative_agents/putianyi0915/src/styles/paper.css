@@ -1,0 +1,282 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-ground: #e6ead9;
+  --paper-yarn: #b8c9a7;
+  --paper-yarn-deep: #76906a;
+  --paper-wood: #92400e;
+  --paper-marker: #f07e47;
+  --paper-accent-2: #d97706;
+}
+
+/* ---------------------------------------------------------------------------
+   修正：components.css 的 `canvas { max-width: 100% }` 只压缩宽度，而 setupCanvas
+   写入的行内高度被固定为固有高度（如 280px），于是当容器窄于画布固有宽度时，
+   画布会被横向挤压（1080 → 872 ≈ 压缩 19%），圆形变椭圆、文字被压扁。
+   这里让高度按画布固有宽高比自动缩放，行内高度需要 !important 覆盖。
+   token 与组件布局均未改动，只修正缩放行为。
+   --------------------------------------------------------------------------- */
+.slide-main canvas {
+  height: auto !important;
+}
+
+/* §1 引入块里的「传统工作流 vs JarvisHub 画布」分条对照。
+   这是本论文特有的新增内容，不改动 tokens.css / components.css 里任何共享组件。
+   配色沿用语义色：--red = 旧方法的缺口，--green = 论文方法的优势。
+   --------------------------------------------------------------------------- */
+.pp-contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.pp-contrast .pp-col {
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.pp-contrast .pp-old {
+  border-left: 4px solid var(--red);
+}
+
+.pp-contrast .pp-new {
+  border-left: 4px solid var(--green);
+}
+
+.pp-contrast .pp-head {
+  font-weight: 700;
+  font-size: var(--ui-type-body-size);
+  line-height: 1.4;
+}
+
+.pp-contrast .pp-old .pp-head {
+  color: var(--red);
+}
+
+.pp-contrast .pp-new .pp-head {
+  color: var(--green);
+}
+
+.pp-contrast ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.pp-contrast li {
+  margin: 6px 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.62;
+}
+
+.pp-contrast li b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* §3 引入块里的「三种能力」单栏文本框（与上面的两栏对照同族样式） */
+.pp-notes {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.pp-notes .pp-head {
+  color: var(--green);
+  font-weight: 700;
+  font-size: var(--ui-type-body-size);
+  line-height: 1.4;
+}
+
+.pp-notes ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.pp-notes li {
+  margin: 6px 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.62;
+}
+
+.pp-notes li b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* §5 / §6 引入块里的清单与表格（工具族、动作空间来源、执行条件、技能·记忆·子智能体） */
+.pp-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: var(--ui-type-body-small-size);
+}
+
+.pp-table th,
+.pp-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.pp-table th {
+  color: var(--blue);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pp-table td:first-child {
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pp-table td {
+  color: var(--ink-2);
+}
+
+.pp-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* §10 三个案例的图文对照 */
+.pp-case-figs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.pp-case-figs figure {
+  margin: 0;
+}
+
+.pp-case-figs img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--paper-2);
+}
+
+.pp-case-figs figcaption {
+  margin-top: 7px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.58;
+}
+
+.pp-case-figs figcaption b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.pp-case-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.6;
+  background: var(--green-soft);
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.pp-case-empty {
+  margin-top: 12px;
+  padding: 26px 14px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  text-align: center;
+  background: var(--paper-2);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm, 8px);
+}
+
+/* §10 模块 10.2 的「能证明 / 不能证明」对照 */
+.pp-claims {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.pp-claim {
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.pp-claim-ok {
+  border-left: 4px solid var(--green);
+}
+
+.pp-claim-no {
+  border-left: 4px solid var(--red);
+}
+
+.pp-claim-head {
+  font-weight: 700;
+  font-size: var(--ui-type-body-size);
+  line-height: 1.4;
+}
+
+.pp-claim-ok .pp-claim-head {
+  color: var(--green);
+}
+
+.pp-claim-no .pp-claim-head {
+  color: var(--red);
+}
+
+.pp-claims ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.pp-claims li {
+  margin: 6px 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.62;
+}
+
+.pp-claims li b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .pp-contrast {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-case-figs {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-claims {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-table th,
+  .pp-table td {
+    padding: 6px 8px;
+  }
+}

@@ -1,0 +1,270 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  meta: {
+    titleEn: 'ImageWAM: Do World Action Models Really Need Video Generation, or Just Image Editing?',
+    titleZh: 'ImageWAM：世界动作模型真的需要视频生成，还是只是图像编辑？',
+    venue: 'arXiv 2026',
+    authors: 'Yuyang Zhang, Wenyao Zhang, Zekun Qi, He Zhang, Haitao Lin, Jingbo Zhang, Yao Mu, Xiaokang Yang, Wenjun Zeng, Xin Jin',
+    affiliation: 'Vision, robotics, and multimodal learning',
+    domain: 'Computer Vision + Robotics',
+    coreProblem: '论文指出，视频式世界动作模型需要处理密集的多帧未来 token，可能在动作无关的时间与外观细节上消耗容量，并因长程想象误差影响动作预测。',
+    coreInsight: 'ImageWAM 探索将预训练图像编辑模型用于机器人动作预测：编辑过程关注当前图像到目标帧的动作相关变化，并将去噪产生的 KV cache 用作紧凑的世界-动作上下文。',
+    keywords: ['世界模型', '机器人动作', '图像编辑', '流匹配', '行动决策'],
+  },
+  hero: {
+    oldMethod: {
+      desc: '论文讨论的视频式世界动作模型需要逐帧建模未来视频，因而会处理大量时间与外观信息，其中一部分可能与当前动作无关。',
+      figure: undefined,
+      componentId: 'example-slider',
+    },
+    newMethod: {
+      desc: 'ImageWAM 将机器人动作预测建立在图像编辑先验之上：它关注当前图像到目标帧的变化，并在推理时使用编辑去噪产生的上下文，而不解码目标帧。',
+      figure: undefined,
+      componentId: 'example-slider',
+    },
+  },
+  chapters: [
+    {
+      kind: 'chapter',
+      id: 'chap-1',
+      title: '为什么视频生成不一定是最优世界动作接口？',
+      badge: 'inf',
+      badgeLabel: '问题定义',
+      bridge: '本章从“世界动作模型”与“视频生成”之间的成本差异切入，解释为什么动作决策不一定需要建模完整未来视频。',
+      analogy: {
+        title: '类比：从“拍电影”到“修一张目标图”',
+        text: '视频生成像要不断拍摄整部未来长片；而动作决策更像提前告诉编辑器：在当前视角下，哪些区域需要更换、哪些结构需要保留。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '1.1',
+          title: '视频生成的三重成本',
+          desc: '多帧未来预测带来高昂 token 成本、动作无关细节的浪费，以及长程幻觉可能导致的错误动作反馈。',
+          componentId: 'example-slider',
+        },
+        {
+          kind: 'module',
+          id: '1.2',
+          title: '动作决策真正需要什么',
+          desc: '对控制而言，更关键的是识别任务相关的状态变化，而不是重建每一个未来帧的完整外观。',
+          componentId: 'example-slider',
+        },
+      ],
+      insight: '论文的研究问题不是断言所有世界动作模型都不需要视频，而是检验图像编辑先验能否在机器人动作预测中提供更匹配、更高效的上下文。',
+      formula: {
+        lead: '下面是帮助理解方法的概念化表达，并非论文中逐字给出的训练目标：动作策略利用当前观测与动作相关变化来输出控制。',
+        unicode: 'a_t \approx \pi_\theta(I_t, \Delta I_t, c), \quad \Delta I_t = Edit(I_t, c)',
+        symbols: [
+          { sym: 'a_t', desc: '当前时刻的动作' },
+          { sym: 'I_t', desc: '当前观测图像' },
+          { sym: '\Delta I_t', desc: '当前到目标状态的关键视觉变化' },
+          { sym: 'c', desc: '任务指令或上下文' },
+        ],
+      },
+      takeaways: [
+        { icon: '🎯', title: '动作相关先于画面细节', desc: '视觉变化越贴近动作目标，决策越稳定。' },
+        { icon: '⚙️', title: '推理开销与目标一致', desc: '模型不必显式重建未来视频，就能更轻地完成短程决策。' },
+        { icon: '💡', title: '思想转向局部编辑', desc: '把世界模型从“生成未来”改为“理解改动”。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-2',
+      title: '为什么图像编辑比视频生成更接近任务目标？',
+      badge: 'trn',
+      badgeLabel: '核心洞察',
+      bridge: '图像编辑天然专注于“局部改动”，这和机器人动作的关键问题高度一致：当前状态如何变成目标状态。',
+      analogy: {
+        title: '类比：修图而非电影剪辑',
+        text: '视频生成需要生成大量连续帧，而编辑更像“在当前图上标注需要移动的区域、需要换掉的物体、需要保留的背景”。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '2.1',
+          title: '任务相关变化优先',
+          desc: '图像编辑模型对目标帧的局部差异更敏感，允许网络聚焦真正影响动作的区域而不是背景噪声。',
+          componentId: 'example-slider',
+        },
+      ],
+      insight: '图像编辑预训练提供了从当前视觉状态到目标视觉状态的变化建模先验；论文将这一先验作为动作预测的输入基础，而不是把编辑任务与控制任务视为完全等价。',
+      formula: {
+        lead: '编辑模型学习的不是所有未来画面，而是条件化的差异场，表达为当前图像与目标图像之间的转换。',
+        unicode: 'p(y | x, c) = p(\Delta y | x, c), \quad \Delta y = y - x',
+        symbols: [
+          { sym: 'x', desc: '当前观测' },
+          { sym: 'y', desc: '目标状态' },
+          { sym: '\Delta y', desc: '动作相关的状态差异' },
+          { sym: 'c', desc: '任务指令或动作语义' },
+        ],
+      },
+      takeaways: [
+        { icon: '🧩', title: '目标转移更稀疏', desc: '动作相关变化通常只发生在一小部分区域，而不是整个场景。' },
+        { icon: '📍', title: '位置更有意义', desc: '编辑模型天然学习“哪里需要变化”，这正是控制问题所需。' },
+        { icon: '🔍', title: '关注任务特征', desc: '模型不被无关背景纹理所稀释。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-3',
+      title: 'ImageWAM 的结构：从图片编辑到行动专家',
+      badge: 'both',
+      badgeLabel: '方法概览',
+      bridge: '本文不是简单抛弃视频，而是把图像编辑过程中的中间表示复用为世界-动作上下文，再交给动作专家做控制。',
+      analogy: {
+        title: '类比：先规划“修改区域”，再决定“怎么动”',
+        text: '编辑模型先告诉系统“目标状态在哪里改变”，动作专家再根据这个信息决定机械动作、抓取方向和推进幅度。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '3.1',
+          title: '当前状态到目标变化的编辑条件',
+          desc: '编辑模型通过去噪过程形成广泛且稳定的视觉-语义上下文，而这些中间表示比完整视频帧更紧凑。',
+          componentId: 'example-slider',
+        },
+      ],
+      insight: 'ImageWAM 的关键是让编辑过程产物成为动作专家可读取的状态摘要，从而在该方法的设计中避免显式解码完整未来视频。',
+      formula: {
+        lead: '编辑缓存与动作策略共享一份压缩世界状态，而不是重放完整未来帧序列。',
+        unicode: 'h_t = E(I_t, c), \quad a_t = \pi_\theta(h_t, s_t)',
+        symbols: [
+          { sym: 'E', desc: '图像编辑编码器' },
+          { sym: 'h_t', desc: '动作相关的压缩上下文' },
+          { sym: 's_t', desc: '现有状态或控制状态' },
+          { sym: '\pi_\theta', desc: '动作专家策略网络' },
+        ],
+      },
+      takeaways: [
+        { icon: '🧠', title: '压缩世界表示', desc: '不仅保留关键变化，也减少无关噪声。' },
+        { icon: '🛠️', title: '编辑缓存可复用', desc: '它服务于动作决策，而非单独用于显示视频。' },
+        { icon: '📈', title: '动作与视觉耦合', desc: '视觉编辑和策略网络共同表达世界状态变化。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-4',
+      title: 'KV cache 为什么能变成世界-动作上下文？',
+      badge: 'trn',
+      badgeLabel: '关键机制',
+      bridge: '在编辑去噪过程中产生的 KV cache 记录了关键视觉注意，它可以直接被动作专家读取，形成更紧凑的动态世界语义。',
+      analogy: {
+        title: '类比：把“修图步骤”记录成导航地图',
+        text: '编辑器会记住哪些区域在具体改动中最关键；动作专家只需要读取这个“导航地图”，而不是重新看整部未来动画。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '4.1',
+          title: '编辑缓存与行为决策的耦合',
+          desc: '利用图像编辑器产生的缓存注入动作头，从而获得更关注任务相关区域的策略输出。',
+          componentId: 'example-slider',
+        },
+      ],
+      insight: '论文的注意力分析支持这样一种解释：编辑缓存更集中于任务相关的变化区域，因此可以作为动作预测的紧凑上下文。',
+      formula: {
+        lead: '动作策略不需要逐帧观看未来，而是从编辑缓存中读取关键信息。',
+        unicode: 'Q_t, K_t, V_t = f_{edit}(I_t, c), \quad a_t = g(Q_t, K_t, V_t, s_t)',
+        symbols: [
+          { sym: 'Q_t', desc: '查询向量' },
+          { sym: 'K_t', desc: '关键视觉键' },
+          { sym: 'V_t', desc: '价值表征' },
+          { sym: 'g', desc: '动作头或策略头' },
+        ],
+      },
+      takeaways: [
+        { icon: '🗺️', title: '关注关键区域', desc: '注意力集中在任务相关的局部变化，而不是整张图。' },
+        { icon: '🚀', title: '更低延迟', desc: '无需生成完整未来视频，节点式推理更高效。' },
+        { icon: '🧪', title: '更稳的长期状态', desc: '减少由不相关未来帧碎片引发的误导。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-5',
+      title: 'ImageWAM 为什么在模拟器与真实世界实验中更强？',
+      badge: 'inf',
+      badgeLabel: '实验结果',
+      bridge: '论文比较了不同基线，重点验证：图像编辑缓存在有效性、效率和稳定性之间实现了更好的平衡。',
+      analogy: {
+        title: '类比：在模拟和真实场景中“更快做出正确动作”',
+        text: '更短的延迟和更聚焦的视觉语义，使动作策略不至于因为过多未来细节而失去方向。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '5.1',
+          title: '效率收益与动作质量',
+          desc: '论文报告 ImageWAM 在其模拟器与真实世界实验中优于所比较的标准 VLA 基线和竞争性 WAM，同时在相应对比设置下将 FLOPs 降至视频式 WAM 的约 1/6、延迟降至约 1/4。',
+          componentId: 'example-slider',
+        },
+        {
+          kind: 'module',
+          id: '5.2',
+          title: '可交互基线权衡：成功率、延迟与算力',
+          desc: '点击基线和分析维度，观察“高成功率、低延迟、低算力”之间的权衡。除 ImageWAM 的摘要级效率比例外，其余点位是定性示意，精确值应以论文统一实验表为准。',
+          componentId: 'baseline-tradeoff',
+        },
+      ],
+      insight: '在论文报告的实验设置中，减少未来重建开销并未阻止 ImageWAM 获得有竞争力的动作性能，同时带来计算与延迟收益；这些数字不应直接外推到所有任务和硬件。',
+      formula: {
+        lead: '效率收益来自于图像编辑表示的稀疏性和动作相关性。',
+        unicode: 'Cost_{video} \gg Cost_{edit}, \quad Latency_{video} \gg Latency_{edit}',
+        symbols: [
+          { sym: 'Cost_{video}', desc: '视频式世界模型的计算成本' },
+          { sym: 'Cost_{edit}', desc: '编辑式世界-动作上下文成本' },
+          { sym: 'Latency_{video}', desc: '视频预测导致的推理等待时间' },
+          { sym: 'Latency_{edit}', desc: '编辑上下文驱动的动作生成延迟' },
+        ],
+      },
+      takeaways: [
+        { icon: '📉', title: '更省计算', desc: '视频模型的未来帧预测代价远高于局部编辑表征。' },
+        { icon: '⚡', title: '更低等待', desc: '动作决策更接近实时控制的要求。' },
+        { icon: '✅', title: '更稳定结果', desc: '在真实与仿真设置中都表现出更稳定的动作质量。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-6',
+      title: '结论：世界动作模型更需要“对变化的理解”，而非“对视频的重建”',
+      badge: 'inf',
+      badgeLabel: '总结',
+      bridge: '这一章把前文合并为一个一句话判断：对动作决策来说，真正重要的是“理解何处会变”，而不是“生成一整段未来视频”。',
+      analogy: {
+        title: '类比：不是照相机记录电影，而是导航仪告诉你下一步怎么改动',
+        text: '人类控制行为最关心的是局部变化、下一步动作和风险区域，而不是整段视觉时间轴。',
+        componentId: 'example-slider',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '6.1',
+          title: '一条可迁移的原则',
+          desc: '如果未来状态中真正重要的是“变化”而不是“每一帧”，那么图像编辑式世界模型可能比视频生成更符合动作决策的基础需求。',
+          componentId: 'example-slider',
+        },
+      ],
+      insight: 'ImageWAM 的意义在于提供了一个实验性替代方案：它挑战“世界动作模型必须显式生成视频”的默认假设，但并不证明视频生成在所有控制任务中都没有价值。',
+      formula: {
+        lead: '最终的教程总结是：在某些动作预测设置中，可以优先建模任务相关的状态变化；这是一种研究方向，而不是对所有世界模型的定义。',
+        unicode: 'ImageWAM context ≈ task-relevant change understanding',
+        symbols: [
+          { sym: 'WorldModel', desc: '理解环境状态如何变化的模型' },
+          { sym: 'VideoPrediction', desc: '整段未来视频的重建' },
+          { sym: 'ChangeUnderstanding', desc: '对任务关键变化的理解与预测' },
+        ],
+      },
+      takeaways: [
+        { icon: '🌟', title: '改变范式', desc: '世界动作模型不必依赖完整视频预测。' },
+        { icon: '🎓', title: '更适应控制', desc: '关注变化胜过关注所有细节。' },
+        { icon: '🧭', title: '向真实应用靠近', desc: '更低成本、更高效率、更可解释的状态理解。' },
+      ],
+    },
+  ],
+};

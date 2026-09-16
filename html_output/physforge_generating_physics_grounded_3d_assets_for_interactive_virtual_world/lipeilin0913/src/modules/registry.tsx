@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Ch10Ana } from './ch10ana';
+import { Ch10Mod1 } from './ch10mod1';
+import { Ch1Ana } from './ch1ana';
+import { Ch1Mod1 } from './ch1mod1';
+import { Ch2Ana } from './ch2ana';
+import { Ch2Mod1 } from './ch2mod1';
+import { Ch3Ana } from './ch3ana';
+import { Ch3Mod1 } from './ch3mod1';
+import { Ch4Ana } from './ch4ana';
+import { Ch4Mod1 } from './ch4mod1';
+import { Ch4Mod2 } from './ch4mod2';
+import { Ch5Ana } from './ch5ana';
+import { Ch5Mod1 } from './ch5mod1';
+import { Ch6Ana } from './ch6ana';
+import { Ch6Mod1 } from './ch6mod1';
+import { Ch7Ana } from './ch7ana';
+import { Ch7Mod1 } from './ch7mod1';
+import { Ch8Ana } from './ch8ana';
+import { Ch8Mod1 } from './ch8mod1';
+import { Ch8Mod2 } from './ch8mod2';
+import { Ch9Ana } from './ch9ana';
+import { Ch9Mod1 } from './ch9mod1';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ch10ana'] = Ch10Ana;
+widgetRegistry['ch10mod1'] = Ch10Mod1;
+widgetRegistry['ch1ana'] = Ch1Ana;
+widgetRegistry['ch1mod1'] = Ch1Mod1;
+widgetRegistry['ch2ana'] = Ch2Ana;
+widgetRegistry['ch2mod1'] = Ch2Mod1;
+widgetRegistry['ch3ana'] = Ch3Ana;
+widgetRegistry['ch3mod1'] = Ch3Mod1;
+widgetRegistry['ch4ana'] = Ch4Ana;
+widgetRegistry['ch4mod1'] = Ch4Mod1;
+widgetRegistry['ch4mod2'] = Ch4Mod2;
+widgetRegistry['ch5ana'] = Ch5Ana;
+widgetRegistry['ch5mod1'] = Ch5Mod1;
+widgetRegistry['ch6ana'] = Ch6Ana;
+widgetRegistry['ch6mod1'] = Ch6Mod1;
+widgetRegistry['ch7ana'] = Ch7Ana;
+widgetRegistry['ch7mod1'] = Ch7Mod1;
+widgetRegistry['ch8ana'] = Ch8Ana;
+widgetRegistry['ch8mod1'] = Ch8Mod1;
+widgetRegistry['ch8mod2'] = Ch8Mod2;
+widgetRegistry['ch9ana'] = Ch9Ana;
+widgetRegistry['ch9mod1'] = Ch9Mod1;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;

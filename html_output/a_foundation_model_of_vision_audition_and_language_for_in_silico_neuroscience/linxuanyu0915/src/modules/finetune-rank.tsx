@@ -1,0 +1,14 @@
+import React from 'react';
+import type { WidgetProps } from './registry';
+import { ConfigurableStudio, AnalogyStudio, type StudioConfig } from './studio-base';
+export const AnalogyCh4:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="把刺激与 BOLD 按五秒协议对齐"/>;
+export const AnalogyCh5:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="临时静音一条轨道"/>;
+export const AnalogyCh6:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="切换观众配置路线"/>;
+const TimeAlignmentConfig:StudioConfig={"title":"协议偏移（秒）","scene":"time-risk","control":"slider","options":["0 s","1 s","2 s","3 s","4 s","5 s","6 s","7 s","8 s"],"feedback":["拖动偏移，观察同一目标配到哪段刺激。","尚未采用论文的五秒协议偏移。","尚未采用论文的五秒协议偏移。","尚未采用论文的五秒协议偏移。","尚未采用论文的五秒协议偏移。","已按论文协议对齐：ŷ[0,T] 使用 x_stim[-5,T-5]。","超过论文采用的五秒协议偏移。","超过论文采用的五秒协议偏移。","超过论文采用的五秒协议偏移。"],"formula":"T=100 s；刺激 2 Hz → 池化 → fMRI 1 Hz；五秒用于时间配对","successIndex":5};
+export const TimeAlignment:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={TimeAlignmentConfig}/>;
+const ModalityDropoutConfig:StudioConfig={"title":"训练输入","scene":"modal","control":"toggle","options":["三模态","缺文本","缺音频","缺视频"],"feedback":["三条模态都可用。","文本置零，音频与视频保留。","音频置零，文本与视频保留。","视频置零，文本与音频保留。"],"formula":"p_mod=0.3；若三条都被遮蔽则重新采样，至少保留一种模态"};
+export const ModalityDropout:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={ModalityDropoutConfig}/>;
+const SubjectRouteConfig:StudioConfig={"title":"被试路线","scene":"subject-route","control":"toggle","options":["已见被试","未见被试"],"feedback":["使用被试模块保留个体映射。","使用特殊线性层预测零样本群体平均响应。"],"formula":"W_subject ∈ ℝ^(S×D_model×N_targets)；p_subj=0.1"};
+export const SubjectRoute:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={SubjectRouteConfig}/>;
+const FinetuneRankConfig:StudioConfig={"title":"低秩初始化","scene":"rank","control":"slider","options":["r=16","r=32","r=64","r=128"],"feedback":["秩低于论文设定，仅用于观察容量变化。","秩低于论文设定，仅用于观察容量变化。","秩低于论文设定，仅用于观察容量变化。","论文设定：rank 128；全模型微调 1 个 epoch。"],"formula":"L_avg ≃ U·(奇异值因子)·Vᵀ；r=128","facts":["新被试数据：最多 1 小时且不超过一半","相对从零训练线性模型：约 2–4×，依协议而变"]};
+export const FinetuneRank:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={FinetuneRankConfig}/>;

@@ -1,0 +1,176 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-accent-wood: #92400e;
+  --paper-accent-sound: #27446e;
+  --paper-accent-highlight: #f07e47;
+  --paper-accent-success: #228d5c;
+  --paper-accent-failure: #c43f52;
+  --paper-accent-aux: #7c3aed;
+}
+
+.widget-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.widget-canvas-wrap {
+  position: relative;
+  width: 100%;
+  background: var(--paper-scene-bg);
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.widget-canvas {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.widget-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.widget-controls label {
+  font-weight: 600;
+  color: #21324a;
+  font-size: 14px;
+}
+
+.widget-controls .val {
+  color: #27446e;
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-toggle {
+  padding: 6px 14px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-toggle.active {
+  background: #27446e;
+  color: #ffffff;
+  border-color: #27446e;
+}
+
+.widget-feedback {
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.5;
+  border-left: 4px solid #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.widget-feedback.good {
+  background: #f0fdf4;
+  color: #166534;
+  border-left-color: #228d5c;
+}
+
+.widget-feedback.bad {
+  background: #fef2f2;
+  color: #991b1b;
+  border-left-color: #c43f52;
+}
+
+.metric-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.metric-badge.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.metric-badge.blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Evidence panels stay in the document flow; wide data tables scroll locally. */
+.widget-container, .module-body, .slide-content, .bg-side, .bg-side-canvas { min-width: 0; }
+.evidence-panel { padding: 20px; border: 1px solid #d7deea; border-radius: 8px; background: #f5f8f0; }
+.evidence-panel h4, .evidence-panel h5 { margin: 0 0 12px; font-size: 1rem; }
+.evidence-panel p, .evidence-panel li { font-size: 1rem; line-height: 1.75; overflow-wrap: anywhere; }
+.evidence-panel p + h5 { margin-top: 20px; }
+.evidence-panel ul { padding-left: 24px; }
+.evidence-source { margin: 0; font-size: .875rem; line-height: 1.7; color: #526175; overflow-wrap: anywhere; }
+.evidence-formula, .evidence-flow { line-height: 1.8; color: #27446e; overflow-wrap: anywhere; }
+.evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.evidence-table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid #d7deea; border-radius: 8px; }
+.evidence-table { width: 100%; border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.evidence-table caption { text-align: left; padding: 14px; font-weight: 600; color: #27446e; }
+.evidence-table th, .evidence-table td { padding: 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid #e2e8f0; }
+.evidence-table thead th { background: #edf2f7; }
+.evidence-table tbody th { font-weight: 500; }
+.evidence-table th:first-child { text-align: left; }
+.evidence-table strong { color: #166534; }
+.evidence-selected { background: #e5eef8; box-shadow: inset 3px 0 #27446e; }
+.evidence-slider { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.evidence-slider input { min-width: 0; width: 220px; max-width: 100%; }
+.wave-plot { display: block; width: 100%; height: auto; border: 1px solid #d7deea; border-radius: 8px; }
+.wave-plot text { fill: #334155; font-size: 15px; }
+.patch-grid { overflow-x: auto; }
+.patch-grid > div { display: flex; gap: 4px; margin-bottom: 4px; }
+.patch-grid span { padding: 6px 10px; min-width: 50px; text-align: center; border: 1px solid #b8c6d5; background: white; }
+.analogy-text-only .analogy-body { width: 100%; padding: 18px 22px; }
+.analogy-text-only { min-height: 0; }
+.btn-toggle { font-size: .875rem; min-height: 40px; }
+.widget-feedback { font-size: 1rem; line-height: 1.7; }
+button:focus-visible, input:focus-visible, .evidence-table-wrap:focus-visible { outline: 3px solid #f07e47; outline-offset: 3px; }
+.fe-formula { overflow-wrap: anywhere; white-space: normal; }
+.formula-symbols { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+@media (max-width: 760px) {
+  .evidence-grid { grid-template-columns: 1fr; }
+  .evidence-panel { padding: 14px; }
+  .widget-controls { padding: 12px; }
+  .evidence-table caption { min-width: 260px; }
+}

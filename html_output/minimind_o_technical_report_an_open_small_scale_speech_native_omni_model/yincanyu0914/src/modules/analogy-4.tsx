@@ -1,0 +1,1 @@
+export function Analogy4(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>一个选择</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>读取哪一层的状态？</div><div style={{fontSize:13,color:'#63758a'}}>默认零基层 3，即第 4 层之后</div></div>}

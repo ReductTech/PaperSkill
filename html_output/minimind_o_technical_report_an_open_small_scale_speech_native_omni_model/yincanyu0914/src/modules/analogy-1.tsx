@@ -1,0 +1,1 @@
+export function Analogy1(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>三种输入</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>文字 / 语音 / 图片</div><div style={{fontSize:13,color:'#63758a'}}>共同输出：文字与语音</div></div>}

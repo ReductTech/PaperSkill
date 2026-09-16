@@ -1,0 +1,52 @@
+import React from 'react';
+import './module-ui.css';
+import { Analogy1 } from './analogy-1';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { C1 } from './c1';
+import { C2 } from './c2';
+import { C3 } from './c3';
+import { C4 } from './c4';
+import { C5 } from './c5';
+import { C6 } from './c6';
+import { C7A } from './c7a';
+import { C7B } from './c7b';
+import { C8 } from './c8';
+import { C9, C9B } from './c9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['c1'] = C1;
+widgetRegistry['c2'] = C2;
+widgetRegistry['c3'] = C3;
+widgetRegistry['c4'] = C4;
+widgetRegistry['c5'] = C5;
+widgetRegistry['c6'] = C6;
+widgetRegistry['c7a'] = C7A;
+widgetRegistry['c7b'] = C7B;
+widgetRegistry['c8'] = C8;
+widgetRegistry['c9'] = C9;
+widgetRegistry['c9b'] = C9B;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;

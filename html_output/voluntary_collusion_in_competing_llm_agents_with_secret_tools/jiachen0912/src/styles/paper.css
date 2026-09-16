@@ -1,0 +1,1137 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* Card-table-night scene colors (牌桌之夜). Only scene neutrals here;
+     semantic roles (--blue/--green/--red/--orange/--purple) stay in tokens.css. */
+  --paper-scene-bg: #f5f8f0;
+  --paper-felt: #b8c9a7;
+  --paper-felt-dark: #76906a;
+  --paper-gold: #d97706;
+}
+
+/* Continuous scroll layout (一页到底): cover + all chapters flow in one page.
+   Chapters get vertical breathing room; the sidebar scrolls to each anchor. */
+.slide-content.continuous > section.chap {
+  margin-top: 48px;
+  scroll-margin-top: 16px;
+}
+.slide-content.continuous > div:not(:first-child) {
+  margin-top: 48px;
+}
+
+/* Reading outline (阅读导览 · 六大部分) */
+.outline {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.outline-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.outline-sub {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.outline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 18px 0 0;
+}
+.outline-part {
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.outline-part-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.outline-part-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 50%;
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.outline-part-title {
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.outline-part-desc {
+  margin: 8px 0 10px;
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.outline-part-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.outline-chap {
+  padding: 5px 11px;
+  background: var(--blue-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-pill);
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  cursor: pointer;
+  text-align: left;
+}
+.outline-chap:hover {
+  border-color: var(--blue);
+}
+.outline-part-note {
+  color: var(--slate-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  font-style: italic;
+}
+.outline-repro {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  background: var(--blue-soft);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.outline-repro b {
+  color: var(--blue);
+}
+
+@media (max-width: 768px) {
+  .outline-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Grouped sidebar: chapters nested under the six outline parts (快速定位) */
+.sidebar-part {
+  margin-top: 2px;
+}
+.sidebar-part-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 4px;
+  color: var(--slate-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.sidebar-part-num {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-radius: 50%;
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+  font-weight: var(--ui-type-h3-weight);
+}
+.sidebar-part-title {
+  color: var(--slate-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.slide-sidebar-item.sidebar-chapter {
+  padding-left: 26px;
+}
+.sidebar-part-note {
+  padding: 4px 12px 6px 26px;
+  color: var(--slate-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  font-style: italic;
+  cursor: pointer;
+}
+.sidebar-part-note:hover {
+  color: var(--blue);
+}
+
+/* Repro guide (项目复现指南与避坑要点) */
+.repro-guide {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.repro-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.repro-sub {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.repro-original {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border-left: 4px solid var(--orange);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.repro-original b {
+  color: var(--orange);
+}
+.repro-h3 {
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  border-bottom: 1px solid var(--line);
+}
+.repro-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.repro-list li {
+  position: relative;
+  padding: 8px 0 8px 22px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+}
+.repro-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 16px;
+  width: 7px;
+  height: 7px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+.repro-list li b {
+  color: var(--ink);
+}
+.repro-problem {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.repro-q {
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.repro-cause {
+  margin: 6px 0;
+  color: var(--red);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+.repro-fix {
+  color: var(--green);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.repro-check-intro {
+  margin: 0 0 8px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.repro-check {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.repro-check li {
+  position: relative;
+  padding: 8px 0 8px 28px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+}
+.repro-check li::before {
+  content: '☐';
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  color: var(--orange);
+  font-size: 16px;
+}
+
+/* Module legend (图例：颜色 → 含义) */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 10px 0 2px;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  color: var(--slate);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Intro (引言 · 项目概述) */
+.intro {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.intro-title {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.intro p {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+  text-align: justify;
+}
+.intro p:last-child {
+  margin-bottom: 0;
+}
+.intro p b {
+  color: var(--ink);
+}
+
+/* Sci-fi science-video script (科普视频 · 创作脚本) */
+.scifi-video {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.scifi-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.scifi-sub {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.scifi-headline {
+  margin: 18px 0 0;
+  padding: 18px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--blue-soft), var(--purple-soft));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.scifi-headline-title {
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.scifi-headline-sub {
+  margin-top: 6px;
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+.scifi-h3 {
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  border-bottom: 1px solid var(--line);
+}
+.scifi-clips {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.scifi-clip {
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.scifi-clip-work {
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.scifi-clip-imagery {
+  margin: 6px 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.scifi-clip-map {
+  color: var(--purple);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.scifi-shots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scifi-shot {
+  display: flex;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.scifi-time {
+  flex-shrink: 0;
+  width: 52px;
+  padding-top: 1px;
+  color: var(--blue);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.scifi-shot-body {
+  flex: 1;
+}
+.scifi-frame {
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.scifi-narration {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+@media (max-width: 768px) {
+  .scifi-clips {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Anime agents section (角色小剧场 · 动漫演示) */
+.anime-agents {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.anime-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.anime-sub {
+  margin: 6px 0 14px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.anime-sub b {
+  color: var(--ink);
+}
+
+/* Original excerpts (原文摘录与数据对照) */
+.excerpt {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.excerpt-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.excerpt-sub {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.excerpt-sub b {
+  color: var(--ink);
+}
+.excerpt-h3 {
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  border-bottom: 1px solid var(--line);
+}
+.excerpt-block {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.excerpt-label {
+  margin-bottom: 8px;
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.excerpt-en {
+  padding-left: 14px;
+  border-left: 4px solid var(--blue);
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+  font-style: italic;
+}
+.excerpt-zh {
+  margin-top: 8px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.excerpt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 0;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+.excerpt-table th,
+.excerpt-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.excerpt-table th {
+  background: var(--paper-2);
+  color: var(--slate);
+  font-weight: var(--ui-type-h3-weight);
+}
+.excerpt-table td:nth-child(2) {
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+}
+
+/* Per-chapter source card (嵌入章节的原文) */
+.chapter-source {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.cs-label {
+  margin-bottom: 6px;
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.cs-en {
+  color: var(--ink);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+  font-style: italic;
+}
+.cs-zh {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+.cs-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--ui-type-body-small-size);
+  vertical-align: top;
+}
+.cs-table tr:last-child td {
+  border-bottom: 0;
+}
+.cs-item {
+  color: var(--slate);
+  font-weight: var(--ui-type-h3-weight);
+  white-space: nowrap;
+}
+.cs-cell-en {
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+  font-style: normal;
+}
+.cs-cell-zh {
+  color: var(--ink-2);
+}
+
+/* Video demo (视频演示) */
+.video-demo {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.video-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.video-sub {
+  margin: 6px 0 14px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.video-player {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #000;
+}
+
+/* Per-chapter scholar Q&A (学者追问) */
+.chapter-qa {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--orange-soft);
+  border: 1px solid rgba(240, 126, 71, 0.38);
+  border-left: 4px solid var(--orange);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.qa-label {
+  margin-bottom: 8px;
+  color: var(--orange);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.qa-item {
+  margin: 8px 0;
+}
+.qa-q {
+  color: var(--ink);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.qa-a {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+
+/* Tech deep-dive (关键技术实现 · 补充) */
+.tech-dive {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.tech-banner {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-bottom: 12px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: var(--ui-radius-pill);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.tech-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.tech-note {
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  background: var(--red-soft);
+  border-left: 4px solid var(--red);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.tech-note b {
+  color: var(--red);
+}
+.tech-h3 {
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  border-bottom: 1px solid var(--line);
+}
+.tech-list {
+  margin: 0 0 8px;
+  padding-left: 22px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+}
+.tech-list li {
+  margin: 6px 0;
+}
+.tech-list b {
+  color: var(--ink);
+}
+.tech-list code {
+  padding: 1px 5px;
+  background: var(--paper-2);
+  border-radius: 4px;
+  color: var(--orange);
+  font-family: var(--ui-font-mono);
+  font-size: 0.9em;
+}
+.tech-tip {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: var(--blue-soft);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.tech-tip b {
+  color: var(--blue);
+}
+.tech-fix {
+  background: var(--orange-soft);
+  border-left-color: var(--orange);
+}
+.tech-fix b {
+  color: var(--orange);
+}
+.tech-doubt {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.tech-doubt b {
+  color: var(--yellow);
+}
+.tech-doubt code {
+  padding: 1px 4px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-family: var(--ui-font-mono);
+  font-size: 0.9em;
+}
+.tech-list em {
+  color: var(--slate-2);
+  font-style: normal;
+  font-size: 0.92em;
+}
+
+/* Per-chapter closing (硬核要点 + 下一问) */
+.chapter-link {
+  margin: 14px 0 0;
+}
+.cl-facts {
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.cl-label {
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.cl-facts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cl-facts li {
+  position: relative;
+  padding: 3px 0 3px 18px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.cl-facts li::before {
+  content: '▸';
+  position: absolute;
+  left: 2px;
+  color: var(--green);
+}
+.cl-next {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--blue-soft);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+.cl-next-label {
+  color: var(--blue);
+  font-weight: var(--ui-type-h3-weight);
+  margin-right: 8px;
+}
+
+/* Per-chapter study zone (新手卡点 + 思考任务 + 设计考量) */
+.chapter-study {
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.csy-pitfall,
+.csy-task,
+.csy-design {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+  color: var(--ink-2);
+}
+.csy-pitfall {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+}
+.csy-task {
+  background: var(--purple-soft);
+  border-left: 4px solid var(--purple);
+}
+.csy-design {
+  background: var(--paper-2);
+  border-left: 4px solid var(--slate-2);
+}
+.csy-tag {
+  display: inline-block;
+  margin-right: 8px;
+  font-weight: var(--ui-type-h3-weight);
+}
+.csy-pitfall .csy-tag {
+  color: var(--yellow);
+}
+.csy-task .csy-tag {
+  color: var(--purple);
+}
+.csy-design .csy-tag {
+  color: var(--slate-2);
+}
+.csy-q {
+  color: var(--ink);
+  font-weight: var(--ui-type-h3-weight);
+}
+.csy-a {
+  display: block;
+  margin-top: 2px;
+}
+.csy-line {
+  margin: 4px 0;
+}
+.csy-line b {
+  color: var(--ink);
+}
+
+/* Intro authenticity note */
+.intro-verify {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--green-soft);
+  border-left: 4px solid var(--green);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+  text-align: left;
+}
+.intro-verify b {
+  color: var(--green);
+}
+
+/* Collapsible */
+.collapsible {
+  margin: 8px 0 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  overflow: hidden;
+}
+.collapsible-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+  color: var(--ink);
+}
+.collapsible-head:hover {
+  background: var(--blue-soft);
+}
+.collapsible-arrow {
+  flex-shrink: 0;
+  color: var(--blue);
+}
+.collapsible-summary {
+  flex: 1;
+}
+.collapsible-hint {
+  color: var(--slate-2);
+  font-weight: var(--ui-type-body-small-weight);
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+.collapsible-body {
+  padding: 8px 14px 12px;
+  border-top: 1px dashed var(--line);
+}
+
+/* Data deep-dive */
+.dd-item {
+  margin: 8px 0;
+}
+.dd-q {
+  color: var(--ink);
+  font-weight: var(--ui-type-h3-weight);
+  font-size: var(--ui-type-body-small-size);
+}
+.dd-a {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+
+/* Applications */
+.applications {
+  padding: 28px 26px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+.apps-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.apps-sub {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+}
+.apps-h3 {
+  margin: 22px 0 10px;
+  padding-bottom: 6px;
+  color: var(--ink);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  border-bottom: 1px solid var(--line);
+}
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.apps-item {
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.apps-ico {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.apps-item b {
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+}
+.apps-item p {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.apps-list {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+}
+.apps-list li {
+  margin: 6px 0;
+}
+.apps-list b {
+  color: var(--ink);
+}
+@media (max-width: 768px) {
+  .apps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Chapter transition band (章节过渡带：勾连翻页连贯感) */
+.chapter-transition {
+  margin: 22px 0 0;
+  padding: 16px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--blue-soft), var(--green-soft));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.ct-arrow {
+  color: var(--blue);
+  font-size: 22px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.ct-q {
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.ct-next {
+  margin-top: 6px;
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+
+/* Chapter intro prose (本章导读：增加文字) */
+.chapter-intro {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+  text-align: justify;
+}
+
+/* 视觉再平衡：等比例缩小大画布（模块 + 动漫小剧场） */
+.module-body canvas,
+.anime-agents canvas {
+  width: 800px !important;
+  height: auto !important;
+}
+.tech-code {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: #1f2937;
+  color: #e5e7eb;
+  border-radius: var(--radius-sm);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-small-size);
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+}

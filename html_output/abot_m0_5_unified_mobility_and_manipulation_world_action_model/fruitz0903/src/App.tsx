@@ -9,6 +9,8 @@ import { TemporalAlignmentSection } from "./presentation/TemporalAlignmentSectio
 import { ActionSpaceAlignmentSection } from "./presentation/ActionSpaceAlignmentSection";
 import { TrainTestAlignmentSection } from "./presentation/TrainTestAlignmentSection";
 import { FinalSynthesisSection } from "./presentation/FinalSynthesisSection";
+import { STORY_SECTIONS } from "./presentation/ProgressNavigation";
+import { PptBars } from "./components/PptBars";
 
 export default function App() {
   const { active, goTo } = useStoryNavigation(6);
@@ -23,6 +25,13 @@ export default function App() {
         <TrainTestAlignmentSection />
         <FinalSynthesisSection />
       </main>
+      <PptBars
+        sections={STORY_SECTIONS}
+        active={active}
+        onSelect={goTo}
+        venue="ABot-M0.5"
+        title="Unified Mobility-and-Manipulation World Action Model"
+      />
     </div>
   );
 }

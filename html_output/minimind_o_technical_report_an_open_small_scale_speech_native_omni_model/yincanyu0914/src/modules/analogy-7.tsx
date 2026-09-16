@@ -1,0 +1,1 @@
+export function Analogy7(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>两个区域</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>参考条件 / 生成目标</div><div style={{fontSize:13,color:'#63758a'}}>条件区不计算目标音频损失</div></div>}

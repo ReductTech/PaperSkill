@@ -1,0 +1,190 @@
+/* Paper-specific overrides for FlowEdit — 修一张照片 / light-table retouching */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-light-env: #b8c9a7;
+  --paper-dark-env: #76906a;
+  --paper-photo-frame: #92400e;
+  --paper-accent-2: #d97706;
+  --paper-table: #e8efe0;
+}
+
+/* Module control buttons: match framework .tiny look (widgets often omit the class) */
+.ctrl button:not(.chip) {
+  padding: 8px 17px;
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  color: #fff;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.ctrl button:not(.chip):hover:not(:disabled) {
+  background: #1f385d;
+  border-color: #1f385d;
+  transform: translateY(-1px);
+}
+.ctrl button:not(.chip):disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.ctrl button:not(.chip).ghost,
+.ctrl button.tiny.ghost {
+  background: #fff;
+  color: var(--blue);
+  border-color: var(--line, #d7deea);
+}
+.ctrl button:not(.chip).ghost:hover:not(:disabled),
+.ctrl button.tiny.ghost:hover:not(:disabled) {
+  background: var(--blue-soft, #e8eef6);
+  border-color: var(--blue);
+}
+button.tiny {
+  padding: 8px 17px;
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  color: #fff;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  appearance: none;
+  -webkit-appearance: none;
+}
+button.tiny:hover:not(:disabled) {
+  background: #1f385d;
+  border-color: #1f385d;
+}
+button.tiny:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button.tiny.ghost {
+  background: #fff;
+  color: var(--blue);
+  border-color: var(--line, #d7deea);
+}
+
+/* Chips: accept both .selected (framework) and .active (widget shorthand) */
+.chip.active,
+button.chip.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+/* Hero side images: keep aspect, avoid empty white slab */
+.bg-side-img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  background: var(--paper-scene-bg);
+  border-top: 1px solid var(--line, #d7deea);
+}
+
+/* Chapter-end quiz */
+.quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.quiz-item {
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 12px;
+}
+.quiz-stem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  color: var(--ink, #21324a);
+  font-weight: 600;
+  line-height: 1.45;
+}
+.quiz-num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--blue-soft, #e8eef6);
+  color: var(--blue);
+  font-size: 13px;
+}
+.quiz-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quiz-choice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  background: var(--paper-2, #f5f7fa);
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 10px;
+  color: var(--ink-2, #334155);
+  font-weight: 500;
+  line-height: 1.4;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.quiz-choice:hover:not(:disabled) {
+  border-color: var(--blue);
+}
+.quiz-choice.selected {
+  border-color: var(--blue);
+  background: var(--blue-soft, #e8eef6);
+  color: var(--blue);
+}
+.quiz-choice.correct {
+  border-color: var(--green, #228d5c);
+  background: var(--green-soft, #e8f6ef);
+  color: var(--green, #228d5c);
+}
+.quiz-choice.wrong {
+  border-color: var(--red, #c43f52);
+  background: var(--red-soft, #fdecee);
+  color: var(--red, #c43f52);
+}
+.quiz-choice:disabled {
+  cursor: default;
+}
+.quiz-key {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.quiz-explain {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--green, #228d5c);
+  color: var(--slate, #68778f);
+  font-size: 0.92em;
+  line-height: 1.45;
+}
+.quiz-actions {
+  margin-top: 4px;
+}

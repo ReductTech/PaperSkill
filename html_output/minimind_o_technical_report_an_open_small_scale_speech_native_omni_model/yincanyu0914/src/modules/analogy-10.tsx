@@ -1,0 +1,1 @@
+export function Analogy10(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>先看协议</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>比较对象与指标定义</div><div style={{fontSize:13,color:'#63758a'}}>CER 不是音质评分</div></div>}

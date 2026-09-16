@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { Msa1 } from './msa-1';
+import { Msa10 } from './msa-10';
+import { Msa2 } from './msa-2';
+import { Msa3 } from './msa-3';
+import { Msa4 } from './msa-4';
+import { Msa5 } from './msa-5';
+import { Msa6 } from './msa-6';
+import { Msa7 } from './msa-7';
+import { Msa8 } from './msa-8';
+import { Msa9 } from './msa-9';
+import { MsaBoundary } from './msa-boundary';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['msa-1'] = Msa1;
+widgetRegistry['msa-10'] = Msa10;
+widgetRegistry['msa-2'] = Msa2;
+widgetRegistry['msa-3'] = Msa3;
+widgetRegistry['msa-4'] = Msa4;
+widgetRegistry['msa-5'] = Msa5;
+widgetRegistry['msa-6'] = Msa6;
+widgetRegistry['msa-7'] = Msa7;
+widgetRegistry['msa-8'] = Msa8;
+widgetRegistry['msa-9'] = Msa9;
+widgetRegistry['msa-boundary'] = MsaBoundary;

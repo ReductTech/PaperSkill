@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { Balance } from './balance';
+import { Conclusion } from './conclusion';
+import { Equations } from './equations';
+import { Grouping } from './grouping';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { Mismatch } from './mismatch';
+import { Practical } from './practical';
+import { Quiz } from './quiz';
+import { Results } from './results';
+import { Reversal } from './reversal';
+import { Scopes } from './scopes';
+import { Stages } from './stages';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['balance'] = Balance;
+widgetRegistry['conclusion'] = Conclusion;
+widgetRegistry['equations'] = Equations;
+widgetRegistry['grouping'] = Grouping;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['mismatch'] = Mismatch;
+widgetRegistry['practical'] = Practical;
+widgetRegistry['quiz'] = Quiz;
+widgetRegistry['results'] = Results;
+widgetRegistry['reversal'] = Reversal;
+widgetRegistry['scopes'] = Scopes;
+widgetRegistry['stages'] = Stages;

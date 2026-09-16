@@ -1,0 +1,1 @@
+export { HeroOld } from './heroComparison';

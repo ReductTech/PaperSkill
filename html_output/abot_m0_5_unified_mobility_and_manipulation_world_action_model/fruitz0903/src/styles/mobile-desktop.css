@@ -1,0 +1,27 @@
+/* ============================================================
+   手机端「桌面版整体缩放」的配套适配
+   ------------------------------------------------------------
+   配合 index.html 里的 <meta name="viewport" content="width=1600">。
+
+   竖屏时布局视口会变成"又高又窄"（例：1600 × 3460，因为布局高度
+   = 设备高度 ÷ 缩放比），于是 `min-height: 100svh` 被放大到几千 px：
+   每一屏 (.story-screen) 被撑得极高、内容又垂直居中 → 章节之间出现
+   大片空白。横屏时布局高度只有几百 px，由论文原有的 max-height 规则
+   接管，所以看起来正常。
+
+   这里在"视口比宽还高（竖屏）"时，改用论文自身窄屏规则（见
+   presentation.css 的 @media (max-width:760px)）的同款做法：每屏按
+   内容高度排布，并把滚动捕捉由 mandatory 放宽为 proximity。
+   本文件只做新增覆盖，不改动 presentation.css。
+   ============================================================ */
+
+@media (min-width: 1051px) and (max-aspect-ratio: 1/1) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .story-screen {
+    min-height: auto;
+    overflow: visible;
+  }
+}

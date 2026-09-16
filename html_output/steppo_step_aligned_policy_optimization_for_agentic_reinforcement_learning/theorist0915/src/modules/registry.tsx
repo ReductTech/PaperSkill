@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { Ch1Compare } from './ch1-compare';
+import { Ch1Mismatch } from './ch1-mismatch';
+import { Ch1Table1 } from './ch1-table1';
+import { Ch10Race } from './ch10-race';
+import { Ch2Repr } from './ch2-repr';
+import { Ch3StepMdp } from './ch3-step-mdp';
+import { Ch4Gae } from './ch4-gae';
+import { Ch5Credit } from './ch5-credit';
+import { Ch6Rollout } from './ch6-rollout';
+import { Ch7Is } from './ch7-is';
+import { Ch8Arch } from './ch8-arch';
+import { Ch9Gamma } from './ch9-gamma';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['ch1-compare'] = Ch1Compare;
+widgetRegistry['ch1-mismatch'] = Ch1Mismatch;
+widgetRegistry['ch1-table1'] = Ch1Table1;
+widgetRegistry['ch10-race'] = Ch10Race;
+widgetRegistry['ch2-repr'] = Ch2Repr;
+widgetRegistry['ch3-step-mdp'] = Ch3StepMdp;
+widgetRegistry['ch4-gae'] = Ch4Gae;
+widgetRegistry['ch5-credit'] = Ch5Credit;
+widgetRegistry['ch6-rollout'] = Ch6Rollout;
+widgetRegistry['ch7-is'] = Ch7Is;
+widgetRegistry['ch8-arch'] = Ch8Arch;
+widgetRegistry['ch9-gamma'] = Ch9Gamma;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;

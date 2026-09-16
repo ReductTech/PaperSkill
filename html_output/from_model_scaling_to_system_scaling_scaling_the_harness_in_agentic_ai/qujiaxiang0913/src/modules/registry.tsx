@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { AnalogyView } from './analogy-view';
+import { Mod11 } from './mod-1-1';
+import { Mod12 } from './mod-1-2';
+import { Mod101 } from './mod-10-1';
+import { Mod21 } from './mod-2-1';
+import { Mod31 } from './mod-3-1';
+import { Mod41 } from './mod-4-1';
+import { Mod51 } from './mod-5-1';
+import { Mod61 } from './mod-6-1';
+import { Mod71 } from './mod-7-1';
+import { Mod81 } from './mod-8-1';
+import { Mod91 } from './mod-9-1';
+import { ModHeroNew } from './mod-hero-new';
+import { ModHeroOld } from './mod-hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['analogy-view'] = AnalogyView;
+widgetRegistry['mod-1-1'] = Mod11;
+widgetRegistry['mod-1-2'] = Mod12;
+widgetRegistry['mod-10-1'] = Mod101;
+widgetRegistry['mod-2-1'] = Mod21;
+widgetRegistry['mod-3-1'] = Mod31;
+widgetRegistry['mod-4-1'] = Mod41;
+widgetRegistry['mod-5-1'] = Mod51;
+widgetRegistry['mod-6-1'] = Mod61;
+widgetRegistry['mod-7-1'] = Mod71;
+widgetRegistry['mod-8-1'] = Mod81;
+widgetRegistry['mod-9-1'] = Mod91;
+widgetRegistry['mod-hero-new'] = ModHeroNew;
+widgetRegistry['mod-hero-old'] = ModHeroOld;

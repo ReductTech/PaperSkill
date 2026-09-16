@@ -1,0 +1,182 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 卡丁车赛道练习主题场景色（与 Canvas 中的固定调色板一致） */
+  --paper-scene-bg: #f5f8f0;
+  --paper-track: #b8c9a7;
+  --paper-track-edge: #76906a;
+  --paper-centerline: #92400e;
+  --paper-kart: #ffffff;
+  --paper-ghost: #27446e;
+}
+
+/* 封面面板点击后的短暂浮窗简介 */
+.hero-tip {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  background: rgba(33, 50, 74, 0.92);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 8px 12px;
+  border-radius: 8px;
+  pointer-events: none;
+  animation: heroTipIn 0.18s ease-out;
+}
+
+@keyframes heroTipIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 模块 + 原文依据浮窗的双栏布局 */
+.module-split {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.module-split-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.evidence-panel {
+  flex: 0 0 268px;
+  max-width: 268px;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--ui-radius-sm);
+  padding: 10px 12px 12px;
+  position: sticky;
+  top: 16px;
+}
+
+.evidence-head {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.evidence-quote {
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.evidence-quote:last-child {
+  margin-bottom: 0;
+}
+
+.evidence-en {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.evidence-en mark {
+  background: var(--orange-soft);
+  color: var(--ink);
+  padding: 0 1px;
+  border-radius: 2px;
+  font-style: normal;
+}
+
+.evidence-zh {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+.evidence-loc {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--slate);
+  opacity: 0.75;
+}
+
+/* 局限与展望面板 */
+.limits-panel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper-2);
+  border-left: 3px solid var(--orange);
+}
+
+.limits-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--orange);
+  margin-bottom: 6px;
+}
+
+.limits-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--slate);
+  line-height: 1.65;
+}
+
+/* 模块内按步文字讲解日志 */
+.step-log {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-log-item {
+  padding: 7px 10px;
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper-2);
+  border-left: 3px solid var(--line-2);
+  font-size: 13px;
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+.step-log-item.good {
+  border-left-color: var(--green);
+  color: var(--green);
+}
+
+.step-log-item.bad {
+  border-left-color: var(--red);
+  color: var(--red);
+}
+
+.step-log-item.info {
+  border-left-color: var(--blue);
+  color: var(--blue);
+}
+
+@media (max-width: 960px) {
+  .module-split {
+    flex-direction: column;
+  }
+
+  .evidence-panel {
+    flex: none;
+    max-width: none;
+    width: 100%;
+    position: static;
+  }
+}

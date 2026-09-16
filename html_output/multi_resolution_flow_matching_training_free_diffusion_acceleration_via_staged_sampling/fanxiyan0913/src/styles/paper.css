@@ -1,0 +1,276 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Semantic color roles from tokens.css stay stable (contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only scene colors are tuned here. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-accent-2: #d97706;
+}
+
+/* ==================================================================
+   前置知识 slide（PrerequisiteMap）
+   ================================================================== */
+.pre-section { display: block; }
+.pre-intro {
+  max-width: 62ch;
+  margin: 4px 0 20px;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: var(--ui-type-body-line-height);
+}
+.pre-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.pre-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+}
+.pre-card:hover { border-color: var(--line-2); box-shadow: var(--shadow-hover); }
+.pre-card.open { border-color: var(--blue); }
+.pre-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pre-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: var(--ui-radius-pill);
+  background: var(--blue);
+  color: #fff;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: 700;
+}
+.pre-title {
+  flex: 1;
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: 700;
+  line-height: 1.4;
+}
+.pre-toggle {
+  color: var(--slate);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-size);
+}
+.pre-intuition {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.pre-detail {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  animation: chap-reveal var(--t-med) var(--ease-out) both;
+}
+.pre-field + .pre-field { margin-top: 12px; }
+.pre-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: 700;
+}
+.pre-field p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+
+/* ==================================================================
+   章节自测（ChapterQuiz）
+   ================================================================== */
+.quiz-block {
+  margin: 24px 0 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+}
+.quiz-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.quiz-kicker {
+  padding: 2px 10px;
+  border-radius: var(--ui-radius-pill);
+  background: var(--blue);
+  color: #fff;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: 700;
+}
+.quiz-hint {
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+}
+.quiz-item + .quiz-item {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--line);
+}
+.quiz-prompt {
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.quiz-num {
+  margin-right: 8px;
+  color: var(--orange);
+  font-family: var(--ui-font-mono);
+  font-weight: 700;
+}
+.quiz-options { display: grid; gap: 8px; }
+.quiz-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+}
+.quiz-option:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-soft); }
+.quiz-option:disabled { cursor: default; }
+.quiz-option-key {
+  flex-shrink: 0;
+  color: var(--slate);
+  font-family: var(--ui-font-mono);
+  font-weight: 700;
+}
+.quiz-option.right { border-color: var(--green); background: var(--green-soft); color: var(--ink); }
+.quiz-option.right .quiz-option-key { color: var(--green); }
+.quiz-option.wrong { border-color: var(--red); background: var(--red-soft); color: var(--ink); }
+.quiz-option.wrong .quiz-option-key { color: var(--red); }
+.quiz-option.dim { opacity: 0.55; }
+.quiz-feedback {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--green);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  background: var(--green-soft);
+  animation: chap-reveal var(--t-med) var(--ease-out) both;
+}
+.quiz-feedback.no { border-left-color: var(--red); background: var(--red-soft); }
+.quiz-feedback-line {
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.quiz-explain {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+}
+.quiz-label {
+  margin-right: 8px;
+  color: var(--blue);
+  font-weight: 700;
+}
+.quiz-retry {
+  margin-top: 10px;
+  padding: 7px 16px;
+  border: 1px solid var(--blue);
+  border-radius: var(--ui-radius-pill);
+  background: var(--paper);
+  color: var(--blue);
+  font-family: inherit;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.quiz-retry:hover { background: var(--blue); color: #fff; }
+
+@media (max-width: 768px) {
+  .pre-grid { grid-template-columns: 1fr; }
+  .quiz-block { padding: 14px 16px; }
+}
+
+/* ==================================================================
+   结语 slide（Closing）
+   ================================================================== */
+.closing-section { display: block; }
+.closing-lead {
+  max-width: 62ch;
+  margin: 4px 0 22px;
+  padding-left: 14px;
+  border-left: 4px solid var(--blue);
+  color: var(--ink);
+  font-size: var(--ui-type-subtitle-size);
+  font-weight: var(--ui-type-subtitle-weight);
+  line-height: var(--ui-type-subtitle-line-height);
+}
+.closing-body { max-width: 68ch; }
+.closing-body p {
+  margin: 0 0 1.15em;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-size);
+  font-weight: var(--ui-type-body-weight);
+  line-height: 1.85;
+  text-align: justify;
+}
+.closing-body p:last-child { margin-bottom: 0; }
+.closing-body b { color: var(--ink); }
+.closing-oneliner {
+  max-width: 68ch;
+  margin: 26px 0 0;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--green-soft);
+  color: var(--ink);
+  font-size: var(--ui-type-body-size);
+  font-weight: 700;
+  line-height: 1.7;
+}
+.closing-oneliner::before {
+  content: '一句话记住';
+  display: block;
+  margin-bottom: 6px;
+  color: var(--green);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+  .closing-body p { font-size: var(--ui-type-body-small-size); text-align: left; }
+  .closing-lead { font-size: var(--ui-type-body-size); }
+}

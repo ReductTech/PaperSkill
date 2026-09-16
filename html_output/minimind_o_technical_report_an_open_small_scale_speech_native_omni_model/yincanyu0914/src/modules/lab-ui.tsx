@@ -1,0 +1,30 @@
+import React, {useId, useState} from 'react';
+import {DeepDive} from './deep-dive';
+const css=`
+.shot-enter{animation:shotEnter .5s ease-out}.process-strip{display:grid;grid-template-columns:1fr 22px 1fr 22px 1fr;gap:7px;align-items:center;margin:15px 0}.process-symbol{font-size:22px;color:#7b90a9}.matrix-block{width:90%;height:54px;border-radius:4px;background:repeating-linear-gradient(90deg,#41658b 0,#41658b 7px,#c4d4e5 7px,#c4d4e5 8px);transition:width .6s,height .6s}.omni-lab button[aria-pressed=true]:hover{background:#27446e;color:white}@keyframes shotEnter{from{opacity:.2;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.shot-enter{animation:none}.matrix-block{transition:none}}
+
+.omni-lab{color:#26364c;font-size:15px;line-height:1.7;--lab-line:#dce3eb;--lab-muted:#63758a}
+.omni-lab .ctrl{display:flex;flex-wrap:wrap;gap:8px;padding:12px!important;background:#f5f7fa!important;margin:12px 0;border:1px solid var(--lab-line);border-radius:12px}
+.omni-lab button,.omni-lab select{font:inherit;font-size:13px;line-height:1.5;border:1px solid #ccd6e2;border-radius:7px;padding:7px 11px;background:#fff;color:#33465f;cursor:pointer;transition:background .15s,border-color .15s}
+.omni-lab button:hover:not(:disabled){background:#edf3fb;border-color:#829ab9}
+.omni-lab button[aria-pressed=true]{background:#27446e;color:white;border-color:#27446e}
+.omni-lab button:disabled{opacity:.4;cursor:default}.omni-lab :is(button,select,input):focus-visible{outline:3px solid #e8a361;outline-offset:3px}
+.omni-lab label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}.omni-lab input[type=range]{accent-color:#27446e;max-width:100%}
+.omni-lab .lab-note{color:var(--lab-muted);font-size:13px;margin:10px 0}.omni-lab .lab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px;margin:16px 0}
+.omni-lab .lab-card{padding:16px;border:1px solid var(--lab-line);border-radius:10px;background:#fff;min-width:0}
+.omni-lab .lab-card.active{border-color:#7995b9;background:#f0f5fb}.omni-lab .lab-card strong{display:block;color:#27446e;margin-bottom:6px}
+.omni-lab .lab-eyebrow{font-size:11px;letter-spacing:.06em;color:var(--lab-muted);text-transform:uppercase}
+.omni-lab .lab-metric{font-size:24px;line-height:1.4;font-weight:650;font-variant-numeric:tabular-nums;color:#27446e}
+.omni-lab .lab-track{border-left:3px solid #829ab9;margin:14px 0;padding:4px 0 4px 16px}
+.omni-lab .lab-token{display:inline-flex;align-items:center;justify-content:center;padding:5px 8px;border:1px solid #cbd8e9;border-radius:5px;background:#edf3fb;font-size:12px;margin:3px;min-width:26px}
+.omni-lab .feedback{font-style:normal!important;font-size:14px!important;border-radius:8px;padding:14px!important;line-height:1.8!important}
+.omni-lab table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.omni-lab th,.omni-lab td{padding:9px 8px;border-bottom:1px solid #e2e8f0}.omni-lab caption{text-align:left;padding:12px 0;color:#63758a}
+.omni-lab .lab-hint{display:inline-flex;position:relative;align-items:center;max-width:100%}.omni-lab .lab-tooltip{position:absolute;bottom:calc(100% + 9px);left:0;width:240px;max-width:calc(100vw - 65px);background:#21324a;color:#fff;border-radius:9px;padding:12px 14px;font-size:12px;line-height:1.8;box-shadow:0 8px 25px #15243b26;z-index:60;font-weight:400;text-align:left;white-space:normal}
+.omni-lab .lab-hint:last-child .lab-tooltip{left:auto;right:0}.omni-lab .lab-scroll{overflow:auto;padding:8px 2px}.omni-lab .lab-help{font-size:12px;color:#63758a}
+.omni-lab .lab-term{position:relative}.omni-lab .lab-term button{padding:0 3px;border:0;border-bottom:1px dotted #7995b9;border-radius:0;font-size:inherit;background:transparent;color:#27446e}.omni-lab .lab-term-detail{display:block;margin:8px 0;padding:12px 16px;border-left:3px solid #7995b9;background:#edf3fb;border-radius:6px;font-size:13px;line-height:1.8}.omni-lab .lab-term-detail small{display:block;color:#63758a;margin-top:4px}
+@media(max-width:600px){.omni-lab .lab-grid{grid-template-columns:1fr}.omni-lab .lab-card{padding:12px}.omni-lab .ctrl{gap:7px}.omni-lab button{min-height:38px}.omni-lab .lab-tooltip{width:210px}}
+`;
+export function Hint({text,children}:{text:string;children:React.ReactElement}){const [open,setOpen]=useState(false);const id=useId();return <span className="lab-hint" onMouseEnter={()=>setOpen(true)} onMouseLeave={()=>setOpen(false)} onFocus={()=>setOpen(true)} onBlur={()=>setOpen(false)} onKeyDown={e=>{if(e.key==='Escape'){setOpen(false);e.stopPropagation();}}}>{React.cloneElement(children as React.ReactElement<any>,{'aria-describedby':open?id:undefined})}{open&&<span id={id} className="lab-tooltip" role="tooltip">{text}</span>}</span>}
+export function Term({name,definition,detail}:{name:string;definition:string;detail:string}){const [hover,setHover]=useState(false),[pinned,setPinned]=useState(false);const id=useId();return <span className="lab-term" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)} onFocus={()=>setHover(true)} onBlur={()=>setHover(false)} onKeyDown={e=>{if(e.key==='Escape'){setPinned(false);setHover(false);e.stopPropagation();}}}><button type="button" aria-label={`${name}：术语说明`} aria-expanded={pinned} aria-controls={pinned?id+'-detail':undefined} aria-describedby={hover&&!pinned?id:undefined} onClick={()=>{setPinned(v=>!v);setHover(false);}}>{name}<small aria-hidden="true"> ⓘ</small></button>{hover&&!pinned&&<span id={id} role="tooltip" className="lab-tooltip">{definition}<small style={{display:'block',opacity:.7}}>点击固定完整说明</small></span>}{pinned&&<span id={id+'-detail'} className="lab-term-detail" role="note" aria-label={`${name}的固定说明`}>{definition} {detail}<small>说明已固定；再次点击术语或按 Esc 收起。</small></span>}</span>}
+export function Panel({children,chapter,state}:{children:React.ReactNode;chapter?:number;state?:string}){return <div className="omni-lab" data-experiment-state={state} onKeyDown={e=>e.stopPropagation()}><style>{css}</style>{children}{chapter&&<DeepDive chapter={chapter}/>}</div>}
+export const LabUi:React.FC=()=>null;

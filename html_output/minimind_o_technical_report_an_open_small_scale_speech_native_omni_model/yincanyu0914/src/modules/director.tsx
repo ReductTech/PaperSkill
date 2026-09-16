@@ -1,0 +1,7 @@
+import {useEffect,useRef,useState} from 'react';
+export type Shot={title:string;caption:string;action:()=>void};
+export function Director({shots}:{shots:Shot[]}){const [index,setIndex]=useState(-1),[playing,setPlaying]=useState(false);const latest=useRef(shots);latest.current=shots;
+ useEffect(()=>{if(!playing)return;const timer=setTimeout(()=>{if(index+1>=latest.current.length){setPlaying(false);return;}latest.current[index+1].action();setIndex(i=>i+1);},2200);return()=>clearTimeout(timer);},[playing,index]);
+ const jump=(i:number)=>{setIndex(i);latest.current[i].action();};
+ return <aside className="director"><div style={{display:'flex',gap:18,alignItems:'center',justifyContent:'space-between'}}><div><span className="director-eyebrow">机制分镜 · {index<0?'等待开始':`${index+1} / ${shots.length}`}</span><h4>{index<0?'跟随一次完整的因果过程':shots[index].title}</h4></div><div style={{display:'flex',gap:7}}><button onClick={()=>{if(index<0||index===shots.length-1)jump(0);setPlaying(!playing);}}>{playing?'暂停分镜':index===shots.length-1?'重播分镜':'播放分镜'}</button><button disabled={index===shots.length-1} onClick={()=>{setPlaying(false);jump(index+1);}}>下一镜</button></div></div><p key={index} className="shot-enter">{index<0?'播放会直接操作下方演示；也可以逐镜查看。动画节奏用于讲解，不代表模型运行时间。':shots[index].caption}</p><div className="director-progress">{shots.map((s,i)=><button key={s.title} aria-label={`跳到分镜 ${i+1}：${s.title}`} aria-pressed={index===i} onClick={()=>{setPlaying(false);jump(i);}} style={{background:i<=index?'#a9c5e9':'#475569'}}/>)}</div></aside>}
+export const DirectorWidget=()=>null;

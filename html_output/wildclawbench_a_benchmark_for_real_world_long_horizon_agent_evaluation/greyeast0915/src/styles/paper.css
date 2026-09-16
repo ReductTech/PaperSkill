@@ -1,0 +1,259 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-rock: #e3eadc;
+  --paper-rope: #27446e;
+  --paper-hold: #92400e;
+  --paper-helmet: #f07e47;
+}
+
+.module canvas,
+.analogy-visual canvas,
+.bg-side-canvas canvas {
+  background: var(--paper-scene-bg);
+}
+
+.analogy-visual .paper-figure {
+  width: 100%;
+  margin: 0;
+}
+
+.analogy-visual .paper-figure img {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+.module .chip-row {
+  row-gap: 8px;
+}
+
+.hero-intro {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-weight: 650;
+}
+
+/* Generated widgets use `active`/aria-pressed for the current choice.  Make the
+   state visible without turning the whole control into a saturated block. */
+.module .chip.active,
+.module .chip[aria-pressed="true"] {
+  background: #edf8f2;
+  border-color: #228d5c;
+  color: #176b46;
+  box-shadow: 0 0 0 2px rgba(34, 141, 92, 0.12);
+}
+
+.module .chip.answer-wrong {
+  background: #fff0f2;
+  border-color: #c43f52;
+  color: #9f2940;
+  box-shadow: 0 0 0 2px rgba(196, 63, 82, 0.1);
+}
+
+.source-links {
+  margin-top: 8px;
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  text-align: center;
+}
+
+.source-links a {
+  color: var(--blue);
+  font-weight: 650;
+}
+
+.legacy-copy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.legacy-copy-grid p {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--slate);
+}
+
+.legacy-copy-grid p:first-child {
+  border-color: rgba(196, 63, 82, 0.35);
+  background: #fff7f8;
+}
+
+.legacy-copy-grid p:last-child {
+  border-color: rgba(34, 141, 92, 0.35);
+  background: #f4fbf7;
+}
+
+.pipeline-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.pipeline-counter {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 750;
+}
+
+.pipeline-heading h4 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 1.08em;
+}
+
+.pipeline-heading p {
+  margin: 0;
+  color: var(--slate);
+}
+
+.pipeline-stage-view {
+  min-height: 430px;
+}
+
+.pipeline-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pipeline-facts span {
+  padding: 11px 12px;
+  border: 1px solid rgba(39, 68, 110, 0.22);
+  border-radius: 10px;
+  background: #f4f7fb;
+  color: var(--ink);
+  font-weight: 650;
+  text-align: center;
+}
+
+.pipeline-formula {
+  margin-top: 14px;
+  padding: 15px 17px;
+  border-left: 4px solid var(--orange);
+  border-radius: 10px;
+  background: #fff8f2;
+  color: var(--ink);
+}
+
+.pipeline-formula > span {
+  display: block;
+  margin: 7px 0;
+  color: var(--blue);
+  font-size: 1.04em;
+  font-weight: 750;
+}
+
+.pipeline-formula p {
+  margin: 0;
+  color: var(--slate);
+}
+
+.pipeline-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.pipeline-nav .chip {
+  justify-content: center;
+}
+
+.pipeline-total {
+  margin-top: 11px;
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  text-align: center;
+}
+
+.grader-explain {
+  margin-top: 14px;
+}
+
+.grader-explain h4 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 1em;
+}
+
+.grader-explain-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.grader-explain-card {
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.grader-explain-card.active {
+  border-color: #228d5c;
+  background: #edf8f2;
+  box-shadow: 0 0 0 2px rgba(34, 141, 92, 0.1);
+}
+
+.grader-explain-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink);
+}
+
+.grader-explain-title span {
+  color: var(--slate);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.82em;
+}
+
+.grader-explain-card p {
+  margin: 8px 0 5px;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.grader-explain-card small {
+  color: var(--slate);
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .legacy-copy-grid,
+  .pipeline-facts,
+  .grader-explain-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pipeline-stage-view {
+    min-height: 0;
+  }
+}

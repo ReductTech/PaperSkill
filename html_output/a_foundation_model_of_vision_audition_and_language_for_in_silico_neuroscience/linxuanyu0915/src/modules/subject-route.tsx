@@ -1,0 +1,14 @@
+import React from 'react';
+import type { WidgetProps } from './registry';
+import { ConfigurableStudio, AnalogyStudio, type StudioConfig } from './studio-base';
+export const AnalogyCh4:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="把刺激与 BOLD 按五秒协议对齐"/>;
+export const AnalogyCh5:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="临时静音一条轨道"/>;
+export const AnalogyCh6:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="切换观众配置路线"/>;
+const TimeAlignmentConfig:StudioConfig={"title":"教学演示偏移（论文固定 5 秒）","scene":"time-risk","control":"slider","options":["0 s","1 s","2 s","3 s","4 s","5 s","6 s","7 s","8 s"],"feedback":["拖动仅用于理解时间配对；论文固定使用 5 秒。","尚未到论文固定的五秒协议偏移。","尚未到论文固定的五秒协议偏移。","尚未到论文固定的五秒协议偏移。","尚未到论文固定的五秒协议偏移。","已对齐论文固定协议：ŷ[0,T] 使用 x_stim[-5,T-5]。","超过论文固定的五秒协议偏移。","超过论文固定的五秒协议偏移。","超过论文固定的五秒协议偏移。"],"formula":"论文固定：T=100 s；刺激 2 Hz → 池化 → fMRI 1 Hz；offset=5 s","successIndex":5};
+export const TimeAlignment:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={TimeAlignmentConfig}/>;
+const ModalityDropoutConfig:StudioConfig={"title":"训练输入（网络结构不变）","scene":"modal","control":"toggle","options":["三模态","缺文本","缺音频","缺视频"],"feedback":["三条模态都可用。","文本输入张量置零，网络结构不切换；音频与视频保留。","音频输入张量置零，网络结构不切换；文本与视频保留。","视频输入张量置零，网络结构不切换；文本与音频保留。"],"formula":"每模态置零概率 p_mod=0.3；若三条都置零则重新采样"};
+export const ModalityDropout:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={ModalityDropoutConfig}/>;
+const SubjectRouteConfig:StudioConfig={"title":"Transformer 后的分叉路线","scene":"subject-route","control":"toggle","options":["Seen：索引个体模块","Unseen：完全旁路"],"feedback":["Seen：按被试索引进入 W_subject 个体映射。","Unseen：完全绕过 W_subject，进入独立 shared linear layer，预测零样本群体平均响应；训练时以 p_subj=0.1 进入该旁路。"],"formula":"Seen → W_subject；Unseen → shared linear layer（训练旁路 p_subj=0.1）"};
+export const SubjectRoute:React.FC<WidgetProps>=p=><div><div className="subject-fork" aria-label="Transformer 输出分为已见被试和未见被试两条互斥路线"><div className="subject-fork-source">Transformer 输出</div><div className="subject-fork-arrow">↓ 分叉</div><div className="subject-fork-branches"><div><strong>Seen</strong><span>按被试索引</span><b>W_subject 个体模块</b></div><div><strong>Unseen</strong><span>完全绕过 W_subject</span><b>独立 shared linear layer</b><small>训练旁路 p_subj=0.1</small></div></div></div><ConfigurableStudio {...p} config={SubjectRouteConfig}/></div>;
+const FinetuneRankConfig:StudioConfig={"title":"低秩初始化","scene":"rank","control":"slider","options":["r=16","r=32","r=64","r=128"],"feedback":["秩低于论文设定，仅用于观察容量变化。","秩低于论文设定，仅用于观察容量变化。","秩低于论文设定，仅用于观察容量变化。","论文设定：rank 128；全部 TRIBE 参数解冻并微调 1 个 epoch。"],"formula":"L_avg ≃ U·Σ·Vᵀ；r=128","facts":["每位新被试：一半数据适配（该部分最多约 1 小时），另一半测试","相对从零训练线性模型：约 2–4×，依协议而变"]};
+export const FinetuneRank:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={FinetuneRankConfig}/>;

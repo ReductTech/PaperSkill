@@ -1,0 +1,337 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-ink: #21324a;
+  --paper-ink-muted: #68778f;
+  --paper-line: #d7deea;
+  --paper-route: #92400e;
+  --paper-blue: #27446e;
+  --paper-green: #228d5c;
+  --paper-red: #c43f52;
+  --paper-orange: #f07e47;
+  --paper-purple: #7c3aed;
+}
+
+/* Optional scene polish. These overrides only adjust presentation of the
+   generator-owned scenes and the shared shell; they do not redefine color roles. */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(240, 126, 71, 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(39, 68, 110, 0.08), transparent 55%),
+    var(--ui-bg-page);
+}
+
+.module,
+.analogy-card,
+.detail-panel {
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.module {
+  border-top: 3px solid var(--paper-blue);
+  transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+}
+
+.module:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ui-shadow-hover);
+}
+
+.analogy-visual canvas,
+.hero canvas,
+.module canvas {
+  display: block;
+  max-width: 100%;
+  /* setupCanvas() writes an inline style.height, so this needs !important to win.
+     Without it desktop clamps the width (1080 -> 857 or 442) while keeping the
+     fixed height, squashing every circle into a tall ellipse. */
+  height: auto !important;
+  border-radius: var(--radius-sm);
+  background: var(--paper-scene-bg);
+}
+
+.ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.chip {
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  padding: 7px 13px;
+  font-weight: 700;
+  transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+  will-change: transform;
+}
+
+.chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.feedback {
+  min-height: 1.6em;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--ui-border-strong);
+  background: var(--ui-bg-muted);
+  color: var(--ui-text-main);
+  font-style: normal;
+  line-height: 1.72;
+}
+
+.feedback.good {
+  border-left-color: var(--ui-success);
+  background: var(--green-soft);
+}
+
+.feedback.bad {
+  border-left-color: var(--ui-danger);
+  background: var(--red-soft);
+}
+
+.detail-panel {
+  padding: 16px 18px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-md);
+  background: var(--ui-bg-muted);
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.detail-panel ul {
+  color: var(--ui-text-main);
+}
+
+.detail-panel li {
+  line-height: 1.78;
+}
+
+.detail-panel li::marker {
+  color: var(--paper-blue);
+}
+
+.hero-compare {
+  gap: 16px;
+}
+
+.bg-side {
+  border-radius: var(--radius-lg);
+  transition: transform var(--t-med) var(--ease-out);
+}
+
+.bg-side:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 760px) {
+  .ctrl.chips {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chip {
+    width: 100%;
+  }
+
+  .module canvas,
+  .analogy-visual canvas,
+  .hero canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* Traceable source link inside the paper-specific detail panels. */
+.detail-panel a {
+  color: var(--paper-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   UI polish — presentation only.
+   Rules below restyle the shared shell (components.css) from the paper-owned
+   stylesheet. No semantic color role from tokens.css is redefined.
+   ========================================================================== */
+
+/* --- CJK typography: balanced headings, no orphaned lines --- */
+.hero h1,
+.chap-title {
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.hero-abs,
+.cb-text,
+.analogy-text,
+.module-desc,
+.feedback,
+.detail-panel {
+  text-wrap: pretty;
+}
+
+/* Figures and readouts must line up: tabular figures everywhere numbers appear. */
+.feedback,
+.ctrl,
+.detail-panel,
+.hero-sub,
+.slide-nav-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Figures read as framed panels instead of floating bitmaps --- */
+.module canvas,
+.analogy-visual canvas {
+  box-shadow: inset 0 0 0 1px var(--paper-line), 0 1px 2px rgba(25, 42, 70, 0.04);
+}
+
+/* --- Takeaway cards: calmer surface, clearer items --- */
+.embed-takeaway {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 141, 92, 0.1) 0%,
+    rgba(39, 68, 110, 0.1) 55%,
+    rgba(240, 126, 71, 0.1) 100%
+  );
+  border-color: var(--paper-line);
+}
+
+.et-item {
+  padding: 18px 16px;
+}
+
+.et-title {
+  font-weight: 700;
+}
+
+.et-arrow {
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--paper-blue);
+}
+
+/* --- Chips: a truthful, visible selected state --- */
+.chip.selected,
+.chip.selected:hover {
+  box-shadow: 0 0 0 3px rgba(39, 68, 110, 0.16);
+}
+
+/* --- Keyboard focus, text selection, sidebar scrollbar --- */
+:where(button, .chip, a, input, [tabindex]):focus-visible {
+  outline: 3px solid rgba(39, 68, 110, 0.45);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(39, 68, 110, 0.16);
+}
+
+.slide-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #cdd7e6 transparent;
+}
+
+.slide-sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.slide-sidebar::-webkit-scrollbar-thumb {
+  background: #cdd7e6;
+  border: 3px solid var(--ui-bg-card);
+  border-radius: var(--ui-radius-pill);
+}
+
+/* --- Small screens: shell chrome must not cover content, targets must be tappable --- */
+@media (max-width: 768px) {
+  /* The floating 目录 button is fixed at the top; keep the first card below it. */
+  .slide-content {
+    padding-top: 68px;
+  }
+
+  .slide-sidebar-toggle {
+    top: max(12px, env(safe-area-inset-top));
+    padding: 9px 16px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px);
+  }
+
+  /* The drawer opens underneath the same button. */
+  .slide-sidebar-header {
+    padding-top: 64px;
+  }
+
+  .slide-nav {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+
+  .slide-nav-btn {
+    min-height: 44px;
+    padding: 10px 18px;
+  }
+
+  /* Long chip lists wrap into two columns instead of one tall stack. */
+  .ctrl.chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .chip {
+    padding: 10px 14px;
+  }
+
+  .et-arrow {
+    height: 18px;
+    background: transparent;
+    color: var(--paper-blue);
+    opacity: 0.6;
+  }
+}
+
+/* --- Respect reduced-motion preferences --- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Cover keyword tags navigate, so they must look and behave like controls --- */
+button.tag-link {
+  cursor: pointer;
+  font: inherit;
+}
+
+button.tag-link:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+button.tag-link:active {
+  transform: translateY(0) scale(0.98);
+}

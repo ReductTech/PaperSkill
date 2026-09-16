@@ -1,0 +1,33 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 台球练习主题：球台呢与库边的中性绿承担大部分像素，语义色只用来解释状态
+     （红=失败/旧方法，蓝=引导/当前，绿=成功/论文方法，橙=用户控制值，紫=辅助机制）。
+     Canvas 内的取值与 src/modules/billiardsKit.ts 保持一致。 */
+  --scene-field: #f5f8f0;
+  --scene-felt: #b8c9a7;
+  --scene-felt-dark: #76906a;
+  --scene-cue: #92400e;
+  --scene-guide: #27446e;
+  --scene-success: #228d5c;
+  --scene-fail: #c43f52;
+  --scene-emphasis: #f07e47;
+  --scene-aux: #7c3aed;
+  --scene-text: #21324a;
+  --scene-text-muted: #68778f;
+  --scene-border: #d7deea;
+}
+
+/* setupCanvas() writes an inline pixel width/height onto every canvas, and the
+   bundled rule only caps the width (`canvas { max-width: 100% }`). When the
+   chapter column is narrower than a module canvas (1080px), the width shrinks
+   while the inline height stays 280px, which stretches the drawing. Letting the
+   height follow the canvas' own aspect ratio keeps circles round at every
+   column width; it changes no spacing, typography, radius, border or shadow. */
+canvas {
+  height: auto !important;
+}
