@@ -45,7 +45,8 @@ self-contained **Simplified Chinese** interactive tutorial web app as a project 
 {{paper-short-name}}-tutorial/
 ├── SKILL.md ← this file (chapter plan + generation rules)
 ├── scaffold.js ← React+TS project scaffolder (copied beside assets/)
-├── assemble-chapter-packets.js ← single writer for chapter data and widget registry
+├── assemble-chapter-packets.js ← single writer for chapter data and widget registry + syntax gate
+├── syntax-check.js ← TypeScript/esbuild syntax gate
 ├── validate-output.js ← final structural gate
 └── assets/
     └── react-template/  (full Vite+React+TS scaffold, copied into the output folder)
@@ -274,6 +275,10 @@ directory (scaffold.js sits beside `assets/`). This copies `assets/react-templat
 the paper title into `package.json` and `index.html`, and ensures `public/images/` exists.
 Do **not** re-emit the framework files — they are already complete.
 
+Then run `npm install` in `<outputDir>` so the template's TypeScript/esbuild is available to the
+syntax gate in Step 4 and to the final validation. If installation is impossible, assembly still
+runs but warns that the syntax gate was skipped.
+
 ### Step 2: Create the shared record and isolated packet directories
 
 Under the recorded task-scoped temporary root, create `chapter-work/shared.json` with the final
@@ -311,6 +316,9 @@ or another packet.
 Run `node assemble-chapter-packets.js <outputDir> <task-temp-root>/chapter-work`. This helper is the
 only writer for `src/data/tutorial.ts`, packet widget copies, and `src/modules/registry.tsx`. Fix any
 duplicate/missing chapter, module, widget, path, export, or component-registration error it reports.
+It also parses `tutorial.ts`, `registry.tsx`, and every copied widget with the project's
+TypeScript/esbuild and fails on any syntax error (a common cause is a truncated widget missing its
+final brace), so a broken widget cannot be assembled.
 
 Then replace `__METAPHOR_CSS__` inside `src/styles/paper.css` `:root {}` once with the approved
 paper-specific color overrides (or remove the placeholder line). Do not let packet workers edit
@@ -358,11 +366,20 @@ global CSS.
 
 Before validation, review the assembled tutorial for canonical terminology, symbol meanings,
 evidence boundaries, chapter transitions, duplicated explanations, theme/color consistency,
-interaction coverage, and result coverage. Then run `node validate-output.js <outputDir>` from
-this skill's directory as the hard gate. Confirm:
+interaction coverage, and result coverage. Then run both gates from this skill's directory and fix
+all failures:
+
+```bash
+node syntax-check.js <outputDir> --require-parser
+node validate-output.js <outputDir>
+```
+
+`--require-parser` fails when TypeScript/esbuild is not installed, so the final sources cannot pass
+by skipping the parse. Confirm:
 no leftover `__XXX__` / `__METAPHOR_CSS__` / `TBD` / `TODO` in `src/data/tutorial.ts`,
 `src/styles/paper.css`, or `src/modules/*`; chapter/module counts match the plan; every `bvid`
-(if any) is real; and it passes the gate. Deliver only the `<outputDir>` folder.
+(if any) is real; every `src/**` file parses cleanly; and both gates pass. Deliver only the
+`<outputDir>` folder.
 `````
 
 ---
@@ -383,8 +400,8 @@ no leftover `__XXX__` / `__METAPHOR_CSS__` / `TBD` / `TODO` in `src/data/tutoria
    strings, and the learner's takeaway for each module.
 6. Write the generated Markdown to the task-scoped temporary paperSkill directory, then copy
    `assets/` (which contains `react-template/`) and `scripts/scaffold.js`,
-   `scripts/assemble-chapter-packets.js`, and `scripts/validate-output.js` beside it. Copy only
-   selected original figures from the validated cache into
+   `scripts/assemble-chapter-packets.js`, `scripts/syntax-check.js`, and `scripts/validate-output.js`
+   beside it. Copy only selected original figures from the validated cache into
    `assets/react-template/public/images/` before Phase 2.
 7. Immediately execute the temporary paperSkill to generate the React + TS project folder
    (Phase 2 reads **only** this skill + its `assets/react-template/` + copied helpers; it does not

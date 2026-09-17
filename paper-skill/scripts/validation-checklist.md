@@ -25,7 +25,7 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 - [ ] `SKILL.md` exists and is fully populated under the task-scoped temporary paperSkill directory.
 - [ ] The temporary directory is outside `skills/`, and the workspace.
 - [ ] `assets/react-template/` exists and contains the full Vite + React + TS scaffold (`src/`, `index.html`, `package.json`, `vite.config.ts`, `tsconfig*.json`).
-- [ ] `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, and `scripts/validate-output.js` are copied beside the temporary `SKILL.md` (they sit beside `assets/` in the intermediate skill directory).
+- [ ] `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, `scripts/syntax-check.js`, and `scripts/validate-output.js` are copied beside the temporary `SKILL.md` (they sit beside `assets/` in the intermediate skill directory).
 - [ ] `SKILL.md` follows the reference template order exactly: introduction and tree; metadata with source-cache provenance; source-evidence and boundary matrix; unified theme; `chapterCount` detailed chapters; symbol table; Bilibili table (optional); Hero design; project-generation instructions.
 - [ ] Every selected original figure was copied from the validated cache into the temporary scaffold's `public/images/`; no figure requires Phase 2 to reopen the paper or source cache.
 
@@ -83,6 +83,7 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 - [ ] Every packet owns disjoint chapter IDs and contains a valid `packet.json`, chapter JSON files, and its own widget TSX files.
 - [ ] Workers never wrote directly to the output project; `assemble-chapter-packets.js` was the only writer of `tutorial.ts`, packet widget copies, and `registry.tsx`.
 - [ ] Packet assembly completed without duplicate/missing chapter IDs, duplicate module/widget IDs, path escapes, missing exports, or unregistered `componentId`s.
+- [ ] Packet assembly parsed `tutorial.ts`, `registry.tsx`, and every copied widget with the project's TypeScript/esbuild and reported no syntax error (a truncated widget missing its final brace is rejected here, before any Pull Request).
 - [ ] No KaTeX, MathJax, CDN, external font, or local media folder is required; the only dependencies are `react` and `react-dom`.
 - [ ] The only permitted network-backed feature is the optional Bilibili metadata loader (per `contract.md` §7).
 - [ ] `src/data/tutorial.ts` is fully filled: `meta`, `hero`, exactly `chapterCount` (`kind:"chapter"`) entries, and `bilibili` (optional). Every `module` entry has `kind:"module"` and a `componentId` registered in `src/modules/registry.tsx`.
@@ -168,18 +169,26 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 
 ## Automated Validator Gate
 
-Run `scripts/validate-output.js` against the produced project folder as a hard gate (in addition
-to the self-checks above):
+Run the syntax gate and the structural validator against the produced project folder as hard gates
+(in addition to the self-checks above):
 
 ```bash
+node scripts/syntax-check.js <path-to>/<paper-short-name>_output --require-parser
 node scripts/validate-output.js <path-to>/<paper-short-name>_output
 ```
 
+`--require-parser` makes the syntax gate exit non-zero when the project's TypeScript/esbuild is not
+installed, so the final sources cannot pass by skipping the parse; install dependencies with
+`npm install` first. This is the same compile-time check the repository CI runs, moved forward to
+the generation stage.
+
+- [ ] Every `src/**` file and the Vite config parse cleanly under TypeScript/esbuild; no truncated or unbalanced `.tsx` widget reaches the output folder.
 - [ ] `kind: "chapter"` count is within `[chapterCountMin, chapterCountMax]` (6–10) per `contract.md` §2.
 - [ ] `kind: "module"` count `>= activeModulesMin`; `>= dualModuleChaptersMin` chapters have two modules (per `contract.md` §3).
 - [ ] No leftover template placeholders (`__…__`, `__METAPHOR_CSS__`, `TBD`, `TODO`) in `src/data/tutorial.ts`, `src/styles/paper.css`, or `src/modules/*`.
 - [ ] Every Bilibili entry (if any) has a real `bvid` (`BV…`) or is omitted.
 - [ ] `src/data/tutorial.ts` and `src/styles/paper.css` exist and parse without a leftover placeholder.
+- [ ] Both commands were run against the final, unmodified project folder; any edit after the gates requires re-running them.
 
 The script exits non-zero on any failure; treat that as a blocker.
 

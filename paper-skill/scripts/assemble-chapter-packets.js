@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { checkFiles, formatErrors } = require('./syntax-check.js');
 
 function fail(message) {
   console.error(`Chapter packet assembly failed: ${message}`);
@@ -219,5 +220,27 @@ const registryLines = [
   '',
 ];
 fs.writeFileSync(path.join(modulesDir, 'registry.tsx'), registryLines.join('\n'), 'utf8');
+
+// Syntax gate: the assembly step is the last place a truncated or unbalanced widget file can be
+// stopped before it reaches a Pull Request. Parse every assembled source with the project's own
+// TypeScript/esbuild (installed by `npm install`) instead of relying on the repository CI build.
+const assembledSources = [
+  path.join(dataDir, 'tutorial.ts'),
+  path.join(modulesDir, 'registry.tsx'),
+  ...sortedWidgets.map(([componentId]) => path.join(modulesDir, `${componentId}.tsx`)),
+];
+const syntaxReport = checkFiles(assembledSources, { projectDir: outputRoot });
+if (!syntaxReport.available) {
+  console.warn('Syntax check skipped: no TypeScript or esbuild under the output folder.');
+  console.warn('Run `npm install` in the output folder and re-run assembly to enable the hard syntax gate.');
+} else if (syntaxReport.errors.length > 0) {
+  for (const line of formatErrors(syntaxReport.errors, outputRoot)) console.error(line);
+  fail(
+    `assembled sources have ${syntaxReport.errors.length} syntax error(s) (checked with ${syntaxReport.parser}). `
+    + 'A common cause is a truncated widget TSX missing its final brace; fix the packet file and re-run assembly.'
+  );
+} else {
+  console.log(`Syntax check passed (${syntaxReport.parser}) over ${syntaxReport.files} assembled source file(s).`);
+}
 
 console.log(`Assembled ${chapters.length} chapters and ${widgets.size} widgets into ${outputRoot}`);
