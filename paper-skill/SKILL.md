@@ -43,6 +43,7 @@ paper PDF, text, URL, or description
   -> scaffold the React+TS project folder (scaffold.js)
   -> generate isolated chapter packets in parallel when safe, or sequentially as a fallback
   -> assemble tutorial.ts / registry / modules once (assemble-chapter-packets.js), then fill paper.css / images
+  -> parse every assembled source with syntax-check.js (TypeScript/esbuild) before preview
   -> validate the project folder (validate-output.js)
   -> delete the exact task-scoped temporary root (unless debug)
   -> return only the final folder path
@@ -78,8 +79,13 @@ Phase 2 only executes the intermediate skill. Its entire input is:
 - `scaffold.js` — a portable build helper that sits beside `assets/` in the temporary
   root and copies the template into the caller's working directory (run it, do not modify it), and
 - `assemble-chapter-packets.js` — the single-writer helper that merges isolated chapter data and
-  widgets into `src/data/tutorial.ts` and `src/modules/registry.tsx`, and
-- running `scripts/validate-output.js` as the hard structural gate.
+  widgets into `src/data/tutorial.ts` and `src/modules/registry.tsx`, and parses the assembled
+  sources so a truncated widget fails during assembly instead of in the repository CI, and
+- `syntax-check.js` — the shared TypeScript/esbuild syntax gate used by assembly and the final
+  validator; run `node syntax-check.js <outputDir> --require-parser` as a hard gate after
+  `npm install`, and
+- running `scripts/validate-output.js` as the hard structural gate (it also runs the syntax gate
+  when dependencies are installed).
 
 Any selected original figures must already have been copied from the validated source cache
 into the temporary scaffold's `public/images/` during Phase 1. Phase 2 does not reopen the
@@ -89,8 +95,8 @@ Do **not** open the original paper-skill's `SKILL.md`, `contract.md`,
 `references/`, `scripts/*.md` (except `validate-output.js`), or `templates/`
 during Phase 2. Every rule those files contain must already be inlined into the
 intermediate skill by Phase 1, so Phase 2 needs nothing outside the temporary
-directory. `scaffold.js` and `assemble-chapter-packets.js` are portable build helpers,
-not rule sources — run them unchanged.
+directory. `scaffold.js`, `syntax-check.js`, and `assemble-chapter-packets.js` are portable build
+helpers, not rule sources — run them unchanged.
 
 ## Phase 1 Summary
 
@@ -152,6 +158,10 @@ After Phase 1 passes, read **only** the generated temporary `SKILL.md` and its c
     worker's files. One coordinator assembles shared files, checks cross-chapter terminology,
     evidence, transitions, duplication, and coverage, then runs every normal validation gate.
     When safe parallel execution is unavailable, use the identical packet contract sequentially.
+28. Move the compile-time syntax check into the generation stage: after `npm install`, run
+    `node syntax-check.js <outputDir> --require-parser` and `node validate-output.js <outputDir>` on
+    the final, unmodified project folder. Any edit after these gates requires re-running them.
+    A truncated or unbalanced widget TSX must never survive to a Pull Request.
 
 ## Resource Map
 
@@ -184,7 +194,8 @@ paper-skill/
 |   |-- chapter-template.md
 |   |-- validation-checklist.md
 |   |-- validate-source-cache.js  <- validates the temporary canonical paper cache
-|   |-- assemble-chapter-packets.js <- single-writer merge for isolated chapter drafts
+|   |-- assemble-chapter-packets.js <- single-writer merge for isolated chapter drafts + syntax gate
+|   |-- syntax-check.js          <- shared TypeScript/esbuild syntax gate
 |   |-- validate-output.js        <- automated structural validator (folder)
 |   `-- scaffold.js               <- React+TS project scaffolder (copied beside assets/)
 `-- templates/

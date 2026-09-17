@@ -138,7 +138,8 @@ The generated temporary `SKILL.md` must satisfy all of these checks (see `contra
 - no `{{...}}`, `__...__`, `TBD`, `TODO`, "same as above", or `complete-chapter-N-plan` remains.
 
 There is **no global character minimum**. Length alone is not quality; the automated
-`scripts/validate-output.js` checks structure and field completeness, not raw length.
+`scripts/validate-output.js` checks structure and field completeness, not raw length, and
+`scripts/syntax-check.js` parses every generated source with TypeScript/esbuild.
 Repetition, generic narration, pseudocode padding, and duplicated requirements do not
 satisfy the detail floor.
 
@@ -164,8 +165,8 @@ The intermediate skill is the only artifact Phase 2 reads. It must be self-conta
 - Do not instruct Phase 2 to read `contract.md`, `references/`, `scripts/*.md`, `templates/`, or the parent `SKILL.md`.
 - Do not instruct Phase 2 to reopen the original paper or read the Phase 1 `source-cache/`. Embed all required evidence and source boundaries in the intermediate skill, and stage selected cached figures in `assets/react-template/public/images/` before Phase 2.
 - Inline every general rule Phase 2 would otherwise need: visual grammar (from `visual-interaction-standard.md`), interaction patterns, color semantics (from `contract.md` §5), chapter order, and hard thresholds.
-- The copied `assets/react-template/` directory plus `scaffold.js` and `assemble-chapter-packets.js` supplies and assembles the project; Phase 2 reads those files but no original paper-skill document.
-- Phase 2 follows the embedded per-module specs and runs `validate-output.js` as the structural gate.
+- The copied `assets/react-template/` directory plus `scaffold.js`, `assemble-chapter-packets.js`, and `syntax-check.js` supplies, assembles, and syntax-checks the project; Phase 2 reads those files but no original paper-skill document.
+- Phase 2 follows the embedded per-module specs, runs `syntax-check.js <outputDir> --require-parser` after `npm install`, and runs `validate-output.js` as the structural gate. Assembly already parses every assembled source, so a truncated widget fails during generation rather than in the repository CI.
 
 ## Parallel Chapter Packet Contract
 
@@ -182,7 +183,7 @@ locked. Record these as one immutable shared contract inside the intermediate Sk
 - Make every chapter JSON conform to `ChapterDef`; make every widget export the exact named React
   component declared by its packet.
 - Use `assemble-chapter-packets.js` as the only writer for `src/data/tutorial.ts`, packet widget
-  copies, and `src/modules/registry.tsx`.
+  copies, and `src/modules/registry.tsx`; it syntax-checks the assembled sources before returning.
 - When parallel task support is unavailable, generate the identical packets sequentially rather
   than falling back to direct shared-file edits.
 

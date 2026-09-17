@@ -16,7 +16,8 @@
  *   5. every Bilibili bvid (if any) is a real `BV...` (empty bvid tolerated as "omit").
  *   6. every componentId referenced in tutorial.ts is registered in src/modules/registry.tsx
  *      (the seeded `example-slider` is always allowed).
- *   7. best-effort: src/data/tutorial.ts has balanced braces/parens/brackets (truncation check).
+ *   7. syntax parse of every project source file (src/** and vite config) with TypeScript or
+ *      esbuild; catches truncated or unbalanced files before the repository CI build.
  *
  * Usage: node scripts/validate-output.js <path-to>/<paper-short-name>_output
  * Exits 0 on pass, 1 on any failure, 2 on usage error.
@@ -26,9 +27,21 @@
 
 const fs = require('fs');
 const path = require('path');
+const { checkProject } = require('./syntax-check.js');
 
 // --- CONFIG (read directly from contract.md §2, §3) ---
-const contractPath = path.join(__dirname, '..', 'contract.md');
+// Contract lives beside this script in the repository (paper-skill/scripts -> paper-skill/) and
+// may be copied beside the helpers in a generated intermediate skill.
+const contractCandidates = [
+  path.join(__dirname, '..', 'contract.md'),
+  path.join(__dirname, 'contract.md'),
+  path.join(__dirname, '..', '..', 'contract.md'),
+];
+const contractPath = contractCandidates.find((candidate) => fs.existsSync(candidate));
+if (!contractPath) {
+  console.error('Cannot find contract.md next to validate-output.js.');
+  process.exit(2);
+}
 const contract = fs.readFileSync(contractPath, 'utf8');
 
 function readContractInteger(field) {
@@ -70,9 +83,8 @@ function readSafe(p) {
   }
 }
 
-// Remove // line comments and /* */ block comments, but keep string/template content
-// intact (so URLs/values survive). Used to avoid counting documentation comments that
-// mention `kind: "chapter"` / `kind: "module"` or `__XXX__` as if they were data.
+// Best-effort helpers below keep string/template content visible so URLs and copy survive when
+// scanning for placeholders. Real syntax checking is delegated to syntax-check.js.
 function stripComments(s) {
   let out = '';
   let inStr = null;
@@ -96,42 +108,8 @@ function stripComments(s) {
   return out;
 }
 
-// Best-effort balance check that ignores string/template/comment content.
-function bracesBalanced(s) {
-  const pairs = { '(': ')', '{': '}', '[': ']' };
-  const open = new Set(Object.keys(pairs));
-  const stack = [];
-  let inStr = null;
-  let prev = '';
-  for (let i = 0; i < s.length; i++) {
-    const c = s[i];
-    if (inStr) {
-      if (c === '\\') { i++; continue; }
-      if (c === inStr) inStr = null;
-      continue;
-    }
-    if (c === '"' || c === "'" || c === '`') { inStr = c; continue; }
-    if (c === '/' && prev === '/') {
-      while (i < s.length && s[i] !== '\n') i++;
-      prev = '';
-      continue;
-    }
-    if (c === '/' && s[i + 1] === '*') {
-      const j = s.indexOf('*/', i + 2);
-      i = j < 0 ? s.length : j + 1;
-      prev = '';
-      continue;
-    }
-    if (open.has(c)) {
-      stack.push(c);
-    } else if (c === ')' || c === '}' || c === ']') {
-      const top = stack.pop();
-      if (top === undefined || pairs[top] !== c) return false;
-    }
-    prev = c;
-  }
-  return stack.length === 0;
-}
+/* Removed: the previous best-effort bracesBalanced() heuristic. syntax-check.js runs a real
+ * TypeScript/esbuild parse over every source file instead of counting brackets. */
 
 function main() {
   const dir = process.argv[2];
@@ -280,12 +258,23 @@ function main() {
       ok(`all ${uniqueIds.length} componentId(s) registered`);
     }
 
-    // --- 7. best-effort balance ---
-    if (bracesBalanced(tut)) {
-      ok('src/data/tutorial.ts braces/parens/brackets balanced (best-effort)');
-    } else {
-      allPass = fail('src/data/tutorial.ts has unbalanced braces/parens/brackets (possibly truncated)');
+  }
+
+  // --- 7. syntax parse of every project source file ---
+  // The repository CI compiles each change with `tsc`/`vite`; this gate moves the same check into
+  // the generation stage so a truncated widget is caught before a Pull Request. When dependencies
+  // are not installed (the repository CI runs this before `npm ci`) the parser is unavailable and
+  // the check is skipped here; CI's build:changed step still compiles the project.
+  const syntaxReport = checkProject(dir);
+  if (!syntaxReport.available) {
+    console.log('  ! syntax check skipped: run `npm install` in the project to enable the parse gate');
+  } else if (syntaxReport.errors.length > 0) {
+    for (const error of syntaxReport.errors.slice(0, 20)) {
+      allPass = fail(`${path.relative(dir, error.file).replace(/\\/g, '/')}:${error.line}:${error.column} ${error.message}`);
     }
+    allPass = fail(`${syntaxReport.errors.length} syntax error(s) in project sources (checked with ${syntaxReport.parser})`);
+  } else {
+    ok(`all ${syntaxReport.files} source file(s) parse cleanly (${syntaxReport.parser})`);
   }
 
   console.log('');

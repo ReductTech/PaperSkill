@@ -325,7 +325,8 @@ The task root now has this structure:
 `-- <paper-short-name>-tutorial/
     |-- SKILL.md
     |-- scaffold.js            <- React+TS project scaffolder (copied beside assets/)
-    |-- assemble-chapter-packets.js <- single writer for Phase 2 chapter packets
+    |-- assemble-chapter-packets.js <- single writer for Phase 2 chapter packets + syntax gate
+    |-- syntax-check.js        <- shared TypeScript/esbuild syntax gate
     |-- validate-output.js
     `-- assets/
         `-- react-template/    <- full Vite + React + TS scaffold
@@ -340,7 +341,7 @@ Before generating the temporary `SKILL.md`:
 
 Generate `SKILL.md` with the same top-level and per-chapter order as the exemplar. Copy its detail level, not its paper facts. Fully expand all `chapterCount` chapters; never emit aggregate placeholders, "same as above", or `complete-chapter-N-plan` shorthand. The detail floor is **field-completeness, not raw length** (per `contract.md` §6): every required field filled, `chapterPlanMinChars` (soft, 600) of real detail per chapter, and **no global character minimum**.
 
-Fill every placeholder with the coordinator-approved outputs from Steps 1-9. Include source kind, SHA-256 digest, locator scheme, and selected cached-figure IDs in the paper metadata; never include a temporary absolute path. Copy this skill's complete `assets/` directory (which contains `react-template/`) and `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, and `scripts/validate-output.js` into the temporary paperSkill (the helpers sit beside `assets/` in the intermediate skill directory).
+Fill every placeholder with the coordinator-approved outputs from Steps 1-9. Include source kind, SHA-256 digest, locator scheme, and selected cached-figure IDs in the paper metadata; never include a temporary absolute path. Copy this skill's complete `assets/` directory (which contains `react-template/`) and `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, `scripts/syntax-check.js`, and `scripts/validate-output.js` into the temporary paperSkill (the helpers sit beside `assets/` in the intermediate skill directory, so `assemble-chapter-packets.js` and `validate-output.js` can `require('./syntax-check.js')`).
 
 When the tutorial will use an original paper figure, copy the already cached image into the temporary `assets/react-template/public/images/` now and record its `/images/...` path in the intermediate skill. Do not reopen the original source during this step. Images staged here are copied into the final project automatically by `scaffold.js`.
 
@@ -365,6 +366,9 @@ Follow the temporary paperSkill exactly.
    skill directory (scaffold.js sits beside `assets/`). This copies `assets/react-template/` to
    `<outputDir>` (the caller's working directory, named `<paper-short-name>_output`), injects the
    paper title into `package.json` + `index.html`, and ensures `public/images/` exists.
+   Then run `npm install` in `<outputDir>` so the template's TypeScript/esbuild is available to the
+   syntax gate (step 4) and to the later preview/build. When installation is impossible, assembly
+   still runs but warns that the syntax gate was skipped.
 2. Create `<task-temp-root>/chapter-work/shared.json` serially with the final `meta`, `hero`, and
    optional `bilibili` objects. Create one isolated directory per packet under
    `chapter-work/packets/<packet-id>/`.
@@ -378,7 +382,9 @@ Follow the temporary paperSkill exactly.
    `node assemble-chapter-packets.js <outputDir> <task-temp-root>/chapter-work`. The helper rejects
    duplicate or missing chapter IDs, duplicate module/widget IDs, path escapes, missing widget
    exports, and unregistered `componentId`s; it alone writes `src/data/tutorial.ts`, copies packet
-   widgets, and writes `src/modules/registry.tsx`.
+   widgets, and writes `src/modules/registry.tsx`. It then parses `tutorial.ts`, `registry.tsx`, and
+   every copied widget with the project's TypeScript/esbuild and fails on any syntax error, so a
+   truncated widget TSX (for example one missing its final brace) can never be assembled.
 5. Replace `__METAPHOR_CSS__` inside `src/styles/paper.css` `:root {}` once, after packet assembly,
    with the coordinator-approved paper-specific color overrides (or remove the placeholder line).
 6. Use only original figures already staged in `assets/react-template/public/images/` during
@@ -400,8 +406,11 @@ Follow the temporary paperSkill exactly.
    `canvasLabelMaxChars` (8) chars and one legend of `canvasLegendMaxItems` (3) entries; show
    result values as bare numbers. Express state through color and shape, not additional words
    (per `contract.md` §3 and `references/visual-interaction-standard.md` §7).
-12. Run one coordinator review across the assembled page, then run `validate-output.js <outputDir>`
-    as the hard structural gate and fix all failures. The review must check cross-chapter terminology,
+12. Run one coordinator review across the assembled page, then run both gates as hard gates and fix
+    all failures:
+    `node syntax-check.js <outputDir> --require-parser` and `node validate-output.js <outputDir>`.
+    `--require-parser` fails with exit code 3 when no TypeScript/esbuild is installed, which guarantees
+    the final sources really were parsed instead of silently skipped. The review must check cross-chapter terminology,
     symbol meanings, evidence boundaries, transitions, duplication, theme/color consistency, module
     coverage, and desktop/mobile behavior.
     Do not re-read original paper-skill documents — the intermediate skill plus its

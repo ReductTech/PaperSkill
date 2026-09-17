@@ -14,6 +14,7 @@
 
 ## Agent 自动检查
 
+- [ ] Agent 已在生成/装配阶段运行语法门禁（`syntax-check.js --require-parser` 与 `validate-output.js`），并确认全部 `src/**` 源码可被 TypeScript/esbuild 解析
 - [ ] Agent 已针对最终待提交源码运行 `npm run validate`
 - [ ] Agent 已运行 `npm run catalog` 验证目录可生成，并恢复了 `catalog/papers.json`
 - [ ] Agent 已运行 `npm run validate:pr -- main`

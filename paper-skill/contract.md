@@ -213,9 +213,14 @@ Video recommendations are an **optional enrichment**, not a blocking requirement
 
 ## §8 Validation
 
-Run `scripts/validate-output.js` on the generated project folder as a hard gate (in addition
-to the agent self-checklist in `scripts/validation-checklist.md`). The script checks:
+Run `scripts/syntax-check.js` and `scripts/validate-output.js` on the generated project folder as hard
+gates (in addition to the agent self-checklist in `scripts/validation-checklist.md`).
+`assemble-chapter-packets.js` already runs the same syntax gate on every assembled source, so a
+truncated widget fails during generation instead of in the repository CI. The scripts check:
 
+- No syntax error in any `src/**` file or the Vite config: `syntax-check.js <folder> --require-parser`
+  parses each file with the project's TypeScript/esbuild and fails on missing brackets, truncation,
+  or unterminated constructs (`--require-parser` also fails when the parser is not installed).
 - `kind: "chapter"` count (in `src/data/tutorial.ts`) is within `[chapterCountMin,
   chapterCountMax]` (§2).
 - `kind: "module"` count `>= activeModulesMin` (§3), and `>= dualModuleChaptersMin` chapters
@@ -223,8 +228,7 @@ to the agent self-checklist in `scripts/validation-checklist.md`). The script ch
 - No leftover template placeholders (`__…__`, `__METAPHOR_CSS__`, `TBD`, `TODO`) in
   `src/data/tutorial.ts`, `src/styles/paper.css`, or `src/modules/*`.
 - Optional: Bilibili entries either have a real `bvid` (`BV…`) or are omitted.
-- Best-effort: the key framework files (`App.tsx`, `types.ts`, `src/styles/tokens.css`) exist
-  and `src/data/tutorial.ts` parses as TypeScript.
+- The key framework files (`App.tsx`, `types.ts`, `src/styles/tokens.css`) exist.
 
 ---
 
