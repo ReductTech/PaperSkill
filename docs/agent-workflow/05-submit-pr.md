@@ -18,7 +18,13 @@ Agent 可以在仓库外部新建 `PR_MATERIALS/` 目录，生成以下草稿：
 
 ## 1. Agent 提交前自动检查（必须全部通过）
 
-Agent 必须针对最终待提交源码亲自运行检查，不得把命令交给使用者代为执行：
+Agent 必须针对最终待提交源码亲自运行检查，不得把命令交给使用者代为执行。推荐先运行一键预检：
+
+```powershell
+npm run preflight
+```
+
+`npm run preflight` 会复现 CI 的检查（`validate`、`validate:pr`、`build:changed`）并预演与基线分支的合并。**退出码非零时不得推送分支或创建 PR**；Agent 必须把预检打印的具体原因告诉使用者，修复后重跑直至通过。预检通过后，再执行以下补充检查：
 
 ```powershell
 npm run validate

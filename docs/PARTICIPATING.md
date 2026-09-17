@@ -81,7 +81,13 @@ html_output/<paper-name>/<version>/
 
 ## 5. 本地验收
 
-创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给使用者代为执行：
+创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给使用者代为执行。推荐先运行一键预检：
+
+```powershell
+npm run preflight
+```
+
+`npm run preflight` 会复现 CI 的检查（`validate`、`validate:pr`、`build:changed`）并预演与 `main` 的合并；退出码非零表示当前分支不应创建 PR，输出会给出具体原因。预检通过后再执行以下命令：
 
 ```powershell
 npm run validate
