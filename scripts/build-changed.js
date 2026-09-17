@@ -19,7 +19,7 @@ function nodeScript(name, args = []) {
 }
 
 const base = process.env.GITHUB_BASE_REF || process.argv[2] || 'main';
-const baseRef = base.startsWith('origin/') ? base : `origin/${base}`;
+const baseRef = base.includes('/') ? base : `origin/${base}`;
 const changedFiles = git(['diff', '--name-only', `${baseRef}...HEAD`]);
 
 // html_output/<paper>/<version>/... → 尽量精确到版本，只有论文级改动时才构建整篇
