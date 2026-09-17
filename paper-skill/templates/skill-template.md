@@ -327,6 +327,8 @@ global CSS.
    1–3 sentences per paragraph, bold key terms with `<b>`.
 3. **Slide navigation** is handled by `App.tsx`: fixed left sidebar TOC, one chapter per screen,
    full-width bottom nav bar pinned to the viewport; videos (if any) appear as the last slide.
+   `index.html` keeps a **fixed-width viewport** (`width=1600`) so mobile renders the whole
+   desktop layout scaled down; never change it to `width=device-width`.
 4. **Life-like Canvas**: draw real things from the metaphor; no abstract particle clouds, arrow
    grids, heatmaps, or bare math waveforms; everything must actually move (travel, flow, drift,
    rise, fall).
