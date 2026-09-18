@@ -1,0 +1,70 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable:
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append scene colors here.
+   Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 手冲咖啡场景色：安静的台面、粉层、器具与杯子。
+     语义色不在这里重定义——--blue / --green / --red / --orange / --purple
+     仍保持 tokens.css 里的固定含义。 */
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-light: #b8c9a7;
+  --paper-scene-dark: #76906a;
+  --paper-support: #92400e;
+  --paper-bean: #6f4a2f;
+  --paper-crema: #d9b98c;
+}
+
+/* ============================================================
+   对框架模板三处缺陷的必要覆盖（不改 components.css 本身）
+   ============================================================ */
+
+/* 缺陷 1：封面关键词是纯展示 <span>，但模板给 .tag 设了 cursor:pointer
+   与 :hover 变色，看起来可点却点不动。这里还原为非交互外观。 */
+.hero-meta .tag {
+  cursor: default;
+}
+.hero-meta .tag:hover {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--slate);
+}
+
+/* 缺陷 2：.fe-hint 是 position:absolute，但父容器 .formula-explain 未定位，
+   导致「点击公式中的符号查看含义」飘到页面左上角、挤占正文。
+   补上定位上下文即可让它回到公式框内。 */
+.formula-explain {
+  position: relative;
+}
+
+/* 缺陷 3：模板给公式内每个可点符号加了 1px 虚线底边，符号一多整条公式
+   像被划满下划线。改为默认不显线，悬停时才提示可点。 */
+.fe-formula .fe-formula-sym {
+  border-bottom-color: transparent;
+}
+.fe-formula .fe-formula-sym:hover {
+  border-bottom-color: currentColor;
+}
+
+/* PyPOTS logo 作为「生态标识」出现在 §8 模块里；模板默认让图片占满整宽，
+   会把模块画布挤出屏幕。这里约束为小尺寸并居中。 */
+.paper-figure {
+  margin: 4px 0 10px;
+  text-align: center;
+}
+.paper-figure img {
+  max-height: 92px;
+  width: auto;
+}
+
+/* 「点击公式中的符号查看含义」是绝对定位的角标，与正文贴得太紧。
+   把它再抬高一点、缩小一点，并给正文留出上边距。 */
+.formula-explain .fe-hint {
+  top: 4px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.formula-explain .fe-lead {
+  margin-top: 8px;
+}

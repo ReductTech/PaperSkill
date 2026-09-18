@@ -6,6 +6,7 @@ const search = document.querySelector('#search');
 const topicFilter = document.querySelector('#topic-filter');
 const summary = document.querySelector('#result-summary');
 let papers = [];
+let cardList = [];
 
 const starterForm = document.querySelector('#starter-form');
 const starterResult = document.querySelector('#starter-result');
@@ -171,6 +172,25 @@ function versionAuthors(version) {
   return (version.participants || []).map((item) => item.name).join('、') || '未署名';
 }
 
+/** 把版本按 GitHub 用户名（无 GitHub 则用展示名）分组 */
+function groupVersions(versions) {
+  const groups = [];
+  const byKey = new Map();
+  for (const version of versions) {
+    const person = (version.participants || [])[0] || {};
+    const key = (person.github || person.name || '未署名').toLowerCase();
+    if (!byKey.has(key)) {
+      byKey.set(key, {
+        label: person.github || person.name || '未署名',
+        items: [],
+      });
+      groups.push(byKey.get(key));
+    }
+    byKey.get(key).items.push(version);
+  }
+  return groups;
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const topic = topicFilter.value;
@@ -187,25 +207,31 @@ function render() {
 
   summary.textContent = `显示 ${visible.length} / ${papers.length} 篇教程`;
   empty.hidden = visible.length !== 0;
-  grid.innerHTML = visible.map((paper) => {
+  cardList = visible.map((paper) => ({ title: paper.title, groups: groupVersions(sortedVersions(paper.versions)) }));
+  grid.innerHTML = visible.map((paper, ci) => {
     const versions = sortedVersions(paper.versions);
+    const groups = groupVersions(versions);
     return `
     <article class="paper-card">
       <div class="card-meta"><span>${escapeHtml([paper.venue, paper.year].filter(Boolean).join(' · ') || '论文教程')}</span><span class="status">${statusLabel(paper.status)}</span></div>
       <h2 class="${titleSizeClass(paper.title)}">${escapeHtml(paper.title)}</h2>
       <div class="topics">${(paper.topics || []).map((item) => `<span class="topic">${escapeHtml(item)}</span>`).join('')}</div>
       <div class="versions">
-        <p class="versions-title">网页版本 · ${versions.length}</p>
-        <ul class="version-list">
-          ${versions.map((version) => `
-          <li>
-            <span class="version-info">
-              <span class="version-name">${escapeHtml(version.version)}</span>
-              <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>
-            </span>
-            <a class="open-link" href="./${escapeHtml(version.tutorialUrl)}">打开 →</a>
-          </li>`).join('')}
-        </ul>
+        <div class="versions-head">
+          <span class="versions-label">网页版本</span>
+          <span class="versions-stats">${versions.length} 个版本${groups.length > 1 ? ` · ${groups.length} 位贡献者` : ''}</span>
+        </div>
+        ${groups.slice(0, 2).map((group, gi) => `
+        <button type="button" class="contributor" data-card="${ci}" data-group="${gi}">
+          <span class="contributor-id">@${escapeHtml(group.label)}</span>
+          <span class="contributor-count">${group.items.length} 个版本</span>
+          <span class="contributor-more">查看 →</span>
+        </button>`).join('')}
+        ${groups.length > 2 ? `
+        <button type="button" class="contributor contributor-all" data-card="${ci}" data-more>
+          <span class="contributor-id">查看更多</span>
+          <span class="contributor-count">还有 ${groups.length - 2} 位贡献者</span>
+        </button>` : ''}
       </div>
       <div class="card-footer">
         <a class="paper-link" href="${escapeHtml(paper.paperUrl)}" target="_blank" rel="noopener">查看原论文</a>
@@ -239,3 +265,99 @@ fetch('./papers.json')
 
 search.addEventListener('input', render);
 topicFilter.addEventListener('change', render);
+
+// —— 版本选择模态框：点「查看 →」/「查看更多」弹出，在弹层中选择账号或版本进入 ——
+const versionModal = document.querySelector('#version-modal');
+const modalPaper = document.querySelector('#modal-paper');
+const modalUser = document.querySelector('#modal-user');
+const modalHint = document.querySelector('#modal-hint');
+const modalBack = document.querySelector('#modal-back');
+const modalAccounts = document.querySelector('#modal-accounts');
+const modalVersions = document.querySelector('#modal-versions');
+let modalCardIndex = -1;
+
+function openModal() {
+  versionModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVersionModal() {
+  versionModal.hidden = true;
+  document.body.style.overflow = '';
+  modalAccounts.hidden = true;
+  modalVersions.hidden = true;
+}
+
+function showAccounts(cardIndex) {
+  const card = cardList[cardIndex];
+  if (!card) return;
+  modalCardIndex = cardIndex;
+  modalPaper.textContent = card.title;
+  modalUser.textContent = '全部贡献者';
+  modalHint.textContent = `共 ${card.groups.length} 位贡献者，点击查看其版本`;
+  modalBack.hidden = true;
+  modalVersions.hidden = true;
+  modalAccounts.innerHTML = card.groups.map((group, gi) => {
+    const first = group.items[0];
+    const person = (first.participants || [])[0] || {};
+    const displayName = person.name && person.name.toLowerCase() !== group.label.toLowerCase() ? person.name : '';
+    return `
+      <button type="button" class="contributor" data-card="${cardIndex}" data-group="${gi}">
+        <span class="contributor-id">@${escapeHtml(group.label)}</span>
+        <span class="contributor-owner">${displayName ? escapeHtml(displayName) : ''}</span>
+        <span class="contributor-count">${group.items.length} 个版本</span>
+        <span class="contributor-more">查看 →</span>
+      </button>`;
+  }).join('');
+  modalAccounts.hidden = false;
+  openModal();
+}
+
+function openVersionModal(cardIndex, groupIndex) {
+  const card = cardList[cardIndex];
+  if (!card) return;
+  const group = card.groups[groupIndex];
+  if (!group) return;
+  modalCardIndex = cardIndex;
+  modalPaper.textContent = card.title;
+  modalUser.textContent = `@${group.label}`;
+  modalHint.textContent = `共 ${group.items.length} 个版本，点击进入对应网页`;
+  modalBack.hidden = card.groups.length <= 1;
+  modalAccounts.hidden = true;
+  modalVersions.innerHTML = group.items.map((version) => `
+    <li>
+      <span class="version-info">
+        <span class="version-name">${escapeHtml(version.version)}</span>
+        <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>
+      </span>
+      <a class="open-link" href="./${escapeHtml(version.tutorialUrl)}" target="_blank" rel="noopener">进入 →</a>
+    </li>`).join('');
+  modalVersions.hidden = false;
+  openModal();
+}
+
+grid.addEventListener('click', (event) => {
+  const row = event.target.closest('.contributor');
+  if (!row) return;
+  const cardIndex = Number(row.dataset.card);
+  if (row.hasAttribute('data-more')) {
+    showAccounts(cardIndex);
+    return;
+  }
+  openVersionModal(cardIndex, Number(row.dataset.group));
+});
+modalAccounts.addEventListener('click', (event) => {
+  const row = event.target.closest('.contributor');
+  if (!row) return;
+  openVersionModal(Number(row.dataset.card), Number(row.dataset.group));
+});
+versionModal.addEventListener('click', (event) => {
+  if (event.target === versionModal) closeVersionModal();
+});
+modalBack.addEventListener('click', () => {
+  if (modalCardIndex >= 0) showAccounts(modalCardIndex);
+});
+document.querySelector('#modal-close').addEventListener('click', closeVersionModal);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !versionModal.hidden) closeVersionModal();
+});

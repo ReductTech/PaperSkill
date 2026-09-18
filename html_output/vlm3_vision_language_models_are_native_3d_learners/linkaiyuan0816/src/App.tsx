@@ -10,6 +10,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -70,6 +71,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="VLM3：视觉语言模型天生就是三维学习者 · 交互式教程"
+    />
     </>
   );
 }

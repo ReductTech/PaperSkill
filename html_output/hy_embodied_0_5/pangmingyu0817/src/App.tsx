@@ -10,6 +10,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 const quickMotModule = {
   kind: 'module' as const,
@@ -109,6 +110,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="HY-Embodied-0.5 · 交互式教程"
+    />
     </>
   );
 }

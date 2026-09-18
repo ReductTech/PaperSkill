@@ -5,6 +5,7 @@ import { Module } from './components/Module';
 import { Formula } from './components/Formula';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -58,6 +59,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="HorizonStream：面向流式三维重建的长时域注意力 · 交互式教程"
+    />
     </>
   );
 }

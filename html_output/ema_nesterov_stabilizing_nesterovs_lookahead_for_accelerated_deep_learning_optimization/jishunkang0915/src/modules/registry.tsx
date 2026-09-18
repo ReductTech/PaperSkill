@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { AnaCh1 } from './ana-ch1';
+import { AnaCh10 } from './ana-ch10';
+import { AnaCh2 } from './ana-ch2';
+import { AnaCh3 } from './ana-ch3';
+import { AnaCh4 } from './ana-ch4';
+import { AnaCh5 } from './ana-ch5';
+import { AnaCh6 } from './ana-ch6';
+import { AnaCh7 } from './ana-ch7';
+import { AnaCh8 } from './ana-ch8';
+import { AnaCh9 } from './ana-ch9';
+import { HeroNewEma } from './hero-new-ema';
+import { HeroOldLookahead } from './hero-old-lookahead';
+import { RiverKit } from './river-kit';
+import { W1EmaRepair } from './w1-ema-repair';
+import { W1LookaheadStress } from './w1-lookahead-stress';
+import { W10ResultRace } from './w10-result-race';
+import { W2SignalDecomp } from './w2-signal-decomp';
+import { W3RouteCompare } from './w3-route-compare';
+import { W4EmaWeights } from './w4-ema-weights';
+import { W5HorizonLag } from './w5-horizon-lag';
+import { W6LowpassFreq } from './w6-lowpass-freq';
+import { W7RateCurve } from './w7-rate-curve';
+import { W8Algoloop } from './w8-algoloop';
+import { W9BetaSchedule } from './w9-beta-schedule';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ana-ch1'] = AnaCh1;
+widgetRegistry['ana-ch10'] = AnaCh10;
+widgetRegistry['ana-ch2'] = AnaCh2;
+widgetRegistry['ana-ch3'] = AnaCh3;
+widgetRegistry['ana-ch4'] = AnaCh4;
+widgetRegistry['ana-ch5'] = AnaCh5;
+widgetRegistry['ana-ch6'] = AnaCh6;
+widgetRegistry['ana-ch7'] = AnaCh7;
+widgetRegistry['ana-ch8'] = AnaCh8;
+widgetRegistry['ana-ch9'] = AnaCh9;
+widgetRegistry['hero-new-ema'] = HeroNewEma;
+widgetRegistry['hero-old-lookahead'] = HeroOldLookahead;
+widgetRegistry['river-kit'] = RiverKit;
+widgetRegistry['w1-ema-repair'] = W1EmaRepair;
+widgetRegistry['w1-lookahead-stress'] = W1LookaheadStress;
+widgetRegistry['w10-result-race'] = W10ResultRace;
+widgetRegistry['w2-signal-decomp'] = W2SignalDecomp;
+widgetRegistry['w3-route-compare'] = W3RouteCompare;
+widgetRegistry['w4-ema-weights'] = W4EmaWeights;
+widgetRegistry['w5-horizon-lag'] = W5HorizonLag;
+widgetRegistry['w6-lowpass-freq'] = W6LowpassFreq;
+widgetRegistry['w7-rate-curve'] = W7RateCurve;
+widgetRegistry['w8-algoloop'] = W8Algoloop;
+widgetRegistry['w9-beta-schedule'] = W9BetaSchedule;

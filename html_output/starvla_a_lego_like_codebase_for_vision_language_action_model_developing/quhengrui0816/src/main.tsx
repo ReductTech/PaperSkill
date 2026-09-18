@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 import "./styles/tokens.css";
 import "./styles/components.css";
 import "./styles/paper.css";
+import "./styles/mobile-desktop.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

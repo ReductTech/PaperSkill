@@ -11,6 +11,7 @@ import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { RelatedPapers } from './components/RelatedPapers';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -75,6 +76,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="MambaPSA：用 Mamba 替换 YOLO26 中的 C2PSA 模块 · 交互式教程"
+    />
     </>
   );
 }

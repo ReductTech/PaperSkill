@@ -10,6 +10,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -75,6 +76,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="optimize_anything：优化任意文本参数的通用 API · 交互式教程"
+    />
     </>
   );
 }

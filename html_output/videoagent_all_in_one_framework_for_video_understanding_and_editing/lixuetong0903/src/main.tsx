@@ -4,6 +4,7 @@ import App from './App';
 import './styles/tokens.css';
 import './styles/components.css';
 import './styles/paper.css';
+import './styles/ppt-mode.css';
 import { EditingSessionProvider } from './lib/EditingSession';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

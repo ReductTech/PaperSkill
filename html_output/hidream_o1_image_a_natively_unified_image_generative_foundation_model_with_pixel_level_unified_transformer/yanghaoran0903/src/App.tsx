@@ -9,6 +9,7 @@ import { Formula } from './components/Formula';
 import { InsightBar } from './components/InsightBar';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -86,6 +87,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="HiDream-O1-Image：原生统一的像素级统一 Transformer 图像生成基础模型 · 交互式教程"
+    />
     </>
   );
 }

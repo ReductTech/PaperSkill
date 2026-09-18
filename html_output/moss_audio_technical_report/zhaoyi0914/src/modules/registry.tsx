@@ -1,0 +1,50 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { C1Mod1 } from './c1mod1';
+import { C1Mod2 } from './c1mod2';
+import { C2Mod1 } from './c2mod1';
+import { C2Mod2 } from './c2mod2';
+import { C3Mod1 } from './c3mod1';
+import { C4Mod1 } from './c4mod1';
+import { C4Mod2 } from './c4mod2';
+import { C5Mod1 } from './c5mod1';
+import { C6Mod1 } from './c6mod1';
+import { C6Mod2 } from './c6mod2';
+import { C7Mod1 } from './c7mod1';
+import { C7Mod2 } from './c7mod2';
+import { C8Mod1 } from './c8mod1';
+import { C8Mod2 } from './c8mod2';
+import { C9Mod1 } from './c9mod1';
+import { C9Mod2 } from './c9mod2';
+import { C10Mod1 } from './c10mod1';
+import { C10Mod2 } from './c10mod2';
+import { HeroCompare } from './hero-compare';
+import { MusicAnalogy } from './music-analogy';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['c1mod1'] = C1Mod1;
+widgetRegistry['c1mod2'] = C1Mod2;
+widgetRegistry['c2mod1'] = C2Mod1;
+widgetRegistry['c2mod2'] = C2Mod2;
+widgetRegistry['c3mod1'] = C3Mod1;
+widgetRegistry['c4mod1'] = C4Mod1;
+widgetRegistry['c4mod2'] = C4Mod2;
+widgetRegistry['c5mod1'] = C5Mod1;
+widgetRegistry['c6mod1'] = C6Mod1;
+widgetRegistry['c6mod2'] = C6Mod2;
+widgetRegistry['c7mod1'] = C7Mod1;
+widgetRegistry['c7mod2'] = C7Mod2;
+widgetRegistry['c8mod1'] = C8Mod1;
+widgetRegistry['c8mod2'] = C8Mod2;
+widgetRegistry['c9mod1'] = C9Mod1;
+widgetRegistry['c9mod2'] = C9Mod2;
+widgetRegistry['c10mod1'] = C10Mod1;
+widgetRegistry['c10mod2'] = C10Mod2;
+widgetRegistry['hero-compare'] = HeroCompare;
+widgetRegistry['music-analogy'] = MusicAnalogy;

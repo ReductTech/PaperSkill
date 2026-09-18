@@ -11,6 +11,7 @@ import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { WelcomeHero } from './components/WelcomeHero';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -83,6 +84,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="RoboDojo：面向通用机器人操作的仿真与真实评测基准 · 交互式教程"
+    />
     </>
   );
 }

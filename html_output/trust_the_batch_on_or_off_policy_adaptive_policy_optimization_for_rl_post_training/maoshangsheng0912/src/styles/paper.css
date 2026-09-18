@@ -1,0 +1,188 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 场景基色 —— 放风筝的户外天空与草地 */
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-sky: #f7faf4;
+  --paper-scene-ground: #76906a;
+  --paper-scene-line: #b8c9a7;
+
+  /* 情境辅助色 */
+  --paper-kite: #27446e;
+  --paper-string: #92400e;
+  --paper-tail: #f07e47;
+
+  /* 论文方法语义（锁定，与 tokens.css 保持一致） */
+  --paper-method: #228d5c;   /* e_B 与自适应通道 */
+  --paper-old: #c43f52;      /* 固定超参 */
+  --paper-emphasis: #f07e47; /* 用户推动 */
+  --paper-aux: #7c3aed;      /* KL 正则通道 */
+}
+
+/* 类比场景的柔和背景，让 560x140 的小画布与页面其余部分区分开 */
+.analogy-visual {
+  background: linear-gradient(180deg, var(--paper-scene-sky) 0%, var(--paper-scene-bg) 100%);
+}
+
+/* 只读滑块：用于展示“写死的固定超参”，不可操作 */
+.ctrl input[type='range']:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 评估用的横向判定条（第 1 章的耦合审查模块） */
+.eval-row {
+  display: grid;
+  grid-template-columns: 108px 1fr 56px;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.eval-label {
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.eval-track {
+  height: 12px;
+  overflow: hidden;
+  background: #e6ecdf;
+  border-radius: 6px;
+}
+
+.eval-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.eval-val {
+  font-family: var(--ui-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* 控制区中并列的固定超参展示 */
+.ctrl-fixed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.fx-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.fx-k {
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+
+.fx-v {
+  color: var(--ui-danger);
+  font-family: var(--ui-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 模块内的小标题行（读数 + 标签并排） */
+.mv-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--ui-text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mv-ess {
+  color: var(--paper-method);
+  font-family: var(--ui-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 公式区：严格使用 Unicode 字符 + HTML，禁用 KaTeX / MathJax。
+   components.css 已定义 .fe-formula 的基础样式，这里只补充可读性细节。 */
+.fe-formula {
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 8px;
+  line-height: 2;
+  white-space: pre-wrap;
+}
+
+/* 第 10 章的多行公式：公式串里用 \n 分行，pre-wrap 负责换行 */
+.fe-formula br {
+  display: block;
+  margin-top: 8px;
+}
+
+/* 第 8 章步进控件：比 .chap-loader-btn 更紧凑的一组按钮 */
+.step-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--ui-surface, #fff);
+  border: 1.5px solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--ui-text-main);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
+}
+
+.step-btn:hover:not(:disabled) {
+  border-color: var(--ui-accent);
+  background: #f4f7fb;
+  transform: translateY(-1px);
+}
+
+.step-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 第 8 章的输入/输出对照块 */
+.io-panel {
+  padding: 12px 14px;
+  width: 100%;
+  background: var(--paper-scene-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  color: var(--ui-text-main);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.io-panel.is-ess {
+  background: #f1f9f4;
+  border-color: #bfe0cd;
+}
+
+/* 可拖拽画布：未悬停时给一个「可抓取」的暗示，避免学习者不知道要拖 */
+canvas[id^='cv-offpolicy-var'] {
+  cursor: grab;
+  touch-action: none;
+}
+
+canvas[id^='cv-offpolicy-var']:active {
+  cursor: grabbing;
+}

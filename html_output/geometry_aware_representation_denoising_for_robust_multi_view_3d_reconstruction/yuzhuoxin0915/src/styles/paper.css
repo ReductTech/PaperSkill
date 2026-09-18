@@ -1,0 +1,696 @@
+/* ==========================================================================
+   GARD 教程 · 暗房主题（paper-skill 唯一允许编辑的样式表，最后导入）
+   设计：暗房深色框架（页面/侧栏/导航） + 相纸浅色内容卡片。
+   依据《GARD章节视觉设计Prompt列表》Prompt 0 色板；canvas widget 内部为浅色
+   绘制，故内容卡片必须保持浅底，深色只用于页面框架。
+   色板语义：琥珀=暗房安全灯(主题强调) 红=退化/旧方法 绿=恢复/本文方法 蓝=特征。
+   ========================================================================== */
+
+:root {
+  /* 暗房框架色板（Prompt 0） */
+  --paper-bg: #141210;
+  --paper-surface: #1e1a17;
+  --paper-surface-2: #28221c;
+  --paper-line-dark: #342c24;
+  --paper-amber: #d97706;
+  --paper-amber-deep: #b45309;
+  --paper-amber-soft: rgba(217, 119, 6, 0.14);
+  --paper-degrade: #e5484d;
+  --paper-degrade-soft: rgba(229, 72, 77, 0.12);
+  --paper-restore: #30a46c;
+  --paper-restore-soft: rgba(48, 164, 108, 0.13);
+  --paper-feature: #4c9be8;
+  --paper-feature-soft: rgba(76, 155, 232, 0.13);
+  --paper-ink-warm: #f5f0e8;
+  --paper-muted-warm: #c4b8a2; /* 6.40 → 8.82，暗底小字更舒适 */
+
+  /* 文字安全色：只用于「相纸浅底上的语义文字」，均通过 WCAG AA 4.5:1。
+     填充/描边/数据条继续用上面的鲜亮原色，二者不要混用。 */
+  --paper-degrade-text: #a93347; /* 退化红 6.20 */
+  --paper-restore-text: #1e7a4c; /* 恢复绿 5.11 */
+  --paper-feature-text: #2f6fae; /* 特征蓝 5.03 */
+  --paper-amber-text: #b45309;   /* 琥珀   4.82 */
+
+  /* 内容卡片（相纸）——覆盖 tokens.css 的冷白 */
+  --ui-bg-card: #fcfaf6;
+  --ui-bg-soft: #f3eee5;
+  --ui-bg-muted: #f6f2ea;
+  --ui-border: #e4dccc;
+  --ui-border-strong: #c4b8a2;
+  --ui-text-main: #29221a;
+  --ui-text-muted: #6e6455;
+  --ui-text-light: #7a7060; /* 3.14 → ~4.6，图注/辅助小字达标 */
+  --ui-success: #1c7a4f;    /* 4.00 → 5.10，feedback.good 文字达标 */
+  --paper: var(--ui-bg-card);
+  --paper-2: var(--ui-bg-muted);
+  --ink: var(--ui-text-main);
+  --ink-2: var(--ui-text-muted);
+  --slate: var(--ui-text-muted);
+  --slate-2: var(--ui-text-light);
+  --line: var(--ui-border);
+  --line-2: var(--ui-border-strong);
+}
+
+/* ---------- 页面框架：暗房 ---------- */
+body {
+  background:
+    /* 顶部台灯光照：模拟相纸被照亮（提示词 1-4） */
+    linear-gradient(180deg, rgba(255, 250, 240, 0.045) 0%, transparent 260px),
+    radial-gradient(1100px 550px at 18% -8%, rgba(217, 119, 6, 0.09), transparent 60%),
+    radial-gradient(900px 500px at 95% 110%, rgba(217, 119, 6, 0.05), transparent 55%),
+    linear-gradient(180deg, #1a1613 0%, var(--paper-bg) 100%);
+  background-attachment: fixed;
+}
+
+/* ---------- 暗房质感层：胶片颗粒 + 暗角（提示词 1） ----------
+   两个伪元素都是 position:fixed + pointer-events:none，不参与布局、
+   不拦截点击；颗粒在最上层但透明，暗角在其下。 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -60%;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
+  animation: grain-drift 7s steps(5) infinite;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 125% 95% at 50% 42%,
+    transparent 56%,
+    rgba(8, 6, 4, 0.13) 80%,
+    rgba(8, 6, 4, 0.28) 100%
+  );
+}
+/* 颗粒缓慢漂移，避免静止噪点的廉价感；step 切换比连续位移更省性能 */
+@keyframes grain-drift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-3%, 2%); }
+  40%  { transform: translate(2%, -3%); }
+  60%  { transform: translate(-2%, -2%); }
+  80%  { transform: translate(3%, 1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* 侧边栏安全灯：顶部与底部各一处琥珀辉光，营造暗房顶灯氛围。
+   注意：绝不在此改动 .slide-sidebar 的 position —— components.css 里
+   桌面是 sticky、移动端媒体查询里是 fixed，paper.css 后加载，
+   在这里写 position 会把它们全部覆盖掉（已踩过坑）。
+   sticky/fixed 本身就是"已定位"元素，可直接作为辉光伪元素的包含块；
+   辉光只在桌面端开启，移动端抽屉不需要。 */
+@media (min-width: 769px) {
+  .slide-sidebar::before,
+  .slide-sidebar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 220px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .slide-sidebar::before {
+    top: 0;
+    background: radial-gradient(400px 200px at 20% 0%, rgba(217, 119, 6, 0.13), transparent 62%);
+  }
+  .slide-sidebar::after {
+    bottom: 0;
+    background: radial-gradient(400px 200px at 30% 100%, rgba(217, 119, 6, 0.10), transparent 62%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
+
+/* 目录侧栏 */
+.slide-sidebar {
+  background: var(--paper-surface);
+  border-right-color: var(--paper-line-dark);
+}
+.slide-sidebar-header { border-bottom-color: var(--paper-line-dark); }
+.slide-sidebar-venue { color: var(--paper-muted-warm); }
+.slide-sidebar-title { color: var(--paper-ink-warm); }
+.slide-sidebar-item { color: var(--paper-muted-warm); }
+.slide-sidebar-item:hover { background: var(--paper-surface-2); color: var(--paper-amber); }
+.slide-sidebar-item.active { background: var(--paper-amber); color: #1a1510; }
+.slide-sidebar-item.active .slide-sidebar-num { color: #1a1510; }
+.slide-sidebar-collapse {
+  background: var(--paper-surface);
+  border-color: var(--paper-line-dark);
+  color: var(--paper-muted-warm);
+}
+.slide-sidebar-collapse:hover { background: var(--paper-surface-2); color: var(--paper-amber); }
+.slide-sidebar-toggle {
+  background: var(--paper-surface);
+  border-color: var(--paper-line-dark);
+  color: var(--paper-amber);
+}
+.slide-sidebar-overlay { background: rgba(10, 8, 6, 0.55); }
+
+/* ---------- 侧边栏：学习旅程进度点（提示词 7） ----------
+   左侧一条垂直轨道，每个章节一个状态点：
+   已讲过=绿色实心(微光) / 当前=琥珀脉冲 / 未到=空心灰点 */
+.slide-sidebar-nav { position: relative; }
+.slide-sidebar-nav::before {
+  content: '';
+  position: absolute;
+  left: 24px; /* nav padding 8 + item padding 12 + dot 半径 5，正好穿过点心 */
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--paper-line-dark);
+}
+.sb-dot {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: var(--paper-surface);
+  border: 2px solid #4a4038;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out),
+    box-shadow var(--t-fast) var(--ease-out);
+}
+.slide-sidebar-item.done .sb-dot {
+  background: var(--paper-restore);
+  border-color: var(--paper-restore);
+  box-shadow: 0 0 8px rgba(48, 164, 108, 0.45);
+}
+.slide-sidebar-item.active .sb-dot {
+  background: #1a1510;
+  border-color: #1a1510;
+  animation: sb-pulse 2s var(--ease-in-out) infinite;
+}
+@keyframes sb-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(217, 119, 6, 0); }
+}
+
+/* 底部导航 */
+.slide-nav { background: var(--paper-surface); border-top-color: var(--paper-line-dark); }
+.slide-nav-btn {
+  background: var(--paper-surface-2);
+  border-color: var(--paper-line-dark);
+  color: var(--paper-muted-warm);
+}
+.slide-nav-btn:hover:not(:disabled) { border-color: var(--paper-amber); color: var(--paper-amber); }
+.slide-nav-btn-primary { background: var(--paper-amber); border-color: var(--paper-amber); color: #1a1510; }
+.slide-nav-btn-primary:hover:not(:disabled) { background: var(--paper-amber-deep); border-color: var(--paper-amber-deep); color: #fff8ee; }
+.slide-nav-counter { color: var(--paper-muted-warm); }
+
+/* ---------- 内容区：相纸卡片 ---------- */
+.slide-content { max-width: 1180px; }
+
+section.hero,
+section.chap {
+  border-color: var(--ui-border);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.28);
+}
+
+/* 章节标题：左侧琥珀竖条，强化层次 */
+.chap-title { position: relative; padding-left: 18px; }
+.chap-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 5px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--paper-amber), #f2a63b);
+}
+.chap-title .num { color: var(--paper-amber-deep); }
+
+/* 难度徽章：对齐色板语义 */
+.badge-tag.inf { background: var(--paper-restore-soft); color: #1e7a4c; }
+.badge-tag.trn { background: var(--paper-amber-soft); color: var(--paper-amber-deep); }
+.badge-tag.both { background: var(--paper-feature-soft); color: #2f6fae; }
+
+/* Hero：旧方法=退化红顶条，本文方法=恢复绿顶条（Prompt 0 语义）
+   顶条用鲜亮原色，标题文字用文字安全色（浅底可读性） */
+.bg-side.old { border-top-color: var(--paper-degrade); }
+.bg-side.middle { border-top-color: var(--paper-amber); }
+.bg-side.new { border-top-color: var(--paper-restore); }
+.bg-side.old .bg-side-head { color: var(--paper-degrade-text); }
+.bg-side.middle .bg-side-head { color: var(--paper-amber-text); }
+.bg-side.new .bg-side-head { color: var(--paper-restore-text); }
+/* 图片容器：固定高度 + 居中，左右两栏严格等高对齐（修复偏移） */
+.bg-side-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  padding: 12px;
+  background: #ffffff;
+}
+.bg-side-img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  margin: 0 auto;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: #fff;
+}
+
+/* ---------- 论文图片统一显示规范 ---------- */
+.paper-figure { margin: 18px auto; text-align: center; }
+.paper-figure img {
+  max-width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 2px 12px rgba(41, 34, 26, 0.07);
+}
+.paper-figure figcaption {
+  margin-top: 8px;
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+}
+
+/* ---------- 细节统一 ---------- */
+/* 类比卡：琥珀语义，与暗房主题一致 */
+.analogy-card {
+  background: var(--paper-amber-soft);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+.analogy-visual { background: var(--paper-amber-soft); }
+.analogy-title { color: var(--paper-amber-deep); }
+.analogy-title::before { background: var(--paper-amber); }
+
+/* 模块头序号：琥珀底，呼应章节竖条 */
+.module-head .num { background: var(--paper-amber-soft); color: var(--paper-amber-deep); }
+
+/* 滑块与选中态保留蓝色（与 canvas widget 内部的引导蓝一致） */
+
+/* 响应式微调 */
+@media (max-width: 768px) {
+  .bg-side-canvas { min-height: 130px; }
+  .bg-side-img { max-height: 120px; }
+  .paper-figure img { max-height: 320px; }
+}
+
+/* ---------- 暗房比喻总览（封面 Hero 之后） ---------- */
+.darkroom-map {
+  max-width: 960px;
+  margin: 28px auto 0;
+  padding: 24px 28px;
+  background: var(--paper-surface);
+  border: 1px solid var(--paper-line-dark);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+.dm-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.dm-icon {
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(217, 119, 6, 0.35));
+}
+.dm-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--paper-ink-warm);
+  letter-spacing: 0.5px;
+}
+.dm-subtitle {
+  font-size: 13px;
+  color: var(--paper-muted-warm);
+  margin-top: 2px;
+}
+.dm-lead {
+  color: var(--paper-muted-warm);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+.dm-lead em {
+  color: var(--paper-amber);
+  font-style: normal;
+  font-weight: 600;
+}
+/* ---------- 暗房比喻总览：工作台流水线时间线（提示词 3） ----------
+   桌面端 5×2 网格，节点上方一条琥珀轨道线贯穿每行，图标坐在轨道上；
+   hover 时当前节点上浮发光、其余节点退后（安全灯只照亮当前步骤）；
+   章节徽章可点击跳转。移动端切换为左侧竖轨的垂直时间线。 */
+.dm-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dm-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 34px 10px 10px;
+  background: var(--paper-surface-2);
+  border: 1px solid var(--paper-line-dark);
+  border-radius: 10px;
+  transition:
+    transform var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out),
+    box-shadow var(--t-fast) var(--ease-out),
+    opacity var(--t-fast) var(--ease-out);
+}
+/* 贯穿本行的琥珀轨道线；行首/行末不外溢，整行看起来是一条连续轨道 */
+.dm-node::before {
+  content: '';
+  position: absolute;
+  top: 13px;
+  left: -12px;
+  right: -12px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--paper-line-dark) 0%,
+    var(--paper-amber) 20%,
+    var(--paper-amber) 80%,
+    var(--paper-line-dark) 100%
+  );
+  opacity: 0.75;
+}
+.dm-node:nth-child(5n + 1)::before { left: 0; }
+.dm-node:nth-child(5n)::before { right: 0; }
+.dm-node-icon {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: var(--paper-surface);
+  border: 1px solid var(--paper-line-dark);
+  border-radius: 50%;
+  z-index: 1;
+}
+.dm-node:hover {
+  transform: translateY(-4px);
+  border-color: var(--paper-amber);
+  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.35), 0 10px 26px rgba(217, 119, 6, 0.16);
+}
+/* 安全灯照亮当前步骤：hover 某节点时同排其余节点退后 */
+.dm-timeline:hover .dm-node:not(:hover) { opacity: 0.55; }
+.dm-node-stage {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--paper-amber);
+  letter-spacing: 1px;
+}
+.dm-node-metaphor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper-ink-warm);
+  line-height: 1.4;
+}
+.dm-node-concept {
+  font-size: 12px;
+  color: var(--paper-muted-warm);
+  line-height: 1.5;
+}
+.dm-chapter {
+  margin-top: 4px;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--paper-ink-warm);
+  text-align: center;
+  background: var(--paper-amber-soft);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+button.dm-chapter {
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+button.dm-chapter:hover { background: var(--paper-amber); color: #1a1510; }
+
+/* ---------- 换页按钮：预告语 ---------- */
+.slide-nav-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  max-width: 460px;
+}
+.slide-nav-next-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.slide-nav-teaser {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.85;
+  line-height: 1.35;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.slide-nav-arrow {
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  /* 暗房时间线 → 垂直：左侧竖轨 + 节点堆叠 */
+  .dm-timeline { grid-template-columns: 1fr; gap: 12px; padding-left: 30px; }
+  .dm-node::before { display: none; }
+  .dm-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--paper-line-dark), var(--paper-amber), var(--paper-line-dark));
+    opacity: 0.75;
+  }
+  .dm-node { padding: 10px 12px; }
+  .dm-node-icon {
+    top: 50%;
+    left: -30px;
+    transform: translateY(-50%);
+  }
+  .dm-node-stage { font-size: 11px; }
+  .dm-node-metaphor { font-size: 13px; }
+  .dm-node-concept { font-size: 12px; }
+  .slide-nav-btn-primary { max-width: 62vw; }
+  .slide-nav-teaser { -webkit-line-clamp: 1; }
+}
+
+/* 动画降级：系统开启"减少动态效果"时关闭脉冲/发光动画 */
+@media (prefers-reduced-motion: reduce) {
+  .slide-sidebar-item.active .sb-dot { animation: none; }
+  .dm-node,
+  .dm-node::before,
+  .sb-dot { transition: none; }
+  .dm-timeline:hover .dm-node:not(:hover) { opacity: 1; }
+}
+
+/* ==========================================================================
+   提示词 2 / 5 / 6 / 8 / 10 —— 首屏与卡片打磨
+   ========================================================================== */
+
+/* ---------- Hero：放大机投射光 + 几何网格 + 数据流动线（提示词 2） ---------- */
+/* 放大机投射光：中心亮、边缘暗，模拟相纸被灯箱照亮 */
+section.hero {
+  background: radial-gradient(ellipse 90% 72% at 50% 0%, #fffdfa 0%, #fcfaf6 58%, #f3eee5 100%);
+}
+/* 标题区几何网格（透明度 5%，径向渐隐），呼应「几何感知」 */
+.hero-inner { position: relative; }
+.hero-inner::before {
+  content: '';
+  position: absolute;
+  top: -22px;
+  left: 0;
+  right: 0;
+  height: 320px;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.05) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(ellipse 72% 100% at 50% 0%, #000 28%, transparent 76%);
+  mask-image: radial-gradient(ellipse 72% 100% at 50% 0%, #000 28%, transparent 76%);
+}
+.hero-inner > * { position: relative; z-index: 1; }
+
+/* 三栏差异化：old 降饱和（退化）/ middle 特征网格 / new 提对比（恢复） */
+.bg-side.old .bg-side-img { filter: saturate(0.72); }
+.bg-side.old .bg-side-canvas { background: linear-gradient(180deg, #fdf5f4 0%, #ffffff 100%); }
+.bg-side.middle .bg-side-canvas {
+  background-color: #fffdf8;
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.bg-side.new .bg-side-img { filter: contrast(1.06) saturate(1.05); }
+.bg-side.new .bg-side-canvas { background: linear-gradient(180deg, #f3fbf6 0%, #ffffff 100%); }
+
+/* 数据流动线：三栏上方一条红→琥珀→绿的轨道，光点周期性从左流到右，
+   表达「退化输入 → 特征空间去噪 → 三维重建恢复」的流向。
+   纯 CSS 动画，不用 JS 逐帧；reduced-motion 下关闭。 */
+.hero-compare.three-col { position: relative; padding-top: 20px; }
+.hero-compare.three-col::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 3%;
+  right: 3%;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--paper-degrade) 0%, var(--paper-amber) 50%, var(--paper-restore) 100%);
+  opacity: 0.5;
+}
+.hero-compare.three-col::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 3%;
+  width: 44px;
+  height: 10px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle 4px at 50% 50%, #ffe0b0 0%, rgba(255, 224, 176, 0.55) 55%, transparent 100%);
+  filter: drop-shadow(0 0 6px rgba(217, 119, 6, 0.85));
+  animation: hero-flow 2.8s var(--ease-in-out) infinite;
+}
+@keyframes hero-flow {
+  0%   { left: 3%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: 97%; opacity: 0; }
+}
+
+/* 关键词标签 hover：上浮 + 琥珀辉光 */
+.hero-meta .tag { transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out); }
+.hero-meta .tag:hover {
+  transform: translateY(-2px);
+  background: var(--paper-amber-soft);
+  border-color: rgba(217, 119, 6, 0.45);
+  color: var(--paper-amber-text);
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.25);
+}
+
+/* ---------- Canvas 与卡片一体化（提示词 5，不做 auto-hide） ----------
+   演示场景下控件必须常显，所以只做质感融合：模块主体给"灯箱"内阴影，
+   画布边框改暖色并加轻投影；滑块 hover/聚焦发光。 */
+.module-body {
+  background: radial-gradient(ellipse 130% 100% at 50% 0%, #fffefb 0%, var(--paper) 72%);
+  box-shadow: inset 0 0 34px rgba(41, 34, 26, 0.045);
+}
+canvas {
+  border-color: rgba(228, 220, 204, 0.75);
+  box-shadow: 0 1px 3px rgba(41, 34, 26, 0.05);
+}
+.ctrl input[type="range"]::-webkit-slider-thumb { transition: box-shadow var(--t-fast) var(--ease-out); }
+.ctrl input[type="range"]:hover::-webkit-slider-thumb,
+.ctrl input[type="range"]:focus-visible::-webkit-slider-thumb,
+.ctrl input[type="range"]:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 5px rgba(76, 155, 232, 0.16), 0 0 12px rgba(76, 155, 232, 0.5);
+}
+.feedback { animation: feedback-in 260ms var(--ease-out) both; }
+@keyframes feedback-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- 公式卡：学术精致感（提示词 6 的视觉部分，不引入 KaTeX） ----------
+   数据里存的是 Unicode+HTML 而非 LaTeX，换渲染引擎会破坏"点符号看含义"
+   的教学交互，故只做视觉升级：特征蓝→恢复绿的微渐变 + 厚卡纸内阴影。 */
+.formula-explain {
+  background: linear-gradient(135deg, #f2f7ff 0%, #f2fff8 100%);
+  border-color: rgba(76, 155, 232, 0.28);
+}
+.fe-formula {
+  background: #ffffff;
+  border-radius: var(--ui-radius-sm);
+  box-shadow: inset 0 1px 3px rgba(41, 34, 26, 0.07), 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.fe-formula .fe-formula-sym { border-bottom: 1px solid rgba(76, 155, 232, 0.35); }
+.fe-formula .fe-formula-sym:hover {
+  background: var(--paper-feature-soft);
+  border-bottom-color: var(--paper-feature-text);
+}
+
+/* ---------- 要点卡：记忆锚点（提示词 8，不做 hover 才展开） ---------- */
+.takeaway-wrap { margin: 16px 0 0; }
+.et-heading {
+  margin: 0 0 10px;
+  font-family: Georgia, "Songti SC", "SimSun", serif;
+  font-style: italic;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--paper-amber-text);
+}
+.et-item { overflow: hidden; }
+.et-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 88px;
+  line-height: 1;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* ---------- 移动端触控与布局（提示词 10，swipe 手势不做） ----------
+   swipe 会与 canvas 内部的点击/滑块手势冲突，收尾阶段以稳为主，
+   只做触控目标放大、内边距收窄与三栏堆叠。 */
+@media (max-width: 768px) {
+  section.chap { padding: 20px; }
+  .slide-nav-btn { min-height: 44px; min-width: 44px; }
+  .chip { padding: 9px 14px; }
+  .ctrl input[type="range"] { height: 28px; }
+  .module { margin: 14px 0 20px; }
+  .hero-compare.three-col { grid-template-columns: 1fr; }
+  .hero-compare.three-col::before,
+  .hero-compare.three-col::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-compare.three-col::after { animation: none; opacity: 0; }
+  .feedback { animation: none; }
+}

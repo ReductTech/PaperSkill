@@ -11,6 +11,7 @@ import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { LineIcon } from './components/LineIcon';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -110,6 +111,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="PP-OCRv6：轻量专用 OCR 的架构、训练与部署 · 交互式教程"
+    />
     </>
   );
 }

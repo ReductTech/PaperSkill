@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { AuditToggle } from './audit-toggle';
+import { BoundaryCheck } from './boundary-check';
+import { BudgetReasoning } from './budget-reasoning';
+import { ClimbAnalogy } from './climb-analogy';
+import { CoverageExplorer } from './coverage-explorer';
+import { FailureTrace } from './failure-trace';
+import { GraderTriad } from './grader-triad';
+import { HarnessMatrix } from './harness-matrix';
+import { HeroContrast } from './hero-contrast';
+import { HorizonPressure } from './horizon-pressure';
+import { LeakageGate } from './leakage-gate';
+import { ModelRace } from './model-race';
+import { RuntimeWalkthrough } from './runtime-walkthrough';
+import { ScoreGapLab } from './score-gap-lab';
+import { SkillAblation } from './skill-ablation';
+import { TaskBlueprint } from './task-blueprint';
+import { VerdictRace } from './verdict-race';
+import { CategoryExamples } from './category-examples';
+import { CurationPipeline } from './curation-pipeline';
+import { JudgeRubric } from './judge-rubric';
+import { ResearchLandscape } from './research-landscape';
+import { LegacyLimitations } from './legacy-limitations';
+import { ResultFailureExplorer } from './result-failure-explorer';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['audit-toggle'] = AuditToggle;
+widgetRegistry['boundary-check'] = BoundaryCheck;
+widgetRegistry['budget-reasoning'] = BudgetReasoning;
+widgetRegistry['climb-analogy'] = ClimbAnalogy;
+widgetRegistry['coverage-explorer'] = CoverageExplorer;
+widgetRegistry['failure-trace'] = FailureTrace;
+widgetRegistry['grader-triad'] = GraderTriad;
+widgetRegistry['harness-matrix'] = HarnessMatrix;
+widgetRegistry['hero-contrast'] = HeroContrast;
+widgetRegistry['horizon-pressure'] = HorizonPressure;
+widgetRegistry['leakage-gate'] = LeakageGate;
+widgetRegistry['model-race'] = ModelRace;
+widgetRegistry['runtime-walkthrough'] = RuntimeWalkthrough;
+widgetRegistry['score-gap-lab'] = ScoreGapLab;
+widgetRegistry['skill-ablation'] = SkillAblation;
+widgetRegistry['task-blueprint'] = TaskBlueprint;
+widgetRegistry['verdict-race'] = VerdictRace;
+widgetRegistry['category-examples'] = CategoryExamples;
+widgetRegistry['curation-pipeline'] = CurationPipeline;
+widgetRegistry['judge-rubric'] = JudgeRubric;
+widgetRegistry['research-landscape'] = ResearchLandscape;
+widgetRegistry['legacy-limitations'] = LegacyLimitations;
+widgetRegistry['result-failure-explorer'] = ResultFailureExplorer;

@@ -1,0 +1,1 @@
+export function Analogy2(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>两个维度</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>位置数 × 特征维度</div><div style={{fontSize:13,color:'#63758a'}}>64 个图像位置，每个 768 维</div></div>}

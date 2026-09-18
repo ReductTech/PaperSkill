@@ -7,6 +7,7 @@ import './shared/react/typography/typography.css';
 import './shared/vendor/mathlive/mathlive-fonts.css';
 import './styles/components.css';
 import './styles/paper.css';
+import './styles/ppt-mode.css';
 
 // Start parsing MathLive while the hero is visible so the first symbol hover is immediate.
 void preloadMathlive();

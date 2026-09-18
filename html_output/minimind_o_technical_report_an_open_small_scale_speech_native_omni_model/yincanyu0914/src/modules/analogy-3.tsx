@@ -1,0 +1,1 @@
+export function Analogy3(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>两条出口</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>文字输出 ≠ 中间隐状态</div><div style={{fontSize:13,color:'#63758a'}}>Talker 还依赖自己的音频历史</div></div>}

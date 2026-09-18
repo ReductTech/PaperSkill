@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { initElfTutorial } from './lib/elf-engine';
 import { ELF_HERO_HTML, ELF_CHAPTERS, ELF_VIDEOS_HTML } from './data/elfContent';
+import { PptBars } from './components/PptBars';
 
 // ELF 交互式教程（React 外壳）。
 // 关键约束：引擎脚本通过 `$qa('section.chap')` 拿章节并把每章当作
@@ -27,6 +28,11 @@ export default function App() {
       <div dangerouslySetInnerHTML={{ __html: ELF_HERO_HTML }} />
       {/* 10 章 + 视频区：必须是 main 的直接子节点（兄弟关系），保持引擎 DOM 假设 */}
       <main dangerouslySetInnerHTML={{ __html: ELF_MAIN_HTML }} />
+      <PptBars
+        chapters={ELF_CHAPTERS.map((ch) => ({ id: ch.id, title: ch.title }))}
+        venue="ELF"
+        title="嵌入语言流（ELF）— 用扩散模型做语言生成 · 交互式教程"
+      />
     </>
   );
 }

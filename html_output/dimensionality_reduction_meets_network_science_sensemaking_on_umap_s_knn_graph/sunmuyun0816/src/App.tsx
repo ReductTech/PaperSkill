@@ -9,6 +9,7 @@ import { Formula } from './components/Formula';
 import { InsightBar } from './components/InsightBar';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -68,6 +69,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="降维遇见网络科学：基于 UMAP kNN 图的数据理解 · 交互式教程"
+    />
     </>
   );
 }

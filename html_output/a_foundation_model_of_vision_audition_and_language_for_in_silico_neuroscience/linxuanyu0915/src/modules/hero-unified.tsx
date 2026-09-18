@@ -1,0 +1,16 @@
+import React from 'react';
+import type { WidgetProps } from './registry';
+import { ConfigurableStudio, AnalogyStudio, type StudioConfig } from './studio-base';
+export const HeroFragmented:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="检查彼此分离的素材路径"/>;
+export const HeroUnified:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="把多轨素材纳入 Transformer"/>;
+export const AnalogyCh1:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="归并散落片段"/>;
+export const AnalogyCh2:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="对齐三条模态轨"/>;
+export const AnalogyCh3:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="比较局部与长上下文"/>;
+const FragmentationStressConfig:StudioConfig={"title":"研究异质性","scene":"fragment-risk","control":"slider","options":["单一设置","+被试","+任务","+脑区","+模态"],"feedback":["局部工程尚易管理，但还没有跨设置共享。","专用路径开始按被试分叉。","任务差异让共现规律继续分散。","脑区差异增加专用映射压力。","异质性越高，碎片方案越难形成统一表示。"],"formula":"720 = 25（联合训练）+ 695（留出测试）","facts":["总体：1,117.7 小时、720 人","教学等级不代表模型数量"]};
+export const FragmentationStress:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={FragmentationStressConfig}/>;
+const UnifiedCoverageConfig:StudioConfig={"title":"组织策略","scene":"unified","control":"toggle","options":["碎片方案","统一框架"],"feedback":["同一批研究被拆成多套映射，知识难以汇集。","统一脑编码把异质条件纳入共享框架；个体差异仍保留。"],"facts":["训练：25 人","留出测试：695 人"]};
+export const UnifiedCoverage:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={UnifiedCoverageConfig}/>;
+const ModalityAlignerConfig:StudioConfig={"title":"查看模态","scene":"modal-align","control":"toggle","options":["文本 2048","音频 1024","视频 1280","三模态"],"feedback":["文本特征投影到 384 维、同步为 2 Hz。","音频特征投影到 384 维、同步为 2 Hz。","视频特征投影到 384 维、同步为 2 Hz。","三条 384 维轨道拼接为 1152 维。"],"formula":"D_model = 3×384 = 1152（全部模态被表示时）"};
+export const ModalityAligner:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={ModalityAlignerConfig}/>;
+const LinearVsTransformerConfig:StudioConfig={"title":"时间模型","scene":"time-compare","control":"toggle","options":["深度 FIR","Transformer"],"feedback":["强线性基线：同特征、9 TR 卷积、5 秒偏移。","TRIBE v2：8 层、8 头在 100 秒上下文中进行非线性整合。"],"formula":"匹配比较：q<1e-4（FDR 校正）；Pearson 越高越好"};
+export const LinearVsTransformer:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={LinearVsTransformerConfig}/>;

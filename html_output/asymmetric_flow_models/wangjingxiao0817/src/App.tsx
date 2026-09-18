@@ -12,6 +12,7 @@ import { BiliVideos } from './components/BiliVideos';
 import { InnovationTwoBridge } from './components/InnovationTwoBridge';
 import { PartHeader } from './components/PartHeader';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 const PART_I_COUNT = 4;
 const RELEASED_CHAPTER_COUNT = 8;
@@ -151,6 +152,14 @@ export default function App() {
           );
         })}
       </main>
+      <PptBars
+        chapters={chapters}
+        revealed={revealed}
+        onRevealNext={revealNext}
+        visible={revealed > 0}
+        venue="Interactive Tutorial"
+        title={tutorial.meta.titleZh}
+      />
     </>
   );
 }

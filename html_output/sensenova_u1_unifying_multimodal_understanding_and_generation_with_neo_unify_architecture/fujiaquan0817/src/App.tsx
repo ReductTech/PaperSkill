@@ -11,6 +11,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -170,6 +171,15 @@ export default function App() {
         })}
         {revealed === total ? <DefenseConclusion /> : null}
         </main>
+      <PptBars
+        chapters={tutorial.chapters}
+        revealed={revealed}
+        onRevealNext={revealNext}
+        visible={revealed > 0}
+        venue="Interactive Tutorial"
+        title="SenseNova-U1：以 NEO-unify 架构统一多模态理解与生成 · 交互式教程"
+      />
+        
       </div>
     </div>
   );

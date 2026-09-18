@@ -1,0 +1,35 @@
+import {useState} from 'react';
+import {CanvasView,Controls,Metric,Feedback,palette as p,page,line,label,bar} from './proofKit';
+function Choices({items,value,onChange}:{items:string[],value:number,onChange:(n:number)=>void}){return <Controls>{items.map((s,i)=><button key={s} className={'chip'+(value===i?' active':'')} style={{minHeight:44}} aria-pressed={value===i} onClick={()=>onChange(i)}>{s}</button>)}</Controls>}
+function Source({page:pg,children}:{page:number,children:React.ReactNode}){return <p><a href={`https://arxiv.org/pdf/2604.06240#page=${pg}`} target="_blank" rel="noreferrer">原文：{children}</a></p>}
+export function ExperimentProtocol(){const [dataset,setDataset]=useState(0),[phase,setPhase]=useState(0),[study,setStudy]=useState(0);return <div>
+<p>实验要回答三个问题：UV与人工判断有多一致？它与基准原生验证器有多大分歧？自动研究能否复现或继续改进专家设计？</p>
+<Choices items={['人工标注对照','原生验证器对照','自动研究设置']} value={study} onChange={setStudy}/>
+{study===0&&<><Choices items={['Internal · 140条','Browserbase · 106条']} value={dataset} onChange={setDataset}/>{dataset===1&&<Choices items={['UV-blind 独立判断','UV-informed 知情复核']} value={phase} onChange={setPhase}/>}
+<CanvasView height={220} label={`轨迹→人工标注→聚合标签→比较预测；${dataset?'Browserbase':'Internal'}`} draw={c=>{for(let i=0;i<4;i++){const x=30+i*265;page(c,x,40,225,130);label(c,String(i+1),x+100,87,p.blue,30);for(let j=0;j<(i===1&&dataset?2:1);j++)line(c,x+50,120+j*17,x+170,120+j*17,i===1&&dataset&&phase?p.orange:p.blue,5);if(i<3)line(c,x+229,100,x+260,100,p.blue,4)}if(dataset&&phase){line(c,940,190,400,190,p.orange,4);line(c,400,190,400,175,p.orange,4)}}}/>
+<p>图例：①任务轨迹；②人工标注；③聚合参考标签；④验证器预测。橙色回线表示知情阶段额外提供UV输出。</p>
+<Feedback tone="neutral">{dataset?'Browserbase：106条Fara-7B在Online-Mind2Web上的轨迹，每条两名标注员，先用10条金标准练习样例校准。':'Internal：140条Fara-7B在WebTailBench上的轨迹，由内部专家标注；消融和自动研究也使用此集。'}{dataset===1&&(phase?' 知情阶段展示UV判断与评分，允许接受或修改先前判断。表2/15的Browserbase主结果采用该协议。':' 盲评看到任务、未评分rubric与轨迹，但看不到UV判断与评分；不是对rubric设计也盲。')}</Feedback>
+<p><b>聚合规则：</b>结果标签取多数票，平票由第三人裁决；过程分取标注者连续分数的中位数，再按≥0.8二值化。该阈值不定义任务结果成功。</p><code>y_process = 𝟙[median(r₁,…,rₘ) ≥ 0.8]</code></>}
+{study===1&&<><CanvasView height={200} label="三个基准分别比较原生判断与UV，不是新增人工金标准" draw={c=>{for(let i=0;i<3;i++){page(c,70+i*340,30,260,135);label(c,String(i+1),180+i*340,78,p.blue,30);line(c,100+i*340,110,170+i*340,110,p.blue,8);line(c,210+i*340,110,295+i*340,110,p.orange,8)}}}/><p>①WebVoyager；②Online-Mind2Web；③WebTailBench。每个基准分别使用Fara-7B与GPT-5（Set-of-Marks代理）的轨迹，比较原生验证器与UV的过程、结果判断。</p><Feedback tone="neutral">此实验扩展比较规模，但表3以UV为参照，不是独立人工金标准。成功率差异不能单独证明哪一个验证器正确。GPT-5在这里是执行任务的代理，不是评分模型。</Feedback></>}
+{study===2&&<><Choices items={['从空白提示开始','继续专家版本']} value={phase} onChange={setPhase}/><CanvasView height={220} label={phase?'从已有专家提示继续优化':'从空白提示开始优化'} draw={c=>{page(c,80,25,320,170);if(phase)for(let i=0;i<4;i++)line(c,115,65+i*30,360,65+i*30,p.blue,5);line(c,425,110,630,110,p.orange,5);page(c,660,25,320,170);for(let i=0;i<4;i++)line(c,695,65+i*30,940,65+i*30,p.blue,5)}}/><p>{phase?'保留专家最佳提示，继续搜索改进。':'将约2,000行提示替换为空白占位，保留代码骨架，不得查看旧提示或历史分支。'}系统约3,000行代码；使用Claude Code 2.1.87与Opus 4.6（1M）。</p><Feedback tone="neutral">在同一Internal集上迭代：优化κ且不增加FPR；增加FPR的改动回滚。独立合规代理检查是否把评测样例记入提示。这个过程不等同于独立留出集泛化验证。</Feedback></>}
+<Source page={7}>§5 Experiments（p.7），标注协议及自动研究设置</Source></div>}
+const main=[[[.67,.73,.31,.45,.24],[.72,.74,.44,.22,.33],[.81,.81,.64,.01,.32]],[[.62,.70,.17,.52,.31],[.66,.70,.32,.25,.40],[.81,.86,.59,.04,.24]],[[.48,.35,.13,.60,.12],[.64,.44,.26,.40,.12],[.88,.65,.58,.08,.31]],[[.55,.47,.22,.56,.05],[.68,.53,.34,.38,.12],[.78,.57,.43,.20,.29]]];
+const metrics=['Accuracy ↑','F1 ↑','κ ↑','FPR ↓','FNR ↓'];
+const studies=[
+{name:'同骨干对照',names:['WebVoyager','WebJudge','UV'],v:[.43,.33,.64],text:'表2，Internal结果标签，全部使用GPT-5.2：κ分别0.43/0.33/0.64，FPR分别0.10/0.07/0.01，FNR分别0.44/0.57/0.32。支持流程设计有贡献，但未配平全部预算与提示长度。',pg:8},
+{name:'同时换生成与评分模型',names:['GPT-5','GPT-5.1','GPT-5.2'],v:[.72,.68,.68],text:'表11，Internal结果标签，同一模型生成与评分：κ为0.72/0.68/0.68，FPR为0.051/0.17/0.00，FNR为0.21/0.15/0.28。此处只展示三种模型；最保守不等于综合一致性最高。',pg:30},
+{name:'固定rubric更换评分器',names:['GPT-5','GPT-5.1','GPT-5.2'],v:[.70,.74,.68],text:'表12，Internal结果标签，rubric固定由GPT-5.2生成：κ为0.70/0.74/0.68，FPR为0.034/0.12/0.00，FNR为0.24/0.14/0.28。表12的零误报不能替换主表的0.01。',pg:30},
+{name:'盲评与知情复核',names:['UV-blind','UV-informed'],v:[.39,.63],text:'表13，Browserbase结果：UV与人工κ由0.39到0.63，FNR由0.62到0.35，FPR由0.05到0.04；过程κ由0.43到0.50。参考标签改变，不是模型升级。表14另有103个双评审任务，人际结果一致率79.6%→82.5%，κ却0.57→0.53，不能将二者混为一谈。',pg:30},
+{name:'原生验证器分歧',names:['原生成功率','UV过程成功率','UV结果成功率'],v:[.746,.49,.379],text:'表3示例：WebVoyager上的594条Fara-7B轨迹，三种成功率分别74.6%、49.0%、37.9%。柱长表示判成功的比例，不是准确率，也没有越高或越低越好的方向。UV是参照而非人工金标准。',pg:9},
+{name:'自动研究结果',names:['空白起步≈','专家水平≈'],v:[.55,.70],text:'§6及图1：空白起步在κ约0.55附近进入平台，专家约0.7；继续专家工作可再改进。作者报告专家32次实验约3周，自动研究约1天；约70%质量、5%时间是作者近似概括。相同提示κ可在0.64–0.71波动，不能把一次微小提升当成稳定收益。图中是近似水平，不是虚构时间曲线。',pg:9}
+];
+export function ExperimentResults(){const [view,setView]=useState(0),[dataset,setDataset]=useState(0),[target,setTarget]=useState(0),[metric,setMetric]=useState(2),[study,setStudy]=useState(0);const r=main[dataset*2+target],s=studies[study];const names=view?s.names:['WebVoyager / GPT-4o','WebJudge / o4-mini','UV / GPT-5.2'];const values=view?s.v:r.map(x=>x[metric]);return <div>
+<Choices items={['主结果：与人工比较','消融、分歧与自动研究']} value={view} onChange={setView}/>
+{view===0?<><Choices items={['Internal · 140','Browserbase · 106']} value={dataset} onChange={setDataset}/><Choices items={['结果标签','过程标签']} value={target} onChange={setTarget}/><Choices items={metrics} value={metric} onChange={setMetric}/></>:<Choices items={studies.map(x=>x.name)} value={study} onChange={setStudy}/>}
+<CanvasView height={260} label={names.map((n,i)=>`${n}：${values[i]}`).join('；')} draw={c=>{values.forEach((v,i)=>{label(c,String(i+1),55,65+i*72,p.ink,24);bar(c,110,40+i*72,780,35,v,i===values.length-1?p.orange:p.blue);label(c,v.toFixed(3).replace(/0$/,''),920,65+i*72,p.ink,24)})}}/>
+<p>图例：{names.map((n,i)=>`${i+1} = ${n}`).join('；')}。共用0–1刻度；{view?(study===4?'此图为成功率，不是准确率。':'此图为κ。'):metrics[metric]+'。'}</p>
+{view===0?<><div style={{overflowX:'auto'}}><table className="paper"><caption>表2：{dataset?'Browserbase（UV-informed标签）':'Internal'} · {target?'过程':'结果'}</caption><thead><tr><th>验证器</th>{metrics.map(x=><th key={x}>{x}</th>)}</tr></thead><tbody>{r.map((row,i)=><tr key={i}><th>{names[i]}</th>{row.map((v,j)=><td key={j}>{v.toFixed(2)}</td>)}</tr>)}</tbody></table></div>
+<Feedback tone="neutral">{['Accuracy=(TP+TN)/N，类别不平衡时须结合其他指标。','F1=2TP/(2TP+FP+FN)，衡量成功类精确率与召回率的平衡。','κ=(pₒ−pₑ)/(1−pₑ)，扣除类别分布带来的偶然一致。','FPR=FP/(FP+TN)：真实失败却判成功。','FNR=FN/(FN+TP)：真实成功却判失败。'][metric]} UV的低误报优势突出，但不是所有指标全胜：Browserbase结果FNR为0.31，高于两种基线的0.12。</Feedback>
+<p>表15报告3次独立运行的均值±标准差。例如UV结果κ：Internal 0.64±0.03、Browserbase 0.58±0.04；标准差不是置信区间。两种基线各输出一个二元预测，分别与过程/结果标签比较，不表示它们原生生成连续过程分。</p><Source page={8}>§6 Results、表2（p.8）；三次运行见表15（p.31）</Source></>:<><Feedback tone="neutral">{s.text}</Feedback><Source page={s.pg}>§6、相应表格；自动研究详细记录见pp.24–25与表17–18</Source></>}
+<p><b>结论边界：</b>人工标注集较小，知情复核可能受UV解释影响；同集迭代可能过拟合，评分存在随机波动。实践上应使用独立留出集并重复运行，这是基于上述限制的建议，不是本文额外完成的实验。</p>
+</div>}

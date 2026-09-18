@@ -11,6 +11,7 @@ import { Takeaway } from './components/Takeaway';
 import { SpeakerCue } from './components/SpeakerCue';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export default function App() {
   const total = tutorial.chapters.length;
@@ -72,6 +73,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="迈向通用自主研究：基于假设树精炼的方法 · 交互式教程"
+    />
     </>
   );
 }

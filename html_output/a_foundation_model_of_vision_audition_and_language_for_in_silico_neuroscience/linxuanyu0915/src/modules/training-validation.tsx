@@ -1,0 +1,17 @@
+import React from 'react';
+import type { WidgetProps } from './registry';
+import { ConfigurableStudio, AnalogyStudio, type StudioConfig } from './studio-base';
+export const AnalogyCh7:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="校准慢漂移基线"/>;
+export const AnalogyCh8:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="检查当前架构阶段"/>;
+export const AnalogyCh9:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="扫描协议内功能地图"/>;
+export const AnalogyCh10:React.FC<WidgetProps>=p=><AnalogyStudio {...p} action="在同一规则下完成评分"/>;
+const TrainingValidationConfig:StudioConfig={"title":"校准步骤","scene":"train-risk","control":"steps","options":["优化","调度","隔离","去趋势"],"feedback":["训练只用预测与实测 fMRI 之间的 MSE，不加额外正则；这不是最终编码分数。","AdamW，batch 16，最多 15 epoch；前 10% warmup 至 1e-4 后余弦衰减，patience 3。","验证刺激与训练刺激无重叠：使用作者划分，或按播客、故事、电影随机留出 10%。","去趋势削弱慢漂移捷径；Pearson 先按每名被试、每个 parcel 汇集验证 TR 计算，再跨被试和 parcel 平均。"],"formula":"MSE=(1/N)Σᵢ(yᵢ−ŷᵢ)²；验证 R=corr(y,ŷ)"};
+export const TrainingValidation:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={TrainingValidationConfig}/>;
+const TribeArchitectureConfig:StudioConfig={"title":"检查阶段","scene":"architecture-modal","control":"steps","options":["冻结特征","投影","拼接","上下文","池化","被试映射","目标"],"feedback":["文本 2048、音频 1024、视频 1280，均为冻结专家的 2 Hz 特征。","每种存在的模态投影到 384 维。","三模态结构拼接为 1152 维，缺失轨不伪装成活跃输入。","8 层、8 头 Transformer 在 100 秒窗口内整合上下文。","自适应平均池化把 2 Hz 表征对齐到 1 Hz。","已见被试走个体模块；未见被试走群体预测旁路。","目标头二选一：20,484 皮层顶点或 8,802 皮层下体素。"],"formula":"刺激 → 冻结特征 → 384维投影 → 1152维拼接 → Transformer → 1Hz → 被试映射 → BOLD"};
+export const TribeArchitecture:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={TribeArchitectureConfig}/>;
+const InsilicoMapConfig:StudioConfig={"title":"实验扫描","scene":"map","control":"steps","options":["刺激","未见被试预测","协议对比","地图"],"feedback":["先锁定论文使用的 IBC 刺激与时序。","所有计算机内实验走未见被试路线，目标是群体响应。","视觉在 t=5 s 形成类别对比；语言按相应任务形成 GLM/对比。","视觉恢复 FFA、PPA、EBA、VWFA；语言恢复预期听觉与语言网络，结论限于 IBC 协议。"],"formula":"视觉：C_cat(v)=ŷ_cat(v,t=5s)−mean_other ŷ(v,t=5s)"};
+export const InsilicoMap:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={InsilicoMapConfig}/>;
+const MultimodalIcaConfig:StudioConfig={"title":"分析拨盘","scene":"modal-map","control":"slider","options":["成分 A","成分 B","成分 C","成分 D","多模态增益"],"feedback":["无序 ICA 成分；与选定 Neurosynth 图相关用于解释功能。","无序 ICA 成分；顺序不代表名次。","无序 ICA 成分；不显示虚构相关系数。","无序 ICA 成分；五个成分对应五类解释图。","三模态平均优于任一单模态；部分颞—顶—枕 parcel 最大报告增益约 50%。"],"formula":"FastICA(W_unseen), n_components=5；最高约50%不是全脑平均"};
+export const MultimodalIca:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={MultimodalIcaConfig}/>;
+const ResultRaceConfig:StudioConfig={"title":"同标尺成绩","scene":"race","control":"button","options":["等待比较","比较完成"],"feedback":["先锁定同一 Algonauts 2025 评分表。","0.2146±0.0312 位列该表第一；这是架构谱系的挑战结果，不是所有实验总分。"],"table":[["1","Ours（早期挑战版本）","0.2146 ± 0.0312","同表四位被试"],["2","Schad et al., 2025","0.2096 ± 0.0283","同一竞赛表"],["3","Eren et al., 2025","0.2094 ± 0.0215","同一竞赛表"],["4","Villanueva et al., 2025","0.2085 ± 0.0267","同一竞赛表"],["5","Unpublished","0.2055 ± 0.0291","同一竞赛表"]],"cards":["匹配 Deep FIR：Pearson 更高，q<1e-4。","HCP 零样本群体响应：R_group 约0.4，约为中位个体 group-predictivity 的两倍。","新被试有限数据微调：相对从零线性模型约 2–4×，依数据集与模态而变。","Algonauts 部分颞—顶—枕区域：相对最佳单模态最高约50%，不是全脑平均。","限制：fMRI 时空分辨率、未覆盖嗅觉/平衡觉/躯体感觉、被动观察、发育/临床/全球人群范围、视频空间平均与预处理异质性。"],"formula":"相同 Pearson 符号不代表不同协议的数值可直接比较。"};
+export const ResultRace:React.FC<WidgetProps>=p=><ConfigurableStudio {...p} config={ResultRaceConfig}/>;

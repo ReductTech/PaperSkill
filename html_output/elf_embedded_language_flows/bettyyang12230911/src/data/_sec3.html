@@ -1,0 +1,93 @@
+<section class="chap" id="sec3">
+  <h2 class="chap-title"><span class="num">§2.</span>嵌入：把词变成坐标<span class="badge-tag inf">推理基础</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🔗</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">§1 展示了文字的加噪去噪，但<em>文字是离散的</em>（"我"和"你"之间没有中间值），无法做连续的数学运算。这一节解决：<b>如何把离散的词变成连续空间中的点</b>，使得后续的Flow Matching（微积分）能在上面运行。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-embed" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">词落在字帖上变成坐标</div>
+      <div class="analogy-text">毛笔从墨池蘸墨，逐个送字入格。<b>山</b>、<b>水</b>、<b>林</b>各占一行——同类字颜色相同、紧挨一起。嵌入就是给每个词一个"格子坐标"，有了距离和方向，才能做连续数学运算。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">2.1</span>
+      <h4>直观感受：词在空间中的位置</h4>
+    </div>
+    <div class="module-body">
+      <p class="module-desc">2D 投影展示词向量的聚类特性：<b>同类词聚集在一起</b>。拖动圆点观察，或随机打散看网络如何把它们放回正确位置。</p>
+      <canvas id="cv-embed" width="800" height="300"></canvas>
+      <div class="ctrl">
+        <button class="tiny" id="btn-embed-reset">↺ 复位</button>
+        <button class="tiny ghost" id="btn-embed-labels">显示标签</button>
+        <button class="tiny ghost" id="btn-embed-shuffle">🎲 随机打散</button>
+        <span style="margin-left:auto; font-size:15px; color:var(--slate-2);">绿色=动物 · 红色=天气 · 蓝色=动作</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">2.2</span>
+      <h4>真实嵌入空间：连续嵌入的 3D 投影</h4>
+    </div>
+    <div class="module-body">
+      <p class="module-desc">实际 ELF 用冻结的 T5-small 编码器（嵌入维度 512），再用瓶颈层压到 128 维连续空间。这里展示 36 个常用词的 3D 投影（PCA 降维），可以旋转、缩放、点击查看最近邻。</p>
+      <canvas id="cv-embed3d" class="point3d-canvas" width="800" height="320"></canvas>
+      <div class="feedback" id="lbl-3d-pick" style="margin-top:6px;">👆 点击圆点查看词与最近邻</div>
+    </div>
+  </div>
+
+  <div class="embed-takeaway">
+    <div class="et-item">
+      <div class="et-icon">🏷️</div>
+      <div class="et-title">每个词 = 一串特征数字</div>
+      <div class="et-desc">就像每个人有身高、体重、性格、爱好...<br>词也用一串"特征数字"来描述（ELF 用 512 维编码器嵌入）</div>
+    </div>
+    <div class="et-arrow">＋</div>
+    <div class="et-item">
+      <div class="et-icon">🤝</div>
+      <div class="et-title">越像 = 方向越一致</div>
+      <div class="et-desc">"山"和"峰"方向接近<br>"山"和"水"方向差很远</div>
+    </div>
+    <div class="et-arrow">＋</div>
+    <div class="et-item">
+      <div class="et-icon">📏</div>
+      <div class="et-title">一句话 = N个词×D维</div>
+      <div class="et-desc">一排词，每个词一串数字<br>组成一张"N行D列"的数字表格</div>
+    </div>
+  </div>
+
+</section>

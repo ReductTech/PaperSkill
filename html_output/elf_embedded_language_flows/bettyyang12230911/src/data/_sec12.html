@@ -1,0 +1,79 @@
+<section class="chap" id="sec12">
+  <h2 class="chap-title"><span class="num">§9.</span>训练技巧：Self-cond / 采样t / 条件任务<span class="badge-tag trn">训练技巧</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-cook" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">看前一笔再写下一笔</div>
+      <div class="analogy-text">写下一笔前先看一眼<b>上一笔落在哪</b>（self-cond），顺势接笔。练字时多练<b>写了一半的字</b>，比只练白纸和全字更有用——这让训练更稳。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">9.1</span>
+      <h4>Self-conditioning：先猜一次再喂回去</h4>
+    </div>
+    <div class="module-body">
+      <canvas id="cv-selfcond" width="800" height="240"></canvas>
+      <div class="ctrl">
+        <label>启用 self-cond</label>
+        <button id="btn-selfcond" type="button" style="padding:6px 18px; border:2px solid var(--blue); background:#fff; color:var(--blue); border-radius:18px; font-weight:bold; cursor:pointer; font-size:15px;">关</button>
+        <span class="val" id="lbl-selfcond" style="color:var(--olive);">单前向</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">9.2</span>
+      <h4>采样 t：ELF 训练时对 t 做均匀采样</h4>
+    </div>
+    <div class="module-body">
+      <p class="module-desc"><b>训练时随机选一个噪声量 t 来练。</b>ELF 从 [0,1] 对 t 做<b>均匀采样</b>（t = sample_t()），每个噪声量等概率。下图对比两种分布：<b>ELF 用均匀（蓝，处处等概率）</b>；logit-normal（橙）是许多其他扩散语言模型常用的"倾斜采样"。</p>
+      <canvas id="cv-logit-normal" width="800" height="290"></canvas>
+      <div class="ctrl">
+        <label>logit-normal 中心</label>
+        <input type="range" id="rng-logit-mu" min="-30" max="30" value="-8" step="1" style="flex:0 1 200px;">
+        <span class="val" id="lbl-logit-mu">-0.8</span>
+        <span class="val" id="lbl-logit-sigma" style="margin-left:auto; color:var(--blue);">logit-normal 峰值 ≈ 0.30</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">9.3</span>
+      <h4>条件任务：源文当条件，译文当目标</h4>
+    </div>
+    <div class="module-body">
+      <canvas id="cv-cond" width="800" height="260"></canvas>
+    </div>
+  </div>
+
+</section>

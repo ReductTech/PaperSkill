@@ -1,0 +1,1 @@
+export function Analogy6(){return <div style={{padding:'20px 28px',color:'#27446e',fontFamily:'inherit'}}><div style={{fontSize:11,letterSpacing:2,color:'#718096',marginBottom:10}}>沿斜线追踪</div><div style={{fontSize:21,fontWeight:650,marginBottom:8}}>八个位置，同一帧</div><div style={{fontSize:13,color:'#63758a'}}>第 8 步才凑齐第一帧</div></div>}

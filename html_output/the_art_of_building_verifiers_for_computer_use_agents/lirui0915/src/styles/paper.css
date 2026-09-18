@@ -1,0 +1,74 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* paper scene  <- replace this line with paper-specific :root overrides, e.g.
+  --paper-scene-bg: #f5f8f0;
+  --paper-accent-2: #d97706;
+  */
+}
+
+
+
+/* First-chapter evidence analogy: keep the illustration compact and text readable. */
+.analogy-card.analogy-card--evidence {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.analogy-card--evidence > .analogy-visual {
+  flex: 0 0 35%;
+  width: 35%;
+  min-width: 0;
+  padding: 12px;
+  box-sizing: border-box;
+}
+.analogy-card--evidence > .analogy-body {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 20px 24px;
+}
+.analogy-card--evidence .analogy-title {
+  font-size: calc(var(--ui-type-body-size) + 2px);
+  line-height: 1.5;
+}
+@media (max-width: 560px) {
+  .analogy-card.analogy-card--evidence { flex-direction: column; }
+  .analogy-card--evidence > .analogy-visual { flex-basis: auto; width: 100%; max-width: 300px; }
+  .analogy-card--evidence > .analogy-body { padding: 16px 20px; }
+}
+
+/* Shared scenario and action buttons throughout the tutorial. */
+.tutorial-controls > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 52px;
+  padding: 12px 20px !important;
+  border: 1px solid #d7deea;
+  border-radius: 12px;
+  background: #fff;
+  color: #27446e;
+  font: 600 16px/1.5 var(--ui-font-sans, sans-serif);
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s;
+}
+.tutorial-controls > button[aria-pressed="true"] {
+  background: #27446e;
+  border-color: #27446e;
+  color: #fff;
+}
+.tutorial-controls > button:not(:disabled):hover { box-shadow: 0 3px 10px #27446e20; }
+.tutorial-controls > button:focus-visible { outline: 3px solid #76906a; outline-offset: 3px; }
+.tutorial-controls > button:disabled { background: #eef1f5; border-color: #d7deea; color: #8490a1; cursor: not-allowed; }
+@media (max-width:560px) { .tutorial-controls > button { flex:1 1 150px; } }
+
+/* Preserve the paper identifier's requested capitalization. */
+.slide-sidebar-venue { text-transform: none; }
+
+/* Consistent chapter badge styling across the tutorial. */
+.chap-title .badge-tag { background: var(--blue-soft); color: var(--blue); }

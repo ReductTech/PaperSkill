@@ -10,6 +10,7 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PptBars } from './components/PptBars';
 
 export function shouldRenderSupplementary(open: boolean, itemCount: number) {
   return open && itemCount > 0;
@@ -82,6 +83,14 @@ export default function App() {
           );
         })}
       </main>
+    <PptBars
+      chapters={tutorial.chapters}
+      revealed={revealed}
+      onRevealNext={revealNext}
+      visible={revealed > 0}
+      venue="Interactive Tutorial"
+      title="守住 Agent：多租户 RAG 的授权边界 · 交互式教程"
+    />
     </>
   );
 }

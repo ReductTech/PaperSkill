@@ -1,0 +1,79 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 主题「制版台上的网点」的场景色。语义色（失败红 / 成功绿 / 引导蓝 /
+     强调橙 / 辅助紫）保持不变，只新增布景用的中性色。 */
+  --paper-scene-bg: #f5f8f0;
+  --paper-table: #b8c9a7;
+  --paper-table-shadow: #76906a;
+  --paper-print: #fffdf6;
+  --paper-print-edge: #d7deea;
+  --paper-screen-line: #68778f;
+  --paper-ink: #21324a;
+
+  /* 事件极性配色：这是事件视觉领域的显示惯例（变亮=红 / 变暗=蓝），
+     属于被可视化数据的固有语义，与上面的状态语义相互独立。
+     凡绘制事件点的画布都必须配「变亮 / 变暗」两项图例。 */
+  --ev-on: #c43f52;
+  --ev-off: #27446e;
+}
+
+/* ---------------------------------------------------------------------------
+   components.css 只内置了 .feedback.good / .feedback.bad 两个状态变体，而本教程
+   的交互规范还需要「引导 / 当前状态」(info) 与「强调 / 阈值」(warn) 两档。
+   下面按与 .good / .bad 完全相同的写法补齐这两档，颜色直接取自 tokens.css 的
+   语义变量；不改动任何布局、间距、字号或组件结构。
+   --------------------------------------------------------------------------- */
+.feedback.info {
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-left-color: var(--blue);
+  font-style: normal;
+}
+.feedback.warn {
+  color: var(--orange);
+  background: var(--orange-soft);
+  border-left-color: var(--orange);
+  font-style: normal;
+}
+
+/* chip 的选中态在 components.css 中叫 .chip.selected；这里补一条等价别名，
+   使 widget 使用 .active 时同样拿到选中样式。取值与 .chip.selected 一致。 */
+.chip.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+/* ---------------------------------------------------------------------------
+   公式用 MathML 原生渲染（浏览器自带，不需要 KaTeX / MathJax 之类的库）。
+   Formula 组件在 symbols 为空数组时会原样输出 unicode 字段，所以那里放的就是
+   MathML 源码；这一节只负责字号与颜色，使它和页面排版一致。
+   --------------------------------------------------------------------------- */
+.fe-formula math {
+  font-size: 1.3em;
+  color: var(--ink);
+  line-height: 1.7;
+}
+.fe-formula math mi,
+.fe-formula math mo,
+.fe-formula math mn,
+.fe-formula math mtext {
+  font-family: "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
+}
+
+/* ---------------------------------------------------------------------------
+   components.css 里的 canvas 只写了 max-width:100%，没有配套的 height:auto；
+   而每个 widget 都用内联 style.height 写死了固有高度。于是当画布比容器宽时，
+   只有宽度被压、高度不变，纵横比被拉坏 —— 实测 1080×520 显示成 922×520
+   （横向压 15%），封面 Hero 的 1080×280 更是被压到 468×280（横向压 57%），
+   圆会变成椭圆、文字会变形。这里补一条 height:auto 让高度随宽度等比缩放。
+   用 !important 是因为要压过 widget 的内联 style.height。
+   --------------------------------------------------------------------------- */
+canvas {
+  height: auto !important;
+}

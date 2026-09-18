@@ -11,7 +11,7 @@ if (!base) {
   process.exit(0);
 }
 
-const baseRef = base.startsWith('origin/') ? base : `origin/${base}`;
+const baseRef = base.includes('/') ? base : `origin/${base}`;
 
 function readGitFiles(args) {
   const result = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });

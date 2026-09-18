@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy1';
+import { Analogy10 } from './analogy10';
+import { Analogy2 } from './analogy2';
+import { Analogy3 } from './analogy3';
+import { Analogy4 } from './analogy4';
+import { Analogy5 } from './analogy5';
+import { Analogy6 } from './analogy6';
+import { Analogy7 } from './analogy7';
+import { Analogy8 } from './analogy8';
+import { Analogy9 } from './analogy9';
+import { CoreSupport } from './drawing';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { Lab1 } from './lab1';
+import { Lab10 } from './lab10';
+import { Lab10b } from './lab10b';
+import { Lab2 } from './lab2';
+import { Lab3 } from './lab3';
+import { Lab4 } from './lab4';
+import { Lab5 } from './lab5';
+import { Lab6 } from './lab6';
+import { Lab7 } from './lab7';
+import { Lab8 } from './lab8';
+import { Lab9 } from './lab9';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy1'] = Analogy1;
+widgetRegistry['analogy10'] = Analogy10;
+widgetRegistry['analogy2'] = Analogy2;
+widgetRegistry['analogy3'] = Analogy3;
+widgetRegistry['analogy4'] = Analogy4;
+widgetRegistry['analogy5'] = Analogy5;
+widgetRegistry['analogy6'] = Analogy6;
+widgetRegistry['analogy7'] = Analogy7;
+widgetRegistry['analogy8'] = Analogy8;
+widgetRegistry['analogy9'] = Analogy9;
+widgetRegistry['drawing'] = CoreSupport;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['lab1'] = Lab1;
+widgetRegistry['lab10'] = Lab10;
+widgetRegistry['lab10b'] = Lab10b;
+widgetRegistry['lab2'] = Lab2;
+widgetRegistry['lab3'] = Lab3;
+widgetRegistry['lab4'] = Lab4;
+widgetRegistry['lab5'] = Lab5;
+widgetRegistry['lab6'] = Lab6;
+widgetRegistry['lab7'] = Lab7;
+widgetRegistry['lab8'] = Lab8;
+widgetRegistry['lab9'] = Lab9;

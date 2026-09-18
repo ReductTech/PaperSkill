@@ -1,0 +1,134 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* Recording-studio palette from the PaperSkill contract. */
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-light: #b8c9a7;
+  --paper-scene-dark: #76906a;
+  --paper-support: #92400e;
+  --paper-blue: #27446e;
+  --paper-green: #228d5c;
+  --paper-red: #c43f52;
+  --paper-orange: #f07e47;
+  --paper-purple: #7c3aed;
+
+  /* Keep the title hierarchy intentionally level across the opening and chapters. */
+  --ui-type-display-size: 2.25rem;
+  --ui-type-h1-size: 2.25rem;
+  --ui-type-display-letter-spacing: 0;
+  --ui-type-h1-letter-spacing: 0;
+  --ui-type-h2-letter-spacing: 0;
+}
+
+body {
+  background: #eef2f7;
+}
+
+.slide-main {
+  padding-bottom: 20px;
+}
+
+/* The canvas kit sets intrinsic inline dimensions for HiDPI drawing. These
+   overrides let the finished visual shrink without stretching on narrow screens. */
+.audio-widget > canvas,
+.hero-compare-widget > canvas,
+.analogy-visual canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+}
+
+.hero-compare-widget {
+  width: 100%;
+}
+
+.hero-term-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 10px;
+  margin: 8px 12px 12px;
+  padding: 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: 1.45;
+  text-align: left;
+}
+
+.hero-term-strip span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hero-term-strip b {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.audio-readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.audio-readout span,
+.audio-evidence-list span {
+  display: block;
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.audio-readout span:first-child {
+  color: var(--blue);
+}
+
+.audio-evidence-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.audio-evidence-list b {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.feedback.warm {
+  color: var(--orange);
+  background: var(--orange-soft);
+  border-left-color: var(--orange);
+  font-style: normal;
+}
+
+@media (max-width: 720px) {
+  .hero-term-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .audio-readout,
+  .audio-evidence-list {
+    grid-template-columns: 1fr;
+  }
+
+  :root {
+    --ui-type-display-size: 1.85rem;
+    --ui-type-h1-size: 1.85rem;
+  }
+}

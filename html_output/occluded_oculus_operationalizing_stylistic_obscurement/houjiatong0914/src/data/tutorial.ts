@@ -1,0 +1,346 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  meta: {
+    titleEn: 'Occluded Oculus: Operationalizing Stylistic Obscurement',
+    titleZh: '被遮蔽之眼：文体隐匿的可操作化',
+    venue: 'arXiv:2607.24411v2 · cs.CR · 2026',
+    authors: 'Robert Dilworth',
+    affiliation: 'Mississippi State University · 计算机科学与工程系',
+    domain: '对抗性文体计量 · 作者归属 · 文本隐写',
+    coreProblem:
+      '在公开、不加密的匿名写作场景下，翻译、混淆、模仿、注入四个模块里，究竟哪一个最能击穿作者归属系统？单点是否足够？',
+    coreInsight:
+      '论文对 TraceTarnish 做 15 场景消融：只有<b>注入</b>能造成误归属——Hughes 的文本被改判为 May；移除注入后，其余模块单独或组合都无法造成误判断。注入既必要又充分。',
+    keywords: ['对抗性文体计量', '作者归属', '零宽字符', '同形字', 'TraceTarnish'],
+  },
+  hero: {
+    oldMethod: {
+      desc: '原样公开：文体指纹完整，识别器按最近邻把你唯一锁定。',
+      componentId: 'hero-panel',
+    },
+    newMethod: {
+      desc: '注入隐形字符与形近字：表面几乎不变，文体距离却被大幅推高。',
+      componentId: 'hero-panel',
+    },
+  },
+  chapters: [
+    {
+      kind: 'chapter',
+      id: 'chap-1',
+      title: '被认出的笔迹',
+      badge: 'inf',
+      badgeLabel: '基础',
+      bridge:
+        '开篇先感受“被认出”的压力：作者归属如何把写作风格变成可计算的指纹，以及在什么条件下它最确定。',
+      analogy: {
+        title: '一笔一笔写满',
+        text: '一支钢笔逐笔写满信纸，写到标定的词数线才停——文本越多，笔迹越难藏。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '1.1',
+          title: '文本量与归属确定性',
+          desc: '拖动“可用文本量”滑块，观察归属的确定程度如何变化。论文引用 Savoy：文本达到约 10,000 词时才能高置信度归属。',
+          componentId: 'ch1mod1',
+        },
+      ],
+      insight: '文本越长、风格越独特，越容易被唯一锁定——写作者需要一个让指纹失准的方法。',
+      takeaways: [
+        { icon: '🎯', title: '风格即指纹', desc: '每个写作者都有稳定的风格痕迹。' },
+        { icon: '🔧', title: '文本量与独特性抬高确定性', desc: '可用文本越多、风格越独特，越容易被再识别。' },
+        { icon: '✨', title: '下一步拆开四个模块', desc: '翻译、混淆、模仿、注入。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-2',
+      title: '把字迹变成特征',
+      badge: 'inf',
+      badgeLabel: '基础',
+      bridge: '上一节留下问题：识别器到底在看什么？本节把字迹拆成四类可计算的特征。',
+      analogy: {
+        title: '放大镜看字迹',
+        text: '一枚放大镜在信纸上移动，照到哪一类，哪一类特征就被看清。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '2.1',
+          title: '四类文体特征',
+          desc: '点击信纸上的四个区域，查看识别器分别提取哪一类特征：功能词频率、字符级与词级 n-gram、词性分布、词汇丰富度。',
+          componentId: 'ch2mod1',
+        },
+      ],
+      insight: '风格不是单个词，而是一组可计算的统计特征。',
+      formula: {
+        lead: '一个文本的文体向量由若干特征分量拼成：',
+        unicode: 'x = (x₁, x₂, …, xₘ)',
+        symbols: [
+          { sym: 'x', desc: '文本的特征向量' },
+          { sym: 'x₁', desc: '第 1 个特征分量' },
+          { sym: 'x₂', desc: '第 2 个特征分量' },
+          { sym: 'xₘ', desc: '第 m 个特征分量' },
+          { sym: 'm', desc: '特征维度' },
+        ],
+      },
+      takeaways: [
+        { icon: '🎯', title: '风格可量化', desc: '功能词、字符级与词级 n-gram、词性、词汇丰富度。' },
+        { icon: '🔧', title: '四类特征构成指纹', desc: '识别器把它们拼成向量。' },
+        { icon: '✨', title: '向量是距离计算的基础', desc: '下一步要量“像谁”。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-3',
+      title: '一个小改动，换一个身份',
+      badge: 'inf',
+      badgeLabel: '基础',
+      bridge: '既然风格是特征，本节用论文的真实实验回答：到底哪一种改写真的能让归属判错？',
+      analogy: {
+        title: '换一种笔迹',
+        text: '一支钢笔把同一句换一种笔迹写下，落章的结果随之改变。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '3.1',
+          title: '原样 vs 改写：谁会被认出',
+          desc: '用“下一步”依次推进三态：原样公开 → 非注入改写 → 注入改写，看归属判定究竟在哪一步翻转；“上一步 / 重置”可回退到起点。',
+          componentId: 'ch3mod1',
+        },
+        {
+          kind: 'module',
+          id: '3.2',
+          title: '四个模块各自做什么',
+          desc: '切换四种手法，查看它做什么、用什么工具、对语义与可读的代价是什么。',
+          componentId: 'ch3mod2',
+        },
+      ],
+      insight: '关键不是改写内容，而是让“文体指纹”失准——而真正生效的只有注入。',
+      takeaways: [
+        { icon: '🎯', title: '只有注入翻转归属', desc: 'Hughes 的文本被改判为 May。' },
+        { icon: '🔧', title: '非注入改写距离仍低', desc: '翻译、混淆、模仿的组合仍被正确归属。' },
+        { icon: '✨', title: '注入是主力', desc: '它是攻击的必要且充分组件。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-4',
+      title: '距离决定归属',
+      badge: 'both',
+      badgeLabel: '进阶',
+      bridge: '上一节看到距离高低决定判定；本节给出数学框架，以及论文实际用来交叉验证的十种距离度量。',
+      analogy: {
+        title: '量一量差距',
+        text: '一把量尺横在两封信之间，读出它们到底差了多远。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '4.1',
+          title: '拖动样本，观察距离',
+          desc: '拖动样本点，观察它与三位作者样本的距离，以及最近邻会把这份文本判给谁。',
+          componentId: 'ch4mod1',
+        },
+      ],
+      insight: '距离不是语义，而是一种可计算的“像不像”。',
+      formula: {
+        lead: '欧氏距离把两个文体向量映射为一个标量：',
+        unicode: 'd(A, B) = √ Σᵢ (aᵢ − bᵢ)²',
+        symbols: [
+          { sym: 'd(A, B)', desc: '两个文体向量的距离' },
+          { sym: 'aᵢ', desc: '向量 A 的第 i 个分量' },
+          { sym: 'bᵢ', desc: '向量 B 的第 i 个分量' },
+          { sym: 'Σ', desc: '对所有分量求和' },
+          { sym: '√', desc: '平方根（欧氏范数）' },
+        ],
+      },
+      takeaways: [
+        { icon: '🎯', title: '归属=最近邻', desc: '谁的特征向量离你最近。' },
+        { icon: '🔧', title: '距离大=更难归属', desc: '对抗的目标就是放大距离。' },
+        { icon: '✨', title: '论文用十种度量交叉验证', desc: 'delta、argamon、eder、simple、canberra、manhattan、euclidean、cosine、wurzburg、minmax。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-5',
+      title: '三层评估：语义、可读、安全',
+      badge: 'both',
+      badgeLabel: '进阶',
+      bridge: '距离变大固然好，但也要守住语义与可读；本节用论文的三项指标给四个模块画像。',
+      analogy: {
+        title: '蘸墨的力道',
+        text: '一支毛笔在砚台里蘸墨，力道不同，写出来的字也完全不同。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '5.1',
+          title: '三个指标的定性画像',
+          desc: '切换手法，比较它们在语义完整度、可读性、安全度三项指标上的表现。论文以定性方式描述这三项，未给出数值评分。',
+          componentId: 'ch5mod1',
+        },
+      ],
+      insight: '对抗效果必须同时衡量语义、可读与安全，而注入付出的代价最小。',
+      takeaways: [
+        { icon: '🎯', title: '三指标不可偏废', desc: '语义、可读、安全。' },
+        { icon: '🔧', title: '翻译与混淆伤可读', desc: '论文指出二者会明显压低可读性，并连带损伤语义。' },
+        { icon: '✨', title: '注入最省代价', desc: '正常渲染下几乎不改语义与可读，安全度最高。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-6',
+      title: '按顺序伪装',
+      badge: 'inf',
+      badgeLabel: '基础',
+      bridge: '知道了每个模块的作用，本节按论文给定的顺序执行整条管线，并解释为什么注入要最后做。',
+      analogy: {
+        title: '重新誊写一遍',
+        text: '一支钢笔按固定顺序把同一段话誊写四遍，每一遍换一种痕迹。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '6.1',
+          title: '管线五步',
+          desc: '逐步执行原文 → 翻译 → 混淆 → 模仿 → 注入，查看每一步使用的工具与它存在的理由。',
+          componentId: 'ch6mod1',
+        },
+      ],
+      insight: '注入必须放在最后，因为它会破坏它之前的所有文本处理。',
+      takeaways: [
+        { icon: '🎯', title: '四步有固定顺序', desc: '翻译 → 混淆 → 模仿 → 注入。' },
+        { icon: '🔧', title: '模仿修可读性', desc: '大模型重写把前两步弄崩的可读性补回来。' },
+        { icon: '✨', title: '注入最后收尾', desc: '因为它会破坏其他所有处理步骤。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-7',
+      title: '实验怎么设计',
+      badge: 'trn',
+      badgeLabel: '训练',
+      bridge: '为了让结论可信，本节说明实验协议，并给出 15 种场景在论文距离表中的真实数值。',
+      analogy: {
+        title: '对照参考样本',
+        text: '一把量尺在参考信笺之间来回比对，看哪一封离得最近。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '7.1',
+          title: '15 场景 × 真实距离',
+          desc: '切换“节选版 / 全文版”，点击任一场景，查看它对 8 份训练文本的真实文体距离。',
+          componentId: 'ch7mod1',
+        },
+      ],
+      insight: '消融实验的核心是逐一移除组件，看攻击力剩下多少。',
+      takeaways: [
+        { icon: '🎯', title: '三人语料消融', desc: 'Gilmore / Hughes / May。' },
+        { icon: '🔧', title: '15 种非空组合', desc: '四模块的全部非空组合，另以未改写原文为对照（口径说明见 7.1 脚注）。' },
+        { icon: '✨', title: '注入样本距离最高', desc: '全文实验中 IN+T 达到 4.20–4.66，为全场最高。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-8',
+      title: '攻击的结构',
+      badge: 'trn',
+      badgeLabel: '训练',
+      bridge: '本节把四模块管线做成交互图，逐个查看它在攻击结构中的位置与作用。',
+      analogy: {
+        title: '再盖一层',
+        text: '一枚印章逐层叠印，每一层都多挡一道风险。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '8.1',
+          title: '交互式管线图',
+          desc: '点击任一个模块，查看它做什么、为什么在这个位置。',
+          componentId: 'ch8mod1',
+        },
+      ],
+      insight: '模块顺序并非任意：模仿修复可读性，注入最后完成致命一击。',
+      takeaways: [
+        { icon: '🎯', title: '四模块可叠加', desc: '论文称之为纵深防御式的冗余。' },
+        { icon: '🔧', title: '每层有独立作用', desc: '翻译、混淆、模仿、注入。' },
+        { icon: '✨', title: '注入最后执行', desc: '是最关键的一层。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-9',
+      title: '注入的三个分身',
+      badge: 'trn',
+      badgeLabel: '训练',
+      bridge: '注入是主力，但它内部还有三个分身；本节用论文的真实距离逐个比较。',
+      analogy: {
+        title: '看不见的一笔',
+        text: '一支钢笔在字上添一笔看不见的笔画，字面没变，底层已经不同。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '9.1',
+          title: 'LI / DI / SI',
+          desc: '切换三种注入，比较它们改动的层次，以及论文全文实验中的真实距离。',
+          componentId: 'ch9mod1',
+        },
+      ],
+      insight: '同形字替换比零宽字符更彻底，因此文体距离更大。',
+      takeaways: [
+        { icon: '🎯', title: '注入有三层', desc: 'LI 零宽、DI 同形字、SI 拼写差异。' },
+        { icon: '🔧', title: 'DI 最强', desc: '全文距离 4.00–4.47，LI 为 2.41–2.84。' },
+        { icon: '✨', title: 'SI 改动极少', desc: 'diff 显示替换面太窄，论文未把它纳入最终比较。' },
+      ],
+    },
+    {
+      kind: 'chapter',
+      id: 'chap-10',
+      title: '结果与边界',
+      badge: 'both',
+      badgeLabel: '进阶',
+      bridge: '最后用论文的真实距离数据做结论，并诚实说明口径分歧、防御与伦理代价。',
+      analogy: {
+        title: '盖下匿名章',
+        text: '一枚印章落在信笺上，章面写着“匿名”，但伪装仍有边界。',
+        componentId: 'analogy-canvas',
+      },
+      modules: [
+        {
+          kind: 'module',
+          id: '10.1',
+          title: '结果赛跑',
+          desc: '按下开始，比较注入系与非注入系在全文 classify() 实验中的距离区间。',
+          componentId: 'ch10mod1',
+        },
+        {
+          kind: 'module',
+          id: '10.2',
+          title: '作者、创新点与边界',
+          desc: '切换卡片，查看作者简介、研究目的与方法、创新点与两种排序口径、局限与相关论文。',
+          componentId: 'ch10mod2',
+        },
+      ],
+      insight: '结论不是“注入万能”，而是它既必要又充分，且口径、边界与伦理代价都要写清。',
+      takeaways: [
+        { icon: '🎯', title: '注入必要且充分', desc: '单独即可翻转归属，去掉它则其余组合全部失效。' },
+        { icon: '🔧', title: '两种排序口径要分清', desc: '正文：注入>模仿>混淆>翻译；附录：注入>模仿>翻译>混淆。' },
+        { icon: '✨', title: '防御与伦理代价同样重要', desc: 'Unicode 清洗可中和注入，读屏体验可能受损。' },
+      ],
+    },
+  ],
+};

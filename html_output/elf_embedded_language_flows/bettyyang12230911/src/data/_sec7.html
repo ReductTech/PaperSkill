@@ -1,0 +1,203 @@
+<section class="chap" id="sec7">
+  <h2 class="chap-title"><span class="num">§5.</span>CFG：调节生成的"规矩度"<span class="badge-tag both">关键技巧</span></h2>
+
+  <div class="flow-mini">
+    <span class="flow-mini-step done">① 加噪</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">② 嵌入</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">③ 可逆</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step done">④ Flow</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step active">⑤ CFG</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑥ 采样</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑦ 训练</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑧ 共享权重</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑨ 技巧</span>
+    <span class="flow-mini-arrow">→</span>
+    <span class="flow-mini-step">⑩ 结果</span>
+  </div>
+
+  <div class="chap-bridge">
+    <div class="chap-bridge-icon">🎛️</div>
+    <div class="chap-bridge-body">
+      <div class="chap-bridge-title">本节作用</div>
+      <div class="chap-bridge-text">§4 的网络能预测方向，但生成文本可能"跑题"。CFG（Classifier-Free Guidance）通过<b>两次预测的差值放大</b>，让网络更听话地遵循源文条件。这是控制生成质量的关键旋钮。</div>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-visual">
+      <canvas id="ana-cfg" width="244" height="130"></canvas>
+    </div>
+    <div class="analogy-body">
+      <div class="analogy-title">老师指导学生临摹字帖</div>
+      <div class="analogy-text">学生自己临摹容易歪，老师（CFG）指导学生往正确方向写。其中参数<b>ω越大</b>越像字帖——字越工整，但太大就死板。论文实际用 CFG scale 1+2（self-guidance=1、input-guidance=2，条件生成）或 self-guidance=3（无条件生成）；下图 ω=2.5 仅作<b>示意</b>。</div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">5.1</span>
+      <h4>ω 调节：译文散布 vs 质量曲线</h4>
+    </div>
+    <div class="module-body">
+      <div class="cfg-io-strip">
+        <span class="cfg-io-label">源文</span>
+        <span class="cfg-io-text">我爱中国山水</span>
+        <span class="cfg-io-arrow">→</span>
+        <span class="cfg-io-label">输出</span>
+        <span class="cfg-io-text" id="cfg-io-out">"I love Chinese landscape"</span>
+      </div>
+      <canvas id="cv-cfg" width="800" height="280"></canvas>
+      <div class="ctrl">
+        <label>Guidance ω</label>
+        <input type="range" id="rng-omega" min="1" max="80" value="25" step="1">
+        <span class="val" id="lbl-omega">2.5</span>
+        <button class="tiny" id="btn-omega-1">ω=1</button>
+        <button class="tiny" id="btn-omega-sweet">ω=2.5</button>
+        <button class="tiny" id="btn-omega-5">ω=5</button>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="l">贴题</div>
+          <div class="v" id="cfg-quality">—</div>
+          <div class="bar"><div class="bar-fill" id="cfg-q-bar" style="background:var(--olive); width:0%;"></div></div>
+        </div>
+        <div class="metric">
+          <div class="l">多样</div>
+          <div class="v" id="cfg-div">—</div>
+          <div class="bar"><div class="bar-fill" id="cfg-d-bar" style="background:var(--sky); width:0%;"></div></div>
+        </div>
+        <div class="metric">
+          <div class="l">算力</div>
+          <div class="v" id="cfg-cost">—</div>
+          <div class="bar"><div class="bar-fill" id="cfg-c-bar" style="background:var(--rust); width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="compare-row" style="margin-top:10px;">
+        <div class="compare-cell bad">
+          <div class="label">ω = 1</div>
+          <div class="val" style="color:var(--bad);">放飞</div>
+          <div class="mini">"love I Chinese landscape" — 语序乱</div>
+        </div>
+        <div class="compare-cell good">
+          <div class="label">ω = 2.5（演示）</div>
+          <div class="val" style="color:var(--olive);">平衡</div>
+          <div class="mini">"I love Chinese landscape" — 准确自然</div>
+        </div>
+        <div class="compare-cell bad">
+          <div class="label">ω = 5</div>
+          <div class="val" style="color:var(--bad);">过度</div>
+          <div class="mini">全是 "I love Chinese landscape" — 重复</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="module">
+    <div class="module-head">
+      <span class="num">5.2</span>
+      <h4>两次预测 → 差值放大：看源文 vs 不看源文</h4>
+    </div>
+    <div class="module-body">
+      <div class="cfg-demo">
+        <div class="cfg-demo-source">
+          <div class="cfg-demo-label">📥 源文</div>
+          <div class="cfg-demo-text" id="cfg-demo-text">"<b>我</b>爱中国山水"<br><span class="cfg-demo-text-zh">I love Chinese landscape</span></div>
+          <div class="cfg-demo-mask" id="cfg-demo-mask">▓ ▓▓▓▓▓</div>
+          <div class="cfg-demo-toggle-row">
+            <button class="cfg-toggle on" id="cfg-toggle-on">👀 看源文</button>
+            <button class="cfg-toggle" id="cfg-toggle-off">🚫 不看源文</button>
+          </div>
+        </div>
+        <div class="cfg-demo-arrow-vert">→</div>
+        <div class="cfg-demo-net">
+          <div class="cfg-demo-label">🧠 同一网络 · 跑两次</div>
+          <div class="cfg-demo-net-box">
+            <div class="cfg-demo-input" id="cfg-demo-input">第1次：看源文</div>
+            <div class="cfg-demo-formula" id="cfg-demo-formula-label">→ "weather is nice"</div>
+          </div>
+        </div>
+        <div class="cfg-demo-arrow-vert">→</div>
+        <div class="cfg-demo-out">
+          <div class="cfg-demo-label">📤 预测方向</div>
+          <canvas id="cfg-demo-canvas" width="200" height="120"></canvas>
+          <div class="cfg-demo-out-label" id="cfg-demo-out-label">准确指向 ✓</div>
+        </div>
+      </div>
+
+      <canvas id="cv-cfg-vec" class="vec-canvas" width="800" height="320"></canvas>
+
+      <div class="vec-grid cfg-trans-grid">
+        <div class="vec-cell">
+          <div class="vc-label">🚫 不看源文</div>
+          <div class="vc-val" id="vc-uncond">"love ??? Chinese ???"</div>
+        </div>
+        <div class="vec-cell">
+          <div class="vc-label">👀 看源文</div>
+          <div class="vc-val" id="vc-cond">"I love Chinese landscape"</div>
+        </div>
+        <div class="vec-cell" style="border-color:var(--olive); background:#f7faf3;">
+          <div class="vc-label">✨ CFG ω=<span id="vc-omega">2.5</span></div>
+          <div class="vc-val" id="vc-cfg" style="color:var(--olive);">"I love Chinese landscape"</div>
+          <div class="vc-bar"><div id="vc-cfg-bar" style="background:var(--olive); width:0%;"></div></div>
+        </div>
+        <div class="vec-cell">
+          <div class="vc-label">调 ω</div>
+          <input type="range" id="rng-cfg-omega" min="0" max="80" value="25" step="1" style="width:100%;">
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <button class="tiny" id="btn-vec-swap">🔄 换例句</button>
+        <button class="tiny ghost" id="btn-vec-collapse">ω=0 不引导</button>
+        <button class="tiny ghost" id="btn-vec-mix">ω=1 平凡</button>
+        <button class="tiny ghost" id="btn-vec-overshoot">ω=5 过强</button>
+      </div>
+
+      <div class="formula-explain" id="cfg-formula-block">
+        <div class="fe-formula"><span class="sym" data-sym="vcfg">v̂_CFG</span> = <span class="sym" data-sym="vuncond">v̂_uncond</span> + <span class="sym" data-sym="omega">ω</span> × (<span class="sym" data-sym="vcond">v̂_cond</span> − <span class="sym" data-sym="vuncond">v̂_uncond</span>)</div>
+        <div class="fe-symbols">
+          <span class="sym-desc" data-desc="vcfg"><b>v̂_CFG</b> = 引导后的预测方向（沿差值方向外推）</span>
+          <span class="sym-desc" data-desc="vuncond"><b>v̂_uncond</b> = 不看源文 → 猜的方向</span>
+          <span class="sym-desc" data-desc="vcond"><b>v̂_cond</b> = 看源文 → 认真翻译的方向</span>
+          <span class="sym-desc" data-desc="omega"><b>ω</b> = 引导强度</span>
+        </div>
+        <div class="fe-hint">点击公式里的符号查看解释</div>
+      </div>
+
+      <div class="cfg-pipeline">
+        <div class="cfg-pipe-step">
+          <div class="cfg-pipe-num">1</div>
+          <div class="cfg-pipe-body">
+            <div class="cfg-pipe-title">不看源文 → 靠猜</div>
+            <div class="cfg-pipe-text" id="cfg-pipe-uc">"I ??? Chinese ???"</div>
+          </div>
+        </div>
+        <div class="cfg-pipe-arrow">→</div>
+        <div class="cfg-pipe-step">
+          <div class="cfg-pipe-num">2</div>
+          <div class="cfg-pipe-body">
+            <div class="cfg-pipe-title">看源文 → 认真翻译</div>
+            <div class="cfg-pipe-text" id="cfg-pipe-c">"I love Chinese landscape"</div>
+          </div>
+        </div>
+        <div class="cfg-pipe-arrow">→</div>
+        <div class="cfg-pipe-step highlight">
+          <div class="cfg-pipe-num">3</div>
+          <div class="cfg-pipe-body">
+            <div class="cfg-pipe-title">差值放大 ω 倍 → 拼接两次预测</div>
+            <div class="cfg-pipe-text" id="cfg-pipe-cfg">"I love Chinese landscape" ✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { BloomAna } from './bloom-ana';
+import { BloomCenterAna } from './bloom-center-ana';
+import { Ch1Mod1 } from './ch1-mod1';
+import { Ch2Mod1 } from './ch2-mod1';
+import { Ch2Mod2 } from './ch2-mod2';
+import { Ch3Mod1 } from './ch3-mod1';
+import { Ch4Mod1 } from './ch4-mod1';
+import { Ch5Mod1 } from './ch5-mod1';
+import { Ch5Mod2 } from './ch5-mod2';
+import { Ch6Mod1 } from './ch6-mod1';
+import { Ch7Mod1 } from './ch7-mod1';
+import { Ch7Mod2 } from './ch7-mod2';
+import { Ch8Mod1 } from './ch8-mod1';
+import { Ch8Mod2 } from './ch8-mod2';
+import { FlowAna } from './flow-ana';
+import { HeroNewBrew } from './hero-new-brew';
+import { HeroOldBrew } from './hero-old-brew';
+import { LevelAna } from './level-ana';
+import { ObservationAna } from './observation-ana';
+import { PotsAna } from './pots-ana';
+import { PulseAna } from './pulse-ana';
+import { TwoCupAna } from './two-cup-ana';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['bloom-ana'] = BloomAna;
+widgetRegistry['bloom-center-ana'] = BloomCenterAna;
+widgetRegistry['ch1-mod1'] = Ch1Mod1;
+widgetRegistry['ch2-mod1'] = Ch2Mod1;
+widgetRegistry['ch2-mod2'] = Ch2Mod2;
+widgetRegistry['ch3-mod1'] = Ch3Mod1;
+widgetRegistry['ch4-mod1'] = Ch4Mod1;
+widgetRegistry['ch5-mod1'] = Ch5Mod1;
+widgetRegistry['ch5-mod2'] = Ch5Mod2;
+widgetRegistry['ch6-mod1'] = Ch6Mod1;
+widgetRegistry['ch7-mod1'] = Ch7Mod1;
+widgetRegistry['ch7-mod2'] = Ch7Mod2;
+widgetRegistry['ch8-mod1'] = Ch8Mod1;
+widgetRegistry['ch8-mod2'] = Ch8Mod2;
+widgetRegistry['flow-ana'] = FlowAna;
+widgetRegistry['hero-new-brew'] = HeroNewBrew;
+widgetRegistry['hero-old-brew'] = HeroOldBrew;
+widgetRegistry['level-ana'] = LevelAna;
+widgetRegistry['observation-ana'] = ObservationAna;
+widgetRegistry['pots-ana'] = PotsAna;
+widgetRegistry['pulse-ana'] = PulseAna;
+widgetRegistry['two-cup-ana'] = TwoCupAna;
