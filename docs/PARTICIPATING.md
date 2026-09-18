@@ -79,6 +79,8 @@ html_output/<paper-name>/<version>/
 
 不得提交 `node_modules/`、`dist/`、本地缓存、密钥、个人隐私或未获授权的素材。使用论文图片或其他外部素材时，应在项目 `README.md` 中注明来源并确认允许公开使用。
 
+外部 fork 提交的 Pull Request 一次只能修改一篇论文（即 `html_output/<paper-name>/` 下的一篇）；由本仓库内部分支创建的 Pull Request 会跳过该数量限制。`npm run validate:pr` 会按此规则校验：CI 中根据 pull_request 事件判断来源，本地（`npm run preflight`）则根据当前分支跟踪的 remote 判断。
+
 ## 5. 本地验收
 
 创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给使用者代为执行。推荐先运行一键预检：
