@@ -1,0 +1,22 @@
+import React from 'react';
+import { Blip2Explorer } from './blip2Explorer';
+import { EchoLobby } from './echoLobby';
+import { MismatchCorridor } from './mismatchCorridor';
+import { VisionAtrium } from './visionAtrium';
+import { QueryHub } from './queryHub';
+import { TriCalibrationChamber } from './triCalibrationChamber';
+import { WhisperingArchive } from './whisperingArchive';
+import { OutputObservatory } from './outputObservatory';
+import { BrokenMemoryZone, ThresholdGate } from './brokenMemoryZone';
+export interface WidgetProps { chapterId:string; moduleId:string; }
+export const widgetRegistry:Record<string,React.FC<WidgetProps>> = {};
+widgetRegistry['blip2-explorer'] = Blip2Explorer;
+widgetRegistry['echo-lobby'] = EchoLobby;
+widgetRegistry['mismatch-corridor'] = MismatchCorridor;
+widgetRegistry['vision-atrium'] = VisionAtrium;
+widgetRegistry['query-hub'] = QueryHub;
+widgetRegistry['tri-calibration-chamber'] = TriCalibrationChamber;
+widgetRegistry['whispering-archive'] = WhisperingArchive;
+widgetRegistry['output-observatory'] = OutputObservatory;
+widgetRegistry['broken-memory-zone'] = BrokenMemoryZone;
+widgetRegistry['threshold-gate'] = ThresholdGate;
