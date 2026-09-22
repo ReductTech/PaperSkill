@@ -172,6 +172,40 @@ function versionAuthors(version) {
   return (version.participants || []).map((item) => item.name).join('、') || '未署名';
 }
 
+/** 版本溯源：按时间顺序记录此前每一位作者；唯一键是版本目录名（同版本只渲染一条），字段缺失或为空 = 无溯源信息 */
+function versionAncestors(version) {
+  const byKey = new Map();
+  for (const item of version.ancestors || []) {
+    if (!item) continue;
+    const key = String(item.version || item.github || '').toLowerCase();
+    if (!key || byKey.has(key)) continue;
+    byKey.set(key, item);
+  }
+  return [...byKey.values()];
+}
+
+/** 溯源项直接展示版本目录名；鼠标悬浮显示该版本的 GitHub 用户名；无溯源信息（缺失或为空）时整行不输出 */
+function lineageHtml(version, paperName) {
+  const chain = versionAncestors(version);
+  if (chain.length === 0) return '';
+  const people = chain.map((item, index) => {
+    const label = `<span class="lineage-version">${escapeHtml(item.version || item.github || '未知版本')}</span>`;
+    const tip = escapeHtml(item.github ? `GitHub：${item.github}` : '未记录 GitHub 用户名');
+    const origin = index === 0 ? '<span class="lineage-origin">原创</span>' : '';
+    const chip = item.version
+      ? `<a class="lineage-person is-link" href="./papers/${encodeURIComponent(paperName)}/${encodeURIComponent(item.version)}/" target="_blank" rel="noopener" title="${tip}">${label}${origin}</a>`
+      : `<span class="lineage-person" title="${tip}">${label}${origin}</span>`;
+    return `${index ? '<span class="lineage-arrow">→</span>' : ''}${chip}`;
+  }).join('');
+  return `
+        <span class="version-lineage">
+          <span class="lineage-label">溯源</span>
+          ${people}
+          <span class="lineage-arrow">→</span>
+          <span class="lineage-self">本版</span>
+        </span>`;
+}
+
 /** 把版本按 GitHub 用户名（无 GitHub 则用展示名）分组 */
 function groupVersions(versions) {
   const groups = [];
@@ -207,7 +241,7 @@ function render() {
 
   summary.textContent = `显示 ${visible.length} / ${papers.length} 篇教程`;
   empty.hidden = visible.length !== 0;
-  cardList = visible.map((paper) => ({ title: paper.title, groups: groupVersions(sortedVersions(paper.versions)) }));
+  cardList = visible.map((paper) => ({ paperName: paper.paperName, title: paper.title, groups: groupVersions(sortedVersions(paper.versions)) }));
   grid.innerHTML = visible.map((paper, ci) => {
     const versions = sortedVersions(paper.versions);
     const groups = groupVersions(versions);
@@ -328,7 +362,7 @@ function openVersionModal(cardIndex, groupIndex) {
     <li>
       <span class="version-info">
         <span class="version-name">${escapeHtml(version.version)}</span>
-        <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>
+        <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>${lineageHtml(version, card.paperName)}
       </span>
       <a class="open-link" href="./${escapeHtml(version.tutorialUrl)}" target="_blank" rel="noopener">进入 →</a>
     </li>`).join('');

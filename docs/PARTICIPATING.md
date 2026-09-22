@@ -52,7 +52,28 @@ html_output/<paper-name>/<pinyin><MMDD>/
 
 例如 `html_output/attention_is_all_you_need/limei0903/`。该目录就是网页项目在 GitHub 中的最终提交位置。后续修改也应在这个版本目录内完成，不要修改 `html_output/`、论文目录或版本目录的名称。
 
-## 4. 项目结构
+## 4. 在已有版本上继续修改（版本溯源）
+
+在一份已经存在的网页上继续修改时，不要覆盖原版本，而是复制出一个新版本：
+
+```powershell
+npm run modify -- html_output/<paper-name>/<原版本> --participant "李雷" --github "lilei" --pinyin "lilei"
+```
+
+命令会把原版本复制成 `html_output/<paper-name>/<你的姓名拼音+MMDD>/`（复制时跳过 `node_modules/`、`dist/`、`.npm-cache/` 和旧 `paper.json`），并自动生成新的 `paper.json`，随后你就可以在新目录里修改网页。同一篇论文的每个版本都独立保留。
+
+新建的 `paper.json` 会带一个溯源字段 `ancestors`，按时间顺序记录这份网页此前的每一位作者（GitHub 用户名 + 其版本目录名），第一位是原创者：
+
+```json
+"ancestors": [
+  { "github": "lilei", "version": "lilei0903" },
+  { "github": "hanmeimei", "version": "hanmeimei0918" }
+]
+```
+
+由 `npm run modify` 生成时该字段会自动写好。如果你是手工编写 `paper.json`，按同样规则自行补上即可。
+
+## 5. 项目结构
 
 每个版本目录必须包含：
 
@@ -81,7 +102,7 @@ html_output/<paper-name>/<version>/
 
 外部 fork 提交的 Pull Request 一次只能修改一篇论文（即 `html_output/<paper-name>/` 下的一篇）；由本仓库内部分支创建的 Pull Request 会跳过该数量限制。`npm run validate:pr` 会按此规则校验：CI 中根据 pull_request 事件判断来源，本地（`npm run preflight`）则根据当前分支跟踪的 remote 判断。
 
-## 5. 本地验收
+## 6. 本地验收
 
 创建 Pull Request 前，Agent 必须针对最终待提交源码在仓库根目录自动执行以下命令，不得交给使用者代为执行。推荐先运行一键预检：
 
@@ -118,7 +139,7 @@ Agent 必须继续检查最终差异，确认目录名称、项目结构、`pape
 
 论文内容的人工核验和最终网页预览确认均未完成时，不得创建 Pull Request。截图只能作为辅助记录，不能替代使用者实际打开和操作网页。
 
-## 6. 创建 Pull Request
+## 7. 创建 Pull Request
 
 一份教程 PR 原则上只修改：
 
@@ -132,7 +153,7 @@ Pull Request 创建后，作品保持 `review` 状态。普通教程 PR 不提�
 
 工程和内容检查通过后，由管理员在最新的 `main` 上将作品 `paper.json` 中的 `status` 改为 `published`，运行 `npm run catalog`，并统一提交 `paper.json` 与 `catalog/papers.json`。`npm run build:site` 也会在正式部署时根据全部 `paper.json` 重新生成站点使用的目录索引。
 
-## 7. Pull Request 检查失败时
+## 8. Pull Request 检查失败时
 
 先点击失败检查的名称或 `View details` 查看日志，不要仅根据红色叉号修改项目：
 

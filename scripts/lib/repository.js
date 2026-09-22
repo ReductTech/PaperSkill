@@ -121,6 +121,8 @@ function versionRecord(meta, submission) {
     skillVersion: meta.skillVersion,
     status: meta.status,
     tutorialUrl: `papers/${submission.paperName}/${submission.version}/`,
+    // 版本溯源：字段缺失或为空时完全不输出，保证既有索引逐字节不变
+    ...(Array.isArray(meta.ancestors) && meta.ancestors.length ? { ancestors: meta.ancestors } : {}),
   };
 }
 

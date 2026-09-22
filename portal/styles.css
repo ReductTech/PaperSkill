@@ -65,6 +65,15 @@ main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 80
 .result-commands li { display: flex; align-items: center; gap: 12px; }
 .result-commands li::before { counter-increment: step; content: counter(step); flex: 0 0 auto; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #47613c; color: #fff; font: 700 13px/1 ui-monospace, monospace; }
 .result-commands code { flex: 1 1 auto; padding: 10px 13px; background: #fbfcf9; border: 1px solid #d3e0c8; border-radius: 6px; font: 700 14px/1.4 ui-monospace, monospace; color: #2f4226; word-break: break-all; }
+/* 「修改已有的网页版本」卡片：沿用 starter 版式，只补内容区样式 */
+.modify-card { margin-bottom: 70px; }
+.modify-note { margin: 20px 0 0; padding: 18px 20px; background: #fff7e8; border: 1px solid #f0d9a8; color: #8a5a12; line-height: 1.7; }
+.modify-note p { margin: 0; }
+.lineage { margin-top: 18px; padding: 20px 22px; background: #edf3e8; border: 1px solid #d3e0c8; color: #47613c; line-height: 1.7; }
+.lineage .lineage-lead { margin: 0 0 14px; font-weight: 700; color: #3c5630; }
+.lineage p { margin: 14px 0 0; }
+.lineage-code { margin: 0; padding: 14px 16px; background: #fbfcf9; border: 1px solid #d3e0c8; color: #2f4226; font: 700 13px/1.6 ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; overflow-x: auto; }
+.lineage code, .modify-note code { font: 700 13px/1.5 ui-monospace, monospace; }
 .collection-heading { margin-bottom: 22px; }
 .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 16px; padding: 18px; background: #fff; border: 1px solid #d8dfd1; box-shadow: 0 8px 28px rgba(28, 48, 43, .06); }
 .toolbar label { display: grid; gap: 8px; color: #68778f; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
@@ -100,6 +109,17 @@ input:focus, select:focus { border-color: #27446e; box-shadow: 0 0 0 3px rgba(39
 .version-info { display: grid; gap: 3px; min-width: 0; }
 .version-name { font: 700 13px/1.35 ui-monospace, monospace; color: #27446e; overflow-wrap: anywhere; }
 .version-meta { color: #68778f; font-size: 12px; overflow-wrap: anywhere; }
+/* 版本溯源：仅在版本带 ancestors 时渲染，缺失或为空时页面上不出现任何元素 */
+.version-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.lineage-label { color: #8a9486; font-size: 12px; }
+.lineage-person { padding: 2px 8px; border: 1px solid #e0e8d8; background: #edf3e8; color: #47613c; font-size: 12px; text-decoration: none; }
+.lineage-version { font: 700 12px/1.45 ui-monospace, monospace; }
+.lineage-person.is-link:hover { border-color: #b8c9a7; background: #e2ecdb; color: #2f4226; text-decoration: underline; }
+/* 「原创」标签写在展示名（版本名）的方框内 */
+.lineage-person .lineage-origin { margin-left: 6px; color: #b4530a; }
+.lineage-person.is-link:hover .lineage-origin { text-decoration: none; }
+.lineage-arrow { color: #b8c9a7; font-size: 12px; }
+.lineage-self { color: #8a9486; font-size: 12px; }
 .version-list .open-link { flex: 0 0 auto; min-height: 34px; padding: 0 13px; font-size: 13px; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(23, 37, 59, .55); }
 .modal-backdrop[hidden] { display: none; }
@@ -139,6 +159,7 @@ footer { padding: 28px 20px; background: #17253b; color: #9fadc0; text-align: ce
   .journey { grid-template-columns: 1fr 1fr; }
   .journey div:nth-child(2) { border-right: 0; }
   .journey div:nth-child(-n+2) { border-bottom: 1px solid #d8dfd1; }
+  .modify-note, .lineage { padding: 16px 14px; }
   .paper-grid { grid-template-columns: 1fr; }
   .paper-card { min-height: 0; }
 }
