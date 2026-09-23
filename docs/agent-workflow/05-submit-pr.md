@@ -38,6 +38,8 @@ git status --short
 
 Agent 还必须检查最终差异，确认目录名称、项目结构、`paper.json`、分支范围和提交格式正确，且不包含 `node_modules/`、`dist/`、自动生成的 `catalog/papers.json`、密钥、个人隐私或本地绝对路径。
 
+核对本版 `paper.json` 的公开展示名、GitHub 用户名和减论 ID 与使用者确认的信息一致；减论 ID 为可选字符串，未提供时可省略，页面显示「暂无」。如果此前尚未收集，应与 GitHub 用户名一起询问；已明确不填写的无需重复追问。不要使用截断 ID，也不要继承其他作者的 ID。
+
 组装与生成阶段已经运行过语法门禁：`assemble-chapter-packets.js` 在合并每个 widget 后、以及 `validate-output.js` 在结构校验后，都会用项目自带的 TypeScript/esbuild 解析全部 `src/**`，缺括号或截断的 `.tsx` 会在生成阶段直接失败。若在生成之后又手工改过任何源码，必须先重跑该门禁再导入：
 
 ```powershell

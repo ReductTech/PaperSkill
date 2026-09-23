@@ -12,7 +12,7 @@ const path = require('path');
 const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE } = require('./lib/repository');
 
 const USAGE = [
-  '用法: npm run modify -- <已有网页的相对路径> --participant "展示名" --github "用户名" [--pinyin "lilei"] [--date 0922] [--version lilei0922] [--force]',
+  '用法: npm run modify -- <已有网页的相对路径> --participant "展示名" --github "用户名" [--jianlun-id "减论完整账号ID"] [--pinyin "lilei"] [--date 0922] [--version lilei0922] [--force]',
   '示例: npm run modify -- html_output/attention_is_all_you_need/tianaopang0913 --participant "李雷" --github "lilei" --pinyin "lilei"',
   '说明: 复制为 html_output/<论文名>/<新版本>，新版本名 = 姓名拼音小写 + 修改日期 MMDD（同一天重复执行自动追加 _2）。',
 ].join('\n');
@@ -150,6 +150,8 @@ copyProject(source, target);
 
 const participant = { name: opts.participant };
 if (opts.github) participant.github = String(opts.github).replace(/^@/, '');
+const jianlunId = String(opts['jianlun-id'] || '').trim();
+if (jianlunId) participant.jianlunId = jianlunId;
 const ancestors = buildAncestors(sourceMeta, sourceVersion);
 const meta = { ...sourceMeta, participants: [participant], status: 'review', version, versionDate: date.iso };
 if (ancestors.length > 0) meta.ancestors = ancestors;
@@ -157,6 +159,7 @@ fs.writeFileSync(path.join(target, 'paper.json'), `${JSON.stringify(meta, null, 
 
 console.log(`已复制网页：${path.relative(ROOT, source)} → ${path.relative(ROOT, target)}`);
 console.log(`已生成 paper.json：本版作者 ${describe([participant])}`);
+console.log(`本版减论 ID：${participant.jianlunId || '暂无'}`);
 if (ancestors.length > 0) {
   console.log(`已写入版本溯源 ancestors：${describe(ancestors)}`);
 } else {

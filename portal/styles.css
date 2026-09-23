@@ -106,9 +106,15 @@ input:focus, select:focus { border-color: #27446e; box-shadow: 0 0 0 3px rgba(39
 .contributor-more { color: #27446e; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .version-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; max-height: 208px; overflow-y: auto; }
 .version-list li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f5f7f1; border: 1px solid #e2e8dc; }
-.version-info { display: grid; gap: 3px; min-width: 0; }
+.version-info { display: grid; gap: 3px; min-width: 0; flex: 1 1 0; }
 .version-name { font: 700 13px/1.35 ui-monospace, monospace; color: #27446e; overflow-wrap: anywhere; }
 .version-meta { color: #68778f; font-size: 12px; overflow-wrap: anywhere; }
+.version-jianlun { display: flex; align-items: center; gap: 10px; min-width: 0; margin-top: 4px; color: #68778f; font-size: 12px; line-height: 1.5; }
+.version-jianlun-label { color: #7b8798; }
+.version-jianlun-empty { color: #9aa3ad; }
+.jianlun-view { border: 0; border-bottom: 1px solid #bdc9d8; padding: 0 0 1px; background: transparent; color: #27446e; font: inherit; font-size: 12px; font-weight: 700; line-height: 1.45; cursor: pointer; }
+.jianlun-view:hover { border-color: #27446e; color: #b4530a; }
+.jianlun-view:focus-visible { outline: 2px solid #d97706; outline-offset: 3px; }
 /* 版本溯源：仅在版本带 ancestors 时渲染，缺失或为空时页面上不出现任何元素 */
 .version-lineage { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
 .lineage-label { color: #8a9486; font-size: 12px; }
@@ -123,6 +129,17 @@ input:focus, select:focus { border-color: #27446e; box-shadow: 0 0 0 3px rgba(39
 .version-list .open-link { flex: 0 0 auto; min-height: 34px; padding: 0 13px; font-size: 13px; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(23, 37, 59, .55); }
 .modal-backdrop[hidden] { display: none; }
+.jianlun-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: rgba(23, 37, 59, .68); }
+.jianlun-backdrop[hidden] { display: none; }
+.jianlun-dialog { width: min(460px, 100%); padding: 24px; background: #fff; border: 1px solid #d8dfd1; border-top: 4px solid #d97706; box-shadow: 0 20px 50px rgba(10, 20, 30, .36); }
+.jianlun-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.jianlun-heading p { margin: 0 0 5px; color: #b4530a; font: 700 10px/1.4 ui-monospace, monospace; letter-spacing: .16em; }
+.jianlun-heading h3 { margin: 0; color: #27446e; font: 700 20px/1.35 Georgia, serif; }
+.jianlun-help { margin: 14px 0 10px; color: #68778f; font-size: 12px; }
+.jianlun-id-value { display: block; max-height: 180px; overflow: auto; padding: 14px; background: #f5f7f1; border: 1px solid #dde4d6; color: #27384f; font: 600 13px/1.75 ui-monospace, monospace; overflow-wrap: anywhere; word-break: break-all; user-select: all; }
+.jianlun-copy { width: 100%; min-height: 40px; margin-top: 14px; border: 0; background: #27446e; color: #fff; font-weight: 700; cursor: pointer; }
+.jianlun-copy:hover { background: #1d3557; }
+.jianlun-copy:focus-visible { outline: 2px solid #d97706; outline-offset: 3px; }
 .modal { position: relative; width: min(620px, 100%); max-height: min(84vh, 760px); display: flex; flex-direction: column; overflow: hidden; padding: 28px; background: #fff; border: 1px solid #d8dfd1; border-top: 5px solid #d97706; box-shadow: 0 24px 60px rgba(10, 20, 30, .35); }
 .modal-topbar { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
 .modal-back { border: 1px solid #cbd4df; background: #fbfcf9; color: #27446e; font: 700 12px/1 inherit; padding: 8px 12px; cursor: pointer; }
@@ -162,4 +179,13 @@ footer { padding: 28px 20px; background: #17253b; color: #9fadc0; text-align: ce
   .modify-note, .lineage { padding: 16px 14px; }
   .paper-grid { grid-template-columns: 1fr; }
   .paper-card { min-height: 0; }
+}
+
+@media (max-width: 480px) {
+  .modal-backdrop { padding: 12px; }
+  .modal { padding: 20px 16px; }
+  #modal-versions li { flex-direction: column; align-items: stretch; }
+  #modal-versions .open-link { align-self: flex-end; }
+  .jianlun-backdrop { padding: 16px; }
+  .jianlun-dialog { padding: 20px 16px; }
 }

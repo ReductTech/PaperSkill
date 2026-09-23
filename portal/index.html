@@ -45,6 +45,7 @@
           <label class="wide"><span>论文链接</span><input id="start-url" type="url" required placeholder="https://arxiv.org/abs/1706.03762" /></label>
           <label><span>论文网页目录名称</span><input id="start-paper-name" readonly required pattern="[a-z0-9]+(?:_[a-z0-9]+)*" placeholder="attention_is_all_you_need" /><small>根据上方「论文英文名」自动生成（小写字母、数字，单词间用下划线）</small></label>
           <label><span>GitHub 用户名</span><input id="start-source" required pattern="[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*" placeholder="your-github-username" /><small>可包含大小写；用于记录创建者 GitHub 账号</small></label>
+          <label class="wide"><span>减论 ID（可选）</span><input id="start-jianlun-id" placeholder="粘贴完整账号 ID，没有可留空" aria-describedby="jianlun-id-help" /><small id="jianlun-id-help">在减论「编辑资料 → 账号 ID」右侧点击复制。集合站通过“查看 →”小窗口显示完整值；留空显示「暂无」。</small></label>
           <div class="name-row">
             <label><span>公开展示名（中文）</span><input id="start-name" required placeholder="小明" /></label>
             <label><span>公开展示名（英文）</span><input id="start-pinyin" required pattern="[a-zA-Z][a-zA-Z0-9]*" placeholder="xiaoming" /><small>版本目录名使用「英文名 + 修改日期」，例如 xiaoming0903</small></label>
@@ -83,7 +84,8 @@
           <article>
             <div><b>一条命令</b><h3>复制原版本并生成新 paper.json</h3></div>
             <button class="copy-btn" type="button" data-copy="modify-command">复制</button>
-            <pre id="modify-command">npm run modify -- html_output/&lt;paper-name&gt;/&lt;原版本&gt; --participant "小明" --github "xiaoming666" --pinyin "xiaoming"</pre>
+            <pre id="modify-command">npm run modify -- html_output/&lt;paper-name&gt;/&lt;原版本&gt; --participant "小明" --github "xiaoming666" --pinyin "xiaoming" --jianlun-id "减论完整账号ID"</pre>
+            <p>没有减论 ID 时省略 <code>--jianlun-id</code> 参数及其值，版本列表显示「暂无」。</p>
           </article>
         </div>
 
@@ -127,6 +129,21 @@
         <p class="modal-hint" id="modal-hint"></p>
         <div id="modal-accounts" class="modal-accounts" hidden></div>
         <ul id="modal-versions" class="version-list" hidden></ul>
+      </div>
+    </div>
+
+    <div id="jianlun-modal" class="jianlun-backdrop" hidden>
+      <div class="jianlun-dialog" role="dialog" aria-modal="true" aria-labelledby="jianlun-title">
+        <div class="jianlun-heading">
+          <div>
+            <p>PUBLIC PROFILE</p>
+            <h3 id="jianlun-title">减论账号 ID</h3>
+          </div>
+          <button type="button" class="modal-close" id="jianlun-close" aria-label="关闭减论 ID 窗口">×</button>
+        </div>
+        <p class="jianlun-help">这是贡献者公开提供的完整账号 ID。</p>
+        <code id="jianlun-id-value" class="jianlun-id-value"></code>
+        <button type="button" id="jianlun-copy" class="jianlun-copy">复制完整 ID</button>
       </div>
     </div>
 

@@ -39,10 +39,12 @@ paper/<paper-name>
 在仓库根目录运行：
 
 ```powershell
-npm run import -- <生成目录> <paper-name> --title "英文论文名" --paper-url "论文链接" --participant "李雷" --pinyin "lilei" --github "GitHub用户名"
+npm run import -- <生成目录> <paper-name> --title "英文论文名" --paper-url "论文链接" --participant "李雷" --pinyin "lilei" --github "GitHub用户名" --jianlun-id "减论完整账号ID"
 ```
 
 `--participant` 是公开展示名（可写中文），`--pinyin` 是姓名拼音小写，用于生成版本目录名；中文姓名必须显式提供 `--pinyin`。`--date 0903` 可指定修改日期（MMDD 或 YYYY-MM-DD），缺省取当天。
+
+`--jianlun-id` 是可选的减论账号 ID，请从减论「编辑资料 → 账号 ID」右侧复制完整值，与 GitHub 用户名一起提供。它按字符串写入本版 `paper.json` 的 `participants[].jianlunId`；集合站版本弹窗会提供“查看 →”入口，点击后显示并可复制完整 ID。没有或暂不填写时省略此参数，页面显示「暂无」；不要传入「暂无」或带省略号的截断 ID。
 
 导入后生成：
 
@@ -57,10 +59,12 @@ html_output/<paper-name>/<pinyin><MMDD>/
 在一份已经存在的网页上继续修改时，不要覆盖原版本，而是复制出一个新版本：
 
 ```powershell
-npm run modify -- html_output/<paper-name>/<原版本> --participant "李雷" --github "lilei" --pinyin "lilei"
+npm run modify -- html_output/<paper-name>/<原版本> --participant "李雷" --github "lilei" --jianlun-id "减论完整账号ID" --pinyin "lilei"
 ```
 
 命令会把原版本复制成 `html_output/<paper-name>/<你的姓名拼音+MMDD>/`（复制时跳过 `node_modules/`、`dist/`、`.npm-cache/` 和旧 `paper.json`），并自动生成新的 `paper.json`，随后你就可以在新目录里修改网页。同一篇论文的每个版本都独立保留。
+
+未提供减论 ID 时省略 `--jianlun-id`，新版本不会继承原作者的减论 ID。
 
 新建的 `paper.json` 会带一个溯源字段 `ancestors`，按时间顺序记录这份网页此前的每一位作者（GitHub 用户名 + 其版本目录名），第一位是原创者：
 
@@ -95,6 +99,7 @@ html_output/<paper-name>/<version>/
 - `paperName` 必须与论文目录名一致；
 - `version` 必须与版本目录名一致（姓名拼音小写加 MMDD）；
 - `versionDate` 记录该版本的修改日期（YYYY-MM-DD）；
+- `participants` 保存本版贡献者的 `name`、可选 `github` 和可选 `jianlunId`；减论 ID 必须为字符串，缺失或空字符串时显示「暂无」，旧版本无需补写；
 - 分支名为 `paper/<paper-name>`；
 - 同一 `paperUrl` 对应一个论文目录，目录下可以有多位同学的版本。
 

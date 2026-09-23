@@ -7,6 +7,7 @@ const topicFilter = document.querySelector('#topic-filter');
 const summary = document.querySelector('#result-summary');
 let papers = [];
 let cardList = [];
+const modalJianlunIds = new Map();
 
 const starterForm = document.querySelector('#starter-form');
 const starterResult = document.querySelector('#starter-result');
@@ -34,6 +35,8 @@ starterForm.addEventListener('submit', (event) => {
   const url = document.querySelector('#start-url').value.trim();
   const paperName = document.querySelector('#start-paper-name').value.trim();
   const githubUser = document.querySelector('#start-source').value.trim();
+  const jianlunId = document.querySelector('#start-jianlun-id').value.trim();
+  const jianlunArg = jianlunId ? ` --jianlun-id '${jianlunId.replace(/'/g, "''")}'` : '';
   const name = document.querySelector('#start-name').value.trim();
   const pinyin = document.querySelector('#start-pinyin').value.trim().toLowerCase();
   const branch = `paper/${paperName}`;
@@ -41,7 +44,7 @@ starterForm.addEventListener('submit', (event) => {
   document.querySelector('#paper-dir-name').textContent = `html_output/${paperName}/<拼音><修改日期>（导入脚本自动生成，例如 html_output/${paperName}/${pinyin}0903）`;
   document.querySelector('#branch-command').textContent = `git switch main\ngit pull origin main\ngit switch -c ${branch}`;
   document.querySelector('#skill-command').textContent = `$paper-skill 请阅读并分析《${title}》（${url}），制作成完整的中文交互式论文教程。`;
-  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}" --participant "${name}" --pinyin "${pinyin}" --github "${githubUser}"`;
+  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}" --participant "${name}" --pinyin "${pinyin}" --github "${githubUser}"${jianlunArg}`;
   document.querySelector('#build-paper-command').textContent = `npm run build:paper -- ${paperName}`;
   starterResult.hidden = false;
   starterResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -170,6 +173,19 @@ function sortedVersions(versions) {
 
 function versionAuthors(version) {
   return (version.participants || []).map((item) => item.name).join('、') || '未署名';
+}
+
+function versionJianlunIds(version, versionIndex = 0) {
+  const participants = version.participants?.length ? version.participants : [{}];
+  return participants.map((person, participantIndex) => {
+    const id = typeof person.jianlunId === 'string' ? person.jianlunId.trim() : '';
+    const owner = participants.length > 1 ? `${person.name || person.github || '未署名'} · ` : '';
+    const label = `<span class="version-jianlun-label">${escapeHtml(owner)}减论 ID</span>`;
+    if (!id) return `<span class="version-jianlun">${label}<span class="version-jianlun-empty">暂无</span></span>`;
+    const key = `${versionIndex}:${participantIndex}`;
+    modalJianlunIds.set(key, id);
+    return `<span class="version-jianlun">${label}<button type="button" class="jianlun-view" data-jianlun-key="${key}" aria-label="查看${escapeHtml(owner)}减论完整 ID">查看 <span aria-hidden="true">→</span></button></span>`;
+  }).join('');
 }
 
 /** 版本溯源：按时间顺序记录此前每一位作者；唯一键是版本目录名（同版本只渲染一条），字段缺失或为空 = 无溯源信息 */
@@ -308,7 +324,27 @@ const modalHint = document.querySelector('#modal-hint');
 const modalBack = document.querySelector('#modal-back');
 const modalAccounts = document.querySelector('#modal-accounts');
 const modalVersions = document.querySelector('#modal-versions');
+const jianlunModal = document.querySelector('#jianlun-modal');
+const jianlunIdValue = document.querySelector('#jianlun-id-value');
+const jianlunCopy = document.querySelector('#jianlun-copy');
 let modalCardIndex = -1;
+let jianlunReturnFocus = null;
+
+function openJianlunModal(id, trigger) {
+  jianlunIdValue.textContent = id;
+  jianlunCopy.textContent = '复制完整 ID';
+  jianlunModal.hidden = false;
+  jianlunReturnFocus = trigger || null;
+  document.querySelector('#jianlun-close').focus();
+}
+
+function closeJianlunModal() {
+  if (jianlunModal.hidden) return;
+  jianlunModal.hidden = true;
+  const target = jianlunReturnFocus;
+  jianlunReturnFocus = null;
+  if (target) target.focus();
+}
 
 function openModal() {
   versionModal.hidden = false;
@@ -316,6 +352,7 @@ function openModal() {
 }
 
 function closeVersionModal() {
+  closeJianlunModal();
   versionModal.hidden = true;
   document.body.style.overflow = '';
   modalAccounts.hidden = true;
@@ -358,11 +395,13 @@ function openVersionModal(cardIndex, groupIndex) {
   modalHint.textContent = `共 ${group.items.length} 个版本，点击进入对应网页`;
   modalBack.hidden = card.groups.length <= 1;
   modalAccounts.hidden = true;
-  modalVersions.innerHTML = group.items.map((version) => `
+  modalJianlunIds.clear();
+  modalVersions.innerHTML = group.items.map((version, versionIndex) => `
     <li>
       <span class="version-info">
         <span class="version-name">${escapeHtml(version.version)}</span>
-        <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>${lineageHtml(version, card.paperName)}
+        <span class="version-meta">${escapeHtml(versionAuthors(version))}${version.versionDate ? ` · ${escapeHtml(version.versionDate)}` : ''} · ${statusLabel(version.status)}</span>
+        ${versionJianlunIds(version, versionIndex)}${lineageHtml(version, card.paperName)}
       </span>
       <a class="open-link" href="./${escapeHtml(version.tutorialUrl)}" target="_blank" rel="noopener">进入 →</a>
     </li>`).join('');
@@ -385,6 +424,20 @@ modalAccounts.addEventListener('click', (event) => {
   if (!row) return;
   openVersionModal(Number(row.dataset.card), Number(row.dataset.group));
 });
+modalVersions.addEventListener('click', (event) => {
+  const trigger = event.target.closest('.jianlun-view');
+  if (!trigger) return;
+  const id = modalJianlunIds.get(trigger.dataset.jianlunKey);
+  if (id) openJianlunModal(id, trigger);
+});
+jianlunCopy.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(jianlunIdValue.textContent);
+  jianlunCopy.textContent = '已复制';
+});
+jianlunModal.addEventListener('click', (event) => {
+  if (event.target === jianlunModal) closeJianlunModal();
+});
+document.querySelector('#jianlun-close').addEventListener('click', closeJianlunModal);
 versionModal.addEventListener('click', (event) => {
   if (event.target === versionModal) closeVersionModal();
 });
@@ -393,5 +446,7 @@ modalBack.addEventListener('click', () => {
 });
 document.querySelector('#modal-close').addEventListener('click', closeVersionModal);
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !versionModal.hidden) closeVersionModal();
+  if (event.key !== 'Escape') return;
+  if (!jianlunModal.hidden) closeJianlunModal();
+  else if (!versionModal.hidden) closeVersionModal();
 });

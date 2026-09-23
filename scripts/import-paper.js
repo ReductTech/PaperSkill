@@ -6,7 +6,7 @@ const path = require('path');
 const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE, findPaper, listVersions } = require('./lib/repository');
 
 function usage() {
-  console.error('用法: npm run import -- <生成目录> <paper-name> --title "..." --paper-url "https://..." --participant "李雷" [--pinyin "limei"] [--github "..."] [--date 0903] [--version liming0903] [--force] [--year 2024] [--venue "..."] [--topics "CV,CNN"]');
+  console.error('用法: npm run import -- <生成目录> <paper-name> --title "..." --paper-url "https://..." --participant "李雷" [--pinyin "limei"] [--github "..."] [--jianlun-id "减论完整账号ID"] [--date 0903] [--version liming0903] [--force] [--year 2024] [--venue "..."] [--topics "CV,CNN"]');
   process.exit(2);
 }
 
@@ -110,6 +110,8 @@ if (target === source || target.startsWith(`${source}${path.sep}`)) throw new Er
 copyFiltered(source, target);
 const participant = { name: opts.participant };
 if (opts.github) participant.github = opts.github.replace(/^@/, '');
+const jianlunId = String(opts['jianlun-id'] || '').trim();
+if (jianlunId) participant.jianlunId = jianlunId;
 const meta = {
   schemaVersion: 1,
   paperName,
