@@ -282,7 +282,7 @@ export const tutorial: TutorialData = {
           "title": "逐步走完一次 Mirage 循环",
           "desc": "用上一步/下一步依次查看初始化、latent 读出、去噪、解码、深度分割、再编码更新。橙色像素操作只出现在<b>按块更新</b>，不是每次条件读出。",
           componentId: "lsm-c5-main",
-          "figure": "/images/figure-3-mirage-overview.png"
+          "figure": "./images/figure-3-mirage-overview.png"
         }
       ],
       "formula": {
@@ -507,7 +507,7 @@ export const tutorial: TutorialData = {
     //       "title": "选择指标，再启动证据赛道",
     //       "desc": "切换 WorldScore、RealEstate10K 闭环、缓存读出时间与缓存显存。所有数值来自对应表格/图，反馈会同时指出胜项和未胜指标。",
     //       componentId: "lsm-c10-main",
-    //       "figure": "/images/figure-5-efficiency.png"
+    //       "figure": "./images/figure-5-efficiency.png"
     //     }
     //   ],
     //   "insight": "Mirage 的主张是：在论文配置与基准上，latent 记忆兼顾质量和效率；它不是对动态世界状态的完整解决方案。",

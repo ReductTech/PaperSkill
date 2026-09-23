@@ -137,7 +137,7 @@ export const tutorial: TutorialData = {
           title: "请你找出第一个分歧点",
           desc: "<b>现在你就是目标模型。</b>选择文本、公式或表格，再点击第一个与目标答案不一致的 token。画面会把它之前的候选连成绿色前缀，让你直接看到“接受长度”怎样决定一次前向能推进多远。候选序列是教学示意，正式速度结果来自论文表格。",
           componentId: "dflash-stepper",
-          figure: "/images/dflash-mask.png"
+          figure: "./images/dflash-mask.png"
         }
       ],
       insight: "<b>加速因果链：</b>一次提出多个候选 → 主模型一次校验 → 一次推进多个已验证 token；答案仍由主模型决定。",
@@ -392,7 +392,7 @@ export const tutorial: TutorialData = {
           title: "点选组件，看激活路径",
           desc: "<b>沿着页面到答案的路径逐个点选组件。</b>主路径负责“看懂并写出”；点到 DFlash 时，路径会绕到旁路草拟候选，再返回目标语言模型校验。由此区分谁负责答案、谁只负责加速。",
           componentId: "architecture-map",
-          figure: "/images/architecture.png"
+          figure: "./images/architecture.png"
         }
       ],
       insight: "<b>架构分工：</b>目标模型始终是作者和裁判，DFlash 只是一次多递几张草稿纸的加速助手。",

@@ -5,8 +5,9 @@ import type { TutorialData } from '../types';
 //  Replace every `__XXX__` with real, paper-specific Simplified Chinese content.
 //  Keep the `kind: "chapter"` / `kind: "module"` fields (validate-output.js counts
 //  them). Every `componentId` MUST be registered in ../modules/registry.tsx.
-//  Figures (`figure`) are OPTIONAL — use a path under /public (e.g. "/images/fig1.png")
-//  or an absolute URL, or omit the field.
+//  Figures (`figure`) are OPTIONAL — use a RELATIVE path to a public/ file
+//  (e.g. "./images/fig1.png"; never "/images/fig1.png", which 404s under the deploy
+//  sub-path) or an absolute URL, or omit the field.
 // ============================================================================
 
 export const tutorial: TutorialData = {

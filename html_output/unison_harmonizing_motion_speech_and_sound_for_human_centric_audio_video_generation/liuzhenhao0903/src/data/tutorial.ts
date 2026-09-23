@@ -229,7 +229,7 @@ export const tutorial: TutorialData = {
           title: "语义条件与门值响应",
           desc: "在语音主导、均衡与音效主导之间调节语义条件，观察两类门值的联动变化。中间状态为基于论文锚点的<b>图示插值</b>。",
           componentId: "unison-active",
-          figure: "/images/unison-gates.png",
+          figure: "./images/unison-gates.png",
         },
       ],
       formula: {
@@ -301,7 +301,7 @@ export const tutorial: TutorialData = {
           title: "联合时间步空间与方向变量",
           desc: "在二维时间步平面中移动状态点，观察领先方向、第二阶段允许区域与受加权分支的变化。",
           componentId: "unison-active",
-          figure: "/images/unison-forcing.png",
+          figure: "./images/unison-forcing.png",
         },
       ],
       formula: {
@@ -475,7 +475,7 @@ export const tutorial: TutorialData = {
           title: "双分支架构与训练状态",
           desc: "选择视频、融合或音频组件，查看本文实现中的 29/23 层配置、双流位置、活动路径以及冻结或可训练状态。",
           componentId: "unison-active",
-          figure: "/images/unison-architecture.png",
+          figure: "./images/unison-architecture.png",
         },
       ],
       takeaways: [
@@ -556,7 +556,7 @@ export const tutorial: TutorialData = {
           title: "同协议指标比较",
           desc: "选择 PQ↑、DS↓、LSE-C↑ 或用户总体排名↓，再启动同协议比较；图中始终保留论文报告的原始数值。",
           componentId: "unison-active",
-          figure: "/images/unison-audio-ablation.png",
+          figure: "./images/unison-audio-ablation.png",
         },
       ],
       insight:

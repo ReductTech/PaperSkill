@@ -335,7 +335,7 @@ export const Ch8RouterArchitecture: React.FC<WidgetProps> = ({ chapterId, module
         <b>边界：</b>LightGBM 是开放冷启动种子；状态编码器、供应编码器与预测头是后续代次设计，不是每一代都已完成基准验证。候选代次只有在同等奖励下降低实付成本或固定预算下提高奖励时才晋级，否则回滚。
       </div>
       <figure className="paper-figure">
-        <img src="/images/agentic-routing-overview.png" alt="论文 Figure 1：Harness 状态进入单模型或多模型路由，执行结果回流为 Arena 数据的总体结构" />
+        <img src="./images/agentic-routing-overview.png" alt="论文 Figure 1：Harness 状态进入单模型或多模型路由，执行结果回流为 Arena 数据的总体结构" />
         <figcaption>Figure 1 只帮助核对全局数据流；上方可点击架构才负责展示节点输入、当前值、输出与部署反馈。</figcaption>
       </figure>
       <div className="hotspot-info"><b>适用性判断：</b>候选能力异质、供应画像可更新且路由开销低于分配节省时，学习型升级才有价值；候选近乎同质或路由延迟吞掉收益时，应停留在便宜门控或回滚。</div>

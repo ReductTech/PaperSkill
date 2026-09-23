@@ -116,7 +116,7 @@ export const trainingDetails = [
 
 export const officialMedia = {
   source: "https://raw.githubusercontent.com/Eyeline-Labs/Vista4D/main/media/single/couple-newspaper.mp4",
-  reshoot: "/official/vista4d-reshooting-demo.mp4",
+  reshoot: "./official/vista4d-reshooting-demo.mp4",
   expansion: "https://eyeline-labs.github.io/Vista4D/media/dse_lounge-man-4_arc-right-left_s65991.mp4",
   recomposition: "https://eyeline-labs.github.io/Vista4D/media/edit_hike.mp4",
   longVideo: "https://eyeline-labs.github.io/Vista4D/media/long_money-count.mp4",

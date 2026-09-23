@@ -1,5 +1,7 @@
-// Optional paper-figure display. `src` is a path under /public (e.g. "/images/fig1.png")
-// or an absolute URL. Figures are OPTIONAL (per contract.md §7/figures): only render when
+// Optional paper-figure display. `src` is a RELATIVE path to a file in public/
+// (e.g. "./images/fig1.png" — never the root-absolute "/images/fig1.png", which 404s
+// because tutorials are served from a repository sub-path) or an absolute URL.
+// Figures are OPTIONAL (per contract.md §7/figures): only render when
 // the generator supplies `src`. UI copy is Simplified Chinese where present.
 
 export function Figure({

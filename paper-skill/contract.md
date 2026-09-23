@@ -278,8 +278,9 @@ Hard rules for the output:
 The tutorial **may** embed the paper's original figures. This is optional, never required.
 
 - To include a figure, copy the image into `public/images/` (e.g. `fig1.png`) and reference it
-  from the data via a `figure` field using a path **under `/public`** (e.g. `/images/fig1.png`)
-  or an absolute URL.
+  from the data via a `figure` field using a **relative path** (e.g. `./images/fig1.png`) or an
+  absolute URL. Never use a root-absolute path such as `/images/fig1.png`: tutorials are served
+  from a repository sub-path, so a root-absolute path resolves to the site root and 404s.
 - `figure` may appear on a Hero side (`hero.oldMethod.figure` / `hero.newMethod.figure`), an
   analogy card (`analogy.figure`), or a module (`module.figure`). It is rendered by
   `src/components/Figure.tsx`; when the field is undefined the figure is simply absent and the

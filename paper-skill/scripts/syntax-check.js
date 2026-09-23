@@ -216,6 +216,10 @@ function checkFiles(filePaths, options = {}) {
   }
   const errors = [];
   for (const filePath of filePaths) {
+    // TypeScript 的 transpileModule 无法处理声明文件：.d.ts 输入在 emit 阶段不产出任何文件，
+    // 会让 transpileModule 抛 Debug Failure. Output generation failed。这类文件只有类型信息，
+    // 真正的类型检查由 tsc（npm run build）负责，这里跳过。
+    if (filePath.toLowerCase().endsWith('.d.ts')) continue;
     let source;
     try {
       source = fs.readFileSync(filePath, 'utf8');

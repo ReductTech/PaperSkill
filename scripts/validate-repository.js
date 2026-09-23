@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { ROOT, listPapers, listVersions, metadataFor, validateMetadata } = require('./lib/repository');
+const { scanVersion } = require('./lib/asset-paths');
 
 const requiredFiles = [
   'paper.json', 'README.md', 'package.json', 'package-lock.json', 'index.html',
@@ -76,6 +77,19 @@ function main() {
         }
       } catch (error) {
         console.error(`    ✗ ${error.message}`);
+        failures += 1;
+      }
+
+      // 教程部署在仓库子路径下，JS/TS 字符串里的 /images/x.png 不会被 Vite 改写，浏览器会去站点根找 → 404
+      const assetIssues = scanVersion(submission.dir);
+      if (assetIssues.length > 0) {
+        // 一个版本只记一处错误
+        for (const issue of assetIssues.slice(0, 5)) {
+          console.error(`    ✗ 根绝对资源路径，请写成相对路径（"/images/x.png" → "./images/x.png"）：${issue.file}:${issue.line} ${issue.ref}`);
+        }
+        if (assetIssues.length > 5) {
+          console.error(`    ✗ 该版本还有 ${assetIssues.length - 5} 处同类问题`);
+        }
         failures += 1;
       }
 

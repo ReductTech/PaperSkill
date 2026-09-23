@@ -182,7 +182,7 @@ export const tutorial: TutorialData = {
           "title": "幂律外推",
           "desc": "在编码器、数据、投影器三条幂律间切换，读懂指数与 95% 置信区间；再开启「外推验证」，看<b>未参与拟合的 0.5/1/2 B 教师落点全部落在预测曲线上</b>。",
           "componentId": "ch4mod2",
-          "figure": "/images/fig2_scaling_laws.png"
+          "figure": "./images/fig2_scaling_laws.png"
         }
       ],
       "insight": "最优不是一个点，而是一条随预算移动的曲线——只有找到顶点，才知道预算该给谁。",
@@ -323,7 +323,7 @@ export const tutorial: TutorialData = {
           "title": "叠帧长曝光",
           "desc": "点按「下一步」逐步叠放曝光帧：每按一次叠入 5 个有效观测，8 步叠满 40 个。推理输入应包含<b>全部有效观测</b>，嵌入随证据累积而变稳；时间窗是可选的推理参数，在动态强的任务上短窗可能更优。",
           "componentId": "ch6mod1",
-          "figure": "/images/fig9_artifacts.png"
+          "figure": "./images/fig9_artifacts.png"
         }
       ],
       "insight": "既然全部有效观测都记录着同一段物候，推理时保留它们只是给出更多证据，而不是把输入拉长到分布之外。",
@@ -434,7 +434,7 @@ export const tutorial: TutorialData = {
           "title": "交互式架构图",
           "desc": "点击画布节点或下方等价芯片行，选中即高亮并沿下游橙色路径延伸；切换教师／学生与 N/S/M/L，逐一查看每个部件的角色、维度与参数量。训练专用的投影器与前缀头<b>推理时全部丢弃</b>，服务时只部署编码器。",
           "componentId": "ch8mod1",
-          "figure": "/images/fig3_architecture.png"
+          "figure": "./images/fig3_architecture.png"
         }
       ],
       "insight": "教师学得深、学生跑得动：训练时多出来的投影器与前缀头，推理时一个都不带走。",
@@ -482,7 +482,7 @@ export const tutorial: TutorialData = {
           "title": "朴素前缀-BT vs 蒸馏：谁在真正排序坐标",
           "desc": "朴素前缀-BT 的 σd 阶梯与 FIRST-16 优势来自<b>梯度多重性</b> 4/3/2/1，而非语义排序；蒸馏保持 σd≈1、边际近高斯，才让前缀真正有序。",
           "componentId": "ch9mod2",
-          "figure": "/images/fig8_matryoshka_failure.png"
+          "figure": "./images/fig8_matryoshka_failure.png"
         }
       ],
       "insight": "自监督只学到表示子空间、坐标顺序是规范自由度；让每个前缀重建冻结教师嵌入，才把「哪几维先携带信息」交给教师固定。",
@@ -553,7 +553,7 @@ export const tutorial: TutorialData = {
           "title": "观测对比赛：留出套件上的可验证领先",
           "desc": "四条赛道从共享基线出发，按当前套件的复合得分重排；44M 学生以 <b>0.647</b> 居首，且去掉 CITYREP、换评分协议与聚合规则后仍第一。",
           "componentId": "ch10mod1",
-          "figure": "/images/fig4_results.png"
+          "figure": "./images/fig4_results.png"
         },
         {
           "kind": "module",
@@ -561,7 +561,7 @@ export const tutorial: TutorialData = {
           "title": "存储–性能前沿：把 d 变成部署旋钮",
           "desc": "d=16/32/64/128 对应约 22/44/89/178 TiB 存储与 0.546/0.574/0.588/0.593 复合得分；<b>编码器规模另管部署成本</b>，从零训练的 44M 只有 0.527。前缀可直接截断使用，但坐标顺序来自蒸馏：自监督只确定表示子空间，不能保证简单截断有效（详见 §9）。",
           "componentId": "ch10mod2",
-          "figure": "/images/fig7_deployment.png"
+          "figure": "./images/fig7_deployment.png"
         }
       ],
       "insight": "共享套件可能参与过模型选型，领先会自带水分；14 个未参与开发的留出数据集加三种压力测试，才让 44M 学生的领先变得可验证。",

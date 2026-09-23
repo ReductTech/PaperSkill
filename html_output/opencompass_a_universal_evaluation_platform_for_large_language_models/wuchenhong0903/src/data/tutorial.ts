@@ -21,7 +21,7 @@ export const tutorial: TutorialData = {
       componentId: 'heroContrast',
     },
     newMethod: {
-      desc: '<video controls preload="metadata" width="100%" src="/videos/oc-demo.mp4"></video><br>统一评测协议，配置/切分/调度/任务/汇总解耦，<b>高并发一次评测 100+ 基准</b>。',
+      desc: '<video controls preload="metadata" width="100%" src="./videos/oc-demo.mp4"></video><br>统一评测协议，配置/切分/调度/任务/汇总解耦，<b>高并发一次评测 100+ 基准</b>。',
     },
   },
   chapters: [
@@ -285,7 +285,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '8.1',
           title: '五大组件架构图',
-          desc: '<video controls preload="metadata" width="100%" src="/videos/opencompass-figure-1-animation.mp4"></video><br>点击五个组件，看<b>配置 → 切分 → 调度 → 任务 → 汇总</b>如何串起整个评测流水线。',
+          desc: '<video controls preload="metadata" width="100%" src="./videos/opencompass-figure-1-animation.mp4"></video><br>点击五个组件，看<b>配置 → 切分 → 调度 → 任务 → 汇总</b>如何串起整个评测流水线。',
           componentId: 'ch8mod1',
         },
       ],

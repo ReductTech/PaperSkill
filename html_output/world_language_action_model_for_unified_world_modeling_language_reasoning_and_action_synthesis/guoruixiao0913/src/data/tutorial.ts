@@ -225,7 +225,7 @@ export const tutorial: TutorialData = {
           "title": "世界专家该预测什么",
           "desc": "用两枚芯片分别切换预测目标（整段视频 / 目标帧）与特征类型（语义特征 / VAE 特征），柱状图的高亮、说明区与反馈会随之更新。切换几次你会发现：帧数越密不一定越好，论文也因此选了 VAE 特征（柱高始终是论文数值，不随切换变化）。",
           "componentId": "wla-4-2",
-          "figure": "/images/fig10.png"
+          "figure": "./images/fig10.png"
         }
       ],
       "insight": "未来那一帧没人替模型标注，于是 WLA 让一个轻量的世界专家专门负责视觉细节，主干只保留驱动变化的核心信息。",
@@ -466,7 +466,7 @@ export const tutorial: TutorialData = {
           "title": "三件家伙的接线图",
           "desc": "依次点击主干 / 元查询 / 世界专家 / 动作专家四个节点，看清每个部件的作用、规模和它在推理时是否还在；再切换「高效推理模式」开关，观察世界专家退场后整机参数量的变化。也可以对照下方的论文原图 2。",
           "componentId": "wla-8-1",
-          "figure": "/images/fig2.png"
+          "figure": "./images/fig2.png"
         }
       ],
       "takeaways": [
@@ -545,7 +545,7 @@ export const tutorial: TutorialData = {
           "title": "成绩竞赛",
           "desc": "用芯片选一个指标（RoboTwin 2.0 Clean / LIBERO 平均 / RMBench 平均），再按「开始对比」，让几位选手从同一基线起跑、比出各自的名次。看结果时记住两条规矩：越高越好，协议不同不能并列比较。",
           "componentId": "wla-10-1",
-          "figure": "/images/fig3.png"
+          "figure": "./images/fig3.png"
         },
         {
           "kind": "module",

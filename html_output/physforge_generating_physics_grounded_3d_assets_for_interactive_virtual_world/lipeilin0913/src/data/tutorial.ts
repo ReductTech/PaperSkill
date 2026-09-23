@@ -48,7 +48,7 @@ export const tutorial: TutorialData = {
           "title": "把“交互需求”调高，看静态资产在哪里崩溃",
           "desc": "拖动滑块提高交互需求强度（从摆着看到机器人操作），观察只有几何的“空心壳”资产何时失效；再点击按钮，看看补上物理属性后会发生什么。",
           "componentId": "ch1mod1",
-          "figure": "/images/fig1-teaser.png"
+          "figure": "./images/fig1-teaser.png"
         }
       ],
       "insight": "要交互，就得把功能与物理规律放进生成过程，而不是事后再补。",
@@ -406,7 +406,7 @@ export const tutorial: TutorialData = {
           "title": "点击流水线：五个组件各管什么",
           "desc": "点击架构图上的组件（或下方按钮），查看每个阶段的输入与输出；紫色节点是全图最关键的 KVI 注入点。对照原图（方法总览）一起看。",
           "componentId": "ch8mod1",
-          "figure": "/images/fig2-pipeline.png"
+          "figure": "./images/fig2-pipeline.png"
         },
         {
           "kind": "module",

@@ -55,7 +55,7 @@ export const HeroNew: React.FC<WidgetProps> = () => {
   }, []);
 
   return (
-    <HeroVideo src="/videos/hero-new.mp4" label="NTM 4 步：像素格从噪声还原为清晰图像">
+    <HeroVideo src="./videos/hero-new.mp4" label="NTM 4 步：像素格从噪声还原为清晰图像">
       <canvas ref={canvasRef} aria-label="NTM 4 步：像素格从噪声还原为清晰图像" />
     </HeroVideo>
   );

@@ -1,4 +1,4 @@
-// Optional paper-figure display. `src` is a path under /public (e.g. "/images/fig1.png")
+// Optional paper-figure display. `src` is a path under /public (e.g. "./images/fig1.png")
 // or an absolute URL. Figures are optional and render only when the tutorial supplies
 // `src`. UI copy is Simplified Chinese where present.
 

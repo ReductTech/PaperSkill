@@ -48,7 +48,7 @@ export const tutorial: TutorialData = {
           title: "论文中的 Figure 2：UMAP 二维布局丢掉了什么",
           desc: "同样数量的稀疏簇与密集簇经过 UMAP 后看起来大小相近；保持二维点位不变，再读取原始 kNN 距离，密度差异就会重新显现。",
           componentId: "figure2-guide",
-          figure: "/images/what-graph.png"
+          figure: "./images/what-graph.png"
         },
         {
           kind: "module",

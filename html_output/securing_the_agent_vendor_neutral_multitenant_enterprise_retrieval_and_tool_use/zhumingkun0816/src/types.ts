@@ -19,7 +19,7 @@ export interface Meta {
 }
 
 export interface FigureRef {
-  /** Path under public/ (e.g. "/images/fig1.png") or an absolute URL. Optional. */
+  /** Path under public/ (e.g. "./images/fig1.png") or an absolute URL. Optional. */
   src: string;
   caption?: string;
   alt?: string;

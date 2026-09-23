@@ -28,7 +28,7 @@ export const tutorial: TutorialData = {
     },
     "newMethod": {
       "desc": "<b>世界模型</b>：预测环境在动作下如何演化。先在想象中预演动作后果，再支持策略学习、规划、模拟评估与数据放大——预见、想象驱动规划、数据放大三种核心能力。",
-      "figure": "/images/figure-1.png",
+      "figure": "./images/figure-1.png",
       "componentId": "hero-predictive"
     }
   },
@@ -296,7 +296,7 @@ export const tutorial: TutorialData = {
           "title": "条件类型：给模型看什么信号？",
           "desc": "同样生成「永」字，切四种条件：不给信号、只给<b>文本指令</b>、只给<b>动作序列</b>、两者都给。看右侧三个生成样本分别错在哪——指令管内容，动作管轨迹。论文原书 Figure 6 画出同一张谱系：动作、观测、指令之外，还有<b>结构先验</b>这第四种条件（Sec 5.4）。",
           "componentId": "m5-2-cond-type",
-          "figure": "/images/figure-6.png"
+          "figure": "./images/figure-6.png"
         }
       ],
       "insight": "想象必须「受力而变」——不对动作敏感的想象，只是装饰画。",
@@ -436,7 +436,7 @@ export const tutorial: TutorialData = {
           "title": "想象数据占比滑杆",
           "desc": "调节<b>想象练习占比 r</b>：上区空中轨迹数量随 r 增减（一条实纸墨迹固定不变），下区成功率曲线上的橙色标记沿曲线移动——先升后降，<b>非单调</b>。想象太多，模型自己的偏差会被练进策略。",
           "componentId": "m7-1-imagined-ratio",
-          "figure": "/images/figure-5.png"
+          "figure": "./images/figure-5.png"
         }
       ],
       "insight": "真机太贵，字帖有限——世界模型把「练」和「验」拆开：练在想象里，验在真纸上。",
@@ -511,7 +511,7 @@ export const tutorial: TutorialData = {
           "title": "五种耦合：点击范式节点",
           "desc": "点击顶部五个范式节点：<b>IDM 解耦</b>、<b>单骨干</b>、<b>专家 MoE</b>、<b>VLA 内化</b>、<b>潜空间</b>——中央架构图随之重排（谁预测、谁行动、怎么连），数据流高亮切换，底部三根权衡条与代表工作同步变化。",
           "componentId": "m8-1-paradigm-map",
-          "figure": "/images/figure-3.png"
+          "figure": "./images/figure-3.png"
         },
         {
           "kind": "module",

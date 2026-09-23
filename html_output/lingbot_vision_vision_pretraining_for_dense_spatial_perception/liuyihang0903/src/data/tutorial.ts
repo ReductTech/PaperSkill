@@ -44,7 +44,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: '同一张图，两种问法',
         text: '看同一张图：<strong>语义视角</strong>回答「这是什么」（一个类别）；<strong>空间感知视角</strong>要逐像素回答「边界在哪、离我多远、结构如何」——输出的是<strong>边界、深度、几何</strong>。上图是论文 Fig.6 的特征分布：纯语义模型的点按「语义」聚团，而 LingBot 的点还沿边界几何展开。',
-        figure: '/images/fig6_pca.jpg',
+        figure: './images/fig6_pca.jpg',
       },
       modules: [
         {
@@ -122,7 +122,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: '随机掩码 vs 边界强制掩码',
         text: '上图来自论文 Fig.2：同一个玩具场景，左列是「随机掩码」——遮住的格子和内容无关；右列是「边界强制掩码」——专门遮住穿过物体轮廓的格子。边界强制掩码把 Teacher 预测的边界 token 集合 B 并入随机掩码 M：<strong>M⁺ = M ∪ B</strong>，逼模型凭上下文重建被藏的结构。',
-        figure: '/images/fig2_masking.png',
+        figure: './images/fig2_masking.png',
       },
       modules: [
         {
@@ -162,7 +162,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: '边界从角点「长」出来（Finding 1）',
         text: '上图是论文发现 1（Finding 1）：边界从角点「长」出来。这是自举的关键前提——给定稀疏角点（物体轮廓的转折点），即使边界场取值几乎随机，投票解码也能得到角点锚定的线段；方向通道由 level-line（像素梯度方向）引导后，每次解码都得到连贯一致的线段。',
-        figure: '/images/fig3_corners.jpg',
+        figure: './images/fig3_corners.jpg',
       },
       modules: [
         {
@@ -185,7 +185,7 @@ export const tutorial: TutorialData = {
           title: '① Predict：预测边界场（表示 + 分类化）',
           desc: 'Teacher 的 Boundary Head（3 层 per-token MLP）把每个 16×16 patch 展开成更密的 field positions（output stride s=2），每个位置输出 4 个几何量 <b>(d, θ, φ₁, φ₂)</b>。<b>但网络不直接回归连续数</b>——而是把每个量离散成 K=32 格的分类分布，再还原回连续值，得到 a_pred(p)。下方两步讲清：边界场怎么表示、为什么不回归而分类化。<b>注意：这里得到的 a_pred(p) 还是带噪声的 raw field，不能直接当标签</b>——下一步要解码。',
           componentId: 'm-4-3',
-          figure: '/images/fig4_field.png',
+          figure: './images/fig4_field.png',
         },
         {
           kind: 'module',
@@ -276,7 +276,7 @@ export const tutorial: TutorialData = {
           title: '特征对比：语义与几何如何分布',
           desc: '上图是论文 Fig.6 的 PCA 投影（主成分分析，把高维特征压到 2 维方便看图）：LingBot 的 patch 特征既按语义分组、又携带边界几何结构；纯语义模型的特征里几何信息稀疏。下方对比各模型的失败模式与 NYU RMSE。',
           componentId: 'm-6-2',
-          figure: '/images/fig6_pca.jpg',
+          figure: './images/fig6_pca.jpg',
         },
         {
           kind: 'module',
@@ -284,7 +284,7 @@ export const tutorial: TutorialData = {
           title: '落地：LingBot-Depth 2.0',
           desc: '<b>掩码深度建模（MDM，Masked Depth Modeling）</b>——RGB（彩色三通道图像）与原始深度双模态 patch 化，按传感器有效性掩码深度 token，解码器只凭上下文重建全分辨率深度。下图是论文 Fig.10 的深度补全结果：',
           componentId: 'm-6-3',
-          figure: '/images/fig10_depth.jpg',
+          figure: './images/fig10_depth.jpg',
         },
         {
           kind: 'module',

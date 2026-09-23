@@ -343,7 +343,7 @@ Generate `SKILL.md` with the same top-level and per-chapter order as the exempla
 
 Fill every placeholder with the coordinator-approved outputs from Steps 1-9. Include source kind, SHA-256 digest, locator scheme, and selected cached-figure IDs in the paper metadata; never include a temporary absolute path. Copy this skill's complete `assets/` directory (which contains `react-template/`) and `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, `scripts/syntax-check.js`, and `scripts/validate-output.js` into the temporary paperSkill (the helpers sit beside `assets/` in the intermediate skill directory, so `assemble-chapter-packets.js` and `validate-output.js` can `require('./syntax-check.js')`).
 
-When the tutorial will use an original paper figure, copy the already cached image into the temporary `assets/react-template/public/images/` now and record its `/images/...` path in the intermediate skill. Do not reopen the original source during this step. Images staged here are copied into the final project automatically by `scaffold.js`.
+When the tutorial will use an original paper figure, copy the already cached image into the temporary `assets/react-template/public/images/` now and record its `./images/...` relative path in the intermediate skill. Always keep a leading `./` (never a root-absolute `/images/...`, which 404s under the deployment sub-path). Do not reopen the original source during this step. Images staged here are copied into the final project automatically by `scaffold.js`.
 
 ## Step 11: Validate Phase 1
 
@@ -388,7 +388,8 @@ Follow the temporary paperSkill exactly.
 5. Replace `__METAPHOR_CSS__` inside `src/styles/paper.css` `:root {}` once, after packet assembly,
    with the coordinator-approved paper-specific color overrides (or remove the placeholder line).
 6. Use only original figures already staged in `assets/react-template/public/images/` during
-   Phase 1 and reference them via the `figure` field (`/images/...`). Omit any figure that does
+   Phase 1 and reference them via the `figure` field (`./images/...` relative path — never a
+   root-absolute `/images/...`). Omit any figure that does
    not fit. Do not reopen the original paper or read `source-cache/` in Phase 2.
 7. Do NOT edit framework files: `src/components/*`, `src/lib/*`, `src/styles/{tokens,components}.css`,
    `App.tsx`, `main.tsx`, config files. Keep all visible explanatory copy in natural Simplified

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { WidgetProps } from './registry';
 
-const A = '/images/robodojo/';
+const A = './images/robodojo/';
 const V = `${A}videos/`;
 const G = `${A}generated/`;
 const D = `${A}data/`;

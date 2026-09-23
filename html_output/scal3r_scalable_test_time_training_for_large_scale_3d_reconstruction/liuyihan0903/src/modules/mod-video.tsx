@@ -8,7 +8,7 @@ export const ModVideo: React.FC<WidgetProps> = () => {
     <div className="video-block">
       <video
         className="result-video"
-        src="/zju-zjg-hero-720p.mp4"
+        src="./zju-zjg-hero-720p.mp4"
         controls
         loop
         muted

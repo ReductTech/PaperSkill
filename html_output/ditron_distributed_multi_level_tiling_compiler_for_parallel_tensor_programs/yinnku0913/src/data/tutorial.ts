@@ -110,7 +110,7 @@ export const tutorial: TutorialData = {
           "title": "三级硬件与三级 tile",
           "desc": "学习者应形成这样一个判断——tiling 的粒度不是随意选的，它必须与所处的硬件域匹配：核级用静态细砖驱动张量核心，设备级用 chunk 走 DMA，任务级用整算子组成 DAG。",
           "componentId": "m2-1-level-spot",
-          "figure": "/images/fig-background.png"
+          "figure": "./images/fig-background.png"
         }
       ],
       "formula": {
@@ -172,7 +172,7 @@ export const tutorial: TutorialData = {
           "title": "有 / 无 swizzle 同步对比",
           "desc": "没有 swizzle 时，除进程 0 之外的所有进程都会在开头一起阻塞；<b>rank 相关偏移</b>能让每个进程的第一次计算都落在本地已经就绪的数据上。",
           "componentId": "m3-1-swizzle-compare",
-          "figure": "/images/fig-swizzle-flow.png"
+          "figure": "./images/fig-swizzle-flow.png"
         },
         {
           "kind": "module",
@@ -320,7 +320,7 @@ export const tutorial: TutorialData = {
           "title": "通信方式 chips + 加速比条",
           "desc": "学习者应形成这样一个判断——同一模块里选哪种通信方式由形状决定：注意力因为 head dim 只有 128 而偏好 AllReduce，FFN 因为中间维大而可以靠 AG+RS 重叠，AllToAll 只属于 MoE 的 dispatch/combine。",
           "componentId": "m5-1-comm-choice",
-          "figure": "/images/fig-covers.png"
+          "figure": "./images/fig-covers.png"
         },
         {
           "kind": "module",
@@ -390,7 +390,7 @@ export const tutorial: TutorialData = {
           "title": "编译流水线单步",
           "desc": "学习者应形成这样一个判断——从用户程序到 MegaKernel 是一条固定的六阶段流水线，分布式语义与单设备语义在第二阶段分道，在第五、六阶段重新合成一个常驻内核。",
           "componentId": "m6-1-pipeline-steps",
-          "figure": "/images/fig-mega.png"
+          "figure": "./images/fig-mega.png"
         }
       ],
       "formula": {

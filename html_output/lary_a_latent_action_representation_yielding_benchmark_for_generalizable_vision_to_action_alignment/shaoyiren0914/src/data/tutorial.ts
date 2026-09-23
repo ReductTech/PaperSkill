@@ -21,12 +21,12 @@ export const tutorial: TutorialData = {
   "hero": {
     "oldMethod": {
       "desc": "糯糯倒在现场，瓶子身份不明。只看画面变化，<b>证据链仍是空白</b>。",
-      "figure": "/images/characters/nuonuo-base.png",
+      "figure": "./images/characters/nuonuo-base.png",
       "componentId": "hero-old"
     },
     "newMethod": {
       "desc": "菲比：‘我早就看出有蹊跷——但今天你主审。<b>你怎么看？</b>’",
-      "figure": "/images/characters/phebe-investigate.png",
+      "figure": "./images/characters/phebe-investigate.png",
       "componentId": "hero-new"
     }
   },

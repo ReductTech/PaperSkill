@@ -47,7 +47,7 @@ export const tutorial: TutorialData = {
           "title": "壳体检查",
           "desc": "切换表示范围，观察口腔和眼球是否拥有独立、可控制的几何。",
           "componentId": "ch1-shell",
-          "figure": "/images/figure-01.png"
+          "figure": "./images/figure-01.png"
         },
         {
           "kind": "module",
@@ -135,7 +135,7 @@ export const tutorial: TutorialData = {
           "title": "拖动参数平面",
           "desc": "在 β/φ 二维切片上拖动橙点，把身份形状与表情变化区分开。",
           "componentId": "ch3-basis",
-          "figure": "/images/figure-02.png"
+          "figure": "./images/figure-02.png"
         }
       ],
       "formula": {
@@ -250,7 +250,7 @@ export const tutorial: TutorialData = {
           "title": "点击区域做表情",
           "desc": "选择左眼、右眼或下脸，再切换全局假想与 GNM 局部控制。",
           "componentId": "ch5-regions",
-          "figure": "/images/figure-08.png"
+          "figure": "./images/figure-08.png"
         }
       ],
       "insight": "分区不是硬切割：相邻掩码允许小幅重叠，并以线性方式平滑融合。",
@@ -305,7 +305,7 @@ export const tutorial: TutorialData = {
           "title": "解剖工作台",
           "desc": "切换牙齿、舌头与眼球，比较各自的数据来源、参数归属和有效范围。",
           "componentId": "ch6-anatomy",
-          "figure": "/images/figure-09.png"
+          "figure": "./images/figure-09.png"
         }
       ],
       "takeaways": [
@@ -517,7 +517,7 @@ export const tutorial: TutorialData = {
           "title": "两套协议结果赛",
           "desc": "选择留出扫描或合成单视图协议，再启动同标尺误差比较。",
           "componentId": "ch10-results",
-          "figure": "/images/table-02.png"
+          "figure": "./images/table-02.png"
         }
       ],
       "insight": "结论应写成“在这些协议下误差更低”，不能扩张成“GNM 在所有人脸任务上都更好”。",

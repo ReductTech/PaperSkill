@@ -39,7 +39,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: "论文图 2 · 去噪轨迹对比",
         text: "左：流匹配 50 步正常、压到 4 步就糊；右：NTM 同样 4 步得到相当质量——差别只在它建模了<b>非高斯的反向条件</b>。",
-        figure: "/images/paper/teaser_v1.jpeg"
+        figure: "./images/paper/teaser_v1.jpeg"
       },
       modules: [
         {
@@ -176,7 +176,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: "论文图 8 · 三种模型的谱系",
         text: "TarFlow 把深度全花在可逆变换上（一步到位但很贵）；扩散模型全靠高斯小步（便宜但步数多）；NTM 居中：<b>浅可逆变换 + 深高斯预测器</b>，各取所长。",
-        figure: "/images/paper/ntm_comparison.png"
+        figure: "./images/paper/ntm_comparison.png"
       },
       modules: [
         {
@@ -260,7 +260,7 @@ export const tutorial: TutorialData = {
           title: "一次训练，多种步数",
           desc: "训练时 T ∈ {4, 8, 16} 随机采样，同一个模型学会三种步长。切换 T 看质量-速度权衡（ImageNet 256² FID-50K，越低越好；参照线是前作 STARFlow 在 256 步下的 2.67）。",
           componentId: "m7-tsteps",
-          figure: "/images/paper/multi_traj.jpeg"
+          figure: "./images/paper/multi_traj.jpeg"
         }
       ],
       insight: "步数越多每步越接近高斯、画质越好：16 步 FID 2.80 已逼近 256 步的前作，甜点区在 T=4–8。而这一切共享同一个训练目标——整条轨迹的精确负对数似然。",
@@ -314,7 +314,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: "论文图 7(a) · 不加对齐损失的下场",
         text: "只靠 NLL 驱动，训练不稳定，画质明显劣化、布满噪点伪影。锚（均值对齐损失）不是锦上添花，是<b>稳定性的关键</b>。",
-        figure: "/images/paper/qualitative_2x2.png"
+        figure: "./images/paper/qualitative_2x2.png"
       },
       modules: [
         {
@@ -323,7 +323,7 @@ export const tutorial: TutorialData = {
           title: "三种起步方式对比",
           desc: "切换三种训练方式看损失曲线与最终画质：随机初始化、恒等初始化、恒等初始化 + 均值对齐损失（λ=2.5，余弦退火到 0——锚逐渐松手）。右图为论文图 7(b)：加了对齐损失后的正常结果。",
           componentId: "m5-finetune",
-          figure: "/images/paper/qualitative_2x2_2.png"
+          figure: "./images/paper/qualitative_2x2_2.png"
         }
       ],
       insight: "配方三件套：① f_T=id（换元账清零）；② μ_P=μ_post——命题 2 证明预训练流匹配模型的速度场可以闭式换算成每步反向的后验均值；③ σ_P=σ_post·exp(δ_σ)，δ_σ 零初始化。三者合起来保证起点与预训练模型分毫不差。",
@@ -377,7 +377,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: "论文图 1 · 4 步文生图",
         text: "上：从头训练（256²）；下：微调预训练流匹配模型（512²）。同一框架、两条路线，全部只用 <b>4 步去噪</b>。",
-        figure: "/images/paper/qualitative_main.jpeg"
+        figure: "./images/paper/qualitative_main.jpeg"
       },
       modules: [
         {
@@ -386,7 +386,7 @@ export const tutorial: TutorialData = {
           title: "成绩赛跑（连步数一起看）",
           desc: "点「开始比较」看各方法成绩条增长（每条都标注步数）。GenEval 越高越好；切到 ImageNet FID 注意方向反转——越低越好。下方论文图 9 是边界：T=1 时全部非高斯性压给浅搬运器，容量不够，严重退化。",
           componentId: "m10-race",
-          figure: "/images/paper/failure_1step.png"
+          figure: "./images/paper/failure_1step.png"
         },
         {
           kind: "module",
@@ -394,7 +394,7 @@ export const tutorial: TutorialData = {
           title: "精确似然的红利：轨迹分数去噪",
           desc: "似然可微 ⇒ 它的梯度就是整条轨迹的联合分数（命题 3），可对生成结果做一次整体修正。切换四种收尾方式看差别；再看论文图 7(c)：把这步蒸馏成学习去噪器 g_φ，0.20 → 1.88 img/s（约 9 倍），LPIPS 仅 0.121。",
           componentId: "m9-denoise",
-          figure: "/images/paper/shallow_denoiser.png"
+          figure: "./images/paper/shallow_denoiser.png"
         }
       ],
       insight: "诚实的结论：4 步 GenEval 0.82 对归一化流家族是巨大跨越（前作 STARFlow 0.56 还要 256 步），也超过 SDXL、SD3-Medium 与 FLUX.1-dev，但距最强的 Qwen-Image 0.87 仍有差距；单步（T=1）精确似然生成仍是开放问题。",

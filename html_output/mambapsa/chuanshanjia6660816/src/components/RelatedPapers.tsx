@@ -18,14 +18,14 @@ const PAPERS: PaperCard[] = [
     title: 'MambaPSA: A Mamba-based Replacement for C2PSA in YOLO26',
     venue: 'arXiv 2607.12681 · 用 Mamba 替换主干末尾的 C2PSA',
     url: 'https://arxiv.org/abs/2607.12681',
-    img: '/images/paper-mambapsa.svg',
+    img: './images/paper-mambapsa.svg',
   },
   {
     tag: '官方代码',
     title: 'MambaPSA 官方代码仓库',
     venue: 'GitHub · 模型代码 + VOC 权重（13 个 .pt）+ 训练/推理脚本',
     url: 'https://github.com/henrychan0719/MambaPSA',
-    img: '/images/paper-github.svg',
+    img: './images/paper-github.svg',
     linkLabel: '前往仓库 →',
   },
   {
@@ -40,7 +40,7 @@ const PAPERS: PaperCard[] = [
     title: 'Mamba: Linear-Time Sequence Modeling with Selective State Spaces',
     venue: 'arXiv 2312.00752 · 选择性状态空间模型',
     url: 'https://arxiv.org/abs/2312.00752',
-    img: '/images/paper-mamba.svg',
+    img: './images/paper-mamba.svg',
   },
 ];
 

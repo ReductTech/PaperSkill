@@ -4,14 +4,14 @@ import { widgetRegistry } from '../modules/registry';
 import { Figure } from './Figure';
 
 const chapterGifMap: Record<string, string> = {
-  'chap-1': '/images/robodojo/videos/chapter-gifs/chapter-1-high-score-trap.gif',
-  'chap-2': '/images/robodojo/videos/chapter-gifs/chapter-2-five-dimensions.gif',
-  'chap-3': '/images/robodojo/videos/chapter-gifs/chapter-3-score-vs-success.gif',
-  'chap-4': '/images/robodojo/videos/chapter-gifs/chapter-4-sim-vs-real.gif',
-  'chap-5': '/images/robodojo/videos/chapter-gifs/chapter-5-three-systems.gif',
-  'chap-6': '/images/robodojo/videos/chapter-gifs/chapter-6-layout-overlay.gif',
-  'chap-7': '/images/robodojo/videos/chapter-gifs/chapter-7-leaderboard-mountain.gif',
-  'chap-8': '/images/robodojo/videos/chapter-gifs/chapter-8-final-takeaway.gif',
+  'chap-1': './images/robodojo/videos/chapter-gifs/chapter-1-high-score-trap.gif',
+  'chap-2': './images/robodojo/videos/chapter-gifs/chapter-2-five-dimensions.gif',
+  'chap-3': './images/robodojo/videos/chapter-gifs/chapter-3-score-vs-success.gif',
+  'chap-4': './images/robodojo/videos/chapter-gifs/chapter-4-sim-vs-real.gif',
+  'chap-5': './images/robodojo/videos/chapter-gifs/chapter-5-three-systems.gif',
+  'chap-6': './images/robodojo/videos/chapter-gifs/chapter-6-layout-overlay.gif',
+  'chap-7': './images/robodojo/videos/chapter-gifs/chapter-7-leaderboard-mountain.gif',
+  'chap-8': './images/robodojo/videos/chapter-gifs/chapter-8-final-takeaway.gif',
 };
 
 // Life-metaphor analogy card (244x130 canvas animation OR an optional paper figure).

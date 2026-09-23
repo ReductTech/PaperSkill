@@ -21,12 +21,12 @@ export const tutorial: TutorialData = {
   "hero": {
     "oldMethod": {
       "desc": "旧办法有两条各不相同的路：要么按 ROUGE / BLEU 这类指标<b>和参考答案比重合度</b>，要么交给<b>判别者</b>主观打分（奖励模型 / LLM 当裁判，带偏好）。左图（论文 Figure 1a）画的就是这两种奖励的偏差：要么偏爱冗长、要么偏爱简短。",
-      "figure": "/images/caprl-fig1.webp",
+      "figure": "./images/caprl-fig1.webp",
       "componentId": "hero-old"
     },
     "newMethod": {
       "desc": "CapRL++ 里讲解者只产出<b>一条讲解稿</b>；题目来自预先筛好的题库，由看不见画面的学生自己读稿作答——答对几题，讲解者就得几分。右图即论文 Figure 3 的两阶段流程。",
-      "figure": "/images/caprl-fig3.webp",
+      "figure": "./images/caprl-fig3.webp",
       "componentId": "hero-new"
     }
   },
@@ -127,7 +127,7 @@ export const tutorial: TutorialData = {
           "title": "四类信息，各管一类问题",
           "desc": "点击画面上的四块区域，看每块能支撑哪一类问题。一次只看一类，才看得清对应关系。",
           "componentId": "mod-2-1",
-          "figure": "/images/caprl-fig2.webp"
+          "figure": "./images/caprl-fig2.webp"
         }
       ],
       "insight": "讲解稿是一段有限的信息预算，得按类别分配：主体、属性、关系、画面里的文字。哪一类没讲到，学生在那一类问题上就只能瞎猜。",
@@ -242,7 +242,7 @@ export const tutorial: TutorialData = {
           "title": "关掉长度这一关会怎样",
           "desc": "把长度关掉，只让「答得对」说话：拖动长度滑块，看稿子会一路写长，以及训练里会发生什么。",
           "componentId": "mod-4-1",
-          "figure": "/images/caprl-fig5.webp"
+          "figure": "./images/caprl-fig5.webp"
         },
         {
           "kind": "module",
@@ -250,7 +250,7 @@ export const tutorial: TutorialData = {
           "title": "三关的权重怎么配",
           "desc": "切换几种配比，看同一段内容的总分怎么变，以及缺掉的那一关会带来什么风险。",
           "componentId": "mod-4-2",
-          "figure": "/images/caprl-fig8.webp"
+          "figure": "./images/caprl-fig8.webp"
         }
       ],
       "insight": "单一目标一定会被钻空子。长度这一关不只是为了简洁——它同时挡住「靠堆字数蒙答案」，还顺带把训练速度提了上去。",
@@ -535,7 +535,7 @@ export const tutorial: TutorialData = {
           "title": "先学静态，再学动态",
           "desc": "切换三种训练顺序，比较图像侧与视频侧的平均分：为什么不一起学？",
           "componentId": "mod-8-2",
-          "figure": "/images/caprl-fig4.webp"
+          "figure": "./images/caprl-fig4.webp"
         }
       ],
       "insight": "被训练的只有讲解者一个人。学生和题库在训练期间都是固定的工具——它们不更新，所以不存在「学生也跟着变强，导致分数虚高」的问题。",
@@ -576,7 +576,7 @@ export const tutorial: TutorialData = {
           "title": "每张图要几道题",
           "desc": "一张图一条曲线、一个滑块：拖动每张图的题数，看平均分在哪里饱和。论文消融显示每项只需 1 道题就能拿到大部分收益。",
           "componentId": "mod-9-1",
-          "figure": "/images/caprl-fig7.webp"
+          "figure": "./images/caprl-fig7.webp"
         },
         {
           "kind": "module",
@@ -591,7 +591,7 @@ export const tutorial: TutorialData = {
           "title": "两种模态，两种饱和速度",
           "desc": "切换图像侧与视频侧：视频在更少的题数上就接近饱和，因为它单条样本的信息密度更高。",
           "componentId": "mod-9-3",
-          "figure": "/images/caprl-fig9.webp"
+          "figure": "./images/caprl-fig9.webp"
         }
       ],
       "insight": "论文的消融显示：每张图只用 1 道题，平均分就从 40.6 升到 48.0；每段视频只用 1 道，从 39.7 升到 45.2。也就是说瓶颈不在标注量，而在有没有一套可信的题目。",
@@ -639,7 +639,7 @@ export const tutorial: TutorialData = {
           "title": "换个方向也成立",
           "desc": "切换三组证据：视频预训练、时间定位、文生图。看同一个原则在不同任务上的表现，以及它的代价。",
           "componentId": "mod-10-2",
-          "figure": "/images/caprl-fig10.webp"
+          "figure": "./images/caprl-fig10.webp"
         }
       ],
       "insight": "论文没有单独的局限性章节。能确认的代价是：描述更密集、更长，精确率因此更低；而长视频上的表现目前只在推理阶段测过，训练用的仍以 30 秒以内的短片为主。",

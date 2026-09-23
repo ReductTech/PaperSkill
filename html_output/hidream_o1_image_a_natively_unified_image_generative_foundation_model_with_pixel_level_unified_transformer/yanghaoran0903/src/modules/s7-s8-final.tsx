@@ -234,22 +234,22 @@ export function ApplicationGallery() {
     {
       title: '电影镜头控制',
       desc: '15 种镜头与机位控制，让生成结果更像可导演的分镜。',
-      img: '/s8/8-1-1.png',
+      img: './s8/8-1-1.png',
     },
     {
       title: '多面板故事板',
       desc: '单次推理生成连贯故事板，角色与场景在面板间保持一致。',
-      img: '/s8/8-1-2.png',
+      img: './s8/8-1-2.png',
     },
     {
       title: '电商产品图编辑',
       desc: '按指令替换背景、调整摆放，同时保留商品主体细节。',
-      img: '/s8/8-1-3.png',
+      img: './s8/8-1-3.png',
     },
     {
       title: '个性化头像生成',
       desc: '保持主体身份特征，在新风格与新场景中复用同一人物。',
-      img: '/s8/8-1-4.png',
+      img: './s8/8-1-4.png',
     },
   ];
   const [active, setActive] = useState(0);

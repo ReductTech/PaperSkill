@@ -109,14 +109,14 @@ export function ReturnMemoryGapV2(_: WidgetProps) {
 
 type TrajectoryInfo = { id:string; label:string; family:string; image:string; result:'成功'|'失败'; phenomenon:string; diagnosis:string; architecture:string; tag:string };
 const trajectories: readonly TrajectoryInfo[] = [
-  { id:'human',label:'Human',family:'参照',image:'/images/figure-7-human-success.png',result:'成功',phenomenon:'完成搜索并推进完整任务。',diagnosis:'作为该代表性 L3 episode 的成功参照。',architecture:'不添加超出论文证据的机制解释。',tag:'成功参照' },
-  { id:'rocket',label:'ROCKET-2',family:'VLA / 视觉运动',image:'/images/figure-7-rocket-2.png',result:'成功',phenomenon:'形成较系统的主动搜索轨迹。',diagnosis:'该代表性 L3 episode 成功；总体高难度仍有探索衰减和返回缺口。',architecture:'goal-conditioned 视觉运动策略有助于形成覆盖。',tag:'系统搜索' },
-  { id:'uni',label:'Uni-NaVid',family:'VLA / 视觉运动',image:'/images/figure-7-uni-navid.png',result:'失败',phenomenon:'具有主动搜索覆盖，但未完成任务。',diagnosis:'终点收敛、低效回溯与返回稳定性仍不足。',architecture:'时间建模有助于搜索，持久空间记忆仍受限。',tag:'返回与收敛不足' },
-  { id:'llm',label:'LLM-YOLO',family:'模块化',image:'/images/figure-7-llm-yolo.png',result:'失败',phenomenon:'被障碍困住，随后停滞。',diagnosis:'前级错误缺少有效恢复，向后传播到规划与行动。',architecture:'感知 → 规划 → 行动的串联流程存在级联脆弱性。',tag:'级联脆弱性' },
-  { id:'vint',label:'ViNT',family:'VLN',image:'/images/figure-7-vint.png',result:'失败',phenomenon:'持续移动，却反复经过相近区域。',diagnosis:'退化循环耗尽有限时间预算，没有有效扩大覆盖。',architecture:'路线检索在陌生环境中缺少可匹配路线与专门探索逻辑。',tag:'移动 ≠ 探索' },
-  { id:'nomad',label:'NoMaD',family:'VLN',image:'/images/figure-7-nomad.png',result:'失败',phenomenon:'轨迹移动明显，但搜索覆盖没有持续扩展。',diagnosis:'重复循环带来高移动量，却未转化为新区域覆盖。',architecture:'目标导向路线策略在未知目标搜索中缺少探索机制。',tag:'退化循环' },
-  { id:'sg',label:'SG-Nav',family:'地图方法',image:'/images/figure-7-sg-nav.png',result:'失败',phenomenon:'有限时间内轨迹覆盖范围较小。',diagnosis:'0.2–0.4 FPS 的推理速度限制了有效动作数量。',architecture:'显式空间推理带来较高单步计算开销。',tag:'推理受限' },
-  { id:'omni',label:'OmniNav',family:'地图方法',image:'/images/figure-7-omninav.png',result:'失败',phenomenon:'只覆盖局部区域，未形成充分搜索。',diagnosis:'有限时间预算内只能执行较少有效动作。',architecture:'地图与视觉语言推理的计算开销限制实际覆盖。',tag:'推理受限' },
+  { id:'human',label:'Human',family:'参照',image:'./images/figure-7-human-success.png',result:'成功',phenomenon:'完成搜索并推进完整任务。',diagnosis:'作为该代表性 L3 episode 的成功参照。',architecture:'不添加超出论文证据的机制解释。',tag:'成功参照' },
+  { id:'rocket',label:'ROCKET-2',family:'VLA / 视觉运动',image:'./images/figure-7-rocket-2.png',result:'成功',phenomenon:'形成较系统的主动搜索轨迹。',diagnosis:'该代表性 L3 episode 成功；总体高难度仍有探索衰减和返回缺口。',architecture:'goal-conditioned 视觉运动策略有助于形成覆盖。',tag:'系统搜索' },
+  { id:'uni',label:'Uni-NaVid',family:'VLA / 视觉运动',image:'./images/figure-7-uni-navid.png',result:'失败',phenomenon:'具有主动搜索覆盖，但未完成任务。',diagnosis:'终点收敛、低效回溯与返回稳定性仍不足。',architecture:'时间建模有助于搜索，持久空间记忆仍受限。',tag:'返回与收敛不足' },
+  { id:'llm',label:'LLM-YOLO',family:'模块化',image:'./images/figure-7-llm-yolo.png',result:'失败',phenomenon:'被障碍困住，随后停滞。',diagnosis:'前级错误缺少有效恢复，向后传播到规划与行动。',architecture:'感知 → 规划 → 行动的串联流程存在级联脆弱性。',tag:'级联脆弱性' },
+  { id:'vint',label:'ViNT',family:'VLN',image:'./images/figure-7-vint.png',result:'失败',phenomenon:'持续移动，却反复经过相近区域。',diagnosis:'退化循环耗尽有限时间预算，没有有效扩大覆盖。',architecture:'路线检索在陌生环境中缺少可匹配路线与专门探索逻辑。',tag:'移动 ≠ 探索' },
+  { id:'nomad',label:'NoMaD',family:'VLN',image:'./images/figure-7-nomad.png',result:'失败',phenomenon:'轨迹移动明显，但搜索覆盖没有持续扩展。',diagnosis:'重复循环带来高移动量，却未转化为新区域覆盖。',architecture:'目标导向路线策略在未知目标搜索中缺少探索机制。',tag:'退化循环' },
+  { id:'sg',label:'SG-Nav',family:'地图方法',image:'./images/figure-7-sg-nav.png',result:'失败',phenomenon:'有限时间内轨迹覆盖范围较小。',diagnosis:'0.2–0.4 FPS 的推理速度限制了有效动作数量。',architecture:'显式空间推理带来较高单步计算开销。',tag:'推理受限' },
+  { id:'omni',label:'OmniNav',family:'地图方法',image:'./images/figure-7-omninav.png',result:'失败',phenomenon:'只覆盖局部区域，未形成充分搜索。',diagnosis:'有限时间预算内只能执行较少有效动作。',architecture:'地图与视觉语言推理的计算开销限制实际覆盖。',tag:'推理受限' },
 ] as const;
 
 const trajectoryEvent = 'rescuebench:trajectory-method';

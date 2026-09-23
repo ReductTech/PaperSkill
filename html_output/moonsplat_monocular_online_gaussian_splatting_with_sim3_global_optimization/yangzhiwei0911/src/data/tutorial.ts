@@ -427,7 +427,7 @@ export const tutorial: TutorialData = {
           "title": "点击因子图节点",
           "desc": "点击任一节点，看清相邻边与闭环边分别把哪些时刻连在了一起。",
           "componentId": "ch8-graph",
-          "figure": "/images/figure-2.jpg"
+          "figure": "./images/figure-2.jpg"
         },
         {
           "kind": "module",
@@ -536,7 +536,7 @@ export const tutorial: TutorialData = {
           "title": "开始对比与指标切换",
           "desc": "按一次按钮完成协议一致的对比，切换指标时同时切换方向，避免把不同协议的数值混在一起比。",
           "componentId": "ch10-race",
-          "figure": "/images/figure-1.jpg"
+          "figure": "./images/figure-1.jpg"
         }
       ],
       "takeaways": [

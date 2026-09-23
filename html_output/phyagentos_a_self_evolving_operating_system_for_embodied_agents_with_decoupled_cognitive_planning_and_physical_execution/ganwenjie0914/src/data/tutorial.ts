@@ -107,7 +107,7 @@ export const tutorial: TutorialData = {
           title: 'System Layer Builder：把「操作系统」一块块搭出来',
           desc: '从裸堆叠开始，逐项开启运行时能力，观察系统形态如何变化；再用「ROS 对照」检查哪些能力属于谁。完成后展开论文原图对照各组件的位置。',
           componentId: 'os-layer-builder',
-          figure: '/images/fig3-architecture.png',
+          figure: './images/fig3-architecture.png',
         },
       ],
       formula: {
@@ -149,7 +149,7 @@ export const tutorial: TutorialData = {
           title: 'Protocol Views：先结构化，再进协议',
           desc: '第一步：点击场景中的物体，生成结构化状态；第二步：打开五份协议文档，看同一状态如何被不同视图引用。',
           componentId: 'protocol-views',
-          figure: '/images/fig7-file-protocol.png',
+          figure: './images/fig7-file-protocol.png',
         },
       ],
       insight: '五份协议文档是同一认知状态空间的五个视图：语义状态进 Markdown，部署参数进 YAML，证据指针让语义可回溯。',
@@ -179,7 +179,7 @@ export const tutorial: TutorialData = {
           title: 'Session Lifecycle：一台可以被你玩坏的状态机',
           desc: '按合法顺序推进会话；试着在 running 时直接点 Verify——看看治理层如何拒绝非法转移。每一步都会在协议控制台里留下记录。',
           componentId: 'session-lifecycle',
-          figure: '/images/fig5-watchdog.png',
+          figure: './images/fig5-watchdog.png',
         },
       ],
       formula: {
@@ -260,7 +260,7 @@ export const tutorial: TutorialData = {
           title: 'Evidence-Based Verifier Lab：你来给出判定',
           desc: '四个真实情境，每个都给出完整证据包（G / S₀ / S_T / τ / H）。先自己判 success、failure 还是 replan，再看系统解释——特别注意只看 S_T 会掉进哪个陷阱。',
           componentId: 'verifier-lab',
-          figure: '/images/fig8-session-verifier.png',
+          figure: './images/fig8-session-verifier.png',
         },
       ],
       formula: {

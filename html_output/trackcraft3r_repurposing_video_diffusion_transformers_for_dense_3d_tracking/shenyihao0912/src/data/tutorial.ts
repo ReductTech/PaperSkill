@@ -463,7 +463,7 @@ export const tutorial: TutorialData = {
           "title": "交互架构图",
           "desc": "点击通路上的任一部件：高亮该部件与激活路径，详情区给出张量形状与设计理由。可切换 <b>输入：RGB+点图</b> 到 <b>输出：残差+可见性</b> 的完整数据流。",
           "componentId": "ch8-arch",
-          "figure": "/images/figure-1.png"
+          "figure": "./images/figure-1.png"
         },
         {
           "kind": "module",
@@ -471,7 +471,7 @@ export const tutorial: TutorialData = {
           "title": "逐层注意力",
           "desc": "步进 Layer 14 → 15 → 16：热斑从第一帧旧位置逐步移到运动后的同一物理点（小狗鼻子），对应论文图 3(b)。右下角证据：时间对齐的 g₅ 分得约 29% 注意力。",
           "componentId": "ch8-layers",
-          "figure": "/images/figure-3.png"
+          "figure": "./images/figure-3.png"
         }
       ],
       "formula": {
@@ -533,7 +533,7 @@ export const tutorial: TutorialData = {
           "title": "步长采样与复杂度",
           "desc": "给定 100 帧素材：<b>TrackCraft3R</b> 锚定第 1 帧、按<b>步长 s</b> 采样取块（绿色块，切换 s 看块数变化；橙色锚点帧在每次前向中都携带）；<b>DELTAv2</b> 则逐个滑窗依序处理、每窗 6 步迭代（红色窗口）。下方为计算配方对比。",
           "componentId": "ch9-stride",
-          "figure": "/images/figure-5.png"
+          "figure": "./images/figure-5.png"
         },
         {
           "kind": "module",
@@ -580,7 +580,7 @@ export const tutorial: TutorialData = {
           "title": "基准对比",
           "desc": "切换指标，<b>柱状图</b>与下方表格即时更新；方向（越高/越低越好）与测量条件随图标注，所有数字均来自论文 Table 1 与 Table 6。",
           "componentId": "ch10-race",
-          "figure": "/images/figure-4.png"
+          "figure": "./images/figure-4.png"
         },
         {
           "kind": "module",

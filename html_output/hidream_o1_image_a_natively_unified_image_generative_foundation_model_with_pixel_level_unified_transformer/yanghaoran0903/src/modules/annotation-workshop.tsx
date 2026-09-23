@@ -15,7 +15,7 @@ const TABS: Tab[] = [
   {
     id: 't2i',
     label: '文本生成图像',
-    srcImg: '/s4/src-t2i.png',
+    srcImg: './s4/src-t2i.png',
     srcAlt: '夕阳下的女孩参考图',
     tags: [
       { label: '用户标签', value: '女孩' },
@@ -28,7 +28,7 @@ const TABS: Tab[] = [
   {
     id: 'edit',
     label: '图像编辑',
-    srcImg: '/s4/src-edit.png',
+    srcImg: './s4/src-edit.png',
     srcAlt: '草地上的房屋编辑参考图',
     tags: [
       { label: '源图描述', value: '绿色草地 / 房屋 / 树木' },
@@ -41,7 +41,7 @@ const TABS: Tab[] = [
   {
     id: 'subject',
     label: '主题个性化',
-    srcImg: '/s4/src-subject.png',
+    srcImg: './s4/src-subject.png',
     srcAlt: '戴红色贝雷帽的女性参考图',
     tags: [
       { label: '身份特征', value: '发型 / 面部特征 / 姿态' },
@@ -54,7 +54,7 @@ const TABS: Tab[] = [
   {
     id: 'panel',
     label: '多面板',
-    srcImg: '/s4/src-panel.png',
+    srcImg: './s4/src-panel.png',
     srcAlt: '四格漫画分镜参考图',
     tags: [
       { label: '全局排列', value: '2 x 2 网格' },
@@ -67,7 +67,7 @@ const TABS: Tab[] = [
   {
     id: 'graphic',
     label: '图形排版',
-    srcImg: '/s4/src-graphic.png',
+    srcImg: './s4/src-graphic.png',
     srcAlt: '促销海报排版参考图',
     tags: [
       { label: 'OCR 文本', value: '春季大促 / 活动时间' },

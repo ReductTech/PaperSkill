@@ -28,11 +28,11 @@ const CASES: CaseDef[] = [
     name: '叙事媒体生成',
     brief: '「生成一部关于『牛仔机器人僵尸拾荒者』的短剧。」',
     trace: {
-      src: '/images/fig4.png',
+      src: './images/fig4.png',
       cap: '工作区轨迹：任务简报、策划笔记、视觉参考、镜头候选、依赖连线与智能体进度',
     },
     artifact: {
-      src: '/images/fig5.png',
+      src: './images/fig5.png',
       cap: '最终产物：经画布管理的流程产出的关键帧，角色、场景线索与跨镜头动作保持连续',
     },
     note: '论文用这个案例检验叙事规划、身份保持、风格一致与跨镜头连续性。',
@@ -42,11 +42,11 @@ const CASES: CaseDef[] = [
     name: '交互式网页开发',
     brief: '「做一个个人摄影网站，风格参考 Awwwards，轻量、好看、动效丰富。」',
     trace: {
-      src: '/images/fig6.png',
+      src: './images/fig6.png',
       cap: '工作区轨迹：需求简报、视觉参考、布局草稿、实现产物、预览与修订状态',
     },
     artifact: {
-      src: '/images/fig7.png',
+      src: './images/fig7.png',
       cap: '最终产物：网页各屏，字体、图片位置、页面结构与视觉方向保持一致',
     },
     note: '论文用这个案例检验布局设计、交互逻辑、前端代码、预览检视与迭代修订之间的协同。',
@@ -56,11 +56,11 @@ const CASES: CaseDef[] = [
     name: '演示文稿生成',
     brief: '「做一份机器学习中决策树的 PPT，风格像 Stanford 的课堂讲义。」',
     trace: {
-      src: '/images/fig8.png',
+      src: './images/fig8.png',
       cap: '工作区轨迹：讲义内容、生成图示、幻灯片草稿、依赖连线、PPT 预览与修订状态',
     },
     artifact: {
-      src: '/images/fig9.png',
+      src: './images/fig9.png',
       cap: '最终产物：各页幻灯片，版式、图示风格、强调色与页面级组织保持一致',
     },
     note: '论文用这个案例检验内容取舍、叙事组织、页面布局、视觉综合与跨页一致性。',

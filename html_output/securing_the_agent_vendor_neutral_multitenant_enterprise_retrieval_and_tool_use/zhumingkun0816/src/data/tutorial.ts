@@ -241,7 +241,7 @@ export const tutorial: TutorialData = {
           title: "沿一次请求，看数据路径与控制路径如何闭环",
           desc: "沿一次 Finance 请求区分离线摄取与在线执行：ABAC 只让授权 chunk 进入共享推理，服务端编排再控制工具授权、租户状态和响应返回。",
           componentId: "layered-architecture-lab",
-          figure: "/images/figure-1.png"
+          figure: "./images/figure-1.png"
         }
       ],
       insight: "架构的关键不是绑定某个后端，而是让安全检查成为服务端不可绕过的必经点。",
@@ -270,7 +270,7 @@ export const tutorial: TutorialData = {
           title: "切换指标，读懂 2×2 配置矩阵",
           desc: "A/C 未门控，B/D 已门控；A/B 客户端编排，C/D 服务端编排。所有数值都来自论文的合成三租户实验，并明确显示指标方向。",
           componentId: "evidence-matrix-lab",
-          figure: "/images/figure-4.png"
+          figure: "./images/figure-4.png"
         }
       ],
       insight: "论文证明的是给定假设和测试床下的隔离与共享，不是无条件适用于所有 RAG。",

@@ -15,12 +15,12 @@ export const tutorial: TutorialData = {
   hero: {
     oldMethod: {
       desc: '旧法：先把照片反演进噪声云，再按目标提示采样回来，结构容易漂移。',
-      figure: '/images/p1-i2.png',
+      figure: './images/p1-i2.png',
       componentId: 'hero-old',
     },
     newMethod: {
       desc: 'FlowEdit：在源与目标分布之间走更短的直接路径，无需反演与测试时优化。',
-      figure: '/images/p1-i1.png',
+      figure: './images/p1-i1.png',
       componentId: 'hero-new',
     },
   },
@@ -88,7 +88,7 @@ export const tutorial: TutorialData = {
           title: '布置编辑台：源图与双提示',
           desc: '拖放源图，切换是否提供源/目标提示，观察编辑台是否就绪。',
           componentId: 'ch2mod1',
-          figure: '/images/p1-i8.png',
+          figure: './images/p1-i8.png',
         },
       ],
       insight: '源提示可辅助对齐，但论文指出其对 FlowEdit 影响较小，甚至可省略。',
@@ -347,7 +347,7 @@ export const tutorial: TutorialData = {
           title: 'SD3 指标赛：CLIP↑ 与 LPIPS↓',
           desc: '对比 FlowEdit 与 SDEdit/反演/iRFDS 在 Table S5 上的折中位置。',
           componentId: 'ch10mod1',
-          figure: '/images/fig-flowedit-grid.png',
+          figure: './images/fig-flowedit-grid.png',
         },
         {
           kind: 'module',

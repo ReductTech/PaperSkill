@@ -163,7 +163,8 @@ working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/
 - [ ] Result labels include the correct protocol and metric direction; higher-is-better and lower-is-better comparisons use the correct visual and verbal conclusion.
 - [ ] When the paper reports them, major ablations, cross-task transfer results, failure cases, and limitations are covered rather than replaced by a single headline benchmark.
 - [ ] Bilibili videos are optional: when present, every `bvid` is real and displayed with a baked-in `cover` and `views` (the runtime `useBiliVideos` loader is best-effort enrichment only, since the unsigned `view` API is often rejected in end-user browsers). Verification of accessibility is not required to display. When absent, the video section is simply omitted because no relevant video exists.
-- [ ] Original paper figures are optional (per `contract.md` §11): when included, the image lives in `public/images/` and is referenced via a `figure` field (`/images/...` path or absolute URL); when omitted, no figure is fabricated.
+- [ ] Original paper figures are optional (per `contract.md` §11): when included, the image lives in `public/images/` and is referenced via a `figure` field (`./images/...` relative path or absolute URL); when omitted, no figure is fabricated.
+- [ ] No root-absolute local asset path (`/images/...`, `/videos/...`) appears in any string inside `src/**` — write `./images/...` instead, otherwise the image only loads when the tutorial is served from the site root and 404s on the deployed sub-path. (CSS `url('/images/...')` is the exception: Vite rewrites it, leave it alone. `npm run fix:assets` in the PaperSkill repository rewrites the wrong form automatically.)
 - [ ] Every local original figure came from the validated Phase 1 cache and was already staged in the temporary scaffold before Phase 2 began.
 - [ ] No unnecessary template or implementation comments remain in `src/data/tutorial.ts`.
 

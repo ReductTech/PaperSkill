@@ -508,7 +508,7 @@ export const tutorial: TutorialData = {
           "title": "四段流水线与五库分工",
           "desc": "点击四个阶段中的任意一个。左侧是流水线本身，右侧是这一段的职责与承担它的库。四段顺序出自论文；五个库的分工（PyPOTS / PyGrinder / BenchPOTS / TSDB / BrewPOTS）是生态事实。",
           "componentId": "ch8-mod1",
-          "figure": "/images/pypots-logo.png"
+          "figure": "./images/pypots-logo.png"
         },
         {
           "kind": "module",

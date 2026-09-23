@@ -33,7 +33,7 @@ export const tutorial: TutorialData = {
       analogy: {
         title: "先看全貌，再翻细节",
         text: "读论文像整理书架：<b>先把整排书的归位看一遍</b>，再逐本细读。图里就是整条网络的骨架。",
-        figure: "/images/net-struct.svg",
+        figure: "./images/net-struct.svg",
       },
       modules: [
         {

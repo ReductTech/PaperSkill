@@ -217,7 +217,7 @@ export const tutorial: TutorialData = {
           title: "拖动极小标注框，观察候选数如何从 0 恢复",
           desc: "<b>先读论文图：</b>Figure 5 从左到右依次是 TAL 基线、使用 s<sub>ref</sub>=16 的 STAL、真实标注；三幅图都采用 0.25 置信度阈值。中图相较左图找回了更多小目标，检测框也更贴近右图的真实标注。<br/><b>再做交互：</b>在 stride=8 的网格上拖动 5×6 像素标注框。打开 STAL 后，候选筛选临时使用 16×16 参考框，因此原本为 0 的候选数可以恢复；匹配评分与边界框回归仍使用原始标注框。",
           componentId: "tiny-gt-drag",
-          figure: "/images/stal-qualitative.png"
+          figure: "./images/stal-qualitative.png"
         }
       ],
       insight: "STAL 只在候选筛选阶段扩大参考区域；训练目标和回归边界继续使用原始标注框。",

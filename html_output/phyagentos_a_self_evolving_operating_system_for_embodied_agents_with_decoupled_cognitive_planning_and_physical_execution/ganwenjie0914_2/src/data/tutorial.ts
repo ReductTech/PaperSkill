@@ -373,7 +373,7 @@ export const tutorial: TutorialData = {
         },
         {
           heading: '与 ROS 的关系：补充，而非替代',
-          body: `ROS 名字里虽然有 OS，但它主要提供节点通信、发布/订阅与硬件抽象，是<b>通信与软件中间件</b>。论文指出的缺失能力——task-level scheduling、persistent cross-session memory、semantic verification、统一安全管理、Agent 与执行层的标准契约——都不在 ROS 的职责里。所以正确的堆叠是：高层 Agent / VLA / 世界模型 → <b>PhyAgentOS</b> → ROS / SDK / 仿真器 → 执行目标。先在右侧把它搭出来，再展开论文原图（Figure 3）对照各组件的位置。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 3：PhyAgentOS 总体架构</summary><img src="/images/fig3-architecture.png" alt="论文 Figure 3：PhyAgentOS 总体架构（Agent Plane / 协议边界 / Runtime Plane）" loading="lazy" /></details>`,
+          body: `ROS 名字里虽然有 OS，但它主要提供节点通信、发布/订阅与硬件抽象，是<b>通信与软件中间件</b>。论文指出的缺失能力——task-level scheduling、persistent cross-session memory、semantic verification、统一安全管理、Agent 与执行层的标准契约——都不在 ROS 的职责里。所以正确的堆叠是：高层 Agent / VLA / 世界模型 → <b>PhyAgentOS</b> → ROS / SDK / 仿真器 → 执行目标。先在右侧把它搭出来，再展开论文原图（Figure 3）对照各组件的位置。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 3：PhyAgentOS 总体架构</summary><img src="./images/fig3-architecture.png" alt="论文 Figure 3：PhyAgentOS 总体架构（Agent Plane / 协议边界 / Runtime Plane）" loading="lazy" /></details>`,
         },
       ],
       modules: [
@@ -435,7 +435,7 @@ export const tutorial: TutorialData = {
         },
         {
           heading: '统一认知状态空间：五份文件，一个世界',
-          body: `<code>SESSIONS.md</code>（事务中心：目标、Runtime、Target、前置条件、接受标准、生命周期）、<code>SKILLRUNTIME.md</code>（这类技能需要什么观测、产出什么动作）、<code>TARGETS.md</code>（目标端能力、模态、约束）、<code>ENVIRONMENT.md</code>（结构化环境快照）、<code>LESSONS.md</code>（失败原因、纠正与验证）——它们不是五份孤立文档，而是<b>统一认知状态空间的五个视图</b>。这套协议还天然划分了 Cloud 与 Edge：云端跑大模型、记忆与长程规划，边缘跑 Watchdog、Runner、控制环与 SafetyGuard；网络上传输的是粗粒度状态，而不是每 1ms 的电机命令。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 7：文件协议边界</summary><img src="/images/fig7-file-protocol.png" alt="论文 Figure 7：五份 Markdown 协议文档与外部 YAML 配置" loading="lazy" /></details>`,
+          body: `<code>SESSIONS.md</code>（事务中心：目标、Runtime、Target、前置条件、接受标准、生命周期）、<code>SKILLRUNTIME.md</code>（这类技能需要什么观测、产出什么动作）、<code>TARGETS.md</code>（目标端能力、模态、约束）、<code>ENVIRONMENT.md</code>（结构化环境快照）、<code>LESSONS.md</code>（失败原因、纠正与验证）——它们不是五份孤立文档，而是<b>统一认知状态空间的五个视图</b>。这套协议还天然划分了 Cloud 与 Edge：云端跑大模型、记忆与长程规划，边缘跑 Watchdog、Runner、控制环与 SafetyGuard；网络上传输的是粗粒度状态，而不是每 1ms 的电机命令。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 7：文件协议边界</summary><img src="./images/fig7-file-protocol.png" alt="论文 Figure 7：五份 Markdown 协议文档与外部 YAML 配置" loading="lazy" /></details>`,
         },
       ],
       modules: [
@@ -474,7 +474,7 @@ export const tutorial: TutorialData = {
         },
         {
           heading: 'WatchdogSupervisor：监督，而不是控制',
-          body: `${term('watchdog', 'WatchdogSupervisor')} 是 Runtime 的监督入口：从 <code>SESSIONS.md</code> 认领 pending 会话、验证运行时契约、执行兼容性${term('preflight', '预检')}、创建 ${term('sessionrunner', 'SessionRunner')}、监控三路${term('heartbeat', '心跳')}（Runner / 策略服务 / 目标端）、传播 timeout 与 cancel、把终止结果写回协议文件。关键约束：<b>它不做 observe → inference → action 的高频循环</b>——监督与故障遏制留在薄层，否则 Supervisor 又会膨胀成一个巨大的耦合模块。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 5：WatchdogSupervisor 的会话级监督</summary><img src="/images/fig5-watchdog.png" alt="论文 Figure 5：WatchdogSupervisor 在执行前检查协议与配置、执行中监控健康、执行后写回证据" loading="lazy" /></details>`,
+          body: `${term('watchdog', 'WatchdogSupervisor')} 是 Runtime 的监督入口：从 <code>SESSIONS.md</code> 认领 pending 会话、验证运行时契约、执行兼容性${term('preflight', '预检')}、创建 ${term('sessionrunner', 'SessionRunner')}、监控三路${term('heartbeat', '心跳')}（Runner / 策略服务 / 目标端）、传播 timeout 与 cancel、把终止结果写回协议文件。关键约束：<b>它不做 observe → inference → action 的高频循环</b>——监督与故障遏制留在薄层，否则 Supervisor 又会膨胀成一个巨大的耦合模块。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 5：WatchdogSupervisor 的会话级监督</summary><img src="./images/fig5-watchdog.png" alt="论文 Figure 5：WatchdogSupervisor 在执行前检查协议与配置、执行中监控健康、执行后写回证据" loading="lazy" /></details>`,
         },
         {
           heading: '显式状态机：会话是一串可审计的转移',
@@ -585,7 +585,7 @@ export const tutorial: TutorialData = {
       prose: [
         {
           heading: 'Verifier 读证据包，不读返回码',
-          body: `${term('verifier', 'SessionVerifier')} 的输入是一个完整${term('evidence', '证据包')}：任务定义与接受标准、初始与终止观测、ENVIRONMENT.md 快照、动作-观测历史、目标端事件与任务指标。控制器返回的 <code>return_code = 0</code> 只是证据中的一个字段，不是最终真相。Verifier 也不必是单一模型——确定性谓词、任务评估器、多模态模型、工具辅助复核、人工复核都可以组合在同一接口之后；稳定的是<b>证据 schema 与 verdict 语义</b>，而不是某个固定模型。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 8：SessionVerifier 的语义验收</summary><img src="/images/fig8-session-verifier.png" alt="论文 Figure 8：Runtime 终止产出证据包，Verifier 对比任务意图、初始与终止状态后给出 success / failure / replan" loading="lazy" /></details>`,
+          body: `${term('verifier', 'SessionVerifier')} 的输入是一个完整${term('evidence', '证据包')}：任务定义与接受标准、初始与终止观测、ENVIRONMENT.md 快照、动作-观测历史、目标端事件与任务指标。控制器返回的 <code>return_code = 0</code> 只是证据中的一个字段，不是最终真相。Verifier 也不必是单一模型——确定性谓词、任务评估器、多模态模型、工具辅助复核、人工复核都可以组合在同一接口之后；稳定的是<b>证据 schema 与 verdict 语义</b>，而不是某个固定模型。<details class="figure-reveal"><summary>📄 查看论文原图 · Figure 8：SessionVerifier 的语义验收</summary><img src="./images/fig8-session-verifier.png" alt="论文 Figure 8：Runtime 终止产出证据包，Verifier 对比任务意图、初始与终止状态后给出 success / failure / replan" loading="lazy" /></details>`,
         },
         {
           heading: '为什么必须同时有 S₀ 和 S_T',

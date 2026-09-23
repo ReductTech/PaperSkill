@@ -18,7 +18,7 @@ export interface Meta {
 }
 
 export interface FigureRef {
-  /** Path under public/ (e.g. "/images/fig1.png") or an absolute URL. Resolved against Vite's base path. */
+  /** Path under public/ (e.g. "./images/fig1.png") or an absolute URL. Resolved against Vite's base path. */
   src: string;
   caption?: string;
   alt?: string;

@@ -60,7 +60,7 @@ export const tutorial: TutorialData = {
           componentId: 'attention-patterns',
           role: 'supplementary',
           evidenceLabel: '论文 Figure 3 · Attention Mask 对比',
-          figure: '/images/figure-3-attention.png',
+          figure: './images/figure-3-attention.png',
           figureCaption:
             '论文 Figure 3：四种注意力 Mask。来源：Chen et al., arXiv:2604.14141v2，CC BY 4.0；为网页展示进行了 PDF→PNG 格式转换。',
         },
@@ -242,7 +242,7 @@ export const tutorial: TutorialData = {
           componentId: 'long-sequence-evidence',
           role: 'primary',
           evidenceLabel: '论文数据 · Oxford / Table 7',
-          figure: '/images/figure-5-trajectories.png',
+          figure: './images/figure-5-trajectories.png',
           figureLabel: '论文结果图',
           figurePlacement: 'after',
           figureCaption:

@@ -202,7 +202,7 @@ export const tutorial: TutorialData = {
           id: "4.1",
           title: "真实输入：图像、文本、本体和动作监督",
           desc: "切换图像、文本、本体、动作，查看四路相机、任务文本、过去/当前本体状态和未来动作监督如何组成一个 VLA 训练样本。论文 Figure 16 对应真实推理输入视角。",
-          figure: "/images/paper/fig16_sensor_input.png",
+          figure: "./images/paper/fig16_sensor_input.png",
           componentId: "vla-widget"
         },
         {

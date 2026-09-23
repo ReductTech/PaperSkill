@@ -25,7 +25,7 @@ export const tutorial: TutorialData = {
     },
     newMethod: {
       desc: "<b>Scal3R：分块 + 共享记录本 + 同步。</b>重叠分块并行、全局上下文记忆压缩全局信息、测试时校准、跨块同步，拼成一张一致地图。",
-      figure: "/images/scal3r_overview.png",
+      figure: "./images/scal3r_overview.png",
       componentId: "hero-new"
     }
   },
@@ -184,7 +184,7 @@ export const tutorial: TutorialData = {
           id: "3.1",
           title: "GCM 是什么",
           desc: "<b>GCM（Global Context Memory，全局上下文记忆）</b>是 Scal3R 在 <b>VGGT</b> 主干上新增的核心神经模块，作用是<b>捕捉并存储跨块的长程上下文</b>，让分块并行处理的各段仍能共享“全局大局观”。<br/><br/>它由三部分组成：① <b>QKV 投影层</b>——把输入 token 投影成键 K、值 V、查询 Q；② 一个<b>紧凑 MLP，充当若干 AMU（自适应记忆单元）</b>（真正“记东西”的地方）；③ <b>输出投影层</b>。",
-          figure: "/images/amu.png"
+          figure: "./images/amu.png"
         },
         {
           kind: "module",

@@ -112,7 +112,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '2.1',
           title: '三层能力，一张折纸工作台看懂',
-          figure: '/images/fig-2-taxonomy.png',
+          figure: './images/fig-2-taxonomy.png',
           desc:
             '点击三个层级，观察同一张纸的三种状态：Level 1 只看懂折痕与几何；Level 2 执行一次折叠并观察形状变化；Level 3 按多步顺序折成纸飞机，并在折错时重来。下方详情区列出论文中每一层的完整子能力与评测证据。',
           componentId: 'origami-layers',
@@ -173,7 +173,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '3.1',
           title: '三阶段数据组织：预训练 / SFT / RL',
-          figure: '/images/fig-3-data.png',
+          figure: './images/fig-3-data.png',
           desc:
             '点击三个阶段：预训练数据完全继承 Hy-Embodied-0.5，建立广泛视觉接地与通用具身理解；SFT 在继承混合数据上新增七类能力导向数据与少量思维链，覆盖全部三个能力层；RL 优先使用可结构化验证或可靠裁判评价的任务。注意：这里显示的 θ_rl 只是第一阶段 RL 的产物，不是最终部署模型；RFT、第二阶段 RL 与专家融合在 §5。',
           componentId: 'data-distiller',
@@ -306,7 +306,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '5.3',
           title: '多阶段流程：RL 出数据，RFT 从 θ_pt 重训，双分支融合',
-          figure: '/images/fig-4-training.png',
+          figure: './images/fig-4-training.png',
           desc:
             '点击检查点查看参数继承与数据依赖：θ_pt → θ_sft → θ_rl；θ_rl 只负责生成候选轨迹，拒绝采样得到约 100 万条经自动条件筛选的 long-CoT；RFT 回到 θ_pt 重新训练得到 θ_cons；再从 θ_cons 并行训练 θ_cont 与 θ_disc，最后参数融合为 θ_final。注意 θ_rl → θ_cons 不是参数连续微调。',
           componentId: 'train-helix',
@@ -365,7 +365,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '6.1',
           title: '38 个基准的排名台',
-          figure: '/images/fig-1-performance.png',
+          figure: './images/fig-1-performance.png',
           desc:
             '切换指标，查看可比参数模型在同一评测协议下的成绩：总平均 65.6、状态理解 68.6、动作转换 64.1、长程自适应 57.4，以及 R2R-CE 与 ObjectNav。A30B 只作参考，不参与排名。',
           componentId: 'bench-podium',
@@ -374,7 +374,7 @@ export const tutorial: TutorialData = {
           kind: 'module',
           id: '6.2',
           title: '闭环导航：观察 → 记忆 → 决策 → 环境更新',
-          figure: '/images/fig-8-nav.png',
+          figure: './images/fig-8-nav.png',
           desc:
             '点击回路节点，看同一个模型如何在每一步重复“观察、记忆、动作块、验证停止”：R2R-CE 得到 SR 57.9 / SPL 54.2 / NE 4.5m；零样本 MP3D ObjectNav 得到 SR 38.3 / SPL 11.2。',
           componentId: 'nav-loopmap',

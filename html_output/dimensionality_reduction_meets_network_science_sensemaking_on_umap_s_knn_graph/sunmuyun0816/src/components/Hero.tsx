@@ -280,7 +280,7 @@ export function Hero({
           <span className="hero-paper-id">{meta.venue}</span>
         </div>
         <div className="hero-affiliation" aria-label="论文作者机构：Apple">
-          <img src="/images/apple-logo.svg" alt="" />
+          <img src="./images/apple-logo.svg" alt="" />
           <span>Apple</span>
           <small>论文作者机构</small>
         </div>

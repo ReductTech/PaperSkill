@@ -2,7 +2,7 @@ import type { WidgetProps } from './registry';
 import { assetPath } from '../lib/assetPath';
 
 export function PaperEvidence(_: WidgetProps) {
-  const figureSrc = assetPath('/images/rescuebench-figure-1.png');
+  const figureSrc = assetPath('./images/rescuebench-figure-1.png');
   return (
     <figure className="paper-evidence">
       <div className="paper-evidence-copy">

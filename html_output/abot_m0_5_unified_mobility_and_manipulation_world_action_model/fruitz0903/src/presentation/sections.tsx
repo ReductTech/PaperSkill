@@ -327,7 +327,7 @@ export function CorePipeline() {
           <div className="pipeline-storyboard">
             <div className="observation-cap input-cap">
               <div className="cap-head"><span>INPUT</span><b>o≤t</b></div>
-              <img src="/images/hang-cup-frames/frame-1.webp" alt="当前机器人观测" />
+              <img src="./images/hang-cup-frames/frame-1.webp" alt="当前机器人观测" />
               <small>当前真实观测</small>
             </div>
             <div className={`story-connector ${step >= 1 ? "is-active" : ""}`}><i>→</i><small>world model</small></div>
@@ -336,7 +336,7 @@ export function CorePipeline() {
               <header><span>01 · DREAM THE WORLD</span><b>z</b></header>
               <h3>真的“想象”未来画面</h3>
               <div className="dream-monitor">
-                <img src="/images/hang-cup-demo.webp" alt="用于解释世界模型未来想象的官方机器人演示画面" />
+                <img src="./images/hang-cup-demo.webp" alt="用于解释世界模型未来想象的官方机器人演示画面" />
                 <div className="dream-overlay"><span>PREDICTED FUTURE</span><b>t+1 → t+H</b></div>
                 <div className="dream-scan" />
                 <div className="dream-frame-index"><i /><i /><i /><i /></div>
@@ -351,7 +351,7 @@ export function CorePipeline() {
               <header><span>02 · UNDERSTAND MOTION</span><b>m</b></header>
               <h3>把画面变化读成运动意图</h3>
               <div className="motion-decoder">
-                <img src="/images/hang-cup-frames/frame-3.webp" alt="机械臂运动意图分析画面" />
+                <img src="./images/hang-cup-frames/frame-3.webp" alt="机械臂运动意图分析画面" />
                 <svg viewBox="0 0 260 142" preserveAspectRatio="none" aria-hidden="true"><path d="M62 38 C105 28 126 58 158 76 S196 91 220 111" /><circle cx="62" cy="38" r="5" /><circle cx="158" cy="76" r="5" /><circle cx="220" cy="111" r="5" /></svg>
                 <span className="intent-label approach">靠近</span><span className="intent-label align">对准</span><span className="intent-label grasp">闭合</span>
               </div>
@@ -377,7 +377,7 @@ export function CorePipeline() {
             <div className={`story-connector ${step >= 6 ? "is-active" : ""}`}><i>→</i><small>environment</small></div>
             <div className={`observation-cap output-cap ${step >= 6 ? "is-active" : ""}`}>
               <div className="cap-head"><span>OUTPUT</span><b>oₜ₊₁</b></div>
-              <img src="/images/hang-cup-frames/frame-5.webp" alt="执行动作后的新观测" />
+              <img src="./images/hang-cup-frames/frame-5.webp" alt="执行动作后的新观测" />
               <small>动作后的新观测</small>
             </div>
           </div>

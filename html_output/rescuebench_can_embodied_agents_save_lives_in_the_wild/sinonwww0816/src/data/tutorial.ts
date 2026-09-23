@@ -23,7 +23,7 @@ export const tutorial: TutorialData = {
     "title": "会导航，就真的会救人吗？",
     "subtitle": "现有基准已经能测试很多局部能力，但一次搜索救援要求它们在同一条任务链中连续发生。",
     "prompt": "导航完成，任务就完成了吗？",
-    "background": "/images/rescuebench_scene.jpeg",
+    "background": "./images/rescuebench_scene.jpeg",
     "componentId": "hero-loop",
     "cta": "看看问题从哪里开始"
   },

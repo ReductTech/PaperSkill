@@ -239,7 +239,7 @@ export const tutorial: TutorialData = {
           "title": "三个时刻与两个方向",
           "desc": "「🟡 上面是论文原图 Fig.5(a)（图源见项目 README）」下面是它的交互版，版式与原图一致：三个时刻横排，每个时刻都有纹理与运动两条分支，前向和后向各自把特征传一遍。",
           "componentId": "m-5-1",
-          "figure": "/images/fig5a-framework.png"
+          "figure": "./images/fig5a-framework.png"
         }
       ],
       "insight": "两条分支是<b>并行</b>消费同一份输入的，不是一条接一条；而循环结构让特征能跨时间步累积，双向则让过去和未来都用得上。",
@@ -285,7 +285,7 @@ export const tutorial: TutorialData = {
           "title": "ITE 迭代步进器",
           "desc": "「🔴 上面是论文原图 Fig.5(b)（图源见项目 README）」下面一步步推进迭代，看每个时间片补上一点什么。原理示意，非模型真实输出。",
           "componentId": "m-6-1",
-          "figure": "/images/fig5b-ite.png"
+          "figure": "./images/fig5b-ite.png"
         }
       ],
       "insight": "不是把事件一次性塞进去，而是<b>一片一片地</b>喂，每次只学一份残差，累加起来——这样每一片的时间细节都不会丢。",
@@ -331,7 +331,7 @@ export const tutorial: TutorialData = {
           "title": "两条流谁搬得准",
           "desc": "「🟡 上面是论文原图 Fig.6（运动分支）（图源见项目 README）」大运动下，RGB 光流和事件光流各自把上一帧搬过来，看谁搬得准，再看融合之后是什么样。",
           "componentId": "m-7-1",
-          "figure": "/images/fig6-tta.png"
+          "figure": "./images/fig6-tta.png"
         }
       ],
       "insight": "没有哪条流永远更好——小运动时 RGB 光流稳，大运动时事件流更能扛。所以论文不赌，而是两条一起用。",
@@ -377,7 +377,7 @@ export const tutorial: TutorialData = {
           "title": "插件框架",
           "desc": "「🟡 上面是论文原图 Fig.7（图源见项目 README）」按原图版式画出来：主干吐出三样东西，插件冻住主干、只训自己。切换两种模式看谁在学。",
           "componentId": "m-8-1",
-          "figure": "/images/fig7-plugin.png"
+          "figure": "./images/fig7-plugin.png"
         }
       ],
       "insight": "插件模式的价值不在精度，而在迁移成本：主干一行都不用改，它只负责产出特征，补纹理的活儿交给插件。",
@@ -470,7 +470,7 @@ export const tutorial: TutorialData = {
           "title": "谁在 Vid4 上最高",
           "desc": "「🟡 上面是论文原图 Fig.1（图源见项目 README）」数值全部来自论文 Table I，点一行看它的成绩。",
           "componentId": "m-10-1",
-          "figure": "/images/fig1-scatter.png"
+          "figure": "./images/fig1-scatter.png"
         },
         {
           "kind": "module",

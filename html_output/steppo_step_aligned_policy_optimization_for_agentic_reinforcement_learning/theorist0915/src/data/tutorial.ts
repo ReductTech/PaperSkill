@@ -54,7 +54,7 @@ export const tutorial: TutorialData = {
           "title": "Table 1：方法粒度对照",
           "desc": "对照论文 Table 1：谁在 MDP 上用步、谁在信用上用步。注意 LightningRL 已是步级 MDP，但信用仍偏轨迹。",
           "componentId": "ch1-table1",
-          "figure": "/images/table-1-methods.png"
+          "figure": "./images/table-1-methods.png"
         }
       ],
       "insight": "需要把建模与信用分配的基本单位，从 token 提升到交互步。",
@@ -171,7 +171,7 @@ export const tutorial: TutorialData = {
           "title": "左右对照：碎转移 vs 整步转移",
           "desc": "左侧模拟 token 级“假转移”，右侧完成 <span class=\"term\" title=\"状态→完整动作→奖励→下一状态\">步级闭环</span>。判断：环境改变的边界在哪。",
           "componentId": "ch3-step-mdp",
-          "figure": "/images/figure-1-mdp.png"
+          "figure": "./images/figure-1-mdp.png"
         }
       ],
       "insight": "步级 MDP 让状态、动作、奖励与智能体真实交互粒度一致。",
@@ -296,7 +296,7 @@ export const tutorial: TutorialData = {
           "title": "三种信用分配的优势分布（示意）",
           "desc": "切换 Token / 轨迹 / Step，看优势形状。数值为教学示意，不是实验分数。对照论文 Figure 3。",
           "componentId": "ch5-credit",
-          "figure": "/images/figure-3-credit.png"
+          "figure": "./images/figure-3-credit.png"
         }
       ],
       "insight": "步级信用既能捕捉中间决策，又不会把整条轨迹糊成同一个信号。",
@@ -519,7 +519,7 @@ export const tutorial: TutorialData = {
           "title": "播放 HotpotQA 训练曲线",
           "desc": "复现 Figure 5 走势。<span class=\"approx-badge\">读图约值</span> 峰值约 0.64 vs 0.57；非正式表格精确数。",
           "componentId": "ch10-race",
-          "figure": "/images/figure-5-curves.png"
+          "figure": "./images/figure-5-curves.png"
         }
       ],
       "insight": "把 MDP 与信用对齐到交互步，是提升多轮智能体训练的有效方向；当前证据主要来自 HotpotQA 受控对照。",

@@ -50,7 +50,7 @@ export const tutorial: TutorialData = {
           title: "拖一拖路线：视频与世界模型的差别",
           desc: "在下方路线条上左右拖动目的地旗（或用 ←/→ 键）：左边是普通视频，右边是世界模型，看看谁听你的。文末附论文 Figure 2 系统总览（数据系统 → 渐进训练 → 流式推理）。",
           componentId: "mod-1-1",
-          figure: "/images/figure2.png"
+          figure: "./images/figure2.png"
         }
       ],
       insight: "要“开进”视频里，模型必须把相机轨迹当作一等输入——这正是 DreamX-World 要解决的第一件事。",
@@ -364,7 +364,7 @@ export const tutorial: TutorialData = {
           title: "开回老地方：有记忆 vs 没记忆",
           desc: "拖动下方滑块让小车沿 U 形路线走一个来回：镜头视角随去程连续偏移、返程回正；无记忆一侧镜头回不正且街景<b>连续漂移变形</b>，有几何检索记忆的一侧按相机几何逐帧校准、视角与街景都不变。下方附论文 Figure 11 的三类重访轨迹实测（往返 / 平移加转向 / 闭环）。",
           componentId: "mod-8-2",
-          figure: "/images/figure11.png"
+          figure: "./images/figure11.png"
         }
       ],
       insight: "记忆的敌人是“训练用真值、推理用自己生成画面”的曝光偏差——误差注入正是为此而设（论文 §3.2.3）。",

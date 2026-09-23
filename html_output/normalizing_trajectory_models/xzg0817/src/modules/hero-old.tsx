@@ -63,7 +63,7 @@ export const HeroOld: React.FC<WidgetProps> = () => {
   }, []);
 
   return (
-    <HeroVideo src="/videos/hero-old.mp4" label="传统扩散压缩到 4 步：每步单高斯，图像保持模糊">
+    <HeroVideo src="./videos/hero-old.mp4" label="传统扩散压缩到 4 步：每步单高斯，图像保持模糊">
       <canvas ref={canvasRef} aria-label="传统扩散压缩到 4 步：每步单高斯，图像保持模糊" />
     </HeroVideo>
   );

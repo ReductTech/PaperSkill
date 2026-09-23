@@ -40,7 +40,7 @@ const stages = [
 export function RescueStageStepperV2(_: WidgetProps) {
   const [index, setIndex] = useState(0);
   const stage = stages[index];
-  const figureSrc = assetPath('/images/rescuebench-figure-2.png');
+  const figureSrc = assetPath('./images/rescuebench-figure-2.png');
 
   return (
     <div className="stage-stepper-v2">
