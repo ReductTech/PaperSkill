@@ -31,7 +31,7 @@ export const AlignmentTower: React.FC<WidgetProps> = () => {
     <div className="ctrl"><label htmlFor="lambda-control">对齐权重 <span className="val">λ = {lambda}</span></label><select id="lambda-control" aria-label="表示对齐权重" value={lambda} onChange={(event) => setLambda(Number(event.target.value))}>{LAMBDAS.map((value) => <option key={value} value={value}>λ = {value}</option>)}</select></div>
     <div className="chip-row">{similarities.map((value, index) => <button type="button" key={index} className={`chip ${layer === index ? 'selected' : ''}`} onClick={() => setLayer(index)}>层 {index + 1} · {value.toFixed(2)}</button>)}</div>
     <div className={`feedback ${lambda === 10 ? 'good' : lambda === 0 || lambda === 20 ? 'bad' : ''}`}>{lambda === 10 ? 'λ=10 是论文采用的默认点。五层与数值为教学示意；实际默认对齐 embedding、全部 block 输出和最终归一化 hidden state。' : lambda === 20 ? '更强并不总更好：Table 2 中 λ=20 的 pass@1 / pass@10 都低于 λ=10。' : lambda === 0 ? '没有表示锚点时，学生只接收去噪与共享的路径规划目标；红线表示可能出现的表示漂移。' : '锚点逐渐增强；实际优劣由下方消融数据判断。'}</div>
-    <EvidenceLens src="/images/figure-2-method.png" title="Figure 2 · 方法架构" caption="论文 Figure 2：同架构 AR 教师保持因果注意力并冻结；DLM 学生切换为双向注意力，逐层接收表示对齐损失。" hotspots={[
+    <EvidenceLens src="./images/figure-2-method.png" title="Figure 2 · 方法架构" caption="论文 Figure 2：同架构 AR 教师保持因果注意力并冻结；DLM 学生切换为双向注意力，逐层接收表示对齐损失。" hotspots={[
       { id: 'teacher', label: '冻结教师', detail: '干净序列进入 pretrained AR，雪花表示其参数不更新。', box: { left: 3, top: 16, width: 34, height: 66 } },
       { id: 'loss', label: '逐层对齐', detail: '对应层的 hidden state 进入 L_align，教师侧停止梯度。', box: { left: 38, top: 25, width: 25, height: 56 } },
       { id: 'student', label: '双向学生', detail: '被遮蔽序列进入 DLM，完整目标包含 L_mdm、共享的 L_path 与加权的 L_align。', box: { left: 63, top: 16, width: 34, height: 68 } },

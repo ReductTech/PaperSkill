@@ -39,7 +39,7 @@ export const ResultExplorer: React.FC<WidgetProps> = () => {
 
   return <div className="result-explorer">
     <div className="chip-row"><button type="button" className={`chip ${mode === 'scale' ? 'selected' : ''}`} onClick={() => setMode('scale')}>模型规模</button><button type="button" className={`chip ${mode === 'data' ? 'selected' : ''}`} onClick={() => setMode('data')}>低数据</button><button type="button" className={`chip ${mode === 'freeze' ? 'selected' : ''}`} onClick={() => setMode('freeze')}>冻结参数</button><button type="button" className={`chip ${mode === 'public' ? 'selected' : ''}`} onClick={() => setMode('public')}>4B 公开对比</button>{mode === 'scale' && <button type="button" className="tiny ghost" onClick={replay}>重播柱图</button>}</div>
-    {mode === 'scale' && <><ScaleChart visible={visible} /><div className="feedback good">200k 步 HumanEval pass@10：0.6B 为 24.9→31.0，1.7B 为 31.1→40.5；较大模型获得更大的绝对增益。</div><EvidenceLens src="/images/figure-3-results.png" title="Figure 3 · 训练效率与规模" caption="论文 Figure 3：左侧比较训练步数曲线，右侧给出 0.6B 与 1.7B 在 200k 步时的 pass@10。" hotspots={[
+    {mode === 'scale' && <><ScaleChart visible={visible} /><div className="feedback good">200k 步 HumanEval pass@10：0.6B 为 24.9→31.0，1.7B 为 31.1→40.5；较大模型获得更大的绝对增益。</div><EvidenceLens src="./images/figure-3-results.png" title="Figure 3 · 训练效率与规模" caption="论文 Figure 3：左侧比较训练步数曲线，右侧给出 0.6B 与 1.7B 在 200k 步时的 pass@10。" hotspots={[
       { id: 'speed', label: '训练曲线', detail: '左图显示 REPR-ALIGN 在早期转换中持续高于 baseline；“最高 4×”来自训练步数效率比较。', box: { left: 2, top: 3, width: 49, height: 66 } },
       { id: 'scale', label: '规模效应', detail: '右图的绝对增益从 0.6B 的 6.1 点扩大到 1.7B 的 9.4 点。', box: { left: 57, top: 3, width: 41, height: 66 } },
     ]} /></>}
