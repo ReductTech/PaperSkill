@@ -1,0 +1,179 @@
+continual_learning:
+  label: 持续学习
+  full_name: Continual learning
+  definition: 按时间顺序学习陆续到来的任务，同时尽量保留先前学到的能力。
+  paper_role: 描述在没有旧任务训练数据时继续添加新任务的背景设定。
+  confusion: 本文实验针对特定的视觉分类设定，并不覆盖所有持续学习情形。
+  prerequisites: []
+  source_category: GENERAL_BACKGROUND
+  source_ref: B03
+
+catastrophic_forgetting:
+  label: 灾难性遗忘
+  full_name: Catastrophic forgetting
+  definition: 模型适应后续任务后，在先前任务上的表现下降。
+  paper_role: 这是 LwF 要缓解的风险。
+  confusion: 它描述模型行为发生变化，并非数据集被删除。
+  prerequisites: [continual_learning]
+  source_category: GENERAL_BACKGROUND
+  source_ref: B03
+
+teacher:
+  label: Teacher
+  full_name: Frozen previous-task model snapshot
+  definition: 完成旧任务训练后保留的模型快照，持有共享主体和旧任务输出头的参数副本。
+  paper_role: 对当前新任务输入 Xₙ 运行并生成旧任务响应 Yₒ；本轮训练不更新 Teacher。
+  confusion: Teacher 不是 Student 中共享参数的可变引用；两套模型参数相互独立。
+  prerequisites: [shared_parameters, task_head]
+  source_category: PAPER_FACT
+  source_ref: A01
+
+student:
+  label: Student
+  full_name: Expanded model for the current task
+  definition: 由旧模型结构扩展出的当前模型，包含共享主体、旧任务输出头和新增任务输出头。
+  paper_role: 用旧响应目标保持旧任务输出，同时由当前任务标签学习新任务。
+  confusion: Student 的参数副本独立于冻结的 Teacher；新增 head 不等于整套 Student。
+  prerequisites: [shared_parameters, task_head]
+  source_category: PAPER_FACT
+  source_ref: A01
+
+shared_parameters:
+  label: 共享参数
+  full_name: Shared network parameters (θ_s)
+  definition: 多个任务输出共同使用、用于计算共享表示的参数。
+  paper_role: LwF 在联合优化阶段可以调整的 CNN 共享主体。
+  confusion: 共享参数与任务专属输出参数 θₒ、θₙ 是不同部分。
+  prerequisites: [classification_network]
+  source_category: PAPER_FACT
+  source_ref: A01
+
+classification_network:
+  label: 分类网络
+  full_name: Convolutional neural network classifier
+  definition: 将图像经过一系列学习到的变换，映射为类别分数和概率的神经网络。
+  paper_role: 论文研究的模型类型。
+  confusion: 实验使用 AlexNet、VGG-16 等 CNN；不要把论文模型误换成现代架构。
+  prerequisites: [softmax_probability]
+  source_category: PAPER_FACT
+  source_ref: C09
+
+task_head:
+  label: 任务专属输出头
+  full_name: Task-specific output parameters
+  definition: 将共享表示映射到某一具体任务标签的参数。
+  paper_role: θₒ 对应旧任务输出头；θₙ 是为新任务添加的输出头。
+  confusion: θₒ 只在预热阶段冻结，在联合优化阶段可以更新。
+  prerequisites: [shared_parameters]
+  source_category: PAPER_FACT
+  source_ref: A02
+
+softmax_probability:
+  label: Softmax 概率
+  full_name: Softmax probability
+  definition: 由分类 logits 计算得到并归一化的类别概率。
+  paper_role: 用于表示旧模型的分类响应和当前模型的输出。
+  confusion: 概率响应不是 one-hot 真实标签。
+  prerequisites: []
+  source_category: GENERAL_BACKGROUND
+  source_ref: B01
+
+knowledge_distillation:
+  label: 知识蒸馏
+  full_name: Knowledge distillation
+  definition: 训练当前模型，使其输出分布接近目标模型的输出分布。
+  paper_role: LwF 将旧模型在新任务图像上的响应作为旧任务监督目标。
+  confusion: 这些响应不是旧图像样本，也不是回放记忆。
+  prerequisites: [softmax_probability]
+  source_category: PAPER_FACT
+  source_ref: C02
+
+temperature:
+  label: 温度参数
+  full_name: Temperature parameter (T)
+  definition: 重新缩放并归一化类别概率、从而调节分布平滑程度的参数。
+  paper_role: 论文报告的实验中，LwF 蒸馏目标使用温度 2。
+  confusion: 它不是优化器的学习率；平滑本身也不保证准确率提升。
+  prerequisites: [softmax_probability]
+  source_category: PAPER_FACT
+  source_ref: F02
+
+lambda_old:
+  label: 旧响应损失权重 λₒ
+  full_name: Old-response loss weight
+  definition: 联合目标中旧任务响应损失前的系数。
+  paper_role: 它控制旧响应保持损失在目标中的权重；多数实验取 1。
+  confusion: 它不是准确率百分比，也不保证旧任务表现一定保留。
+  prerequisites: [knowledge_distillation]
+  source_category: PAPER_FACT
+  source_ref: F05
+
+warm_up:
+  label: 预热阶段
+  full_name: New-head warm-up stage
+  definition: 初始训练阶段；冻结共享参数和旧任务参数，只训练新任务参数。
+  paper_role: 论文在联合优化前使用了这一阶段。
+  confusion: 论文指出预热并非 LwF 的关键条件；旧任务输出头也不是全程冻结。
+  prerequisites: [task_head]
+  source_category: PAPER_FACT
+  source_ref: C05
+
+joint_optimize:
+  label: 联合优化
+  full_name: Joint optimization of expanded model parameters
+  definition: 使用联合目标一起训练共享参数、旧任务参数和新任务参数。
+  paper_role: LwF 训练流程的第二阶段。
+  confusion: 它不同于需要旧任务数据的联合训练基线。
+  prerequisites: [warm_up, knowledge_distillation]
+  source_category: PAPER_FACT
+  source_ref: C05
+
+joint_training:
+  label: 联合训练
+  full_name: Joint training baseline
+  definition: 同时使用旧任务和新任务的图像与标签进行训练。
+  paper_role: 论文实验中的对比方法。
+  confusion: 它不符合 LwF 所针对的“旧数据不可用”条件。
+  prerequisites: [continual_learning]
+  source_category: PAPER_FACT
+  source_ref: C01
+
+replay:
+  label: 样本回放
+  full_name: Example replay / exemplar memory
+  definition: 保留旧任务样本，并在学习后续任务时再次使用这些样本。
+  paper_role: 用于对比并理解 LwF 的旧任务信号来源。
+  confusion: Yₒ 由当前新任务输入生成，并非来自保存的旧样本。
+  prerequisites: []
+  source_category: GENERAL_BACKGROUND
+  source_ref: A07
+
+backpropagation:
+  label: 反向传播
+  full_name: Backpropagation
+  definition: 计算目标函数相对于模型参数的导数。
+  paper_role: 说明旧、新损失如何经扩展模型传递梯度。
+  confusion: 计算梯度本身不会应用参数更新。
+  prerequisites: [cross_entropy]
+  source_category: GENERAL_BACKGROUND
+  source_ref: B02
+
+cross_entropy:
+  label: 交叉熵
+  full_name: Cross-entropy loss
+  definition: 比较预测概率分布与目标分布的损失函数。
+  paper_role: 同时用于新任务监督和旧响应蒸馏。
+  confusion: 这两种损失使用不同的目标和输出路径。
+  prerequisites: [softmax_probability]
+  source_category: GENERAL_BACKGROUND
+  source_ref: B01
+
+accuracy_and_map:
+  label: 准确率与 mAP
+  full_name: Classification accuracy and mean average precision
+  definition: 论文针对不同数据集报告的评估指标。
+  paper_role: VOC 报告 mAP，其余主要分类任务报告准确率。
+  confusion: 不同指标或数据集划分下的数值不能直接视作同一尺度进行比较。
+  prerequisites: []
+  source_category: PAPER_FACT
+  source_ref: E01

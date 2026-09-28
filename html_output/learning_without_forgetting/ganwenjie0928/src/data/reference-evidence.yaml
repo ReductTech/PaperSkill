@@ -1,0 +1,226 @@
+claims:
+  C01:
+    text: "LwF adds a task to a trained CNN using only new-task images and labels, without the old tasks' training data."
+    type: PAPER_FACT
+    source: {kind: abstract_and_method, location: "PDF pp.1, 4"}
+    boundary: "Paper's tested setting is mainly sequential visual classification."
+  C02:
+    text: "The old model computes old-task responses on each new-task image, and the expanded model is trained to match them."
+    type: PAPER_FACT
+    source: {kind: figure_and_text, location: "Figure 2(e), PDF pp.3-4"}
+    boundary: "Y_o is not an old image, ground-truth old label, or replay memory."
+  C03:
+    text: "The objective combines weighted old-response distillation, new-task supervision, and regularization."
+    type: PAPER_FACT
+    source: {kind: equations, location: "Equations (1)-(4), Figure 3, PDF pp.4-5"}
+    boundary: "R is simple weight decay in these experiments; parameter L2 is a comparison baseline."
+  C04:
+    text: "The paper uses T=2 and sets lambda_o to 1 in most experiments."
+    type: PAPER_FACT
+    source: {kind: method_text, location: "PDF pp.4-5"}
+    boundary: "These are experiment settings, not universal optima or performance guarantees."
+  C05:
+    text: "Training warms up the new parameters while shared and old-task parameters are frozen, then jointly optimizes all parameter groups."
+    type: PAPER_FACT
+    source: {kind: method_text, location: "PDF p.4"}
+    boundary: "The old-task head is not permanently frozen; warm-up is not crucial to LwF."
+  C06:
+    text: "Across tested settings, LwF often improves the fine-tuning trade-off but has task-pair exceptions."
+    type: PAPER_RESULT
+    source: {kind: table_and_figure, location: "Table 1, Figure 4, PDF pp.7-8"}
+    boundary: "State task pair, model, split, metric, and protocol; do not claim universal superiority."
+  C07:
+    text: "Matching old outputs on new inputs may not preserve behavior over the full old-task distribution when input coverage differs."
+    type: AUTHOR_INTERPRETATION
+    source: {kind: discussion_and_examples, location: "PDF pp.2, 7, 10"}
+    boundary: "The tutorial's coverage framing is an interpretation, not a universal quantitative law."
+  C08:
+    text: "The authors characterize LwF as a hybrid of knowledge distillation and fine-tuning."
+    type: AUTHOR_INTERPRETATION
+    source: {kind: discussion, location: "PDF p.10"}
+    boundary: "This does not make LwF replay, parameter isolation, or joint training."
+  C09:
+    text: "The paper's main experiments cover visual classification plus one tracking appendix experiment."
+    type: PAPER_FACT
+    source: {kind: experiments, location: "PDF pp.6-10, 12-13"}
+    boundary: "Does not validate LLMs, foundation models, or broad online learning."
+  C10:
+    text: "Semantic segmentation, object detection, representative old-domain samples, theory, and online learning are proposed as future directions."
+    type: FUTURE_WORK
+    source: {kind: discussion, location: "PDF pp.10-11"}
+    boundary: "These are not capabilities demonstrated in this paper."
+  C11:
+    text: "The paper argues that output regularization can preserve task behavior more directly than constraining individual parameters."
+    type: AUTHOR_INTERPRETATION
+    source: {kind: ablation_discussion, location: "Figure 7 and PDF pp.9-10"}
+    boundary: "LwF still matches outputs only on the new-task training inputs."
+
+architecture:
+  A01:
+    text: "theta_s are shared network parameters."
+    type: PAPER_FACT
+    source: {kind: method, location: "PDF pp.3-4"}
+  A02:
+    text: "theta_o are existing task-specific output parameters for old tasks; they can update in joint-optimize."
+    type: PAPER_FACT
+    source: {kind: method, location: "PDF pp.3-5"}
+  A03:
+    text: "theta_n are randomly initialized output parameters added for new classes."
+    type: PAPER_FACT
+    source: {kind: method, location: "PDF pp.4-5"}
+  A04:
+    text: "Y_o is computed by running the old model on X_n."
+    type: PAPER_FACT
+    source: {kind: algorithm, location: "Figure 3 and PDF pp.4-5"}
+  A05:
+    text: "Warm-up freezes theta_s and theta_o; joint-optimize trains theta_s, theta_o, and theta_n."
+    type: PAPER_FACT
+    source: {kind: method, location: "PDF p.4"}
+  A06:
+    text: "The classification response loss uses temperature-transformed probabilities; T=2 in the paper."
+    type: PAPER_FACT
+    source: {kind: equations, location: "Equations (2)-(4), PDF p.4"}
+  A07:
+    text: "LwF does not use old-task training examples in the new-task training objective."
+    type: PAPER_FACT
+    source: {kind: abstract_and_method, location: "PDF pp.1, 4-5"}
+  A08:
+    text: "Additional task-specific layers and network expansion are explored as alternative designs, not the default LwF architecture."
+    type: PAPER_FACT
+    source: {kind: figure_and_table, location: "Figure 6 and Table 2, PDF pp.9-10"}
+
+formulas:
+  F01:
+    text: "L_new = -y_n · log(yhat_n), multinomial logistic loss for new-task labels."
+    type: PAPER_FACT
+    source: {kind: equation, location: "Equation (1), PDF p.4"}
+  F02:
+    text: "Temperature rescales each teacher probability by exponent 1/T and renormalizes it."
+    type: PAPER_FACT
+    source: {kind: equation, location: "Equation (4), PDF p.4"}
+  F03:
+    text: "L_old is cross-entropy from temperature-adjusted old responses to current old-task outputs."
+    type: PAPER_FACT
+    source: {kind: equations, location: "Equations (2)-(3), PDF p.4"}
+  F04:
+    text: "L_total = lambda_o L_old + L_new + R(theta_s, theta_o, theta_n)."
+    type: PAPER_FACT
+    source: {kind: algorithm, location: "Figure 3 and PDF p.5"}
+  F05:
+    text: "lambda_o weights old-response distillation; larger values favor the old-task objective relative to the new-task objective."
+    type: PAPER_FACT
+    source: {kind: method_text, location: "PDF p.5; Figure 7, pp.9-10"}
+  F06:
+    text: "The authors chose T=2 by grid search on a held-out set."
+    type: PAPER_FACT
+    source: {kind: method_text, location: "PDF p.4"}
+
+results:
+  E01:
+    text: "LwF ImageNet old-task and CUB new-task accuracy for AlexNet."
+    type: PAPER_RESULT
+    dataset: "ImageNet → CUB-200-2011"
+    model: "AlexNet"
+    split: "ImageNet validation; CUB test"
+    metric: "accuracy"
+    protocol: "Table 1(a); center crop; mean of three training runs"
+    value: "54.7% old / 57.7% new (values printed for LwF)"
+    source: {kind: table, location: "Table 1(a), PDF p.7; protocol p.6"}
+  E02:
+    text: "Fine-tuning absolute accuracies derived from Table 1(a)'s signed differences relative to LwF."
+    type: PAPER_RESULT
+    dataset: "ImageNet → CUB-200-2011"
+    model: "AlexNet"
+    split: "ImageNet validation; CUB test"
+    metric: "accuracy"
+    protocol: "LwF baseline plus printed signed delta; mean-of-three protocol as Table 1"
+    value: "50.9% old / 57.0% new; derived, not all printed as absolute values"
+    source: {kind: table_and_calculation, location: "Table 1(a), PDF p.7; protocol p.6"}
+  E03:
+    text: "Feature-extraction absolute accuracies derived from Table 1(a)'s signed differences relative to LwF."
+    type: PAPER_RESULT
+    dataset: "ImageNet → CUB-200-2011"
+    model: "AlexNet"
+    split: "ImageNet validation; CUB test"
+    metric: "accuracy"
+    protocol: "LwF baseline plus printed signed delta; mean-of-three protocol as Table 1"
+    value: "57.0% old / 52.5% new; derived, not all printed as absolute values"
+    source: {kind: table_and_calculation, location: "Table 1(a), PDF p.7; protocol p.6"}
+  E04:
+    text: "Joint-training absolute accuracies derived from Table 1(a)'s signed differences relative to LwF."
+    type: PAPER_RESULT
+    dataset: "ImageNet → CUB-200-2011"
+    model: "AlexNet"
+    split: "ImageNet validation; CUB test"
+    metric: "accuracy"
+    protocol: "Uses old-task data; LwF baseline plus printed signed delta; mean-of-three protocol as Table 1"
+    value: "55.3% old / 56.6% new; derived, not all printed as absolute values"
+    source: {kind: table_and_calculation, location: "Table 1(a), PDF p.7; protocol p.6"}
+  E05:
+    text: "The paper reports that performance changes across task pairs, including ImageNet→MNIST and Places365/CUB comparisons."
+    type: PAPER_RESULT
+    dataset: "Multiple task pairs, including ImageNet → MNIST"
+    model: "AlexNet for the cited main comparison unless noted"
+    split: "Per dataset protocol; consult paper table and text before plotting values"
+    metric: "accuracy, except VOC where mAP is used"
+    protocol: "Task-pair comparisons from the paper; not a pooled cross-task score"
+    value: "Qualitative boundary; no pooled value"
+    source: {kind: experiments_and_discussion, location: "PDF pp.7-10"}
+  E06:
+    text: "MD-Net tracking appendix reports 0.373 and 0.383 expected average overlap, with a difference the authors call not statistically significant."
+    type: PAPER_RESULT
+    dataset: "VOT 2015 tracking benchmark"
+    model: "MD-Net and MD-Net + LwF"
+    split: "Paper's appendix protocol"
+    metric: "expected average overlap"
+    protocol: "Tracking appendix; authors report the difference as not statistically significant"
+    value: "0.373 / 0.383"
+    source: {kind: appendix_table_and_text, location: "PDF pp.12-13"}
+
+implementation:
+  I01:
+    text: "theta_s may map to a runtime collection of shared backbone parameters."
+    type: IMPLEMENTATION_MAPPING
+    source: null
+    boundary: "Conceptual mapping; not an exact module name from the paper implementation."
+  I02:
+    text: "theta_o and theta_n may map to separate task-head parameter collections."
+    type: IMPLEMENTATION_MAPPING
+    source: null
+    boundary: "Specific tensor names and framework containers depend on an implementation."
+  I03:
+    text: "In an autograd implementation, backward computes gradients and an optimizer step applies updates to parameters included in its groups."
+    type: IMPLEMENTATION_MAPPING
+    source: null
+    boundary: "General implementation explanation; the paper describes training with SGD, not this specific API."
+
+background:
+  B01:
+    text: "Softmax maps classification logits to normalized class probabilities; cross-entropy compares a probability output with a target distribution."
+    type: GENERAL_BACKGROUND
+    source: null
+  B02:
+    text: "Backpropagation computes derivatives; parameter mutation occurs when an optimizer applies an update."
+    type: GENERAL_BACKGROUND
+    source: null
+  B03:
+    text: "A shared backbone can feed multiple task-specific heads."
+    type: GENERAL_BACKGROUND
+    source: null
+
+teaching_toys:
+  T01:
+    text: "A fixed three-logit distribution can illustrate temperature smoothing."
+    type: TEACHING_TOY
+    source: null
+    boundary: "Toy logits and resulting probabilities are not predictions reported by the paper."
+  T02:
+    text: "A qualitative near/unknown/far input relation can illustrate coverage concerns."
+    type: TEACHING_TOY
+    source: null
+    boundary: "No numeric distance or measured performance is implied."
+  T03:
+    text: "A two-arrow weight diagram can illustrate lambda_o's relative objective coefficient."
+    type: TEACHING_TOY
+    source: null
+    boundary: "Loss magnitudes and accuracies are not simulated from the paper."
