@@ -1,1 +1,0 @@
-export { HeroNew } from './heroComparison';
