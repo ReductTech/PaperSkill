@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { AnaAllocate } from './ana-allocate';
+import { AnaBuffer } from './ana-buffer';
+import { AnaFlatten } from './ana-flatten';
+import { AnaLedger } from './ana-ledger';
+import { AnaMark } from './ana-mark';
+import { AnaOverview } from './ana-overview';
+import { AnaPractice } from './ana-practice';
+import { AnaRace } from './ana-race';
+import { AnaTools } from './ana-tools';
+import { AnaTrace } from './ana-trace';
+import { HeroContrast } from './hero-contrast';
+import { ModAllocate } from './mod-allocate';
+import { ModArchHotspots } from './mod-arch-hotspots';
+import { ModCapacity } from './mod-capacity';
+import { ModDensity } from './mod-density';
+import { ModKl } from './mod-kl';
+import { ModPriorModes } from './mod-prior-modes';
+import { ModRateDistortion } from './mod-rate-distortion';
+import { ModResults } from './mod-results';
+import { ModStructure } from './mod-structure';
+import { ModTraining } from './mod-training';
+import { ModTransform } from './mod-transform';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ana-allocate'] = AnaAllocate;
+widgetRegistry['ana-buffer'] = AnaBuffer;
+widgetRegistry['ana-flatten'] = AnaFlatten;
+widgetRegistry['ana-ledger'] = AnaLedger;
+widgetRegistry['ana-mark'] = AnaMark;
+widgetRegistry['ana-overview'] = AnaOverview;
+widgetRegistry['ana-practice'] = AnaPractice;
+widgetRegistry['ana-race'] = AnaRace;
+widgetRegistry['ana-tools'] = AnaTools;
+widgetRegistry['ana-trace'] = AnaTrace;
+widgetRegistry['hero-contrast'] = HeroContrast;
+widgetRegistry['mod-allocate'] = ModAllocate;
+widgetRegistry['mod-arch-hotspots'] = ModArchHotspots;
+widgetRegistry['mod-capacity'] = ModCapacity;
+widgetRegistry['mod-density'] = ModDensity;
+widgetRegistry['mod-kl'] = ModKl;
+widgetRegistry['mod-prior-modes'] = ModPriorModes;
+widgetRegistry['mod-rate-distortion'] = ModRateDistortion;
+widgetRegistry['mod-results'] = ModResults;
+widgetRegistry['mod-structure'] = ModStructure;
+widgetRegistry['mod-training'] = ModTraining;
+widgetRegistry['mod-transform'] = ModTransform;
