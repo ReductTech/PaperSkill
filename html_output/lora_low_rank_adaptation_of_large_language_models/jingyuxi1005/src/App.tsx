@@ -144,7 +144,7 @@ export default function App() {
                     <li>多个已合并任务权重不便在同一批次动态混用。</li>
                     <li>原论文主要验证语言任务，未验证视觉语言个性化或长期记忆。</li>
                   </ul>
-                  <p>LoRA 是五篇路线的起点：先回答如何低成本适配大模型，再把研究问题推进到视觉语言任务与用户个性化。路线表示问题演进，不表示后四篇直接继承 LoRA。</p>
+                  <p>LoRA 用低秩任务增量降低适配成本；参数效率、合并推理与实验结果需要结合这些边界理解。</p>
                 </div>
               ) : null}
               {[1, 3, 6].includes(active) ? <AnalogyCard analogy={currentChapter.analogy} chapterId={currentChapter.id} /> : null}
