@@ -1,0 +1,57 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* --- RT-2 metaphor scene palette: "one cook, one stove, a light dinner" --- */
+  --paper-scene-bg: #f5f8f0;
+  --paper-counter: #e7e3d8;
+  --paper-counter-edge: #cfc8b6;
+  --paper-flame: #f07e47;
+  --paper-steam: rgba(104, 119, 143, 0.35);
+  --paper-accent-2: #92400e;
+  --paper-env-light: #b8c9a7;
+  --paper-env-dark: #76906a;
+  --paper-pan: #4a5568;
+  --paper-pan-edge: #2d3748;
+  --paper-card: #ffffff;
+  --paper-card-edge: #d7deea;
+}
+
+/* Kitchen-scene canvas surfaces share one quiet backdrop so the ten chapters
+   read as the same kitchen visited at different moments. */
+.metaphor-canvas {
+  background: var(--paper-scene-bg);
+}
+
+/* Shared props drawn on every kitchen scene: counter, pan, flame, jar, card. */
+.scene-counter { fill: var(--paper-counter); stroke: var(--paper-counter-edge); }
+.scene-pan { fill: var(--paper-pan); stroke: var(--paper-pan-edge); }
+.scene-flame { fill: var(--paper-flame); }
+.scene-steam { fill: var(--paper-steam); }
+.scene-card { fill: var(--paper-card); stroke: var(--paper-card-edge); }
+.scene-env-light { fill: var(--paper-env-light); }
+.scene-env-dark { fill: var(--paper-env-dark); }
+
+/* Hero sides reuse the chapter canvas widgets inside a ~470px column, while the
+   widgets hard-set their inline width to their logical scene width (560/720px).
+   Without this, the inline width overflows the hero column and the visible slice
+   is mostly blank. Constrain the box and let the canvas scale down while keeping
+   its logical aspect ratio (height:auto keeps the drawn geometry undistorted). */
+.hero-compare .bg-side-canvas {
+  overflow: hidden;
+}
+.hero-compare .bg-side-canvas canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  display: block;
+}
+
+/* Widgets outside the hero fill their module card the same way. */
+.module-canvas canvas {
+  max-width: 100%;
+  height: auto;
+}
