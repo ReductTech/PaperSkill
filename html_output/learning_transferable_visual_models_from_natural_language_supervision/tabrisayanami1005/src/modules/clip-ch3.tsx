@@ -21,15 +21,15 @@ function Matrix(){
  <p>每一行表示“这张图片该配哪段文字”，每一列表示“这段文字该配哪张图片”。按原始配对顺序排列时，正例位于对角线；训练希望对应格比同一行、同一列的其他候选更突出，而不是只学习一个固定类别编号。</p></div>;
 }
 function Batch(){
- const [choice,setChoice]=useState(0);const n=choice+2;const negatives=n*n-n;
+ const [choice,setChoice]=useState(0);const n=choice+2;const negatives=n*n-n;const countScale=27;
  return <div><Canvas ariaLabel="批大小决定相似度矩阵和正负配对数量" draw={ctx=>{
   const size=196/n;
   for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=170+j*size,y=39+i*size;ctx.fillStyle=i===j?C.green:C.passive;ctx.fillRect(x+3,y+3,size-6,size-6);if(i===j){ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='25px sans-serif';ctx.fillText('✓',x+size/2,y+size*.67);ctx.textAlign='start';}}
   label(ctx,'原始配对',450,80,C.green);label(ctx,'其他候选',450,155,C.dark);
-  ctx.fillStyle=C.green;ctx.fillRect(608,60,n*42,24);ctx.fillStyle=C.passive;ctx.fillRect(608,134,negatives*27,24);
-  ctx.fillStyle=C.text;ctx.font='25px "Microsoft YaHei",sans-serif';ctx.fillText(`${n}`,620+n*42,81);ctx.fillText(`${negatives}`,620+negatives*27,155);ctx.fillText(`${n} × ${n} = ${n*n}`,450,229);
+  ctx.fillStyle=C.green;ctx.fillRect(608,60,n*countScale,24);ctx.fillStyle=C.passive;ctx.fillRect(608,134,negatives*countScale,24);
+  ctx.fillStyle=C.text;ctx.font='25px "Microsoft YaHei",sans-serif';ctx.fillText(`${n}`,620+n*countScale,81);ctx.fillText(`${negatives}`,620+negatives*countScale,155);ctx.fillText(`${n} × ${n} = ${n*n}`,450,229);
  }}/><Chips options={['批大小 2','批大小 3','批大小 4']} value={choice} onChange={setChoice} label="一个训练批次的图文原始配对数"/>
  <Feedback>配对计数：N = {n}，含 {n} 张图片和 {n} 段对应文字。全部交叉比较得到 {n*n} 个格子，其中 {n} 个原始配对是正例，另外 {negatives} 个格子在训练目标中作为负例；每张图片面对 {n-1} 个其他文字候选。</Feedback>
- <p>批次是一次训练计算同时处理的一组样本。扩大批次提供更多对照，也增加 N² 次配对打分的规模；“负例”指训练目标的角色，不能断言其他文字在语义上一定错误，同义描述可能成为假负例。</p></div>;
+ <p>两根柱子使用相同的比例尺，柱长可以直接比较：N=2时同长，N=4时负例柱长为正例的3倍。批次是一次训练计算同时处理的一组样本。扩大批次提供更多对照，也增加 N² 次配对打分的规模；“负例”指训练目标的角色，不能断言其他文字在语义上一定错误，同义描述可能成为假负例。</p></div>;
 }
 export const ClipCh3:React.FC<WidgetProps>=({moduleId})=>moduleId==='3.2'?<Batch/>:<Matrix/>;

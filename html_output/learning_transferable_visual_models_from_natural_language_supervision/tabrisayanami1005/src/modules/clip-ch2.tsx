@@ -7,6 +7,7 @@ const neat=(x:number)=>(Math.abs(x)<1e-8?0:x).toFixed(3);
 function Direction(){
  const [angle,setAngle]=useState(60);const dragging=useRef(false);
  const cosine=Math.cos(radians(angle));
+ const includedAngle=Math.abs(angle); // angle is a signed direction in [-180, 180].
  const update=(e:React.PointerEvent<HTMLCanvasElement>)=>{
   const rect=e.currentTarget.getBoundingClientRect();
   const x=(e.clientX-rect.left)*1080/rect.width-620;
@@ -15,7 +16,7 @@ function Direction(){
  };
  const change=(delta:number)=>setAngle(a=>Math.max(-180,Math.min(180,a+delta)));
  return <div>
-  <Canvas ariaLabel="拖动橙色文字向量端点，或用左右方向键每次旋转五度" tabIndex={0}
+  <Canvas ariaLabel={`文字方向角${angle}度，两向量夹角${includedAngle}度；拖动橙色端点或用左右方向键每次旋转五度`} tabIndex={0}
    onPointerDown={e=>{dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);update(e);}}
    onPointerMove={e=>{if(dragging.current)update(e);}}
    onPointerUp={e=>{dragging.current=false;if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}}
@@ -28,13 +29,13 @@ function Direction(){
     const tx=620+95*cosine,ty=145-95*Math.sin(radians(angle));
     arrow(ctx,620,145,tx,ty,C.orange);ctx.fillStyle=C.orange;ctx.beginPath();ctx.arc(tx,ty,9,0,2*Math.PI);ctx.fill();
     label(ctx,'图片向量',795,85,C.blue);label(ctx,'文字向量',795,160,C.orange);
-    ctx.fillStyle=C.text;ctx.font='24px "Microsoft YaHei",sans-serif';ctx.fillText(`θ = ${angle}°`,800,211);ctx.fillText(`cos θ = ${neat(cosine)}`,800,249);
+    ctx.fillStyle=C.text;ctx.font='24px "Microsoft YaHei",sans-serif';ctx.fillText(`θ = ${includedAngle}°`,800,211);ctx.fillText(`cos θ = ${neat(cosine)}`,800,249);
    }}/>
   <div className="chip-row" role="group" aria-label="文字方向的键盘等效操作">
    <button type="button" className="chip" onClick={()=>change(-5)}>旋转 −5°</button><button type="button" className="chip" onClick={()=>change(5)}>旋转 +5°</button><button type="button" className="chip" onClick={()=>setAngle(60)}>重置为 60°</button>
   </div>
-  <Feedback>二维算例：图片单位向量 u = (1, 0)，文字单位向量 v = ({neat(cosine)}, {neat(Math.sin(radians(angle)))})。当前夹角为 {angle}°，余弦相似度为 {neat(cosine)}；方向越接近，相似度越高。</Feedback>
-  <p>拖动图中的橙色端点，也可以先聚焦画布再按左右方向键，每次改变 5°。图片中的“猫”只是帮助记忆的例子：真实 CLIP 的向量具有很多维，每一维通常没有可直接命名的含义，网页也没有把文字重新送进编码器。</p>
+  <Feedback>二维算例：图片单位向量 u = (1, 0)，文字单位向量 v = ({neat(cosine)}, {neat(Math.sin(radians(angle)))})。文字方向角 φ = {angle}°，与图片向量的夹角 θ = {includedAngle}°，余弦相似度为 {neat(cosine)}；方向越接近，相似度越高。</Feedback>
+  <p>方向角 φ 以向右为0°，逆时针为正、顺时针为负；向量夹角 θ 取0°到180°。拖动图中的橙色端点，也可以先聚焦画布再按左右方向键，每次改变 5°。图片中的“猫”只是帮助记忆的例子：真实 CLIP 的向量具有很多维，每一维通常没有可直接命名的含义，网页也没有把文字重新送进编码器。</p>
  </div>;
 }
 function Normalization(){

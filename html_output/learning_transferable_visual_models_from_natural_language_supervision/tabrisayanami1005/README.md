@@ -19,7 +19,8 @@
 
 ## 来源与演示边界
 
-- 原论文：[ICML 2021 PDF](https://proceedings.mlr.press/v139/radford21a/radford21a.pdf)，[论文信息](https://proceedings.mlr.press/v139/radford21a.html)。
+- 原论文：[ICML 2021 PDF](https://proceedings.mlr.press/v139/radford21a/radford21a.pdf)，[论文信息](https://proceedings.mlr.press/v139/radford21a.html)。实验图表与正文节号默认按该16页会议版。
+- 第五章提示词与模板集成另引 [arXiv 完整版§3.1.4，第7–8页](https://arxiv.org/pdf/2103.00020#page=7)；两版图号与节号不同，不混用。
 - 作者：Alec Radford、Jong Wook Kim、Chris Hallacy、Aditya Ramesh、Gabriel Goh、Sandhini Agarwal、Girish Sastry、Amanda Askell、Pamela Mishkin、Jack Clark、Gretchen Krueger、Ilya Sutskever。
 - 网页中的二维向量、相似度、提示词方向、训练矩阵是教学设定；未加载 CLIP 权重，不是模型推理或完整训练。
 - 第十章表1、图4与图7的数字是原论文报告值，页面标注模型、基线、数据集及指标，动画只是展示。图4展示差值，不是假造两方绝对准确率。
