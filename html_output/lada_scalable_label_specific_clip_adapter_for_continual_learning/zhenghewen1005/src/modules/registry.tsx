@@ -1,0 +1,56 @@
+import React from 'react';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { LadaOne } from './lada-1';
+import { Lada10 } from './lada-10';
+import { Lada10Metrics } from './lada-10-metrics';
+import { LadaTwo } from './lada-2';
+import { LadaThree } from './lada-3';
+import { LadaFour } from './lada-4';
+import { LadaFive } from './lada-5';
+import { LadaSix } from './lada-6';
+import { Lada7 } from './lada-7';
+import { Lada8 } from './lada-8';
+import { Lada9 } from './lada-9';
+import { Lada9Ablation } from './lada-9-ablation';
+import { LadaHeroNew } from './lada-hero-new';
+import { LadaHeroOld } from './lada-hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['lada-1'] = LadaOne;
+widgetRegistry['lada-10'] = Lada10;
+widgetRegistry['lada-10-metrics'] = Lada10Metrics;
+widgetRegistry['lada-2'] = LadaTwo;
+widgetRegistry['lada-3'] = LadaThree;
+widgetRegistry['lada-4'] = LadaFour;
+widgetRegistry['lada-5'] = LadaFive;
+widgetRegistry['lada-6'] = LadaSix;
+widgetRegistry['lada-7'] = Lada7;
+widgetRegistry['lada-8'] = Lada8;
+widgetRegistry['lada-9'] = Lada9;
+widgetRegistry['lada-9-ablation'] = Lada9Ablation;
+widgetRegistry['lada-hero-new'] = LadaHeroNew;
+widgetRegistry['lada-hero-old'] = LadaHeroOld;
