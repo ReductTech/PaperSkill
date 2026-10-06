@@ -1,0 +1,27 @@
+import React from 'react';
+import {RevisedWidget,RevisedPrelude,RevisedHero} from './RevisedWidgets';
+export interface WidgetProps {chapterId:string;moduleId:string;}
+export const widgetRegistry:Record<string,React.FC<WidgetProps>>={};
+widgetRegistry['chapter-1-widget']=RevisedWidget;
+widgetRegistry['analogy-1']=RevisedPrelude;
+widgetRegistry['chapter-2-widget']=RevisedWidget;
+widgetRegistry['analogy-2']=RevisedPrelude;
+widgetRegistry['chapter-3-widget']=RevisedWidget;
+widgetRegistry['analogy-3']=RevisedPrelude;
+widgetRegistry['chapter-4-widget']=RevisedWidget;
+widgetRegistry['analogy-4']=RevisedPrelude;
+widgetRegistry['chapter-5-widget']=RevisedWidget;
+widgetRegistry['analogy-5']=RevisedPrelude;
+widgetRegistry['chapter-6-widget']=RevisedWidget;
+widgetRegistry['analogy-6']=RevisedPrelude;
+widgetRegistry['chapter-7-widget']=RevisedWidget;
+widgetRegistry['analogy-7']=RevisedPrelude;
+widgetRegistry['chapter-8-widget']=RevisedWidget;
+widgetRegistry['analogy-8']=RevisedPrelude;
+widgetRegistry['chapter-9-widget']=RevisedWidget;
+widgetRegistry['analogy-9']=RevisedPrelude;
+widgetRegistry['chapter-10-widget']=RevisedWidget;
+widgetRegistry['analogy-10']=RevisedPrelude;
+widgetRegistry['config-widget']=RevisedWidget;
+widgetRegistry['hero-old']=RevisedHero;
+widgetRegistry['hero-new']=RevisedHero;
