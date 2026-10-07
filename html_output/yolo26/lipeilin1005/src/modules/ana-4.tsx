@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, easeInOutQuad } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ana 4: analog 16-tick gauge needle jitters at the end of its range while a
@@ -14,7 +14,6 @@ const C = {
 
 export const Ana4: React.FC<WidgetProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,13 +39,18 @@ export const Ana4: React.FC<WidgetProps> = () => {
         ctx.lineTo(gx + Math.cos(a) * r, gy + Math.sin(a) * r);
         ctx.stroke();
       }
-      // needle sweeps and jitters at the end
-      const raw = t;
-      const frac = Math.min(raw / 0.85, 1);
-      const jitter = raw > 0.85 ? Math.sin(time / 40) * 0.02 : 0;
+      // needle sweeps with easing and jitters once pegged at the end
+      const frac = easeInOutQuad(Math.min(t / 0.85, 1));
+      const pegged = t > 0.85;
+      const jitter = pegged ? Math.sin(time / 40) * 0.02 : 0;
       const a = Math.PI + (frac + jitter) * Math.PI;
-      ctx.strokeStyle = raw > 0.85 ? C.red : C.blue; ctx.lineWidth = 3;
+      ctx.strokeStyle = pegged ? C.red : C.blue; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + Math.cos(a) * (r - 10), gy + Math.sin(a) * (r - 10)); ctx.stroke();
+      // red glow while pegged
+      if (pegged) {
+        ctx.fillStyle = `rgba(196,63,82,${0.12 + 0.06 * Math.sin(time / 90)})`;
+        ctx.beginPath(); ctx.arc(gx, gy, r + 6, Math.PI, 0); ctx.fill();
+      }
       ctx.fillStyle = C.text; ctx.font = '12px sans-serif';
       ctx.fillText('DFL·16格', gx - 26, gy + 18);
       // digital odometer (right)
@@ -63,15 +67,7 @@ export const Ana4: React.FC<WidgetProps> = () => {
       ctx.beginPath(); ctx.moveTo(280, 68); ctx.lineTo(280, 96); ctx.stroke();
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   return <canvas id="cv-ana-4" ref={canvasRef} width={W} height={H} />;

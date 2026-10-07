@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, lerp } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, drawCyclist, loopX, lerp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch2 Module 2.1 (P4): stride 8/16/32 — denser grid watches small objects,
@@ -26,8 +26,7 @@ const BOXSIDE: Record<number, number> = { 8: 22, 16: 52, 32: 110 };
 
 export const Ch2Strides: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const stateRef = useRef({ stride: 16 });
+  const stateRef = useRef({ stride: 16, slope: 0.5, fade: 1 });
   const [stride, setStride] = useState(16);
   const [fb, setFb] = useState(FB[16]);
 
@@ -39,7 +38,10 @@ export const Ch2Strides: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
     const render = (time: number) => {
       const s = stateRef.current.stride;
-      const d = SLOPE[s];
+      // eased slope + a short fade-in on the grid after switching stride
+      stateRef.current.slope = lerp(stateRef.current.slope, SLOPE[s], 0.14);
+      stateRef.current.fade = Math.min(1, stateRef.current.fade + 0.06);
+      const d = stateRef.current.slope;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       // ---- left: slope riding, gentler for larger stride ----
@@ -47,32 +49,50 @@ export const Ch2Strides: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       const slopeH = lerp(70, 8, d);
       ctx.strokeStyle = C.route; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(0, 232); ctx.lineTo(500, 232 - slopeH); ctx.stroke();
-      const t = (time / 2600) % 1;
-      const px = 40 + t * 380;
-      const py = 232 - (px / 500) * slopeH + Math.sin(t * Math.PI * (8 + d * 10)) * (4 - d * 2.5);
-      const sc = 0.85;
-      ctx.strokeStyle = C.blue; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(px - 18 * sc, py, 14 * sc, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(px + 20 * sc, py, 14 * sc, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px - 18 * sc, py); ctx.lineTo(px - 2 * sc, py - 16 * sc);
-      ctx.lineTo(px + 20 * sc, py); ctx.lineTo(px - 18 * sc, py);
-      ctx.moveTo(px - 2 * sc, py - 16 * sc); ctx.lineTo(px + 4 * sc, py - 20 * sc);
-      ctx.stroke();
-      ctx.fillStyle = C.blue;
-      ctx.beginPath(); ctx.arc(px + 2 * sc, py - 30 * sc, 6 * sc, 0, Math.PI * 2); ctx.fill();
-      // gear indicator: three cogs, current one highlighted
+      const t = (time / 2800) % 1;
+      const px = loopX(t, 500, 60);
+      const axleY = 232 - (px / 500) * slopeH - 12 + Math.sin(t * Math.PI * (8 + d * 10)) * (4 - d * 2.5);
+      drawCyclist(ctx, px, axleY, {
+        scale: 0.85, color: C.blue,
+        wheelPhase: px / 12, pedalPhase: px / (26 - d * 10),
+      });
+      // gear indicator: three toothed cogs labeled by stride — the engaged
+      // gear spins slowly and glows, so the metaphor reads at a glance
       const gearIdx = GEAR[s];
+      const gearLabels = ['8', '16', '32'];
+      ctx.fillStyle = C.muted; ctx.font = '11px sans-serif';
+      ctx.fillText('档位', 30, 20);
       for (let i = 0; i < 3; i++) {
-        const gx = 60 + i * 40; const gy = 40; const r = 10 + i * 4;
-        ctx.strokeStyle = i === gearIdx ? C.blue : C.muted; ctx.lineWidth = i === gearIdx ? 3 : 1.5;
+        const gx = 56 + i * 56; const gy = 44; const r = 11 + i * 3;
+        const active = i === gearIdx;
+        const col = active ? C.blue : C.muted;
+        if (active) {
+          ctx.strokeStyle = 'rgba(39,68,110,0.22)'; ctx.lineWidth = 6;
+          ctx.beginPath(); ctx.arc(gx, gy, r + 6, 0, Math.PI * 2); ctx.stroke();
+        }
+        // teeth — the engaged gear rotates
+        ctx.strokeStyle = col; ctx.lineWidth = active ? 2.5 : 1.5;
+        const spin = active ? time / 900 : 0;
+        for (let k = 0; k < 8; k++) {
+          const a = (k / 8) * Math.PI * 2 + spin;
+          ctx.beginPath();
+          ctx.moveTo(gx + Math.cos(a) * r, gy + Math.sin(a) * r);
+          ctx.lineTo(gx + Math.cos(a) * (r + 4), gy + Math.sin(a) * (r + 4));
+          ctx.stroke();
+        }
         ctx.beginPath(); ctx.arc(gx, gy, r, 0, Math.PI * 2); ctx.stroke();
+        // hub
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(gx, gy, 2.5, 0, Math.PI * 2); ctx.fill();
+        // stride label under the cog
+        ctx.font = '11px sans-serif';
+        ctx.fillText(gearLabels[i], gx - ctx.measureText(gearLabels[i]).width / 2, gy + r + 15);
       }
-      ctx.strokeStyle = C.muted; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(100, 40); ctx.lineTo(150, 66); ctx.stroke();
       // ---- right inset: grid + anchors + responsible band ----
       ctx.fillStyle = '#fff'; ctx.fillRect(540, 20, 520, 240);
       ctx.strokeStyle = '#d7deea'; ctx.lineWidth = 2; ctx.strokeRect(540, 20, 520, 240);
+      ctx.save();
+      ctx.globalAlpha = stateRef.current.fade;
       const cells = CELLS[s];
       const gx0 = 580; const gy0 = 50; const gs = 192;
       ctx.strokeStyle = '#dfe6f0'; ctx.lineWidth = 1;
@@ -96,20 +116,18 @@ export const Ch2Strides: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.fillText(BAND[s], 800 - 30, 146 + boxSide / 2 + 18);
       ctx.fillStyle = C.muted; ctx.font = '12px sans-serif';
       ctx.fillText('s = ' + s, 580, 244);
+      ctx.restore();
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
-  const pick = (v: number) => { stateRef.current.stride = v; setStride(v); setFb(FB[v]); };
+  const pick = (v: number) => {
+    stateRef.current.stride = v;
+    stateRef.current.fade = 0;
+    setStride(v);
+    setFb(FB[v]);
+  };
 
   return (
     <div>

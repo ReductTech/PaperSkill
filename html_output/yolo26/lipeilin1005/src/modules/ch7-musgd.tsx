@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, easeOutCubic } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, easeOutCubic } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch7 Module 7.2 (P3/P4): MuSGD vs SGD — MuSGD orthogonalizes updates so the
@@ -17,7 +17,6 @@ const musgdAt = (f: number) => (f <= 500 / 600 ? 46.0 + 1.4 * easeOutCubic(f / (
 
 export const Ch7MuSGD: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef({ mode: 'both', progress: 0, running: false, startAt: 0, done: false });
   const [mode, setMode] = useState<'sgd' | 'musgd' | 'both'>('both');
   const [fb, setFb] = useState({ text: '最终成绩：SGD 47.0@600ep，MuSGD 47.4@500ep。', cls: '' });
@@ -34,7 +33,11 @@ export const Ch7MuSGD: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       if (s.running) {
         const raw = (time - s.startAt) / 2000;
         s.progress = Math.min(raw, 1);
-        if (raw >= 1) { s.running = false; s.done = true; setBtn('再看一次'); setFb({ text: '同样的车，传动效率决定了谁先到达。', cls: 'good' }); }
+        if (raw >= 1 && !s.done) {
+          s.running = false; s.done = true;
+          setBtn('再看一次');
+          setFb({ text: '同样的车，传动效率决定了谁先到达。', cls: 'good' });
+        }
       }
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
@@ -47,10 +50,13 @@ export const Ch7MuSGD: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.strokeStyle = C.muted; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(cx, cy, r1, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.arc(300, cy + 10, r2, 0, Math.PI * 2); ctx.stroke();
-      // chain
+      // chain — links march with the drivetrain
       ctx.strokeStyle = s.mode === 'sgd' ? C.red : C.green; ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+      ctx.lineDashOffset = -(time / 20) % 14;
       ctx.beginPath(); ctx.moveTo(cx + r1, cy); ctx.lineTo(300 + r2, cy + 10); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx + r1, cy + 4); ctx.lineTo(300 + r2, cy + 14); ctx.stroke();
+      ctx.setLineDash([]);
       // crank arm + pedal
       const showMu = s.mode !== 'sgd';
       ctx.strokeStyle = showMu ? C.green : slip ? C.red : C.blue; ctx.lineWidth = 4;
@@ -104,31 +110,28 @@ export const Ch7MuSGD: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.fillStyle = C.green; ctx.fillText('MuSGD 47.4 @500ep', ax0 + 8, ay0 + 36);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
+
+  const startRun = () => {
+    stateRef.current.progress = 0;
+    stateRef.current.running = true;
+    stateRef.current.done = false;
+    stateRef.current.startAt = performance.now();
+  };
 
   const pick = (m: 'sgd' | 'musgd' | 'both') => {
     stateRef.current.mode = m;
-    stateRef.current.progress = 0;
-    stateRef.current.done = false;
     setMode(m); setBtn('开始');
     if (m === 'sgd') setFb({ text: '600 epoch 爬到 47.0——传动有损耗。', cls: '' });
     else if (m === 'musgd') setFb({ text: '500 epoch 达 47.4，少 16.7% 轮次还高 0.4。', cls: 'good' });
     else setFb({ text: '按开始，同步绘制两条收敛曲线。', cls: '' });
+    // single-mode selections replay automatically so the panel is never blank
+    if (m !== 'both') startRun();
   };
 
   const run = () => {
-    stateRef.current.progress = 0;
-    stateRef.current.running = true;
-    stateRef.current.startAt = performance.now();
+    startRun();
     setBtn('绘制中…');
   };
 

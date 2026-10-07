@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, lerp } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, lerp, easeOutCubic } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch1 Module 1.2 (P4): with-DFL vs DFL-free head — parameters, FLOPs and the
@@ -19,8 +19,7 @@ const FB = {
 
 export const Ch1Lighten: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const stateRef = useRef({ p: 2.6, f: 6.5, r: 480, dfl: true });
+  const stateRef = useRef({ p: 2.6, f: 6.5, r: 480, needle: 0.62, dfl: true, swap: 1 });
   const [dfl, setDfl] = useState(true);
   const [fb, setFb] = useState(FB.old);
 
@@ -37,12 +36,13 @@ export const Ch1Lighten: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     };
     const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
-    const render = () => {
+    const render = (time: number) => {
       const s = stateRef.current;
       const tgt = s.dfl
         ? { p: 2.6, f: 6.5, r: 480 }
         : { p: 2.3, f: 5.2, r: 1010 };
       s.p = lerp(s.p, tgt.p, 0.18); s.f = lerp(s.f, tgt.f, 0.18); s.r = lerp(s.r, tgt.r, 0.18);
+      s.needle = lerp(s.needle, 0.62 + Math.sin(time / 480) * 0.02, 0.2);
       const col = s.dfl ? C.blue : C.green;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
@@ -68,8 +68,11 @@ export const Ch1Lighten: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       }
       ctx.fillStyle = C.muted; ctx.font = '12px sans-serif';
       ctx.fillText('s=32、K=16：单边上限 (K−1)×stride = 480 px；整框宽/高界 ≈ 2(K−1)×stride ≈ 960 px', 60, 258);
-      // right gauge icon: dial vs digital
+      // right gauge icon: dial vs digital — cross-fades on chip switch
+      s.swap = Math.min(1, s.swap + 0.055);
       const gx = 920; const gy = 130;
+      ctx.save();
+      ctx.globalAlpha = easeOutCubic(s.swap);
       ctx.strokeStyle = C.muted; ctx.lineWidth = 2;
       ctx.strokeRect(840, 40, 170, 180);
       if (s.dfl) {
@@ -84,28 +87,22 @@ export const Ch1Lighten: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           ctx.stroke();
         }
         ctx.strokeStyle = C.blue; ctx.lineWidth = 3;
-        const a = Math.PI + 0.62 * Math.PI;
+        const a = Math.PI + s.needle * Math.PI;
         ctx.beginPath(); ctx.moveTo(gx, gy + 20); ctx.lineTo(gx + Math.cos(a) * 32, gy + 20 + Math.sin(a) * 32); ctx.stroke();
       } else {
         ctx.fillStyle = C.green; ctx.fillRect(gx - 52, gy - 6, 104, 40);
         ctx.fillStyle = '#fff'; ctx.font = '24px monospace';
         ctx.fillText('1204', gx - 32, gy + 22);
       }
+      ctx.restore();
     };
 
-    const tick = () => {
-      render();
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const pick = (v: boolean) => {
     stateRef.current.dfl = v;
+    stateRef.current.swap = 0; // restart the gauge cross-fade
     setDfl(v);
     setFb(v ? FB.old : FB.neu);
   };

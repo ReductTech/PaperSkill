@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, lerp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch6 Module 6.1 (P2): step through the five-stage end-to-end pipeline —
@@ -23,8 +23,9 @@ const STEPS = [
 
 export const Ch6Pipeline: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef({ step: 0 });
+  // eased rider x + per-connection fill progress
+  const easeRef = useRef({ rx: 90, conn: [0, 0, 0, 0, 0] as number[] });
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -33,31 +34,49 @@ export const Ch6Pipeline: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     let ctx: CanvasRenderingContext2D;
     try { ctx = setupCanvas(canvas, W, H); } catch { return; }
 
-    const render = () => {
+    const render = (time: number) => {
       const st = stateRef.current.step;
+      const e = easeRef.current;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       // route nodes
       const nodes = STEPS.map((s, i) => ({ ...s, x: 90 + i * 180 }));
-      // connections
+      // connections fill progressively as the rider passes
       for (let i = 0; i < nodes.length - 1; i++) {
-        ctx.strokeStyle = i < st ? C.green : '#cdd6e4';
-        ctx.lineWidth = i < st ? 5 : 3;
+        e.conn[i] = lerp(e.conn[i], i < st ? 1 : 0, 0.1);
+        ctx.strokeStyle = '#cdd6e4';
+        ctx.lineWidth = 3;
         ctx.beginPath(); ctx.moveTo(nodes[i].x + 34, 90); ctx.lineTo(nodes[i + 1].x - 34, 90); ctx.stroke();
+        if (e.conn[i] > 0.02) {
+          ctx.strokeStyle = C.green;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x + 34, 90);
+          ctx.lineTo(nodes[i].x + 34 + (nodes[i + 1].x - 68 - nodes[i].x) * e.conn[i], 90);
+          ctx.stroke();
+        }
       }
       nodes.forEach((n, i) => {
         const done = i < st;
         const cur = i === st;
         ctx.fillStyle = done ? C.green : cur ? C.blue : '#e8edf5';
         ctx.beginPath(); ctx.arc(n.x, 90, 30, 0, Math.PI * 2); ctx.fill();
+        // breathing ring on the current node
+        if (cur) {
+          const pr = 34 + Math.sin(time / 280) * 3;
+          ctx.strokeStyle = `rgba(39,68,110,${0.5 + 0.25 * Math.sin(time / 280)})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(n.x, 90, pr, 0, Math.PI * 2); ctx.stroke();
+        }
         ctx.fillStyle = done || cur ? '#fff' : C.muted;
         ctx.font = '13px sans-serif';
         ctx.fillText(n.name, n.x - ctx.measureText(n.name).width / 2, 95);
         ctx.fillStyle = C.text; ctx.font = '12px sans-serif';
         ctx.fillText(n.shape, n.x - ctx.measureText(n.shape).width / 2, 142);
       });
-      // rider icon positioned at current node
-      const cx = nodes[st].x; const cy = 46;
+      // rider icon glides to the current node with a gentle bob
+      e.rx = lerp(e.rx, nodes[st].x, 0.12);
+      const cx = e.rx; const cy = 46 + Math.sin(time / 350) * 1.5;
       ctx.strokeStyle = C.route; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.arc(cx - 8, cy + 8, 7, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.arc(cx + 9, cy + 8, 7, 0, Math.PI * 2); ctx.stroke();
@@ -76,15 +95,7 @@ export const Ch6Pipeline: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.fillText(s.desc, 84, 240);
     };
 
-    const tick = () => {
-      render();
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const go = (v: number) => {

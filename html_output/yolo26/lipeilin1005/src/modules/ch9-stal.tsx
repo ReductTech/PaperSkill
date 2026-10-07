@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, lerp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch9 Module 9.1 (P1+P4): the zero-supervision blind spot. When the box side is
@@ -26,8 +26,8 @@ const countHits = (sidePx: number) => {
 
 export const Ch9Stal: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef({ sizePx: 6, method: 'stal' });
+  const easeRef = useRef({ size: 6, hits: countHits(16) });
   const [sizePx, setSizePx] = useState(6);
   const [method, setMethod] = useState<'tal' | 'stal'>('stal');
   const [fb, setFb] = useState({ text: '代理框只用于候选筛选，回归仍用原始真值框——小目标拿回监督，s_ref=16 时 APS +0.6。', cls: 'good' });
@@ -40,8 +40,14 @@ export const Ch9Stal: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
     const render = (time: number) => {
       const s = stateRef.current;
-      const screenSide = s.method === 'stal' ? (s.sizePx < 8 ? 16 : s.sizePx) : s.sizePx;
+      const e = easeRef.current;
+      // eased box size so slider drags glide instead of snapping
+      e.size = lerp(e.size, s.sizePx, 0.16);
+      const screenSide = s.method === 'stal' ? (e.size < 8 ? 16 : e.size) : e.size;
       const hits = countHits(screenSide);
+      // eased count-up for the badge number
+      e.hits = lerp(e.hits, hits, 0.2);
+      const hitsShown = Math.round(e.hits);
       const zero = hits === 0;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
@@ -55,12 +61,16 @@ export const Ch9Stal: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.moveTo(140, 200); ctx.lineTo(220, 120); ctx.lineTo(360, 200); ctx.lineTo(140, 200);
       ctx.stroke();
       const sx = 220; const sy = 120;
-      const screwR = Math.max(4, s.sizePx * 0.8);
+      const screwR = Math.max(4, e.size * 0.8);
       ctx.fillStyle = zero ? C.red : C.green;
       ctx.beginPath(); ctx.arc(sx, sy, screwR, 0, Math.PI * 2); ctx.fill();
       if (zero) {
-        ctx.fillStyle = C.red; ctx.font = '13px sans-serif';
+        // pulsing warning
+        ctx.fillStyle = C.red;
+        ctx.globalAlpha = 0.6 + 0.4 * Math.sin(time / 150);
+        ctx.font = '13px sans-serif';
         ctx.fillText('松动!', sx + 16, sy - 10);
+        ctx.globalAlpha = 1;
       } else {
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
         ctx.beginPath(); ctx.moveTo(sx - screwR * 0.5, sy); ctx.lineTo(sx - screwR * 0.15, sy + screwR * 0.4); ctx.lineTo(sx + screwR * 0.6, sy - screwR * 0.4); ctx.stroke();
@@ -80,15 +90,17 @@ export const Ch9Stal: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         ctx.beginPath(); ctx.moveTo(gx0 + i * 8 * sc, gy0); ctx.lineTo(gx0 + i * 8 * sc, gy0 + 64 * sc); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(gx0, gy0 + i * 8 * sc); ctx.lineTo(gx0 + 64 * sc, gy0 + i * 8 * sc); ctx.stroke();
       }
-      // gt box (orange) and STAL proxy (purple dashed)
+      // gt box (orange) and STAL proxy (purple dashed, marching ants)
       const bcx = gx0 + 32 * sc; const bcy = gy0 + 32 * sc;
-      if (s.method === 'stal' && s.sizePx < 8) {
-        ctx.strokeStyle = C.purple; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+      if (s.method === 'stal' && e.size < 8) {
+        ctx.strokeStyle = C.purple; ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.lineDashOffset = -time / 40;
         ctx.strokeRect(bcx - (16 * sc) / 2, bcy - (16 * sc) / 2, 16 * sc, 16 * sc);
         ctx.setLineDash([]);
       }
       ctx.strokeStyle = C.orange; ctx.lineWidth = 2.5;
-      ctx.strokeRect(bcx - (s.sizePx * sc) / 2, bcy - (s.sizePx * sc) / 2, s.sizePx * sc, s.sizePx * sc);
+      ctx.strokeRect(bcx - (e.size * sc) / 2, bcy - (e.size * sc) / 2, e.size * sc, e.size * sc);
       // anchor centers: green if inside, gray otherwise
       for (const cx of CENTERS) for (const cy of CENTERS) {
         const inside = Math.abs(cx - 32) <= screenSide / 2 && Math.abs(cy - 32) <= screenSide / 2;
@@ -99,21 +111,13 @@ export const Ch9Stal: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.fillStyle = zero ? C.red : C.green;
       ctx.fillRect(830, 60, 190, 52);
       ctx.fillStyle = '#fff'; ctx.font = '15px sans-serif';
-      ctx.fillText(`正样本计数：${hits}`, 846, 92);
+      ctx.fillText(`正样本计数：${hitsShown}`, 846, 92);
       ctx.fillStyle = C.muted; ctx.font = '12px sans-serif';
       ctx.fillText(s.method === 'stal' ? 'd<8 时按 16 筛选，否则按 d' : '筛选尺寸 = d', 830, 140);
       ctx.fillText(`真值框：${s.sizePx} px`, 830, 164);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const update = (size: number, m: 'tal' | 'stal') => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, drawCyclist, loopX } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ana 1: loaded bike labors up a slope toward a summit signpost.
@@ -11,9 +11,10 @@ const C = {
   blue: '#27446e', red: '#c43f52', text: '#21324a',
 };
 
+const roadY = (x: number) => 106 - (x / W) * 32;
+
 export const Ana1: React.FC<WidgetProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,7 +23,7 @@ export const Ana1: React.FC<WidgetProps> = () => {
     try { ctx = setupCanvas(canvas, W, H); } catch { return; }
 
     const render = (time: number) => {
-      const t = (time / 3200) % 1;
+      const t = (time / 3400) % 1;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = C.light; ctx.fillRect(0, 104, W, 36);
@@ -33,35 +34,27 @@ export const Ana1: React.FC<WidgetProps> = () => {
       ctx.beginPath(); ctx.moveTo(500, 96); ctx.lineTo(500, 46); ctx.stroke();
       ctx.fillStyle = C.blue; ctx.fillRect(474, 30, 56, 20);
       ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.fillText('坡顶', 492, 45);
-      // rider + heavy pannier, slow wobbling climb
-      const px = 30 + t * 440;
-      const py = 104 - (px / W) * 30 + Math.sin(t * Math.PI * 10) * 2.5;
-      const s = 0.8;
-      ctx.strokeStyle = C.blue; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(px - 18 * s, py, 14 * s, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(px + 20 * s, py, 14 * s, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px - 18 * s, py); ctx.lineTo(px - 2 * s, py - 16 * s);
-      ctx.lineTo(px + 20 * s, py); ctx.lineTo(px - 18 * s, py);
-      ctx.moveTo(px - 2 * s, py - 16 * s); ctx.lineTo(px + 4 * s, py - 20 * s);
-      ctx.stroke();
-      ctx.fillStyle = C.blue;
-      ctx.beginPath(); ctx.arc(px + 2 * s, py - 30 * s, 6 * s, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = C.red; ctx.fillRect(px - 34 * s, py - 26 * s, 18 * s, 20 * s);
-      // effort puffs
+      // rider + heavy pannier, slow wobbling climb — seamless off-screen loop
+      const px = loopX(t, W, 60);
+      const wobble = Math.sin(t * Math.PI * 10) * 2.5;
+      const axleY = roadY(px) - 11 + wobble;
+      drawCyclist(ctx, px, axleY, {
+        scale: 0.8, color: C.blue, loaded: true, loadColor: C.red, loadSize: 18,
+        wheelPhase: px / 11, pedalPhase: px / 18,
+      });
+      // effort puffs rising above the rider
       ctx.fillStyle = 'rgba(104,119,143,0.5)';
-      ctx.beginPath(); ctx.arc(px + 16, py - 42 - Math.sin(t * Math.PI * 10) * 2, 3, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 3; i++) {
+        const pt = (t * 3 + i / 3) % 1;
+        ctx.globalAlpha = 0.5 * (1 - pt);
+        ctx.beginPath();
+        ctx.arc(px + 16 + pt * 6, axleY - 32 - pt * 14, 2 + pt * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   return <canvas id="cv-ana-1" ref={canvasRef} width={W} height={H} />;

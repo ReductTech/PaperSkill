@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, lerp } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, lerp, loopX, drawCyclist, drawClouds } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch7 Module 7.1 (P1+P4): progressive loss scheduling — drag the training round
@@ -29,8 +29,8 @@ const FB: Record<string, { text: string; cls: string }> = {
 
 export const Ch7Progressive: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef({ t: 0.6, sched: 'def' as keyof typeof SCHED });
+  const easeRef = useRef({ t: 0.6, alpha: SCHED.def.alpha(0.6) });
   const [t, setT] = useState(60);
   const [sched, setSched] = useState<keyof typeof SCHED>('def');
   const [fb, setFb] = useState(FB.def);
@@ -43,31 +43,28 @@ export const Ch7Progressive: React.FC<WidgetProps> = ({ chapterId, moduleId }) =
 
     const render = (time: number) => {
       const s = stateRef.current;
+      const e = easeRef.current;
       const sch = SCHED[s.sched];
-      const alpha = sch.alpha(s.t);
+      // eased transitions: dragging the slider or switching schedules glides
+      e.t = lerp(e.t, s.t, 0.12);
+      e.alpha = lerp(e.alpha, sch.alpha(s.t), 0.12);
+      const alpha = e.alpha;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+      drawClouds(ctx, time, 430, 24);
       // ---- left: rider + schedule board ----
       ctx.fillStyle = C.light; ctx.fillRect(0, 226, 420, 54);
-      const slopeH = lerp(6, 40, s.t) + lerp(24, 0, alpha);
+      const slopeH = lerp(6, 40, e.t) + lerp(24, 0, alpha);
       ctx.strokeStyle = C.route; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(0, 232); ctx.lineTo(420, 232 - slopeH); ctx.stroke();
-      const px = 40 + ((time / 3000) % 1) * 300;
+      // seamless off-screen loop, spinning wheels and pedaling
+      const px = loopX((time / 4200) % 1, 420, 50);
       const py = 232 - (px / 420) * slopeH + Math.sin(time / 120) * 1.5;
-      const sc = 0.8;
-      ctx.strokeStyle = C.blue; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(px - 18 * sc, py, 14 * sc, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(px + 20 * sc, py, 14 * sc, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px - 18 * sc, py); ctx.lineTo(px - 2 * sc, py - 16 * sc); ctx.lineTo(px + 20 * sc, py); ctx.lineTo(px - 18 * sc, py);
-      ctx.moveTo(px - 2 * sc, py - 16 * sc); ctx.lineTo(px + 4 * sc, py - 20 * sc);
-      ctx.stroke();
-      ctx.fillStyle = C.blue;
-      ctx.beginPath(); ctx.arc(px + 2 * sc, py - 30 * sc, 6 * sc, 0, Math.PI * 2); ctx.fill();
-      // schedule board with fill = t
+      drawCyclist(ctx, px, py, { scale: 0.8, color: C.blue, riderColor: C.blue, wheelPhase: px / 11 });
+      // schedule board with fill = t (eased)
       ctx.fillStyle = '#fff'; ctx.fillRect(300, 60, 100, 120);
       ctx.strokeStyle = C.muted; ctx.lineWidth = 2; ctx.strokeRect(300, 60, 100, 120);
-      ctx.fillStyle = C.green; ctx.fillRect(310, 170 - 100 * s.t, 80, 100 * s.t);
+      ctx.fillStyle = C.green; ctx.fillRect(310, 170 - 100 * e.t, 80, 100 * e.t);
       ctx.strokeStyle = C.muted; ctx.strokeRect(310, 70, 80, 100);
       // ---- right inset: alpha curve + weight bars + mAP ----
       ctx.fillStyle = '#fff'; ctx.fillRect(460, 20, 600, 240);
@@ -85,13 +82,13 @@ export const Ch7Progressive: React.FC<WidgetProps> = ({ chapterId, moduleId }) =
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
-      // current point
-      const ax = cx0 + s.t * cw; const ay = cy0 + (1 - alpha) * ch;
+      // current point (eased)
+      const ax = cx0 + e.t * cw; const ay = cy0 + (1 - alpha) * ch;
       ctx.fillStyle = C.orange;
       ctx.beginPath(); ctx.arc(ax, ay, 6, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = C.text; ctx.font = '13px sans-serif';
       ctx.fillText('α(t)', cx0, cy0 - 8);
-      // weight bars
+      // weight bars (eased)
       ctx.fillText('o2m 权重', 830, 84);
       ctx.fillStyle = '#e8edf5'; ctx.fillRect(830, 92, 200, 18);
       ctx.fillStyle = C.blue; ctx.fillRect(830, 92, 200 * alpha, 18);
@@ -108,15 +105,7 @@ export const Ch7Progressive: React.FC<WidgetProps> = ({ chapterId, moduleId }) =
       ctx.fillText(best ? 'E2E mAP 最佳' : 'E2E mAP', 836, 246);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const update = (tv: number, sv: keyof typeof SCHED) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, clamp } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, clamp, lerp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch4 Module 4.1 (P1+P4): drag the ground-truth box size (or switch 640/1280)
@@ -15,8 +15,9 @@ const C = {
 
 export const Ch4Regression: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef({ sizePx: 40, res: 640 });
+  // eased display values
+  const easeRef = useRef({ bins: new Array(16).fill(8) as number[], needle: 0.4, digital: 40 });
   const [sizePx, setSizePx] = useState(40);
   const [res, setRes] = useState(640);
   const [fb, setFb] = useState({ text: '16 格分布从容覆盖，DFL 工作正常。', cls: '' });
@@ -29,10 +30,10 @@ export const Ch4Regression: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
 
     const render = (time: number) => {
       const s = stateRef.current;
+      const e = easeRef.current;
       const scale = s.res / 640;
       const peakBin = clamp(Math.round((s.sizePx * scale) / 4), 0, 20);
       const trunc = peakBin > 15;
-      const near = !trunc && peakBin >= 12;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       // ---- left: rider + two gauges ----
@@ -49,7 +50,7 @@ export const Ch4Regression: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
       ctx.stroke();
       ctx.fillStyle = C.blue;
       ctx.beginPath(); ctx.arc(px + 2, py - 44, 6, 0, Math.PI * 2); ctx.fill();
-      // needle gauge (DFL)
+      // needle gauge (DFL) — eased needle, jitters while pegged at the cap
       const gx = 240; const gy = 200; const r = 52;
       ctx.strokeStyle = C.route; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(gx, gy, r, Math.PI, 0); ctx.stroke();
@@ -61,24 +62,28 @@ export const Ch4Regression: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
         ctx.lineTo(gx + Math.cos(a) * r, gy + Math.sin(a) * r);
         ctx.stroke();
       }
+      e.needle = lerp(e.needle, clamp(peakBin / 16, 0, 1), 0.15);
       const jit = trunc ? Math.sin(time / 40) * 0.03 : 0;
-      const frac = clamp(peakBin / 16 + jit, 0, 1);
+      const frac = clamp(e.needle + jit, 0, 1);
       const a = Math.PI + frac * Math.PI;
       ctx.strokeStyle = trunc ? C.red : C.blue; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + Math.cos(a) * (r - 12), gy + Math.sin(a) * (r - 12)); ctx.stroke();
-      // digital gauge (direct regression)
+      // digital gauge (direct regression) — eased count
+      e.digital = lerp(e.digital, s.sizePx * scale, 0.2);
       ctx.fillStyle = C.green; ctx.fillRect(330, 140, 108, 42);
       ctx.fillStyle = '#fff'; ctx.font = '22px monospace';
-      ctx.fillText(String(s.sizePx * scale), 356, 168);
+      ctx.fillText(String(Math.round(e.digital)), 356, 168);
       ctx.fillStyle = trunc ? C.red : C.green; ctx.font = '12px sans-serif';
       ctx.fillText(trunc ? '顶到上限!' : '精确直显', 344, 206);
-      // ---- right inset: 16-bin distribution ----
+      // ---- right inset: 16-bin distribution (bar heights ease) ----
       ctx.fillStyle = '#fff'; ctx.fillRect(500, 20, 560, 240);
       ctx.strokeStyle = '#d7deea'; ctx.lineWidth = 2; ctx.strokeRect(500, 20, 560, 240);
       const bx0 = 540; const bw = 26; const base = 226;
       for (let i = 0; i < 16; i++) {
         const dist = Math.abs(i - Math.min(peakBin, 15));
-        const h = Math.max(8, 120 * Math.exp(-dist * dist / 8));
+        const target = Math.max(8, 120 * Math.exp(-dist * dist / 8));
+        e.bins[i] = lerp(e.bins[i], target, 0.18);
+        const h = e.bins[i];
         const clipped = trunc && i === 15;
         ctx.fillStyle = clipped ? C.red : C.blue;
         ctx.fillRect(bx0 + i * (bw + 4), base - h, bw, h);
@@ -89,20 +94,12 @@ export const Ch4Regression: React.FC<WidgetProps> = ({ chapterId, moduleId }) =>
         ctx.fillStyle = C.red; ctx.font = '12px sans-serif';
         ctx.fillText('截断', bx0 + 16 * (bw + 4) - 14, 44);
       }
-      ctx.fillStyle = C.green; ctx.fillRect(540, base + 8, clamp((s.sizePx * scale) / 64, 0, 1) * 440, 8);
+      ctx.fillStyle = C.green; ctx.fillRect(540, base + 8, clamp(e.digital / 64, 0, 1) * 440, 8);
       ctx.fillStyle = C.muted; ctx.font = '12px sans-serif';
       ctx.fillText('直接回归：' + s.sizePx * scale + ' px', 540, base + 32);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const update = (size: number, resolution: number) => {

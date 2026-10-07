@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, easeInOutQuad } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, easeInOutQuad, easeOutCubic, clamp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch3 Module 3.1 (P3): one shared start button drives two synchronized panels —
@@ -29,8 +29,7 @@ const J = OBJS.map((_, i) => [0, 1, 2].map((k) => ({
 
 export const Ch3OneToOne: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const stateRef = useRef({ progress: 0, running: false, startAt: 0 });
+  const stateRef = useRef({ progress: 0, running: false, startAt: 0, finished: false });
   const [fb, setFb] = useState({ text: '按下开始，左右两侧将从同一张街景出发。', cls: '' });
   const [btn, setBtn] = useState('开始对比');
 
@@ -40,7 +39,7 @@ export const Ch3OneToOne: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     let ctx: CanvasRenderingContext2D;
     try { ctx = setupCanvas(canvas, W, H); } catch { return; }
 
-    const drawPanel = (ox: number, title: string, color: string) => {
+    const drawPanel = (ox: number, title: string) => {
       ctx.fillStyle = '#fff'; ctx.fillRect(ox, 10, 500, 260);
       ctx.strokeStyle = '#d7deea'; ctx.lineWidth = 2; ctx.strokeRect(ox, 10, 500, 260);
       ctx.fillStyle = C.text; ctx.font = '13px sans-serif';
@@ -56,8 +55,9 @@ export const Ch3OneToOne: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       if (s.running) {
         const raw = (time - s.startAt) / 1800;
         s.progress = Math.min(raw, 1);
-        if (raw >= 1) {
+        if (raw >= 1 && !s.finished) {
           s.running = false;
+          s.finished = true;
           setBtn('再看一次');
           setFb({ text: '左侧靠 NMS 事后筛掉 8 个重复框；右侧训练时就一对一，推理零后处理——代价只是 AP 低 0.6–0.8。', cls: 'good' });
         }
@@ -66,52 +66,59 @@ export const Ch3OneToOne: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       // ---- left panel: one-to-many + NMS ----
-      drawPanel(20, '一对多头 + NMS', C.red);
-      const leftCount = Math.round(12 - 8 * (p > 0.55 ? (p - 0.55) / 0.45 : 0));
+      drawPanel(20, '一对多头 + NMS');
+      // continuous trimming: the box being removed fades out instead of popping
+      const trimP = p > 0.55 ? (p - 0.55) / 0.45 : 0;
+      const leftF = 12 - 8 * trimP;
+      const fullCount = Math.ceil(leftF);
       let drawn = 0;
       OBJS.forEach((o, i) => {
-        // keep 1 "true" box per object; the rest are duplicates
-        const dupForThis = i < leftCount % 4 ? Math.floor(leftCount / 4) + 1 : Math.floor(leftCount / 4);
-        for (let k = 0; k < dupForThis && drawn < leftCount; k++, drawn++) {
+        for (let k = 0; k < 3 && drawn < fullCount; k++, drawn++) {
           const jx = k === 0 ? 0 : J[i][k - 1].dx;
           const jy = k === 0 ? 0 : J[i][k - 1].dy;
-          const isSurvivor = p > 0.55 && k === 0;
-          ctx.strokeStyle = isSurvivor ? C.blue : `rgba(196,63,82,${0.35 + p * 0.3})`;
-          ctx.lineWidth = isSurvivor ? 2.5 : 1.5;
+          const isSurvivor = trimP > 0 && k === 0;
+          const fadeA = drawn === fullCount - 1 && leftF % 1 !== 0 ? leftF % 1 : 1;
+          if (isSurvivor) {
+            ctx.strokeStyle = C.blue;
+            ctx.lineWidth = 2.5;
+          } else {
+            ctx.strokeStyle = `rgba(196,63,82,${(0.35 + p * 0.3) * fadeA})`;
+            ctx.lineWidth = 1.5;
+          }
           ctx.strokeRect(20 + o.x - o.s / 2 + jx, o.y - o.s / 2 + jy, o.s, o.s);
         }
       });
       // NMS gate icon at right edge of left panel
-      ctx.fillStyle = p > 0.55 ? C.green : C.red;
+      ctx.fillStyle = trimP > 0 ? C.green : C.red;
       ctx.fillRect(486, 110, 26, 60);
       ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif';
       ctx.fillText('NMS', 487, 145);
       // ---- right panel: one-to-one ----
-      drawPanel(560, '一对一头（端到端）', C.green);
-      if (s.progress > 0.05) {
-        OBJS.forEach((o) => {
+      drawPanel(560, '一对一头（端到端）');
+      const appear = clamp((s.progress - 0.05) / 0.2, 0, 1);
+      if (appear > 0) {
+        OBJS.forEach((o, i) => {
+          const local = easeOutCubic(clamp(appear * 1.6 - i * 0.15, 0, 1));
+          if (local <= 0) return;
+          ctx.save();
+          ctx.globalAlpha = local;
+          const ss = o.s * (0.7 + 0.3 * local);
           ctx.strokeStyle = C.green; ctx.lineWidth = 2.5;
-          ctx.strokeRect(560 + o.x - o.s / 2, o.y - o.s / 2, o.s, o.s);
+          ctx.strokeRect(560 + o.x - ss / 2, o.y - ss / 2, ss, ss);
+          ctx.restore();
         });
       }
       ctx.fillStyle = C.green; ctx.font = '12px sans-serif';
       ctx.fillText('零后处理', 946, 252);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const run = () => {
     stateRef.current.progress = 0;
     stateRef.current.running = true;
+    stateRef.current.finished = false;
     stateRef.current.startAt = performance.now();
     setBtn('进行中…');
     setFb({ text: '两侧从同一张图出发……', cls: '' });

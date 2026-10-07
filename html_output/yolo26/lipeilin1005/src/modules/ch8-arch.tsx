@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, clamp, easeOutCubic } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch8 Module 8.1 (P5): clickable YOLO26 architecture map — five hotspots
@@ -87,8 +87,8 @@ const center = (p: { x: number; y: number; w: number; h: number }) => ({ x: p.x 
 
 export const Ch8Arch: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
   const stateRef = useRef<{ selected: PartId | null }>({ selected: null });
+  const selAtRef = useRef(0);
   const [selected, setSelected] = useState<PartId | null>(null);
   const [fb, setFb] = useState({ text: '点击一个部件开始。', cls: '' });
 
@@ -105,7 +105,7 @@ export const Ch8Arch: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       const activeDown = sel ? new Set([sel, ...DOWN[sel]]) : null;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
-      // edges
+      // edges — hot paths get marching dashes so data flow reads as motion
       EDGES.forEach(([a, b]) => {
         const pa = a === 'input' ? center(inputBox) : center(PARTS[a]);
         const pb = center(PARTS[b]);
@@ -116,7 +116,12 @@ export const Ch8Arch: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
           : false;
         ctx.strokeStyle = hot ? C.green : '#c3cdcf';
         ctx.lineWidth = hot ? 4 : 2;
+        if (hot) {
+          ctx.setLineDash([10, 8]);
+          ctx.lineDashOffset = -time / 40;
+        }
         ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+        if (hot) ctx.setLineDash([]);
       });
       // input
       ctx.fillStyle = '#e8edf5';
@@ -124,18 +129,23 @@ export const Ch8Arch: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.strokeStyle = C.muted; ctx.lineWidth = 2; ctx.strokeRect(inputBox.x, inputBox.y, inputBox.w, inputBox.h);
       ctx.fillStyle = C.text; ctx.font = '13px sans-serif';
       ctx.fillText('输入', inputBox.x + 20, inputBox.y + 27);
+      // selection pop: box springs in over ~260 ms after being picked
+      const pop = sel ? 0.92 + 0.08 * easeOutCubic(clamp((time - selAtRef.current) / 260, 0, 1)) : 1;
       // parts
       (Object.keys(PARTS) as PartId[]).forEach((id) => {
         const p = PARTS[id];
         const isSel = sel === id;
         const isDown = activeDown ? activeDown.has(id) && !isSel : false;
+        const k = isSel ? pop : 1;
+        const cx = p.x + p.w / 2; const cy = p.y + p.h / 2;
+        const bw = (p.w * k) / 2; const bh = (p.h * k) / 2;
         ctx.fillStyle = isSel ? C.blue : isDown ? '#e3f2ea' : '#fff';
-        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillRect(cx - bw, cy - bh, bw * 2, bh * 2);
         ctx.strokeStyle = isSel ? C.blue : isDown ? C.green : C.muted;
         ctx.lineWidth = isSel ? 4 : isDown ? 3 : 2;
-        ctx.strokeRect(p.x, p.y, p.w, p.h);
+        ctx.strokeRect(cx - bw, cy - bh, bw * 2, bh * 2);
         ctx.fillStyle = isSel ? '#fff' : C.text; ctx.font = '14px sans-serif';
-        ctx.fillText(p.label, p.x + p.w / 2 - ctx.measureText(p.label).width / 2, p.y + p.h / 2 + 5);
+        ctx.fillText(p.label, cx - ctx.measureText(p.label).width / 2, cy + 5);
         // pulsing hint ring when nothing selected
         if (!sel) {
           const pulse = 4 + Math.sin(time / 300 + p.x) * 2;
@@ -146,19 +156,12 @@ export const Ch8Arch: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       });
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const pick = (id: PartId | null) => {
     stateRef.current.selected = id;
+    selAtRef.current = performance.now();
     setSelected(id);
     if (id) setFb({ text: DETAIL[id].fb, cls: DETAIL[id].cls });
     else setFb({ text: '点击一个部件开始。', cls: '' });

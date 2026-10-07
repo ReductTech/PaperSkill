@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, easeOutCubic } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, easeOutCubic, easeOutBounce, clamp, drawFlag } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch10 Module 10.1 (P8+P4): same-scale race — YOLO11 baseline vs YOLO26
@@ -25,8 +25,7 @@ const DATA: Record<string, [number, number, number, number, number, number]> = {
 
 export const Ch10Race: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const stateRef = useRef({ scale: 's', racing: false, startAt: 0, progress: 0, done: false });
+  const stateRef = useRef({ scale: 's', racing: false, startAt: 0, progress: 0, done: false, doneAt: 0 });
   const [scale, setScale] = useState('s');
   const [fb, setFb] = useState({ text: '选择尺度，按下开始，同尺度对决。', cls: '' });
   const [btn, setBtn] = useState('开始竞赛');
@@ -43,7 +42,7 @@ export const Ch10Race: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
         const raw = (time - s.startAt) / 1200;
         s.progress = Math.min(raw, 1);
         if (raw >= 1) {
-          s.racing = false; s.done = true;
+          s.racing = false; s.done = true; s.doneAt = time;
           setBtn('再赛一次');
           const [nms, e2e, lat] = DATA[s.scale];
           setFb({ text: `YOLO26${s.scale}：${nms.toFixed(1)} mAP（E2E ${e2e.toFixed(1)}），T4 ${lat.toFixed(1)} ms——同尺度领先，且 E2E 仅低 0.6–0.8 AP。`, cls: 'good' });
@@ -69,27 +68,26 @@ export const Ch10Race: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       ctx.fillStyle = C.green; ctx.fillRect(bx, 156, bw * (nms / maxV) * pGreen, 34);
       ctx.fillStyle = '#fff'; ctx.font = '15px sans-serif';
       if (pGreen > 0.1) ctx.fillText(nms.toFixed(1), bx + bw * (nms / maxV) * pGreen - 52, 179);
-      // delta badge
+      // delta badge — springs in with a bounce once the race finishes
       if (s.done) {
         const delta = nms - base;
+        const bs = easeOutBounce(clamp((time - s.doneAt) / 480, 0, 1));
+        const bxc = bx + bw + 16 + 46; const byc = 106 + 22;
+        ctx.save();
+        ctx.translate(bxc, byc); ctx.scale(bs, bs); ctx.translate(-bxc, -byc);
         ctx.fillStyle = C.green; ctx.fillRect(bx + bw + 16, 106, 92, 44);
         ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif';
         ctx.fillText('+' + delta.toFixed(1), bx + bw + 34, 135);
+        ctx.restore();
+        // little waving flag planted at the green bar tip
+        drawFlag(ctx, bx + bw * (nms / maxV) + 6, 122, 34, time, C.green);
       }
       // finish scale note
       ctx.fillStyle = C.muted; ctx.font = '12px sans-serif';
       ctx.fillText('COCO mAP 50-95 · 同尺度对比', 120, 240);
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const pick = (sc: string) => {
@@ -103,6 +101,7 @@ export const Ch10Race: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
 
   const run = () => {
     stateRef.current.progress = 0;
+    stateRef.current.done = false; // clear the previous badge before re-racing
     stateRef.current.racing = true;
     stateRef.current.startAt = performance.now();
     setBtn('竞赛中…');

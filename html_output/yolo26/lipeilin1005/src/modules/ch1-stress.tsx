@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { setupCanvas, observeCanvas, clamp, lerp } from '../lib/canvasKit';
+import { setupCanvas, startCanvasLoop, drawCyclist, loopX, clamp, lerp } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 
 // Ch1 Module 1.1 (P1): stress-test the old pipeline — the harder the scene,
@@ -21,8 +21,7 @@ const FB = {
 
 export const Ch1Stress: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const stateRef = useRef({ diff: 30 });
+  const stateRef = useRef({ diff: 30, cur: 30 });
   const [diff, setDiff] = useState(30);
   const [fb, setFb] = useState(FB.easy);
 
@@ -33,7 +32,10 @@ export const Ch1Stress: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
     try { ctx = setupCanvas(canvas, W, H); } catch { return; }
 
     const render = (time: number) => {
-      const d = stateRef.current.diff / 100;
+      // ease toward the slider value so slope/load/bars glide instead of snapping
+      const st = stateRef.current;
+      st.cur = lerp(st.cur, st.diff, 0.12);
+      const d = st.cur / 100;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
       // ---- left scene (0-540): loaded bike climbing a slope ----
@@ -41,30 +43,22 @@ export const Ch1Stress: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       const slopeH = lerp(6, 66, d);
       ctx.strokeStyle = C.route; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(0, 232); ctx.lineTo(540, 232 - slopeH); ctx.stroke();
-      const t = (time / 3000) % 1;
-      const px = 40 + t * 400;
-      const py = 232 - (px / 540) * slopeH + Math.sin(t * Math.PI * 12) * (1 + d * 3);
-      const s = 0.85;
-      ctx.strokeStyle = C.blue; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(px - 18 * s, py, 14 * s, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(px + 20 * s, py, 14 * s, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px - 18 * s, py); ctx.lineTo(px - 2 * s, py - 16 * s);
-      ctx.lineTo(px + 20 * s, py); ctx.lineTo(px - 18 * s, py);
-      ctx.moveTo(px - 2 * s, py - 16 * s); ctx.lineTo(px + 4 * s, py - 20 * s);
-      ctx.stroke();
-      ctx.fillStyle = C.blue;
-      ctx.beginPath(); ctx.arc(px + 2 * s, py - 30 * s, 6 * s, 0, Math.PI * 2); ctx.fill();
-      // red pannier grows with difficulty
-      const bag = lerp(10, 34, d);
-      ctx.fillStyle = d > 0.7 ? C.red : '#a85448';
-      ctx.fillRect(px - 34 * s - bag / 2, py - 26 * s, bag, 20 * s + bag / 2);
+      const t = (time / 3200) % 1;
+      const px = loopX(t, 540, 60);
+      const wobble = Math.sin(t * Math.PI * 12) * (1 + d * 3);
+      const axleY = 232 - (px / 540) * slopeH - 12 + wobble;
+      drawCyclist(ctx, px, axleY, {
+        scale: 0.85, color: C.blue, loaded: true,
+        loadColor: d > 0.7 ? C.red : '#a85448',
+        loadSize: lerp(10, 34, d),
+        wheelPhase: px / 12, pedalPhase: px / (20 - d * 6),
+      });
       // ---- right inset (560-1080): evidence bars ----
       ctx.fillStyle = '#fff';
       ctx.fillRect(560, 20, 500, 240);
       ctx.strokeStyle = '#d7deea'; ctx.lineWidth = 2;
       ctx.strokeRect(560, 20, 500, 240);
-      const overload = stateRef.current.diff > 70;
+      const overload = st.cur > 70;
       // latency bar
       const lat = lerp(0.08, 1, d);
       ctx.fillStyle = C.text; ctx.font = '14px sans-serif';
@@ -95,15 +89,7 @@ export const Ch1Stress: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
       }
     };
 
-    const tick = (time: number) => {
-      render(time);
-      if (!canvas.classList.contains('is-ready')) canvas.classList.add('is-ready');
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    const stop = () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); rafRef.current = null; };
-    const start = () => { if (!rafRef.current) rafRef.current = requestAnimationFrame(tick); };
-    const disconnect = observeCanvas(canvas, start, stop);
-    return () => { stop(); disconnect(); };
+    return startCanvasLoop(canvas, render);
   }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
