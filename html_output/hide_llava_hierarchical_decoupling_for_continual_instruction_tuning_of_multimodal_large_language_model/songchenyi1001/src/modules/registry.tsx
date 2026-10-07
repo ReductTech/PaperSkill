@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy01 } from './analogy-01';
+import { Analogy02 } from './analogy-02';
+import { Analogy03 } from './analogy-03';
+import { Analogy04 } from './analogy-04';
+import { Analogy05 } from './analogy-05';
+import { Analogy06 } from './analogy-06';
+import { Analogy07 } from './analogy-07';
+import { Analogy08 } from './analogy-08';
+import { Analogy09 } from './analogy-09';
+import { Analogy10 } from './analogy-10';
+import { AnchorSteps } from './anchor-steps';
+import { ArchitectureMap } from './architecture-map';
+import { CkaLayers } from './cka-layers';
+import { DecoupleDrag } from './decouple-drag';
+import { ExpansionDepth } from './expansion-depth';
+import { FusionModes } from './fusion-modes';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { LeakBenchmark } from './leak-model';
+import { ResultRace } from './result-race';
+import { RoutingWeights } from './routing-weights';
+import { TrainInferSync } from './train-infer-sync';
+import { TrainingSteps } from './training-steps';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-01'] = Analogy01;
+widgetRegistry['analogy-02'] = Analogy02;
+widgetRegistry['analogy-03'] = Analogy03;
+widgetRegistry['analogy-04'] = Analogy04;
+widgetRegistry['analogy-05'] = Analogy05;
+widgetRegistry['analogy-06'] = Analogy06;
+widgetRegistry['analogy-07'] = Analogy07;
+widgetRegistry['analogy-08'] = Analogy08;
+widgetRegistry['analogy-09'] = Analogy09;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['anchor-steps'] = AnchorSteps;
+widgetRegistry['architecture-map'] = ArchitectureMap;
+widgetRegistry['cka-layers'] = CkaLayers;
+widgetRegistry['decouple-drag'] = DecoupleDrag;
+widgetRegistry['expansion-depth'] = ExpansionDepth;
+widgetRegistry['fusion-modes'] = FusionModes;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['leak-model'] = LeakBenchmark;
+widgetRegistry['result-race'] = ResultRace;
+widgetRegistry['routing-weights'] = RoutingWeights;
+widgetRegistry['train-infer-sync'] = TrainInferSync;
+widgetRegistry['training-steps'] = TrainingSteps;
