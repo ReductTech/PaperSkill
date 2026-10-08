@@ -18,7 +18,7 @@ export interface Meta {
 }
 
 export interface FigureRef {
-  /** Path under public/ (e.g. "./images/fig1.png") or an absolute URL. Optional. */
+  /** Relative path to a public/ file (e.g. "./images/fig1.png") or an absolute URL. Optional. */
   src: string;
   caption?: string;
   alt?: string;
@@ -100,4 +100,3 @@ export interface TutorialData {
   chapters: ChapterDef[];
   bilibili?: BiliDef[];
 }
-

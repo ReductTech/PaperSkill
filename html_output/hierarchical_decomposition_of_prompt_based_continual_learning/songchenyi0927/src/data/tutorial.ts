@@ -48,7 +48,8 @@ export const tutorial: TutorialData = {
           "id": "1.1",
           "title": "通用印章强度",
           "desc": "拖动强度，观察<b>无指令表示</b>与<b>有指令表示</b>如何越来越相似，任务身份又如何变难预测。",
-          "componentId": "universal-stamp"
+          "componentId": "universal-stamp",
+          "figure": "./images/page-04-img-02.jpg"
         }
       ],
       "insight": "任务不是越“统一”越好：prompt 需要写入任务专属知识，才能让持续学习不被表面的通用性遮蔽。",
@@ -88,7 +89,8 @@ export const tutorial: TutorialData = {
           "id": "2.1",
           "title": "表示距离滑轨",
           "desc": "拖动照片卡：横向越靠右，两种表示的 <b>CKA 相似度</b> 越高；纵向位置表示任务特异性。",
-          "componentId": "representation-map"
+          "componentId": "representation-map",
+          "figure": "./images/page-22-img-01.jpg"
         }
       ],
       "insight": "CKA 是诊断量，不是越大越好；论文指出自监督表示更相似，因而 prompt 更难注入任务知识。",
@@ -146,7 +148,8 @@ export const tutorial: TutorialData = {
           "id": "3.1",
           "title": "三层目标步进器",
           "desc": "按顺序步进，观察 <b>WTP、TII、TAP</b> 如何从局部任务内预测扩展到全局类别预测。",
-          "componentId": "hierarchy-stepper"
+          "componentId": "hierarchy-stepper",
+          "figure": "./images/page-04-img-01.png"
         }
       ],
       "insight": "这不是三个彼此独立的名字，而是一条从任务内到任务身份再到全局类别的层级链路。",
@@ -340,7 +343,8 @@ export const tutorial: TutorialData = {
           "id": "6.1",
           "title": "Prompt 集成比例",
           "desc": "调整旧知识权重 α，观察旧任务知识与当前任务适配如何共同决定新页面的颜色。",
-          "componentId": "ensemble-mixer"
+          "componentId": "ensemble-mixer",
+          "figure": "./images/page-10-img-01.jpg"
         }
       ],
       "insight": "论文让新 prompt 从上一任务初始化，再与冻结的历史 prompt 加权组合；α 控制传递多少旧知识。",
@@ -468,7 +472,8 @@ export const tutorial: TutorialData = {
           "id": "8.1",
           "title": "架构热点与路径",
           "desc": "点击架构节点，观察样本从无指令表示经 TII、Prompt 集成到有指令表示与 TAP 的路径。",
-          "componentId": "hierarchical-architecture"
+          "componentId": "hierarchical-architecture",
+          "figure": "./images/page-06-img-01.png"
         },
         {
           "kind": "module",
@@ -599,7 +604,8 @@ export const tutorial: TutorialData = {
           "id": "10.1",
           "title": "验证结果竞速",
           "desc": "选择匹配协议后开始比较：FAA 向上增长，FFM 向下表示遗忘更少。",
-          "componentId": "result-race"
+          "componentId": "result-race",
+          "figure": "./images/page-23-img-01.jpg"
         }
       ],
       "insight": "结论应和协议绑定：论文报告相同设定下 HiDe-Prompt 的 FAA/CAA 更高、FFM 更低，但限定于充分预训练与 Transformer 主干。",
