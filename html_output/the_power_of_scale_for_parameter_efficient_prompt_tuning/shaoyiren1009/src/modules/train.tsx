@@ -1,0 +1,1 @@
+export {TrainWidget} from './TrainingWidgets';

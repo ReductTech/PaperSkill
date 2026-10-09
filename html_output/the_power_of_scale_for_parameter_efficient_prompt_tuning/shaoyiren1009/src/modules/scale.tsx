@@ -1,0 +1,1 @@
+export {ScaleWidget} from './TrainingWidgets';
