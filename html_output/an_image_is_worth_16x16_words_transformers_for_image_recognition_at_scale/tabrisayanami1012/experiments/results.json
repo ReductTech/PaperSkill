@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "study_date": "2026-10-12",
+  "scope": "教学验证；固定随机两层微型Transformer编码器，仅训练二分类线性头；非ViT原论文复现",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "dtype": "float64",
+    "device": "CPU"
+  },
+  "script_sha256": "e6bc66783324111bbf5d21730dd09d24cda3f0c6191c6e7414c2b1d1f414bd23",
+  "numerical_checks": {
+    "patch_roundtrip_max_abs_error": 0.0,
+    "projection_vs_stride_conv_max_abs_error": 1.0658141036401503e-14,
+    "attention_row_sum_max_abs_error": 2.220446049250313e-16,
+    "no_position_cls_permutation_max_abs_error": 2.4424906541753444e-15,
+    "no_position_patch_equivariance_max_abs_error": 1.7763568394002505e-15,
+    "fixed_position_cls_permutation_max_abs_difference": 0.6376405722482499
+  },
+  "attention_example": {
+    "weights": [
+      0.44580827410760315,
+      0.44580827410760315,
+      0.10838345178479356
+    ],
+    "output": [
+      0.5541917258923967,
+      0.5541917258923967
+    ]
+  },
+  "sgd_example": [
+    {
+      "step": 0,
+      "weight": 0.0,
+      "probability": 0.5,
+      "loss": 0.6931471805599453
+    },
+    {
+      "step": 1,
+      "weight": 0.5,
+      "probability": 0.6224593312018546,
+      "loss": 0.47407698418010663
+    },
+    {
+      "step": 2,
+      "weight": 0.8775406687981454,
+      "probability": 0.7063123281484124,
+      "loss": 0.34769774816994703
+    },
+    {
+      "step": 3,
+      "weight": 1.171228340649733,
+      "probability": 0.76336697230204,
+      "loss": 0.27001640355499373
+    },
+    {
+      "step": 4,
+      "weight": 1.407861368347693,
+      "probability": 0.8034284061300069,
+      "loss": 0.21886720028842727
+    },
+    {
+      "step": 5,
+      "weight": 1.604432962217686,
+      "probability": 0.8326370411764527,
+      "loss": 0.18315745664917124
+    }
+  ],
+  "resolution_checks": [
+    {
+      "resolution": 224,
+      "patch": 16,
+      "patches": 196,
+      "tokens": 197,
+      "per_head_attention_elements": 38809
+    },
+    {
+      "resolution": 384,
+      "patch": 16,
+      "patches": 576,
+      "tokens": 577,
+      "per_head_attention_elements": 332929
+    },
+    {
+      "resolution": 224,
+      "patch": 14,
+      "patches": 256,
+      "tokens": 257,
+      "per_head_attention_elements": 66049
+    },
+    {
+      "resolution": 518,
+      "patch": 14,
+      "patches": 1369,
+      "tokens": 1370,
+      "per_head_attention_elements": 1876900
+    }
+  ],
+  "experiment": {
+    "task": "同一对图块的左右交换，预测红色图块在左边；每对输入图块集合完全相同，标签相反",
+    "train_examples": 256,
+    "test_examples": 128,
+    "train_seed": 13001,
+    "test_seed": 24002,
+    "train_data_sha256": "3613a5d12193bde793cd27c50c538bdeb66cdbe998bf394405339dc58b06a1f2",
+    "test_data_sha256": "d177eee898f8f38c9b80fa77a8837f3ca4906978ee6f620750e45c519108550e",
+    "encoder": {
+      "image_shape": [
+        8,
+        8,
+        3
+      ],
+      "patch": 4,
+      "width": 24,
+      "heads": 4,
+      "depth": 2,
+      "mlp_width": 96,
+      "position_std": 0.2,
+      "dropout": 0,
+      "trained": false
+    },
+    "head_training": {
+      "optimizer": "full-batch gradient descent",
+      "epochs": 400,
+      "learning_rate": 0.2,
+      "l2": 0.0001,
+      "feature_standardization": "仅用训练集均值/标准差；std下限0.05",
+      "initial_weights": "zero"
+    },
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "trials": [
+      {
+        "seed": 0,
+        "position": false,
+        "train_accuracy": 0.5,
+        "test_accuracy": 0.5,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 100,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 200,
+            "loss": 0.6931471805599452
+          },
+          {
+            "step": 400,
+            "loss": 0.6931471805599454
+          }
+        ],
+        "head_weight_norm": 6.553660917616465e-15
+      },
+      {
+        "seed": 0,
+        "position": true,
+        "train_accuracy": 1.0,
+        "test_accuracy": 1.0,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.030572201002185554
+          },
+          {
+            "step": 100,
+            "loss": 0.01718100494663494
+          },
+          {
+            "step": 200,
+            "loss": 0.009671435089014612
+          },
+          {
+            "step": 400,
+            "loss": 0.005553399389497306
+          }
+        ],
+        "head_weight_norm": 2.8215194367197336
+      },
+      {
+        "seed": 1,
+        "position": false,
+        "train_accuracy": 0.5,
+        "test_accuracy": 0.5,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 100,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 200,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 400,
+            "loss": 0.6931471805599454
+          }
+        ],
+        "head_weight_norm": 1.7697554358273658e-14
+      },
+      {
+        "seed": 1,
+        "position": true,
+        "train_accuracy": 0.99609375,
+        "test_accuracy": 1.0,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.12047005212678712
+          },
+          {
+            "step": 100,
+            "loss": 0.07939946017860756
+          },
+          {
+            "step": 200,
+            "loss": 0.05113006937051676
+          },
+          {
+            "step": 400,
+            "loss": 0.032441864951724395
+          }
+        ],
+        "head_weight_norm": 3.9428759003596756
+      },
+      {
+        "seed": 2,
+        "position": false,
+        "train_accuracy": 0.5,
+        "test_accuracy": 0.5,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 100,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 200,
+            "loss": 0.6931471805599452
+          },
+          {
+            "step": 400,
+            "loss": 0.6931471805599454
+          }
+        ],
+        "head_weight_norm": 6.41966120887261e-15
+      },
+      {
+        "seed": 2,
+        "position": true,
+        "train_accuracy": 1.0,
+        "test_accuracy": 1.0,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.07363633832571231
+          },
+          {
+            "step": 100,
+            "loss": 0.046168492204874206
+          },
+          {
+            "step": 200,
+            "loss": 0.028658332601892482
+          },
+          {
+            "step": 400,
+            "loss": 0.01767648931162929
+          }
+        ],
+        "head_weight_norm": 3.579734915461641
+      },
+      {
+        "seed": 3,
+        "position": false,
+        "train_accuracy": 0.5,
+        "test_accuracy": 0.5,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.6931471805599452
+          },
+          {
+            "step": 100,
+            "loss": 0.6931471805599452
+          },
+          {
+            "step": 200,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 400,
+            "loss": 0.6931471805599453
+          }
+        ],
+        "head_weight_norm": 1.4560988738126132e-14
+      },
+      {
+        "seed": 3,
+        "position": true,
+        "train_accuracy": 1.0,
+        "test_accuracy": 1.0,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.09003197617217532
+          },
+          {
+            "step": 100,
+            "loss": 0.05713567324149639
+          },
+          {
+            "step": 200,
+            "loss": 0.0354963396565988
+          },
+          {
+            "step": 400,
+            "loss": 0.021525230805129292
+          }
+        ],
+        "head_weight_norm": 3.6463805355990697
+      },
+      {
+        "seed": 4,
+        "position": false,
+        "train_accuracy": 0.5,
+        "test_accuracy": 0.5,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 100,
+            "loss": 0.6931471805599452
+          },
+          {
+            "step": 200,
+            "loss": 0.6931471805599454
+          },
+          {
+            "step": 400,
+            "loss": 0.6931471805599452
+          }
+        ],
+        "head_weight_norm": 1.4206996527325203e-14
+      },
+      {
+        "seed": 4,
+        "position": true,
+        "train_accuracy": 1.0,
+        "test_accuracy": 0.984375,
+        "loss_history": [
+          {
+            "step": 0,
+            "loss": 0.6931471805599453
+          },
+          {
+            "step": 50,
+            "loss": 0.09116297311449195
+          },
+          {
+            "step": 100,
+            "loss": 0.060469177571025025
+          },
+          {
+            "step": 200,
+            "loss": 0.03946107314619619
+          },
+          {
+            "step": 400,
+            "loss": 0.02525093093542501
+          }
+        ],
+        "head_weight_norm": 3.6659454722422833
+      }
+    ],
+    "summary": [
+      {
+        "position": false,
+        "mean_test_accuracy": 0.5,
+        "sample_std_test_accuracy": 0.0
+      },
+      {
+        "position": true,
+        "mean_test_accuracy": 0.996875,
+        "sample_std_test_accuracy": 0.006987712429686843
+      }
+    ],
+    "limitations": [
+      "只改变固定随机位置表是否加入；位置表本身未训练，而原论文学习位置表。",
+      "只在自造空间关系任务上做线性读出，不证明真实图像准确率或端到端ViT训练效果。",
+      "五seed共享同一数据划分，只反映编码器初始化敏感性，不覆盖数据划分不确定性。",
+      "无位置仍可能完成无需空间顺序的任务；加位置允许但不保证学会有用空间关系。"
+    ]
+  },
+  "elapsed_seconds": 0.768
+}
