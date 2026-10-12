@@ -1,0 +1,55 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1, Analogy2, Analogy3, Analogy4, Analogy5, Analogy6, Analogy7, Analogy8, Analogy9, Analogy10 } from './analogies';
+import { HeroOld, HeroNew } from './hero';
+import { DetectorLab } from './ch1-detector';
+import { EmbeddingLab } from './ch2-embedding';
+import { Fig1Lab } from './ch3-fig1';
+import { ConnectLab } from './ch3-connect';
+import { SscaLab } from './ch4-ssca';
+import { ScaleLab } from './ch4-scale';
+import { VariantsLab } from './ch5-variants';
+import { PeLab } from './ch5-pe';
+import { CfnLab } from './ch6-cfn';
+import { FfnLab } from './ch6-ffn';
+import { SupervisionLab, ScheduleLab } from './ch7-train';
+import { ArchLab } from './ch8-arch';
+import { AblationLab, HparamLab } from './ch9-ablation';
+import { ResultsLab, CasesLab } from './ch10-results';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['detector-lab'] = DetectorLab;
+widgetRegistry['embedding-lab'] = EmbeddingLab;
+widgetRegistry['fig1-lab'] = Fig1Lab;
+widgetRegistry['connect-lab'] = ConnectLab;
+widgetRegistry['ssca-lab'] = SscaLab;
+widgetRegistry['scale-lab'] = ScaleLab;
+widgetRegistry['variants-lab'] = VariantsLab;
+widgetRegistry['pe-lab'] = PeLab;
+widgetRegistry['cfn-lab'] = CfnLab;
+widgetRegistry['ffn-lab'] = FfnLab;
+widgetRegistry['supervision-lab'] = SupervisionLab;
+widgetRegistry['schedule-lab'] = ScheduleLab;
+widgetRegistry['arch-lab'] = ArchLab;
+widgetRegistry['ablation-lab'] = AblationLab;
+widgetRegistry['hparam-lab'] = HparamLab;
+widgetRegistry['results-lab'] = ResultsLab;
+widgetRegistry['cases-lab'] = CasesLab;
