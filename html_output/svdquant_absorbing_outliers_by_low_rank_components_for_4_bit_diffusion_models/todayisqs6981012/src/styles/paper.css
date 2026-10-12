@@ -1,0 +1,337 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   语义色沿用 tokens.css（红=失败/旧方法，绿=成功/本文方法，蓝=引导/当前，
+   橙=强调，紫=辅助）。这里只补 SVDQuant 教程需要的布局/流程/表格样式，
+   不改 tokens.css / components.css。 */
+
+/* ===== 流程 / 架构图（DOM 节点 + 箭头） ===== */
+.svq-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px auto;
+}
+.svq-flow.vertical {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 720px;
+}
+.svq-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 10px 14px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  color: var(--ink);
+  text-align: center;
+}
+.svq-node small {
+  display: block;
+  color: var(--slate-2);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 3px;
+}
+.svq-node.on {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  box-shadow: var(--shadow-soft);
+}
+.svq-node.green {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.svq-node.red {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+.svq-node.orange {
+  border-color: var(--orange);
+  background: var(--orange-soft);
+}
+.svq-node.purple {
+  border-color: var(--purple);
+  background: var(--purple-soft);
+}
+.svq-arrow {
+  color: var(--slate-2);
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.svq-arrow.active { color: var(--blue); }
+
+/* ===== 两栏 / 三栏对比面板 ===== */
+.svq-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 14px auto;
+  max-width: 880px;
+}
+.svq-compare.three { grid-template-columns: 1fr 1fr 1fr; }
+.svq-panel {
+  padding: 14px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.svq-panel h5 {
+  margin: 0 0 8px;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+}
+.svq-panel .big {
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+  color: var(--ink);
+}
+.svq-panel .sub { color: var(--slate-2); font-size: 13px; line-height: 1.6; }
+.svq-panel.is-old { border-color: var(--red); background: var(--red-soft); }
+.svq-panel.is-new { border-color: var(--green); background: var(--green-soft); }
+.svq-panel.is-active { border-color: var(--blue); background: var(--blue-soft); }
+
+/* ===== 概念说明（灰色小字，区分示意与真实数据） ===== */
+.concept-note {
+  color: var(--slate-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.concept-note b { color: var(--ink); }
+
+/* ===== 折叠深入阅读（论文真实数据表） ===== */
+details.deep-reading {
+  margin: 12px auto 0;
+  max-width: 880px;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  background: var(--paper);
+}
+details.deep-reading summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  color: var(--blue);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  user-select: none;
+}
+.table-scroll { overflow-x: auto; padding: 0 12px 12px; }
+table.paper {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 13px;
+}
+table.paper th, table.paper td {
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+table.paper th:first-child, table.paper td:first-child { text-align: left; }
+table.paper thead th {
+  background: var(--paper-2);
+  color: var(--ink);
+  font-weight: 700;
+}
+table.paper tr.win td { background: var(--green-soft); }
+
+/* ===== 键盘/按键格子 ===== */
+.svq-keys { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.svq-key {
+  width: 38px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--ui-font-mono);
+  font-weight: 700;
+  color: var(--ink);
+  transition: border-color var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+}
+.svq-key.on { border-color: var(--blue); background: var(--blue); color: #fff; }
+
+@media (max-width: 860px) {
+  .svq-compare { grid-template-columns: 1fr; }
+  .svq-compare.three { grid-template-columns: 1fr; }
+}
+
+/* ===== 实验台布局：主画布 + 联动读数栏 ===== */
+.svq-lab {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 14px;
+  align-items: stretch;
+  margin: 6px 0 12px;
+}
+.svq-lab canvas {
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.svq-side {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+}
+.svq-side h6 {
+  margin: 4px 0 0;
+  color: var(--slate-2);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.svq-side h6:not(:first-child) { margin-top: 8px; }
+.svq-readout {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--slate-2);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.svq-readout b {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+  font-size: 14.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.svq-readout b.good { color: var(--green); }
+.svq-readout b.bad { color: var(--red); }
+.svq-readout b.blue { color: var(--blue); }
+.svq-readout b.purple { color: var(--purple); }
+.svq-meter {
+  height: 8px;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.svq-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.45s var(--ease-out);
+}
+.svq-meter-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 38px;
+  gap: 8px;
+  align-items: center;
+  color: var(--slate-2);
+  font-size: 12px;
+}
+.svq-meter-row b {
+  color: var(--ink);
+  font-family: var(--ui-font-mono);
+  font-size: 12.5px;
+  text-align: right;
+}
+.svq-readout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 18px;
+  max-width: 760px;
+  margin: 10px auto;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+}
+@media (max-width: 860px) {
+  .svq-lab { grid-template-columns: 1fr; }
+  .svq-readout-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== Hero 四支柱 + 指标 ===== */
+.hero-pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 22px auto 0;
+  text-align: left;
+}
+.hero-pillar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+}
+.hp-index {
+  flex: 0 0 auto;
+  color: var(--blue);
+  font-family: var(--ui-font-mono);
+  font-weight: 800;
+  font-size: 18px;
+}
+.hp-body { display: flex; flex-direction: column; gap: 3px; }
+.hp-body strong {
+  color: var(--ink);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+.hp-body span {
+  color: var(--slate-2);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.hero-performance {
+  margin: 18px auto 0;
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.hp-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.hp-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.hp-metric strong {
+  color: var(--green);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-h2-size);
+  font-weight: var(--ui-type-h2-weight);
+}
+.hp-metric span {
+  color: var(--slate-2);
+  font-size: 12.5px;
+  max-width: 220px;
+  text-align: center;
+}
+.hp-conditions {
+  margin: 10px 0 0;
+  color: var(--slate-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+@media (max-width: 860px) {
+  .hero-pillars { grid-template-columns: 1fr 1fr; }
+}
