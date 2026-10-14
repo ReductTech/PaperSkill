@@ -1,0 +1,169 @@
+{
+  "id": "figure-3",
+  "source": {
+    "type": "paper_evidence",
+    "sourceId": "uploaded-pdf",
+    "paperId": "adalora",
+    "page": 10,
+    "section": "4.4",
+    "locator": "Figure 3",
+    "representation": "verbatim_values",
+    "verification": "text_and_visual"
+  },
+  "researchQuestion": "训练最终保留了怎样的 Rank 分布？",
+  "controls": [
+    "DeBERTaV3-base",
+    "MNLI",
+    "同一图的最终分配"
+  ],
+  "changedVariables": [
+    "矩阵类型",
+    "层位置"
+  ],
+  "model": "DeBERTaV3-base",
+  "datasets": [
+    "MNLI"
+  ],
+  "evaluationProtocol": "最终 Rank 观察；不是逐模块 accuracy 测量",
+  "relativePerformance": "分配不均；作者概括偏向 FFN/高层，但 Wf2 与最后一层等有明确例外",
+  "trend": "许多中高层 Wf1 高 Rank，也有 Attention 矩阵高 Rank；不是单调规律",
+  "applicableConditions": [
+    "DeBERTaV3-base",
+    "MNLI",
+    "仅限本记录的预算、指标和设置"
+  ],
+  "limitations": [
+    "图注未明确给出该图预算超参数，不根据视觉补推",
+    "不能把 Rank 当因果重要性或准确率",
+    "筛选低/高层是教程界面划分"
+  ],
+  "metric": {
+    "name": "final rank",
+    "unit": "integer directions",
+    "direction": "descriptive_not_performance"
+  },
+  "layers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "matrixOrderTopToBottom": [
+    "Wf2",
+    "Wf1",
+    "Wo",
+    "Wv",
+    "Wk",
+    "Wq"
+  ],
+  "matrixGroups": {
+    "Attention": [
+      "Wq",
+      "Wk",
+      "Wv",
+      "Wo"
+    ],
+    "FFN": [
+      "Wf1",
+      "Wf2"
+    ]
+  },
+  "values": {
+    "Wf2": [
+      4,
+      1,
+      5,
+      2,
+      3,
+      5,
+      5,
+      6,
+      10,
+      5,
+      5,
+      0
+    ],
+    "Wf1": [
+      6,
+      9,
+      9,
+      9,
+      12,
+      11,
+      12,
+      12,
+      12,
+      12,
+      12,
+      2
+    ],
+    "Wo": [
+      7,
+      3,
+      5,
+      8,
+      8,
+      10,
+      12,
+      12,
+      12,
+      12,
+      12,
+      5
+    ],
+    "Wv": [
+      6,
+      6,
+      10,
+      6,
+      10,
+      11,
+      11,
+      11,
+      12,
+      12,
+      11,
+      9
+    ],
+    "Wk": [
+      5,
+      4,
+      5,
+      5,
+      10,
+      9,
+      9,
+      11,
+      12,
+      12,
+      12,
+      12
+    ],
+    "Wq": [
+      3,
+      2,
+      5,
+      4,
+      7,
+      7,
+      7,
+      10,
+      11,
+      11,
+      10,
+      3
+    ]
+  },
+  "derivedChecks": {
+    "sumOfDisplayedRanks": 576,
+    "derivation": "对图中 72 个原始格值求和，教程校验量，非额外论文实验"
+  }
+}

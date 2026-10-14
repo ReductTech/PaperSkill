@@ -1,0 +1,4 @@
+import {limits,relations,logicNodes} from '../data/finalReview';
+import {describeValue} from '../data/learningReport';
+import type {VerdictState} from '../store/verdictStore';
+export default function VerdictJournal({state:s}:{state:VerdictState}){return <div className="journal-lines"><div><span>初次工程判断</span><p>{describeValue(s.prediction)}</p></div><div><span>我的改进逻辑</span><p>{s.order.map(id=>logicNodes.find(n=>n.id===id)!.title).join(' → ')}</p><p>{s.orderChecked?'已提交检查。':'尚未提交。'}</p></div>{limits.map(l=><div key={l.id}><span>{l.title}</span><p>初次：{s.limits[l.id].first===null?'尚未判断':l.options[s.limits[l.id].first!]}</p><p>当前：{s.limits[l.id].answer===null?'尚未判断':l.options[s.limits[l.id].answer!]} · {s.limits[l.id].read?'已读证据':'尚未阅读'}</p></div>)}<div><span>最终审查</span><p>{relations.filter(r=>s.relations[r.id].answer===r.correct).length} / 3 个关系已确认；自述由你自行核对，不是 AI 自动评分。</p><p>{s.completed?'已完成有条件的学习审查。':'尚未完成审查。'}</p></div></div>;}
