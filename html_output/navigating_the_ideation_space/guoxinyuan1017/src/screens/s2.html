@@ -1,0 +1,97 @@
+<section class="card" id="s2" aria-labelledby="s2h">
+    <div class="card-head">
+      <span class="tag-no">S2</span>
+      <span class="tag-name">跃迁 · 两个向量相减</span>
+    </div>
+
+    <h2 class="h2" id="s2h">把「从问题到方法」这段推理，也变成一个向量</h2>
+    <p class="intro">静态相似度只能回答「两篇论文像不像」。论文进一步假设：一篇论文内部的推理结构本身也可以表示成一个向量 —— 把三个子空间向量两两相减，得到两条「跃迁」。检索时，谁的跃迁方向一致，谁的推理结构就相似，哪怕话题完全不同。</p>
+
+    <div class="chain">
+      <div class="cbox" data-dim="p">
+        <p class="cbox-s">S_problem</p>
+        <span class="cvec"></span>
+        <p class="cbox-e">E_problem</p>
+      </div>
+      <div class="carrow is-on" data-link="pm" aria-hidden="true">
+        <p class="carrow-t">T_PM</p>
+        <div class="carrow-l"><i></i><span>▶</span></div>
+        <p class="carrow-s">表 3 的 P2M</p>
+      </div>
+      <div class="cbox" data-dim="m">
+        <p class="cbox-s">S_method</p>
+        <span class="cvec"></span>
+        <p class="cbox-e">E_method</p>
+      </div>
+      <div class="carrow" data-link="mf" aria-hidden="true">
+        <p class="carrow-t">T_MF</p>
+        <div class="carrow-l"><i></i><span>▶</span></div>
+        <p class="carrow-s">表 3 的 M2K</p>
+      </div>
+      <div class="cbox" data-dim="f">
+        <p class="cbox-s">S_findings</p>
+        <span class="cvec"></span>
+        <p class="cbox-e">E_findings</p>
+      </div>
+    </div>
+
+    <p class="cformula">T_PM(p) = E_method(p) − E_problem(p)　　　T_MF(p) = E_findings(p) − E_method(p)</p>
+
+    <div class="seg" role="group" aria-label="选择跃迁分支">
+      <button class="seg-btn is-on" type="button" data-branch="pm" aria-pressed="true">P2M · 问题 → 方法</button>
+      <button class="seg-btn" type="button" data-branch="mf" aria-pressed="false">M2K · 方法 → 发现</button>
+    </div>
+
+    <div class="ev">
+      <div class="ev-tile is-on" data-branch="pm">
+        <p class="ev-t">P2M　T_PM</p>
+        <div class="ev-r">
+          <span class="ev-k">R@30</span>
+          <div class="ev-bars"><div class="ev-bar b-ours" style="width:84%"></div><div class="ev-bar b-base" style="width:80%"></div></div>
+          <span class="ev-v">0.168</span>
+        </div>
+        <div class="ev-r">
+          <span class="ev-k">HR@30</span>
+          <div class="ev-bars"><div class="ev-bar b-ours" style="width:87%"></div><div class="ev-bar b-base" style="width:90%"></div></div>
+          <span class="ev-v">0.611</span>
+        </div>
+        <p class="ev-note">R@30 只比 E5 高 0.008</p>
+      </div>
+      <div class="ev-tile" data-branch="mf">
+        <p class="ev-t">M2K　T_MF</p>
+        <div class="ev-r">
+          <span class="ev-k">R@30</span>
+          <div class="ev-bars"><div class="ev-bar b-ours" style="width:74%"></div><div class="ev-bar b-base" style="width:80%"></div></div>
+          <span class="ev-v">0.148</span>
+        </div>
+        <div class="ev-r">
+          <span class="ev-k">HR@30</span>
+          <div class="ev-bars"><div class="ev-bar b-ours" style="width:78%"></div><div class="ev-bar b-base" style="width:90%"></div></div>
+          <span class="ev-v">0.548</span>
+        </div>
+        <p class="ev-note is-bad">两项均低于 E5</p>
+      </div>
+    </div>
+
+    <div class="rows-foot">
+      <p class="rownote">实心条 = 本文跃迁库 · 灰条 = E5-base-v2（问题文本 + 方法文本拼接）。两支数字始终同屏，切换只做高亮强调；此为显示口径的 K。</p>
+      <div class="stars">
+        <button class="star" id="starA" type="button" aria-expanded="false" aria-controls="annoA">★ 跨空间对齐零验证</button>
+        <button class="star" id="starB" type="button" aria-expanded="false" aria-controls="annoB">★ 主张强 · 证据弱</button>
+      </div>
+    </div>
+
+    <div class="anno-body" id="annoA"><div class="anno-in"><div class="anno-box">
+      <p>§2.3 原文写明三个编码器是 <code>independently</code> 训练的（各自从 SPECTER2 初始化），§2.4 却直接把来自两个不同空间的向量相减。相减要有意义，前提是这些空间共享同一套几何 —— 这个前提论文没有验证过。</p>
+      <p>缺的具体是：没测 T_PM / T_MF 的分布与方差，也没检验相减后的向量是否退化。表 3 里 T_MF 拖后腿，很可能正是弱对齐的表现，但作者没有朝这个方向解释。</p>
+      <p>可做的实验：先统计两个跃迁向量的分布与方差；再做对齐（Procrustes / 加对齐损失）后重跑 M2K。成本中等，但能直接决定跃迁这条路要不要留。</p>
+      <p>交叉引用：这与 S1 的正交性角标同源 —— 两处问的都是「三个空间彼此到底是什么关系」。</p>
+    </div></div></div>
+
+    <div class="anno-body" id="annoB"><div class="anno-in"><div class="anno-box">
+      <p>主张（§2.4）：跃迁向量能检索「话题不同、但推理结构相似」的论文 —— 这是全文最强的一句主张。</p>
+      <p class="warn">证据（表 3，显示口径）：T_PM 的 R@30 = 0.168，同表 E5 = 0.160，只高出 0.008；T_MF 的 R@30 = 0.148，低于 E5。跃迁检索是全文增益最小的部分，而它恰好是主张最强的一处。</p>
+      <p>另有一条方向相同的细节：M2K 单独使用时输给全部基线，Transition Space 的领先是靠 P2M 与两支融合拉回来的。论文把它归因于融合，没有解释 M2K 为什么失败。</p>
+      <p>交叉引用：完整指标口径见 S4。</p>
+    </div></div></div>
+  </section>
