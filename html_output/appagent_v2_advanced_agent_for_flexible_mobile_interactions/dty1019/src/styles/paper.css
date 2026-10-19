@@ -1,0 +1,34 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-camera-blue: #27446e;
+  --paper-note-green: #228d5c;
+  --paper-focus-orange: #f07e47;
+}
+
+.field-widget { width: 100%; min-width: 0; }
+.field-widget canvas { display: block; width: 100% !important; height: auto !important; aspect-ratio: 14 / 5; object-fit: contain; }
+.bg-side-canvas .field-widget canvas { aspect-ratio: 5 / 1; }
+.analogy-visual .field-widget canvas { aspect-ratio: 5 / 1; }
+.field-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 10px; }
+.field-action-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.field-action-controls .field-control { padding-inline: 8px; white-space: nowrap; }
+.field-control { min-height: 38px; padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 5px; background: var(--paper); color: var(--ink-2); font-weight: 600; cursor: pointer; }
+.field-control:hover { border-color: var(--blue); color: var(--blue); }
+.field-control.active { border-color: var(--blue); background: var(--blue); color: #fff; }
+.field-control:disabled { cursor: not-allowed; opacity: .45; }
+.field-stepper { justify-content: space-between; }
+.field-step-label { flex: 1; min-width: 120px; color: var(--ink-2); text-align: center; }
+.field-feedback { min-height: 44px; display: flex; align-items: center; padding: 10px 13px; border-left: 3px solid var(--green); background: var(--green-soft); color: var(--ink); line-height: 1.5; }
+.field-feedback.warning { border-left-color: var(--orange); background: var(--orange-soft); }
+@media (max-width: 1200px) {
+  .analogy-card { flex-direction: column; }
+  .analogy-visual { width: 100%; flex-shrink: 1; min-width: 0; }
+  .analogy-body { min-width: 0; overflow-wrap: anywhere; }
+}
+@media (max-width: 560px) { .field-controls { gap: 6px; } .field-control { flex: 1 1 auto; padding-inline: 10px; } .field-action-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
