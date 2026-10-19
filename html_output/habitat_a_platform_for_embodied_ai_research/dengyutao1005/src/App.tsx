@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { tutorial, quizData, comicData } from './data/tutorial';
+import { tutorial, quizData } from './data/tutorial';
 import { figureData } from './data/figureData';
 import { Hero } from './components/Hero';
 import { ChapterBridge } from './components/ChapterBridge';
@@ -10,7 +10,6 @@ import { InsightBar } from './components/InsightBar';
 import { Takeaway } from './components/Takeaway';
 import { BiliVideos } from './components/BiliVideos';
 import { Quiz } from './components/Quiz';
-import { ComicViewer } from './components/ComicViewer';
 import { SymbolCard } from './components/SymbolCard';
 import { FigureGallery } from './components/FigureGallery';
 import { FigureButton } from './components/FigureButton';
@@ -48,6 +47,9 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // 第一人称导航小游戏内：方向键/空格交给游戏处理，避免翻页
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest && t.closest('.nav-quest')) return;
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
         next();
@@ -71,9 +73,6 @@ export default function App() {
   const currentChapter = active >= 1 && active <= total ? chapters[active - 1] : null;
   const chapterQuizzes = currentChapter
     ? quizData.filter((q) => q.chapterId === currentChapter.id)
-    : [];
-  const chapterComics = currentChapter
-    ? comicData.filter((c) => c.chapterId === currentChapter.id)
     : [];
   const chapterFigures = currentChapter
     ? figureData.filter((f) => f.chapter === active)
@@ -140,7 +139,6 @@ export default function App() {
               {currentChapter.insight ? <InsightBar text={currentChapter.insight} /> : null}
               {currentChapter.formula ? <Formula formula={currentChapter.formula} /> : null}
               <Takeaway items={currentChapter.takeaways} />
-              {chapterComics.length > 0 ? <ComicViewer comics={chapterComics} /> : null}
               {chapterFigures.length > 0 ? (
                 <div className="chapter-figrefs">
                   <h4 className="figrefs-heading">📎 本章图表</h4>

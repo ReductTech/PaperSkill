@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
+import { Surface3D } from './surface3d';
 
 // Figure 5 泛化矩阵热力图（P11）：行=(agent,train)，列=test set。悬停显示精确 SPL。
+// 支持视图切换：热力图 ↔ 3D 曲面（曲面+等高线+颜色映射）。
 const ROWS = [
   { label: 'Blind / Gibson', v: [0.42, 0.34] },
   { label: 'Blind / MP3D', v: [0.28, 0.25] },
@@ -24,9 +26,30 @@ const color = (v: number) => {
 
 export const Fig5Heatmap: React.FC<WidgetProps> = () => {
   const [hover, setHover] = useState<{ r: number; c: number } | null>(null);
+  const [view, setView] = useState<'heatmap' | '3d'>('heatmap');
   return (
     <div className="dvc">
-      <svg viewBox={`0 0 ${W} ${H}`} className="dvc-svg" role="img" aria-label="Figure 5 泛化矩阵热力图">
+      <div className="dvc-tools">
+        <button className={`tgl ${view === 'heatmap' ? 'active' : ''}`} onClick={() => setView('heatmap')}>热力图</button>
+        <button className={`tgl ${view === '3d' ? 'active' : ''}`} onClick={() => setView('3d')}>3D 曲面</button>
+      </div>
+      {view === '3d' ? (
+        <Surface3D
+          spec={{
+            title: 'Figure 5 · SPL 泛化矩阵（曲面高度 = SPL，行 = agent/train，列 = test）',
+            xLabels: COLS,
+            yLabels: ROWS.map((r) => r.label),
+            z: ROWS.map((r) => r.v),
+            xTitle: '测试数据集',
+            yTitle: 'agent / 训练集',
+            zTitle: 'SPL',
+            zSuffix: ' SPL',
+            height: 400,
+            colorscale: 'Viridis',
+          }}
+        />
+      ) : (
+        <svg viewBox={`0 0 ${W} ${H}`} className="dvc-svg" role="img" aria-label="Figure 5 泛化矩阵热力图">
         {COLS.map((c, ci) => (
           <text key={c} x={padL + ci * colW + colW / 2} y={padT - 12} textAnchor="middle" fontSize="12" fontWeight="700" fill="#21324a">{c}</text>
         ))}
@@ -61,7 +84,8 @@ export const Fig5Heatmap: React.FC<WidgetProps> = () => {
             {ROWS[hover.r].label} → {COLS[hover.c]}：SPL {ROWS[hover.r].v[hover.c].toFixed(2)}
           </text>
         ) : null}
-      </svg>
+        </svg>
+      )}
       <div className="feedback good">
         数据来源：Figure 5, §5。仅 Depth 跨数据集泛化良好；对角线为同数据集 train→test（与 Table 2 一致）。
       </div>

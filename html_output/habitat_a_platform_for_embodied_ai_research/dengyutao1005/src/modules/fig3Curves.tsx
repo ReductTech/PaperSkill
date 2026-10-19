@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
+import { Surface3D } from './surface3d';
 
 // Figure 3 交互折线图（示意重建）：Gibson / MP3D 上下两个子图（约束 B），五条曲线 + SLAM 常数线。
+// 新增「3D 曲面」视图：训练步数 × 传感器 × SPL（曲面 + 等高线 + 颜色映射），可切换 Gibson/MP3D。
 // 数据为按 §5 定性趋势重建的示意锚点（SLAM 恒定 0.59/0.42；Depth 约 10M Gibson / 30M MP3D 追上）。
 const G = {
   key: 'Gibson 验证集', slam: 0.59,
@@ -73,10 +75,59 @@ function Subplot({ d }: { d: typeof G }) {
 }
 
 export const Fig3Curves: React.FC<WidgetProps> = () => {
+  const [view, setView] = useState<'2d' | '3d'>('2d');
+  const [ds, setDs] = useState<'G' | 'M'>('G');
+  const datasets: Record<'G' | 'M', { key: string; curves: typeof G.curves }> = {
+    G,
+    M,
+  };
+  const cur = datasets[ds];
+  // 训练步数网格（两个数据集的锚点并集），用于 3D 曲面 x 轴
+  const STEPS = [0, 1, 3, 5, 10, 15, 20, 30, 40, 75];
+  const interp = (pts: number[][], s: number) => {
+    if (s <= pts[0][0]) return pts[0][1];
+    if (s >= pts[pts.length - 1][0]) return pts[pts.length - 1][1];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [s0, v0] = pts[i];
+      const [s1, v1] = pts[i + 1];
+      if (s >= s0 && s <= s1) return v0 + ((s - s0) / (s1 - s0)) * (v1 - v0);
+    }
+    return pts[pts.length - 1][1];
+  };
+  const z3d = cur.curves.map((c) => STEPS.map((s) => Number(interp(c.pts, s).toFixed(3))));
   return (
     <div className="dvc">
-      <Subplot d={G} />
-      <Subplot d={M} />
+      <div className="dvc-tools">
+        <button className={`tgl ${view === '2d' ? 'active' : ''}`} onClick={() => setView('2d')}>2D 曲线</button>
+        <button className={`tgl ${view === '3d' ? 'active' : ''}`} onClick={() => setView('3d')}>3D 曲面</button>
+        {view === '3d' ? (
+          <>
+            <button className={`tgl ${ds === 'G' ? 'active' : ''}`} onClick={() => setDs('G')}>Gibson 验证集</button>
+            <button className={`tgl ${ds === 'M' ? 'active' : ''}`} onClick={() => setDs('M')}>MP3D 验证集</button>
+          </>
+        ) : null}
+      </div>
+      {view === '3d' ? (
+        <Surface3D
+          spec={{
+            title: `Figure 3 · 训练曲线示意（${cur.key}，曲面 = SPL，曲线锚点线性插值）`,
+            xLabels: STEPS.map((s) => `${s}M`),
+            yLabels: cur.curves.map((c) => c.name),
+            z: z3d,
+            xTitle: '训练步数（百万）',
+            yTitle: '传感器',
+            zTitle: 'SPL',
+            zSuffix: ' SPL',
+            height: 400,
+            colorscale: 'Viridis',
+          }}
+        />
+      ) : (
+        <>
+          <Subplot d={G} />
+          <Subplot d={M} />
+        </>
+      )}
       <div className="dvc-legend">
         <span style={{ color: '#16a34a' }}>■ Depth</span>
         <span style={{ color: '#dc2626' }}>■ RGBD</span>

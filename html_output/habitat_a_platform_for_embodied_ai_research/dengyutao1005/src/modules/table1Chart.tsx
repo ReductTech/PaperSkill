@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import type { WidgetProps } from './registry';
+import { Surface3D } from './surface3d';
 
 // Table 1：Habitat-Sim fps 分组柱状图（SVG，零外部库）。悬停显示精确值 + 数据表视图切换。
+// 新增「3D 曲面」视图：分辨率 × 进程配置 × fps（对数轴 + 等高线 + 颜色映射）。
 const DATA = [
   { label: '128', r: [4093, 10592, 2050, 5223] },
   { label: '256', r: [1987, 3574, 1042, 1774] },
@@ -13,7 +15,7 @@ const MAX = 12000;
 
 export const Table1Chart: React.FC<WidgetProps> = () => {
   const [hover, setHover] = useState<{ g: number; s: number } | null>(null);
-  const [view, setView] = useState<'chart' | 'table'>('chart');
+  const [view, setView] = useState<'chart' | 'table' | '3d'>('chart');
   const W = 640, H = 320, padL = 56, padB = 34, padT = 16, padR = 12;
   const gW = (W - padL - padR) / DATA.length;
   const bW = gW / 4 * 0.62;
@@ -24,8 +26,25 @@ export const Table1Chart: React.FC<WidgetProps> = () => {
       <div className="dvc-tools">
         <button className={`tgl ${view === 'chart' ? 'active' : ''}`} onClick={() => setView('chart')}>图表</button>
         <button className={`tgl ${view === 'table' ? 'active' : ''}`} onClick={() => setView('table')}>数据表</button>
+        <button className={`tgl ${view === '3d' ? 'active' : ''}`} onClick={() => setView('3d')}>3D 曲面</button>
       </div>
-      {view === 'chart' ? (
+      {view === '3d' ? (
+        <Surface3D
+          spec={{
+            title: 'Table 1 · Habitat-Sim fps（曲面 = fps，对数轴更清晰：423 → 10,592）',
+            xLabels: DATA.map((g) => g.label),
+            yLabels: SERIES,
+            z: SERIES.map((_, si) => DATA.map((g) => g.r[si])),
+            xTitle: '分辨率',
+            yTitle: '渲染配置',
+            zTitle: 'fps（对数）',
+            zSuffix: ' fps',
+            zLog: true,
+            height: 400,
+            colorscale: 'Cividis',
+          }}
+        />
+      ) : view === 'chart' ? (
         <svg viewBox={`0 0 ${W} ${H}`} className="dvc-svg" role="img" aria-label="Table 1 Habitat-Sim fps">
           {[0, 4000, 8000, 12000].map((v) => (
             <g key={v}>

@@ -126,6 +126,13 @@ export const comicData: ComicDef[] = [
   { id: 'comic-2', chapterId: 'chap-6', title: '五种传感器五双眼', src: './images/comics/comic-2.png', strip: true, caption: 'Blind / RGB / Depth / RGBD 看同一个房间：有的只盯距离，有的被花哨细节带偏。' },
   { id: 'comic-3', chapterId: 'chap-6', title: '碰墙滑移', src: './images/comics/comic-3.png', strip: true, caption: 'move_forward 却撞墙：只挪了半程，甚至贴着墙滑开——里程计不再平凡。' },
   { id: 'comic-4', chapterId: 'chap-7', title: '绕路 vs 直路', src: './images/comics/comic-4.png', strip: true, caption: 'SPL 惩罚绕路：送到但绕远 vs 送到且抄近路，裁判给的分不一样。' },
+  { id: 'comic-5', chapterId: 'chap-2', title: '一个仓库装不下所有订单', src: './images/comics/comic-5.png', strip: true, caption: '旧模拟器把任务、平台、数据集绑死，换个订单或换栋楼就得重搭。' },
+  { id: 'comic-6', chapterId: 'chap-3', title: '从地图、路况到下单', src: './images/comics/comic-6.png', strip: true, caption: '送货三件套：数据（Datasets）· 引擎（Simulators）· 规则（Tasks），Habitat 统一成一套标准。' },
+  { id: 'comic-7', chapterId: 'chap-4', title: '快递分拣流水线提速', src: './images/comics/comic-7.png', strip: true, caption: '旧模拟器多次渲染 10–100 fps；Habitat 单 pass 多输出冲到上万 fps。' },
+  { id: 'comic-8', chapterId: 'chap-5', title: '一张可填写的送货单', src: './images/comics/comic-8.png', strip: true, caption: 'Task 定义任务与评测，Episode 是一次具体送货回合，Environment 随时开工。' },
+  { id: 'comic-9', chapterId: 'chap-8', title: '老练导航员 vs 新手学徒', src: './images/comics/comic-9.png', strip: true, caption: 'SLAM 自带地图不训练（0.59），RL 学徒起步很菜，但练到 75M 步反超（0.79）。' },
+  { id: 'comic-10', chapterId: 'chap-9', title: '换栋楼送货', src: './images/comics/comic-10.png', strip: true, caption: 'Gibson 练熟换到 MP3D：Depth 0.68 ✓ 稳，RGBD 0.53 ✗ 迷路——只有“只看距离”的最稳。' },
+  { id: 'comic-11', chapterId: 'chap-10', title: '平台让实验一键换场景', src: './images/comics/comic-11.png', strip: true, caption: '跨数据集实验简单到“改个数据集名”，这就是平台的意义。' },
 ];
 
 export const tutorial: TutorialData = {
@@ -244,6 +251,7 @@ export const tutorial: TutorialData = {
       modules: [
         { kind: 'module', id: '6.1', title: '转向·前进·碰撞', desc: '拖动滑块控制转向角度与前进距离，看圆柱体 agent 在俯视图中的位移；撞墙会滑移。', componentId: 'p1-sensorNav', figure: './images/figures/figure-4.png' },
         { kind: 'module', id: '6.2', title: '四种传感器四双眼', desc: '切换 Blind / RGB / Depth / RGBD，看同一场景下它们“看到”什么。', componentId: 'p2-sensorToggle' },
+        { kind: 'module', id: '6.3', title: '亲手开送货：第一人称导航', desc: '方向键/WASD 或按钮控制送货员（圆柱体 agent）在公寓迷宫里找目标门；切换四种传感器体验它们“看到”什么，对照最短路线看 SPL。', componentId: 'nav-quest' },
       ],
       insight: '静态 PointGoal + 理想化 GPS：把“真实任务”与“仿真噪声/碰撞”解耦，按传感器公平比较。',
       formula: {
