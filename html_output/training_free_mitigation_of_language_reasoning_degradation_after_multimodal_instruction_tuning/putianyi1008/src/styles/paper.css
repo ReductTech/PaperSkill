@@ -1,0 +1,78 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* Home-studio scene colours for the tutorial-wide metaphor (guitar practice +
+     mixing console). Neutrals only; the semantic roles above stay untouched. */
+  --metaphor-scene: #f5f8f0;
+  --metaphor-warm: #92400e;
+  --metaphor-string: #b8c9a7;
+  --metaphor-deck: #76906a;
+}
+
+/* The paper widgets mark the active chip with `.chip.active`; the bundled sheet
+   styles `.chip.selected`. Alias them so the selected mode is unmistakable. */
+.chip.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+/* Compact evidence table under the Chapter 10 data-table module. */
+.metric-table {
+  width: 100%;
+  margin: 12px 0 4px;
+  border-collapse: collapse;
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-small-size);
+}
+
+.metric-table th,
+.metric-table td {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  text-align: right;
+}
+
+.metric-table th:first-child,
+.metric-table td:first-child {
+  text-align: left;
+  font-family: var(--ui-font);
+}
+
+.metric-table thead th {
+  background: var(--paper-2);
+  color: var(--slate);
+}
+
+/* Highlight of the column selected by the Chapter 10 column chips. */
+.metric-table th.is-col,
+.metric-table td.is-col {
+  background: var(--orange-soft);
+  outline: 1px solid var(--orange);
+  color: var(--ink);
+}
+
+/* Non-interactive status tags (step names, cost-row names). Deliberately NOT
+   styled like `.chip`, so they never look clickable or focusable. */
+.step-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+}
+
+.step-tag-active {
+  border-color: var(--blue);
+  color: var(--blue);
+  font-weight: 600;
+}
