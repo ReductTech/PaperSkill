@@ -1,0 +1,263 @@
+/* 论文专属覆盖。
+   语义色（蓝=当前路径，绿=本文方法，红=失败，橙=用户强调，紫=辅助）保持不变。
+   组件内部排版沿用模板；只有「公式模块」和「整篇长文模式」两处按需求做了版式调整。 */
+
+:root {
+  /* 暖教室场景色 */
+  --scene-paper: #f8f5ef;
+  --scene-card: #fdfbf6;
+  --scene-floor: #e7ddcc;
+  --scene-wood: #a98f6b;
+  --scene-wood-dark: #7a6142;
+  --scene-board: #3f5449;
+  --scene-ink: #21324a;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(169, 143, 107, 0.10), transparent 30%),
+    linear-gradient(180deg, #fbf9f4 0%, #f2ece1 100%);
+}
+
+/* 画布底色统一为纸张色，避免白色方块与暖色卡片割裂 */
+canvas {
+  background: var(--scene-card);
+}
+
+.analogy-visual canvas {
+  background: var(--scene-card);
+}
+
+/* ------------------------------------------------------------------ 整篇长文模式 */
+
+/* 顶部阅读进度：直接改 transform，不参与 React 重渲染 */
+.read-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 400;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), #4f7fb5);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+/* 术语速查：封面下方的四个锚点 */
+.term-index {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 1180px;
+  margin: 4px auto 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.term-index-label {
+  margin-right: 4px;
+  color: var(--slate-2);
+}
+.term-index a {
+  padding: 3px 11px;
+  background: var(--blue-soft);
+  border-radius: var(--ui-radius-pill);
+  color: var(--blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.term-index a b {
+  font-weight: 700;
+}
+.term-index a:hover {
+  background: var(--blue);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* 正文里的术语跳转 */
+.term {
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(39, 68, 110, 0.45);
+}
+.term:hover {
+  background: var(--blue-soft);
+  text-decoration: none;
+}
+
+.slide-content {
+  padding-bottom: 96px;
+}
+
+.article-hero > section.hero {
+  max-width: 1180px;
+  margin: 24px auto 6px;
+}
+
+.article-chap {
+  margin: 28px 0 0;
+  scroll-margin-top: 16px;
+}
+
+.article-chap .chap-title {
+  margin-bottom: 6px;
+}
+
+.article-bili {
+  margin-top: 32px;
+}
+
+.article-footer {
+  margin: 44px 0 0;
+  color: var(--slate-2);
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+/* 回到顶部：两万像素的长文里比滚轮靠谱 */
+.article-top {
+  position: fixed;
+  right: 22px;
+  bottom: 26px;
+  z-index: 150;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--blue);
+  font-size: 17px;
+  line-height: 1;
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+.article-top:hover {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+/* 1280 以下：左侧目录占比过大，收窄目录与页面留白，给正文腾位置 */
+@media (max-width: 1280px) {
+  .slide-sidebar {
+    width: 244px;
+  }
+  .slide-content {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* 1180 以下：正文区放不下「580px 固定宽动画 + 文字」，改为上下排 */
+@media (max-width: 1180px) {
+  .hero-compare {
+    grid-template-columns: 1fr;
+  }
+  .analogy-card {
+    flex-direction: column;
+  }
+  .analogy-visual {
+    width: 100%;
+  }
+  .embed-takeaway,
+  .reversibility-takeaway {
+    flex-direction: column;
+  }
+  /* 竖排时把箭头整个去掉：旋转 90° 会让它变成一根盖住文字的长条 */
+  .et-arrow {
+    display: none;
+  }
+  .et-item {
+    flex: 0 0 auto;
+    padding: 14px 18px;
+  }
+  .et-item + .et-item,
+  .et-arrow + .et-item {
+    border-top: 1px solid rgba(33, 50, 74, 0.08);
+  }
+}
+
+/* ------------------------------------------------------------------ 公式模块 */
+
+/* 四层竖排：提示语 → 引导句 → 公式 → 解释，不再让提示语压住正文 */
+.formula-explain {
+  padding: 14px 18px 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.formula-explain .fe-hint {
+  position: static;
+  margin: 0 0 8px;
+  color: var(--slate-2);
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.formula-explain .fe-lead {
+  margin: 0 0 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.formula-explain .fe-formula {
+  display: block;
+  margin: 0 0 12px;
+  padding: 18px 20px;
+  background: #fbf7ef;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--blue);
+  line-height: 2.1;
+  text-align: center;
+}
+
+.formula-explain .fe-formula .fe-formula-sym {
+  border-bottom-color: rgba(39, 68, 110, 0.35);
+}
+
+.formula-explain .fe-explain {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--paper-2);
+  border-left-width: 3px;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  /* 顶部固定的「目录」按钮会压住章节标题，锚点跳转时让开 */
+  section.chap.article-chap {
+    scroll-margin-top: 64px;
+  }
+  .slide-sidebar-toggle {
+    padding: 7px 14px;
+  }
+  .term-index {
+    margin: 8px 0 0;
+  }
+  .formula-explain {
+    padding: 12px 12px 14px;
+  }
+  .formula-explain .fe-formula {
+    padding: 14px 10px;
+    font-size: 15px;
+    line-height: 2;
+  }
+  section.chap.article-chap {
+    padding: 20px 16px;
+  }
+}
