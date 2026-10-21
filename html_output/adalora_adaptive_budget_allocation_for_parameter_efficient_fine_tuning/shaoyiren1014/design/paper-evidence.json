@@ -1,0 +1,4013 @@
+{
+  "schemaVersion": 1,
+  "project": "THE ADAPTIVE ENGINE — 自适应引擎",
+  "status": "design_only",
+  "paper": {
+    "id": "adalora",
+    "title": "AdaLoRA: Adaptive Budget Allocation for Parameter-Efficient Fine-Tuning",
+    "venue": "ICLR 2023",
+    "uploadedFilename": "2303.10512v2.pdf",
+    "uploadedPageCount": 17,
+    "uploadedSha256": "7afe399a4d0c5cf37c956b0a8afb2294c2d2b289608162b4e49bddecc3b311ef",
+    "publicVersionUrl": "https://arxiv.org/abs/2303.10512v2",
+    "authority": "数值以用户上传文件为准；未证明其字节与公开下载完全一致"
+  },
+  "sourceTypes": [
+    "paper_evidence",
+    "conceptual_simulation",
+    "hypothetical_scenario"
+  ],
+  "experiments": [
+    {
+      "id": "figure-1",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 2,
+        "section": "1 Introduction",
+        "locator": "Figure 1a / 1b",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "固定可训练参数数目，选择不同矩阵或层组是否改变适配表现？",
+      "controls": [
+        "DeBERTaV3-base",
+        "MNLI-m",
+        "总可训练参数 0.28M",
+        "使用 LoRA"
+      ],
+      "changedVariables": [
+        "1a：跨层选择一种矩阵类型",
+        "1b：选择连续三层组"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "MNLI-m"
+      ],
+      "evaluationProtocol": "MNLI matched accuracy；图注未单独标明 split 与随机种子协议",
+      "relativePerformance": "FFN 两种矩阵在本对照高于四种 Attention 矩阵；较高层组表现较高",
+      "trend": "固定总参数数目下配置位置产生差异",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "MNLI-m",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "两个面板是独立实验",
+        "不能推出所有模型、任务都偏好 FFN 或高层",
+        "不是玩家配额的测量结果"
+      ],
+      "budget": {
+        "kind": "trainable_params_million",
+        "value": 0.28,
+        "matched": "exact_in_caption"
+      },
+      "metrics": {
+        "MNLI-m accuracy": {
+          "unit": "percent",
+          "direction": "higher_is_better"
+        }
+      },
+      "panels": [
+        {
+          "id": "1a",
+          "rows": [
+            {
+              "matrix": "Wq",
+              "accuracy": 88.58
+            },
+            {
+              "matrix": "Wk",
+              "accuracy": 88.98
+            },
+            {
+              "matrix": "Wv",
+              "accuracy": 89.36
+            },
+            {
+              "matrix": "Wo",
+              "accuracy": 89.28
+            },
+            {
+              "matrix": "Wf1",
+              "accuracy": 89.91
+            },
+            {
+              "matrix": "Wf2",
+              "accuracy": 89.99
+            }
+          ]
+        },
+        {
+          "id": "1b",
+          "rows": [
+            {
+              "layers": [
+                1,
+                2,
+                3
+              ],
+              "accuracy": 77.87
+            },
+            {
+              "layers": [
+                4,
+                5,
+                6
+              ],
+              "accuracy": 85.82
+            },
+            {
+              "layers": [
+                7,
+                8,
+                9
+              ],
+              "accuracy": 88.15
+            },
+            {
+              "layers": [
+                10,
+                11,
+                12
+              ],
+              "accuracy": 88.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "table-1",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 7,
+        "section": "4.1",
+        "locator": "Table 1",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "近似参数预算档内，各方法在语言理解任务表现怎样？",
+      "controls": [
+        "底座模型与各任务一致",
+        "相近预算档",
+        "按论文设置选取方法配置"
+      ],
+      "changedVariables": [
+        "方法",
+        "参数预算档"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "GLUE"
+      ],
+      "evaluationProtocol": "development set；五个不同随机种子的均值；STS-B 为平均相关系数",
+      "relativePerformance": "AdaLoRA 在多数对照有优势，但例如低档 STS-B 略低于 LoRA",
+      "trend": "收益依任务不同；严格使用实际参数数，不把近似预算写成相等",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "GLUE",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "各方法实际参数数不同",
+        "Table 1 中档没有 LoRA/AdaLoRA 行",
+        "GLUE 指标不能当成同一纵轴"
+      ],
+      "metricKeys": [
+        "MNLI_m",
+        "MNLI_mm",
+        "SST2_acc",
+        "CoLA_mcc",
+        "QQP_acc",
+        "QQP_f1",
+        "QNLI_acc",
+        "RTE_acc",
+        "MRPC_acc",
+        "STSB_corr",
+        "All_ave"
+      ],
+      "metricDirection": "higher_is_better",
+      "metricUnit": "table_reported_score",
+      "rows": [
+        {
+          "id": "t1-0",
+          "method": "Full FT",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 184,
+            "nominalBand": "reference",
+            "matched": "reference_only"
+          },
+          "values": {
+            "MNLI_m": 89.9,
+            "MNLI_mm": 90.12,
+            "SST2_acc": 95.63,
+            "CoLA_mcc": 69.19,
+            "QQP_acc": 92.4,
+            "QQP_f1": 89.8,
+            "QNLI_acc": 94.03,
+            "RTE_acc": 83.75,
+            "MRPC_acc": 89.46,
+            "STSB_corr": 91.6,
+            "All_ave": 88.09
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-1",
+          "method": "BitFit",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.1,
+            "nominalBand": "reference",
+            "matched": "reference_only"
+          },
+          "values": {
+            "MNLI_m": 89.37,
+            "MNLI_mm": 89.91,
+            "SST2_acc": 94.84,
+            "CoLA_mcc": 66.96,
+            "QQP_acc": 88.41,
+            "QQP_f1": 84.95,
+            "QNLI_acc": 92.24,
+            "RTE_acc": 78.7,
+            "MRPC_acc": 87.75,
+            "STSB_corr": 91.35,
+            "All_ave": 86.02
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-2",
+          "method": "HAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 1.22,
+            "nominalBand": "high",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.13,
+            "MNLI_mm": 90.17,
+            "SST2_acc": 95.53,
+            "CoLA_mcc": 68.64,
+            "QQP_acc": 91.91,
+            "QQP_f1": 89.27,
+            "QNLI_acc": 94.11,
+            "RTE_acc": 84.48,
+            "MRPC_acc": 89.95,
+            "STSB_corr": 91.48,
+            "All_ave": 88.12
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-3",
+          "method": "PAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 1.18,
+            "nominalBand": "high",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.33,
+            "MNLI_mm": 90.39,
+            "SST2_acc": 95.61,
+            "CoLA_mcc": 68.77,
+            "QQP_acc": 92.04,
+            "QQP_f1": 89.4,
+            "QNLI_acc": 94.29,
+            "RTE_acc": 85.2,
+            "MRPC_acc": 89.46,
+            "STSB_corr": 91.54,
+            "All_ave": 88.24
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-4",
+          "method": "LoRA r=8",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 1.33,
+            "nominalBand": "high",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.65,
+            "MNLI_mm": 90.69,
+            "SST2_acc": 94.95,
+            "CoLA_mcc": 69.82,
+            "QQP_acc": 91.99,
+            "QQP_f1": 89.38,
+            "QNLI_acc": 93.87,
+            "RTE_acc": 85.2,
+            "MRPC_acc": 89.95,
+            "STSB_corr": 91.6,
+            "All_ave": 88.34
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-5",
+          "method": "AdaLoRA",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 1.27,
+            "nominalBand": "high",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.76,
+            "MNLI_mm": 90.79,
+            "SST2_acc": 96.1,
+            "CoLA_mcc": 71.45,
+            "QQP_acc": 92.23,
+            "QQP_f1": 89.74,
+            "QNLI_acc": 94.55,
+            "RTE_acc": 88.09,
+            "MRPC_acc": 90.69,
+            "STSB_corr": 91.84,
+            "All_ave": 89.31
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-6",
+          "method": "HAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.61,
+            "nominalBand": "mid",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.12,
+            "MNLI_mm": 90.23,
+            "SST2_acc": 95.3,
+            "CoLA_mcc": 67.87,
+            "QQP_acc": 91.65,
+            "QQP_f1": 88.95,
+            "QNLI_acc": 93.76,
+            "RTE_acc": 85.56,
+            "MRPC_acc": 89.22,
+            "STSB_corr": 91.3,
+            "All_ave": 87.93
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-7",
+          "method": "PAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.6,
+            "nominalBand": "mid",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.15,
+            "MNLI_mm": 90.28,
+            "SST2_acc": 95.53,
+            "CoLA_mcc": 69.48,
+            "QQP_acc": 91.62,
+            "QQP_f1": 88.86,
+            "QNLI_acc": 93.98,
+            "RTE_acc": 84.12,
+            "MRPC_acc": 89.22,
+            "STSB_corr": 91.52,
+            "All_ave": 88.04
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-8",
+          "method": "HAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.31,
+            "nominalBand": "low",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.1,
+            "MNLI_mm": 90.02,
+            "SST2_acc": 95.41,
+            "CoLA_mcc": 67.65,
+            "QQP_acc": 91.54,
+            "QQP_f1": 88.81,
+            "QNLI_acc": 93.52,
+            "RTE_acc": 83.39,
+            "MRPC_acc": 89.25,
+            "STSB_corr": 91.31,
+            "All_ave": 87.6
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-9",
+          "method": "PAdapter",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.3,
+            "nominalBand": "low",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 89.89,
+            "MNLI_mm": 90.06,
+            "SST2_acc": 94.72,
+            "CoLA_mcc": 69.06,
+            "QQP_acc": 91.4,
+            "QQP_f1": 88.62,
+            "QNLI_acc": 93.87,
+            "RTE_acc": 84.48,
+            "MRPC_acc": 89.71,
+            "STSB_corr": 91.38,
+            "All_ave": 87.9
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-10",
+          "method": "LoRA r=2",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.33,
+            "nominalBand": "low",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.3,
+            "MNLI_mm": 90.38,
+            "SST2_acc": 94.95,
+            "CoLA_mcc": 68.71,
+            "QQP_acc": 91.61,
+            "QQP_f1": 88.91,
+            "QNLI_acc": 94.03,
+            "RTE_acc": 85.56,
+            "MRPC_acc": 89.71,
+            "STSB_corr": 91.68,
+            "All_ave": 88.15
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "id": "t1-11",
+          "method": "AdaLoRA",
+          "budget": {
+            "kind": "trainable_params_million",
+            "value": 0.32,
+            "nominalBand": "low",
+            "matched": "approximate_band"
+          },
+          "values": {
+            "MNLI_m": 90.66,
+            "MNLI_mm": 90.7,
+            "SST2_acc": 95.8,
+            "CoLA_mcc": 70.04,
+            "QQP_acc": 91.78,
+            "QQP_f1": 89.16,
+            "QNLI_acc": 94.49,
+            "RTE_acc": 87.36,
+            "MRPC_acc": 90.44,
+            "STSB_corr": 91.63,
+            "All_ave": 88.86
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 7,
+            "section": "4.1",
+            "locator": "Table 1",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        }
+      ]
+    },
+    {
+      "id": "table-2",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 8,
+        "section": "4.2",
+        "locator": "Table 2",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "较低预算下，问答表现及预算增加的收益怎样？",
+      "controls": [
+        "底座和各数据集一致",
+        "表中预算档",
+        "相同指标"
+      ],
+      "changedVariables": [
+        "方法",
+        "预算档"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "SQuADv1.1",
+        "SQuADv2.0"
+      ],
+      "evaluationProtocol": "EM/F1；split 与种子汇总方式未在 Table 2 图注明确，不沿用 Table 1",
+      "relativePerformance": "AdaLoRA 在本表每一预算档的 EM/F1 高于三类 PEFT 基线",
+      "trend": "AdaLoRA 的跨预算表现较稳定，但 SQuADv2.0 非严格单调",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "SQuADv1.1",
+        "SQuADv2.0",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "不能推广到任意模型与问答任务",
+        "预算百分比按原表标签，不反推完全精确参数数"
+      ],
+      "metrics": {
+        "EM": {
+          "unit": "percent",
+          "direction": "higher_is_better"
+        },
+        "F1": {
+          "unit": "percent",
+          "direction": "higher_is_better"
+        }
+      },
+      "rows": [
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.4,
+            "F1": 91.5
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.3,
+            "F1": 92.1
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.1,
+            "F1": 92.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.7,
+            "F1": 92.9
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 83.4,
+            "F1": 86.6
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.3,
+            "F1": 87.3
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.9,
+            "F1": 87.9
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "HAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.4,
+            "F1": 88.3
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.4,
+            "F1": 91.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.9,
+            "F1": 92.5
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.2,
+            "F1": 92.8
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.6,
+            "F1": 93.0
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.2,
+            "F1": 87.2
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.5,
+            "F1": 87.6
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.9,
+            "F1": 87.8
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "PAdapter",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.5,
+            "F1": 87.5
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.4,
+            "F1": 92.8
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.6,
+            "F1": 92.9
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.7,
+            "F1": 93.1
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.7,
+            "F1": 93.1
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.7,
+            "F1": 87.5
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 83.6,
+            "F1": 86.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 84.5,
+            "F1": 87.4
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.0,
+            "F1": 88.0
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 87.2,
+            "F1": 93.4
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 87.5,
+            "F1": 93.6
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 87.5,
+            "F1": 93.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv1.1",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 87.6,
+            "F1": 93.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.6,
+            "F1": 88.7
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.7,
+            "F1": 88.8
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 85.5,
+            "F1": 88.6
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SQuADv2.0",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "EM": 86.0,
+            "F1": 88.9
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.2",
+            "locator": "Table 2",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        }
+      ],
+      "fullFineTuningReference": {
+        "SQuADv1.1": {
+          "EM": 86.0,
+          "F1": 92.7
+        },
+        "SQuADv2.0": {
+          "EM": 85.4,
+          "F1": 88.4
+        }
+      }
+    },
+    {
+      "id": "table-3",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 8,
+        "section": "4.3",
+        "locator": "Table 3",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "生成任务在不同预算下表现和差距怎样？",
+      "controls": [
+        "BART-large",
+        "相同数据集和指标",
+        "表中预算档"
+      ],
+      "changedVariables": [
+        "方法",
+        "预算档"
+      ],
+      "model": "BART-large",
+      "datasets": [
+        "XSum",
+        "CNN/DailyMail"
+      ],
+      "evaluationProtocol": "ROUGE-1/2/L；Table 3 未单独标明 split 与种子汇总方式",
+      "relativePerformance": "多数格 AdaLoRA 高于 LoRA；CNN/DailyMail 2.20% 的 R1 是例外",
+      "trend": "XSum 的预算增加收益与 Figure 2c 一致；不得跨任务合并指标",
+      "applicableConditions": [
+        "BART-large",
+        "XSum",
+        "CNN/DailyMail",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "本表没有 Adapter/BitFit 结果",
+        "Full FT 是 100% 预算参考",
+        "正文数字例子不替换表格行"
+      ],
+      "metrics": {
+        "R1": {
+          "unit": "ROUGE score",
+          "direction": "higher_is_better"
+        },
+        "R2": {
+          "unit": "ROUGE score",
+          "direction": "higher_is_better"
+        },
+        "RL": {
+          "unit": "ROUGE score",
+          "direction": "higher_is_better"
+        }
+      },
+      "rows": [
+        {
+          "method": "LoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 2.2,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.95,
+            "R2": 20.72,
+            "RL": 35.68
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 2.2,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 45.03,
+            "R2": 21.84,
+            "RL": 42.15
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 2.2,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 44.72,
+            "R2": 21.46,
+            "RL": 36.46
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 2.2,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 45.0,
+            "R2": 21.89,
+            "RL": 42.16
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 1.1,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.4,
+            "R2": 20.2,
+            "RL": 35.2
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 1.1,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 44.72,
+            "R2": 21.58,
+            "RL": 41.84
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 1.1,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 44.35,
+            "R2": 21.13,
+            "RL": 36.13
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 1.1,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 44.96,
+            "R2": 21.77,
+            "RL": 42.09
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.26,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.18,
+            "R2": 19.89,
+            "RL": 34.92
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.26,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.95,
+            "R2": 20.91,
+            "RL": 40.98
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.26,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.55,
+            "R2": 20.17,
+            "RL": 35.2
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.26,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 44.39,
+            "R2": 21.28,
+            "RL": 41.5
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.13,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 42.81,
+            "R2": 19.68,
+            "RL": 34.73
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.13,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.68,
+            "R2": 20.63,
+            "RL": 40.71
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "XSum",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.13,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.29,
+            "R2": 19.95,
+            "RL": 35.04
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CNN/DailyMail",
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.13,
+            "matched": "reported_percentage"
+          },
+          "values": {
+            "R1": 43.94,
+            "R2": 20.83,
+            "RL": 40.96
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 8,
+            "section": "4.3",
+            "locator": "Table 3",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        }
+      ],
+      "fullFineTuningReference": {
+        "XSum": {
+          "R1": 45.49,
+          "R2": 22.33,
+          "RL": 37.26
+        },
+        "CNN/DailyMail": {
+          "R1": 44.16,
+          "R2": 21.28,
+          "RL": 40.9
+        }
+      }
+    },
+    {
+      "id": "table-4",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 9,
+        "section": "4.4",
+        "locator": "Table 4",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "因子结构与重要性评分变体怎样影响表现？",
+      "controls": [
+        "DeBERTaV3-base",
+        "相同任务/预算档",
+        "Prune LoRA 采用相同重要性评分、调度和训练设置"
+      ],
+      "changedVariables": [
+        "因子/剪枝结构",
+        "重要性评分变体"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "SST-2",
+        "RTE",
+        "CoLA"
+      ],
+      "evaluationProtocol": "SST-2/RTE accuracy 与 CoLA MCC；主文 Table 4",
+      "relativePerformance": "完整 AdaLoRA 通常有优势；RTE 高档仅敏感性略高且低档持平",
+      "trend": "评分变体的影响随任务和预算不同",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "SST-2",
+        "RTE",
+        "CoLA",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "不同表的 AdaLoRA 行不能替换",
+        "不证明单项微小差值显著",
+        "不能合成未报告的多组件组合"
+      ],
+      "metricDirection": "higher_is_better",
+      "metricUnit": "table_reported_score",
+      "rows": [
+        {
+          "method": "Prune LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.84,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.5,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.95,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 86.28,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 86.15,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.0,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 66.71,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 69.29,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Prune LoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 69.57,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.52,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.8,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 96.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.36,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.73,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 88.09,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 70.21,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 70.04,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 71.45,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.61,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.3,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.64,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.36,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.71,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 88.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 66.71,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 68.83,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Sensitivity only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 70.19,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.41,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.41,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.87,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 87.0,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 86.28,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "RTE",
+          "metric": "accuracy",
+          "value": 88.0,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 67.67,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 68.44,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "Magnitude only",
+          "dataset": "CoLA",
+          "metric": "MCC",
+          "value": 70.38,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 9,
+            "section": "4.4",
+            "locator": "Table 4",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        }
+      ]
+    },
+    {
+      "id": "table-5",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 10,
+        "section": "4.4",
+        "locator": "Table 5",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "SVD-like 结构、自适应分配和正交正则各有什么作用？",
+      "controls": [
+        "底座",
+        "相同任务/预算档",
+        "对应论文预设变体"
+      ],
+      "changedVariables": [
+        "SVD-like 结构",
+        "预算分配",
+        "正交正则"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "SST-2",
+        "MNLI"
+      ],
+      "evaluationProtocol": "MNLI 为 m/mm accuracy 平均；缺失值保留 null",
+      "relativePerformance": "完整方法高于本表已报告变体，但单独正则或 SVD 不是每格都优于 LoRA",
+      "trend": "多项设计联合有效，不能简单相加各组件贡献",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "SST-2",
+        "MNLI",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "null 表示未报告，不是零",
+        "不是四个开关的所有组合实验",
+        "不能与 MNLI-m 单列直接相减"
+      ],
+      "metricDirection": "higher_is_better",
+      "metricUnit": "percent",
+      "rows": [
+        {
+          "method": "LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.38,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.95,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": null,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.95,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.19,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.34,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": null,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.57,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": null,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.61,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.72,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 94.61,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": null,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.3,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.4,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "LoRA + orthogonal regularization",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.66,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.33,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.18,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.07,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.53,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.28,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.25,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.52,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "SVD-LoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.62,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.41,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.3,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.37,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.34,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.56,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA gamma=0",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.43,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.64,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 95.8,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 96.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "SST-2",
+          "metric": "accuracy",
+          "value": 96.1,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.65,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.08,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.68,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.16,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.66,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.32,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        },
+        {
+          "method": "AdaLoRA",
+          "dataset": "MNLI",
+          "metric": "mean m/mm accuracy",
+          "value": 90.77,
+          "budget": {
+            "kind": "trainable_params_percent",
+            "value": 0.65,
+            "matched": "reported_percentage"
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 10,
+            "section": "4.4",
+            "locator": "Table 5",
+            "representation": "verbatim_values",
+            "verification": "text_and_visual"
+          }
+        }
+      ]
+    },
+    {
+      "id": "figure-3",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 10,
+        "section": "4.4",
+        "locator": "Figure 3",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "researchQuestion": "训练最终保留了怎样的 Rank 分布？",
+      "controls": [
+        "DeBERTaV3-base",
+        "MNLI",
+        "同一图的最终分配"
+      ],
+      "changedVariables": [
+        "矩阵类型",
+        "层位置"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "MNLI"
+      ],
+      "evaluationProtocol": "最终 Rank 观察；不是逐模块 accuracy 测量",
+      "relativePerformance": "分配不均；作者概括偏向 FFN/高层，但 Wf2 与最后一层等有明确例外",
+      "trend": "许多中高层 Wf1 高 Rank，也有 Attention 矩阵高 Rank；不是单调规律",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "MNLI",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "图注未明确给出该图预算超参数，不根据视觉补推",
+        "不能把 Rank 当因果重要性或准确率",
+        "筛选低/高层是教程界面划分"
+      ],
+      "metric": {
+        "name": "final rank",
+        "unit": "integer directions",
+        "direction": "descriptive_not_performance"
+      },
+      "layers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "matrixOrderTopToBottom": [
+        "Wf2",
+        "Wf1",
+        "Wo",
+        "Wv",
+        "Wk",
+        "Wq"
+      ],
+      "matrixGroups": {
+        "Attention": [
+          "Wq",
+          "Wk",
+          "Wv",
+          "Wo"
+        ],
+        "FFN": [
+          "Wf1",
+          "Wf2"
+        ]
+      },
+      "values": {
+        "Wf2": [
+          4,
+          1,
+          5,
+          2,
+          3,
+          5,
+          5,
+          6,
+          10,
+          5,
+          5,
+          0
+        ],
+        "Wf1": [
+          6,
+          9,
+          9,
+          9,
+          12,
+          11,
+          12,
+          12,
+          12,
+          12,
+          12,
+          2
+        ],
+        "Wo": [
+          7,
+          3,
+          5,
+          8,
+          8,
+          10,
+          12,
+          12,
+          12,
+          12,
+          12,
+          5
+        ],
+        "Wv": [
+          6,
+          6,
+          10,
+          6,
+          10,
+          11,
+          11,
+          11,
+          12,
+          12,
+          11,
+          9
+        ],
+        "Wk": [
+          5,
+          4,
+          5,
+          5,
+          10,
+          9,
+          9,
+          11,
+          12,
+          12,
+          12,
+          12
+        ],
+        "Wq": [
+          3,
+          2,
+          5,
+          4,
+          7,
+          7,
+          7,
+          10,
+          11,
+          11,
+          10,
+          3
+        ]
+      },
+      "derivedChecks": {
+        "sumOfDisplayedRanks": 576,
+        "derivation": "对图中 72 个原始格值求和，教程校验量，非额外论文实验"
+      }
+    },
+    {
+      "id": "table-15-mnli",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 17,
+        "section": "Appendix H",
+        "locator": "Table 15, MNLI rows",
+        "representation": "verbatim_values",
+        "verification": "text_only"
+      },
+      "researchQuestion": "动态分配是否引入训练开销？",
+      "controls": [
+        "单张 NVIDIA V100",
+        "DeBERTaV3-base",
+        "与正文设置相同训练超参数"
+      ],
+      "changedVariables": [
+        "方法",
+        "预算档"
+      ],
+      "model": "DeBERTaV3-base",
+      "datasets": [
+        "MNLI"
+      ],
+      "evaluationProtocol": "training only；time/epoch 与 GPU memory；此条仅文本核对",
+      "relativePerformance": "AdaLoRA 在报告设置训练耗时较 LoRA 增加，显存接近",
+      "trend": "MNLI 各档训练每 epoch 约增加一成，非通用硬件结论",
+      "applicableConditions": [
+        "DeBERTaV3-base",
+        "MNLI",
+        "仅限本记录的预算、指标和设置"
+      ],
+      "limitations": [
+        "Appendix H 第二任务正文与表格标签冲突，不引用其定量结论",
+        "不同硬件、实现或任务可能不同"
+      ],
+      "rows": [
+        {
+          "budgetPercent": 0.08,
+          "LoRA": {
+            "gpuMemoryGB": 11.094,
+            "timePerEpochMin": 105
+          },
+          "AdaLoRA": {
+            "gpuMemoryGB": 11.104,
+            "timePerEpochMin": 116
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 17,
+            "section": "Appendix H",
+            "locator": "Table 15, MNLI rows",
+            "representation": "verbatim_values",
+            "verification": "text_only"
+          }
+        },
+        {
+          "budgetPercent": 0.16,
+          "LoRA": {
+            "gpuMemoryGB": 11.098,
+            "timePerEpochMin": 105
+          },
+          "AdaLoRA": {
+            "gpuMemoryGB": 11.11,
+            "timePerEpochMin": 117
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 17,
+            "section": "Appendix H",
+            "locator": "Table 15, MNLI rows",
+            "representation": "verbatim_values",
+            "verification": "text_only"
+          }
+        },
+        {
+          "budgetPercent": 0.65,
+          "LoRA": {
+            "gpuMemoryGB": 11.128,
+            "timePerEpochMin": 105
+          },
+          "AdaLoRA": {
+            "gpuMemoryGB": 11.188,
+            "timePerEpochMin": 117
+          },
+          "source": {
+            "type": "paper_evidence",
+            "sourceId": "uploaded-pdf",
+            "paperId": "adalora",
+            "page": 17,
+            "section": "Appendix H",
+            "locator": "Table 15, MNLI rows",
+            "representation": "verbatim_values",
+            "verification": "text_only"
+          }
+        }
+      ]
+    }
+  ],
+  "mechanismClaims": [
+    {
+      "id": "lora",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 2,
+        "section": "1–2",
+        "locator": "Eq. 1; Section 2, Eq. 2",
+        "representation": "author_statement",
+        "verification": "text_only"
+      },
+      "claim": "LoRA 冻结预训练矩阵，训练两低秩因子；Rank 控制结构容量"
+    },
+    {
+      "id": "svd-like",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 4,
+        "section": "3.1",
+        "locator": "Eq. 3–4",
+        "representation": "author_statement",
+        "verification": "text_only"
+      },
+      "claim": "训练 PΛQ，正则鼓励近似正交；不反复计算精确 SVD"
+    },
+    {
+      "id": "score",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 5,
+        "section": "3.2",
+        "locator": "Eq. 7–11",
+        "representation": "author_statement",
+        "verification": "text_and_visual"
+      },
+      "claim": "单参数平滑敏感性乘变化项，聚合 λ 和 P/Q 两侧均值后用于三元组全局排序"
+    },
+    {
+      "id": "recovery",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 6,
+        "section": "4",
+        "locator": "Implementation Details",
+        "representation": "author_statement",
+        "verification": "text_only"
+      },
+      "claim": "按间隔掩蔽保留被抑制方向后续更新/再激活可能；不是恢复保证"
+    },
+    {
+      "id": "scheduler",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 6,
+        "section": "3.3",
+        "locator": "Section 3.3; Appendix A p.14",
+        "representation": "author_statement",
+        "verification": "text_only"
+      },
+      "claim": "预热、三次下降、固定最终分配后继续微调"
+    },
+    {
+      "id": "figure-2-trend",
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 9,
+        "section": "4.4",
+        "locator": "Figure 2",
+        "representation": "author_statement",
+        "verification": "text_and_visual"
+      },
+      "claim": "不同任务增加预算的收益不同；只使用图中趋势，不把未标注点数字化为精确原值"
+    }
+  ],
+  "simulationSpecs": [
+    {
+      "id": "equal-dimension-rank",
+      "source": {
+        "type": "conceptual_simulation",
+        "scenarioId": "act-2-rank",
+        "mechanismReferences": [
+          "lora",
+          "scheduler"
+        ],
+        "assumptions": [
+          "四个同尺寸 64×64 教学矩阵",
+          "总 Rank 12",
+          "每项 Rank 0–8",
+          "总 LoRA 因子参数 1536"
+        ],
+        "disclaimer": "教学模拟，不代表真实训练结果"
+      },
+      "initialRanks": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "performanceMetrics": null
+    },
+    {
+      "id": "budget-schedule",
+      "source": {
+        "type": "conceptual_simulation",
+        "scenarioId": "act-5-schedule",
+        "mechanismReferences": [
+          "scheduler"
+        ],
+        "assumptions": [
+          "初始总 Rank 24",
+          "目标 16",
+          "12 个教学时间点",
+          "阶段长度为教学设定，不是原论文日志"
+        ],
+        "disclaimer": "教学模拟，不代表真实训练结果"
+      },
+      "performanceMetrics": null
+    }
+  ],
+  "knownExceptions": [
+    {
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 8,
+        "section": "4.3",
+        "locator": "Table 3",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "condition": "CNN/DailyMail, 2.20%, R1",
+      "LoRA": 45.03,
+      "AdaLoRA": 45.0
+    },
+    {
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 9,
+        "section": "4.4",
+        "locator": "Table 4",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "condition": "RTE, 0.65%, accuracy",
+      "sensitivityOnly": 88.1,
+      "AdaLoRA": 88.09
+    },
+    {
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 7,
+        "section": "4.1",
+        "locator": "Table 1",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "condition": "STS-B low band, correlation",
+      "LoRA": 91.68,
+      "AdaLoRA": 91.63
+    },
+    {
+      "source": {
+        "type": "paper_evidence",
+        "sourceId": "uploaded-pdf",
+        "paperId": "adalora",
+        "page": 10,
+        "section": "4.4",
+        "locator": "Figure 3",
+        "representation": "verbatim_values",
+        "verification": "text_and_visual"
+      },
+      "condition": "layer 12",
+      "Wf1": 2,
+      "Wf2": 0,
+      "Wq": 3
+    }
+  ],
+  "unreportedRules": [
+    "null 不等于 0",
+    "未报告基线无柱子",
+    "不插值任意预算表现",
+    "不合成多个消融开关的结果",
+    "不制作伪训练日志"
+  ]
+}

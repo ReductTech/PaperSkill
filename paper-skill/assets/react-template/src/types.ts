@@ -3,8 +3,6 @@
 // validate-output.js counts chapters/modules via `kind: "chapter"` / `kind: "module"`
 // so do not omit them.
 
-export type Badge = 'inf' | 'trn' | 'both';
-
 export interface Meta {
   titleEn: string;
   titleZh: string;
@@ -17,17 +15,10 @@ export interface Meta {
   keywords: string[];
 }
 
-export interface FigureRef {
-  /** Relative path to a public/ file (e.g. "./images/fig1.png", never "/images/fig1.png") or an absolute URL. Optional. */
-  src: string;
-  caption?: string;
-  alt?: string;
-}
-
 export interface HeroSide {
+  title?: string; // Source-grounded method/concept name shown above the cover animation.
   desc: string;
-  figure?: string; // optional path/URL to the paper's original figure
-  componentId?: string; // optional canvas widget id registered in src/modules/registry.tsx
+  componentId: string; // Cover animation widget reads useCoverPlayback().
 }
 
 export interface HeroConfig {
@@ -46,40 +37,36 @@ export interface FormulaDef {
   symbols: SymbolDef[];
 }
 
-export interface AnalogyCard {
-  title: string;
-  text: string;
-  figure?: string; // optional path/URL to a paper figure
-  componentId?: string; // optional canvas widget id for the life-metaphor animation
-}
-
 export interface ModuleDef {
   kind: 'module';
   id: string; // e.g. "1.1"
   title: string;
   desc: string;
   componentId: string; // MUST match a key in src/modules/registry.tsx
-  figure?: string; // optional path/URL to a paper figure
 }
 
-export interface Takeaway {
-  icon: string; // emoji
+/** One independently composed slide with one learning objective. */
+export interface SceneDef {
+  id: string;
   title: string;
-  desc: string;
+  goal: string;
+  summary: string;
+  interaction: string;
+  next: string;
+  notes: string;
+  /** Body component receives a fixed 1472 × 622 CSS pixel region. */
+  /** Every scene supplies its own paper-specific body widget. */
+  componentId: string;
+  moduleId?: string;
+  thumbnail?: string;
 }
 
 export interface ChapterDef {
   kind: 'chapter';
   id: string; // e.g. "chap-1"
   title: string;
-  badge: Badge;
-  badgeLabel: string;
-  bridge: string; // "本节作用" copy
-  analogy: AnalogyCard;
-  modules: ModuleDef[];
-  insight?: string;
-  formula?: FormulaDef;
-  takeaways: Takeaway[];
+  modules: ModuleDef[]; // Empty for evidence/boundary-only chapters; method coverage is deck-wide.
+  scenes: SceneDef[];
 }
 
 export interface BiliDef {
@@ -95,6 +82,8 @@ export interface BiliDef {
 }
 
 export interface TutorialData {
+  /** Optional preview images keyed by scene ID, including cover/videos. */
+  thumbnails?: Record<string, string>;
   meta: Meta;
   hero: HeroConfig;
   chapters: ChapterDef[];

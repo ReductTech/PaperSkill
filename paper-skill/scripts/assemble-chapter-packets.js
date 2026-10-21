@@ -99,11 +99,13 @@ if (packetDirectories.length === 0) {
 }
 
 const chaptersByNumber = new Map();
+const sceneComponentIds = new Set();
 const moduleIds = new Set();
+const sceneIds = new Set(['cover', 'videos']);
 const referencedComponents = new Set();
 const widgets = new Map();
-const exportNames = new Set(['ExampleSlider']);
-const reservedComponentIds = new Set(['example-slider', 'registry']);
+const exportNames = new Set();
+const reservedComponentIds = new Set(['registry']);
 
 function recordComponentId(value, label) {
   if (value === undefined) return;
@@ -113,6 +115,7 @@ function recordComponentId(value, label) {
 
 for (const side of ['oldMethod', 'newMethod']) {
   requireObject(shared.hero[side], `shared.hero.${side}`);
+  requireString(shared.hero[side].componentId, `shared.hero.${side}.componentId (cover animation)`);
   recordComponentId(shared.hero[side].componentId, `shared.hero.${side}.componentId`);
 }
 
@@ -128,14 +131,31 @@ for (const packetName of packetDirectories) {
     const chapter = readJson(chapterPath, chapterRelative);
     requireObject(chapter, chapterRelative);
     if (chapter.kind !== 'chapter') fail(`${chapterRelative}.kind must be chapter.`);
+    for (const legacyField of ['badge', 'badgeLabel', 'bridge', 'analogy', 'insight', 'formula', 'takeaways']) {
+      if (chapter[legacyField] !== undefined) fail(`${chapterRelative}: legacy ${legacyField} field is not rendered; put its teaching content in scenes.`);
+    }
     const chapterMatch = /^chap-([1-9][0-9]*)$/.exec(chapter.id);
     if (!chapterMatch) fail(`${chapterRelative}.id must match chap-N.`);
     const chapterNumber = Number(chapterMatch[1]);
     if (chaptersByNumber.has(chapterNumber)) fail(`chapter ${chapterNumber} is duplicated.`);
-    requireObject(chapter.analogy, `${chapterRelative}.analogy`);
     requireArray(chapter.modules, `${chapterRelative}.modules`);
-    requireArray(chapter.takeaways, `${chapterRelative}.takeaways`);
-    recordComponentId(chapter.analogy.componentId, `${chapterRelative}.analogy.componentId`);
+    requireArray(chapter.scenes, `${chapterRelative}.scenes`);
+    if (chapter.scenes.length === 0) fail(`${chapterRelative} needs explicit scenes.`);
+    for (const scene of chapter.scenes) {
+      requireObject(scene, `${chapterRelative} scene`);
+      for (const field of ['id', 'title', 'goal', 'summary', 'interaction', 'notes']) {
+        requireString(scene[field], `${chapterRelative} scene.${field}`);
+      }
+      if (typeof scene.next !== 'string') fail(`${scene.id}.next must be a string.`);
+      if (!/^[a-z0-9][a-z0-9.-]*$/.test(scene.id) || sceneIds.has(scene.id)) fail(`invalid or duplicate scene id: ${scene.id}`);
+      sceneIds.add(scene.id);
+      if (scene.focus !== undefined) fail(`${scene.id}: legacy focus body is unsupported; provide a paper-specific componentId.`);
+      requireString(scene.componentId, `${scene.id}.componentId (paper-specific scene body)`);
+      if (sceneComponentIds.has(scene.componentId)) fail(`${scene.id}: scene componentId is reused; each page needs a distinct body widget.`);
+      sceneComponentIds.add(scene.componentId);
+      if (scene.moduleId !== undefined && !chapter.modules.some(module => module.id === scene.moduleId)) fail(`${scene.id}: unknown moduleId.`);
+      recordComponentId(scene.componentId, `${scene.id}.componentId`);
+    }
     for (const module of chapter.modules) {
       requireObject(module, `${chapterRelative} module`);
       if (module.kind !== 'module') fail(`${chapterRelative} contains a module without kind=module.`);
@@ -143,6 +163,9 @@ for (const packetName of packetDirectories) {
       if (moduleIds.has(module.id)) fail(`module id is duplicated: ${module.id}`);
       moduleIds.add(module.id);
       recordComponentId(module.componentId, `${chapterRelative} module componentId`);
+      const visible = chapter.scenes.some(scene =>
+        scene.moduleId === module.id || scene.componentId === module.componentId);
+      if (!visible) fail(`${chapterRelative}: module ${module.id} has no teaching scene; do not replace live interaction with static slides.`);
     }
     chaptersByNumber.set(chapterNumber, chapter);
   }
@@ -177,12 +200,13 @@ for (const packetName of packetDirectories) {
 
 const chapterNumbers = [...chaptersByNumber.keys()].sort((a, b) => a - b);
 if (chapterNumbers.length === 0) fail('no chapters were produced.');
+if (moduleIds.size === 0) fail('tutorial needs at least one active module; evidence-only chapters are allowed.');
 chapterNumbers.forEach((number, index) => {
   if (number !== index + 1) fail(`chapter sequence must be contiguous from 1; found chap-${number}.`);
 });
 
 for (const componentId of referencedComponents) {
-  if (componentId !== 'example-slider' && !widgets.has(componentId)) {
+  if (!widgets.has(componentId)) {
     fail(`componentId has no widget packet: ${componentId}`);
   }
 }
@@ -190,6 +214,7 @@ for (const componentId of referencedComponents) {
 const chapters = chapterNumbers.map((number) => chaptersByNumber.get(number));
 const tutorial = { meta: shared.meta, hero: shared.hero, chapters };
 if (shared.bilibili !== undefined) tutorial.bilibili = shared.bilibili;
+if (shared.thumbnails !== undefined) tutorial.thumbnails = shared.thumbnails;
 
 const tutorialSource = [
   "import type { TutorialData } from '../types';",
@@ -198,6 +223,13 @@ const tutorialSource = [
   '',
 ].join('\n');
 fs.writeFileSync(path.join(dataDir, 'tutorial.ts'), tutorialSource, 'utf8');
+fs.writeFileSync(path.join(outputRoot, 'outlines.json'), JSON.stringify({
+  title: shared.meta.titleZh,
+  pages: chapters.flatMap(chapter => chapter.scenes.map(scene => ({
+    id: scene.id, chapterId: chapter.id, title: scene.title, goal: scene.goal,
+    summary: scene.summary, interaction: scene.interaction, next: scene.next, snippet: scene.notes,
+  }))),
+}, null, 2) + '\n', 'utf8');
 
 const sortedWidgets = [...widgets.entries()].sort(([a], [b]) => a.localeCompare(b, 'en'));
 for (const [componentId, widget] of sortedWidgets) {
@@ -206,7 +238,6 @@ for (const [componentId, widget] of sortedWidgets) {
 
 const registryLines = [
   "import React from 'react';",
-  "import { ExampleSlider } from './exampleSlider';",
   ...sortedWidgets.map(([componentId, widget]) => `import { ${widget.exportName} } from './${componentId}';`),
   '',
   'export interface WidgetProps {',
@@ -215,7 +246,6 @@ const registryLines = [
   '}',
   '',
   'export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};',
-  "widgetRegistry['example-slider'] = ExampleSlider;",
   ...sortedWidgets.map(([componentId, widget]) => `widgetRegistry['${componentId}'] = ${widget.exportName};`),
   '',
 ];

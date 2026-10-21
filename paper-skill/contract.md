@@ -24,98 +24,198 @@ in **Simplified Chinese**; this contract and the skill's own instruction files a
 
 ## §2 Chapter Structure
 
-The tutorial is organized as a fixed narrative arc, but the **chapter count is flexible**.
-
-| Field                      | Value                |
-| -------------------------- | -------------------- |
-| `chapterCountDefault`      | 10                   |
-| `chapterCountMin`          | 6                    |
-| `chapterCountMax`          | 10                   |
-| `sectionsPerChapterMax`    | 3                    |
+The tutorial follows the paper's teaching arc. The model chooses the chapter count and
+slide count from distinct teaching questions; chapters group slides and are not slides
+themselves. For a substantial paper, **about 10–15 teaching slides including the cover**
+is a useful planning target. It is not a permitted range or a validation threshold.
+Optional video supplements do not count toward the teaching plan. A shorter or longer
+deck is appropriate when the paper's evidence and concepts justify it; never split or
+repeat material merely to reach the target.
 
 Rules:
 
-- Use 10 chapters for the standard arc. Reduce toward 6 only when the paper is genuinely
-  thin, or keep 10 when its structure is rich — the allowed range is 6–10.
-- Never reduce below 6 or pad above 10 to hit a quota.
-- Each chapter is organized into **at most 3 sections** (see §2.3): 引入节 / 讲解节 / 总结节.
-  Do not add a fourth independent section; fold any extra material into one of the three.
-- The narrative arc below is the **default ordering** for 10 chapters. When the count
-  changes, merge or split adjacent roles rather than reordering the pedagogy
-  (problem → insight → mechanism → method → training → results).
+- Give each chapter one coherent scientific question and one or more independent slides.
+  Split material when the learning objective or fixed canvas needs another page.
+- Preserve the broad learning progression: problem → insight → method/mechanism →
+  source-backed evidence → limitations. Add training, inference, proof, architecture,
+  system details or ablations only where the actual paper makes them central.
 
-### §2.1 Default 10-Chapter Arc
+### §2.1 Paper-Specific Chapter Arc
 
-| Chapter | Default role                                      | Badge  |
-| ------- | ------------------------------------------------- | ------ |
-| 1       | Problem and core loop                             | `inf`  |
-| 2       | Input representation or embedding                 | `inf`  |
-| 3       | Key insight or reversibility                      | `inf`  |
-| 4       | Core mathematical framework                       | `both` |
-| 5       | Conditioning or guidance                          | `both` |
-| 6       | Inference or sampling                             | `inf`  |
-| 7       | Training objective                               | `trn`  |
-| 8       | Architecture innovation **or** key technical module | `trn`  |
-| 9       | Practical techniques or auxiliary mechanisms      | `trn`  |
-| 10      | Results, comparisons, limitations, takeaways      | `both` |
+Choose chapter questions from the paper's own contribution and prerequisite chain.
+The opening establishes the problem and the core method; the ending compares verified
+results, applicability and limitations. Between them, choose only supported roles such as
+representation, formal rule, algorithm step, training objective, inference procedure,
+architecture consequence, proof, ablation, implementation trade-off or robustness.
+Do not use a diffusion-style topic sequence as the default for unrelated papers.
 
 ### §2.2 Paper-Type Branching
 
-Select one `paperType` in Phase 1. It only adjusts **which chapters may vary** and how
-Chapter 8 is treated — it does not change the output language or the analogy rules.
+Select one `paperType` in Phase 1 as a planning hint. It does not fix a chapter number or
+change the output language or analogy rules.
 
-| `paperType`     | Chapter 8 guidance                                                                 | Notes                                                                 |
-| --------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `generative`    | Interactive architecture / structure module is usually appropriate.                 | Diffusion / generation / autoregressive papers.                        |
-| `theoretical`   | Chapter 8 may become a key proof, bound, or ablation module instead of a network.   | Theory / optimization / stats papers with no nontrivial network.       |
-| `system`        | Chapter 8 should be the interactive system / pipeline module.                       | Systems, retrieval, infra, or multi-component papers.                  |
-| `rl`            | Chapter 8 may be the policy / value / trajectory module.                            | Reinforcement learning, control, planning papers.                      |
-| `other`         | Follow the default arc; Chapter 8 is a flexible "key technical mechanism" module.   | Anything that does not fit the above.                                  |
+| `paperType` | Possible key mechanism | Notes |
+| --- | --- | --- |
+| `generative` | Sampling, representation, conditioning or architecture, if present. | Generation papers vary widely. |
+| `theoretical` | Interactive proof idea, bound, optimization or trade-off. | No network diagram is required. |
+| `system` | A theme-grounded system decision with linked technical consequences. | Retrieval, infrastructure and pipelines. |
+| `rl` | State, action, value, policy or trajectory judgment. | Control and planning papers. |
+| `other` | The paper's actual central mechanism. | Do not borrow a role from another paper type. |
 
-For `theoretical` and similar types with **no nontrivial network structure**, do **not**
-force an interactive architecture diagram. Replace Chapter 8's architecture module with a
-different active technical module (interactive proof, trade-off, or ablation) that still
-satisfies the interaction-density contract in §3.
+When a paper has **no nontrivial network structure**, do not force an architecture
+diagram. Use a different active technical module that satisfies §3.
 
-### §2.3 Per-Chapter Section Cap (max 3)
+### §2.3 Chapter Narrative
 
-Each chapter renders as at most three coarse sections, in fixed order:
+Use introduction, mechanism, experiment, evidence, and recap as optional teaching roles.
+They are not a fixed set of page sections or DOM slots. One slide has one objective and a
+freely composed body; a chapter may use as many distinct scenes as its paper content needs.
 
-1. **引入节 (Intro)** — `bridge` + `analogy` (+ optional `insight`).
-2. **讲解节 (Body)** — `modules[]` (1–2) + optional `formula`.
-3. **总结节 (Recap)** — `takeaways` (exactly 3 items).
+### §2.4 Fixed Slide Canvas (Hard Presentation Contract)
 
-Treat `bridge` / `analogy` / `insight` as one intro block, `modules` / `formula` as one
-body block, and `takeaways` as the recap block. This keeps every chapter within three
-visible sections even though it contains more fine-grained elements.
+| Field | Value | Meaning |
+| --- | --- | --- |
+| `slideWidth` | 1600 | Logical design width in CSS pixels. |
+| `slideHeight` | 900 | Logical design height in CSS pixels. |
+
+- Cover, every scene, and video pages share this same 16:9 canvas. Chapters are narrative
+  groups, NOT pages. Let the paper determine the page count. One scene answers one question with one
+  focal visual. Neither document nor scene content may scroll; external navigation/notes may.
+- `SlideStage` measures the available area after TOC and navigation, then scales the whole
+  canvas by `min(availableWidth / slideWidth, availableHeight / slideHeight)` with a small
+  desktop workspace margin; fullscreen uses the entire fitted area. Center it
+  with letterboxing. Use a device-width viewport. Mobile keeps the same composition;
+  do not stack panels, grow the slide, or use screen media queries inside slide content.
+- Keep a device-width viewport with `user-scalable=yes` and no browser zoom cap. The
+  bundled `SlideStage` additionally owns local canvas zoom: two-pointer pinch, one-pointer
+  panning while magnified, a zoom/reset control, and wheel zoom on compact screens (Ctrl+
+  wheel on desktop). This must work in DevTools touch emulation as well as real mobile.
+  Only the gesture-owned stage may use `touch-action:none`; do not disable browser zoom
+  globally. Do not change the viewport to a fixed width or reflow slide contents to zoom.
+  Controls/TOC stay outside the canvas transform. Reserve single-pointer widget controls
+  for their own interaction; widgets must yield to multi-pointer stage gestures.
+  No-overflow validation applies at fitted scale; magnified content is intentionally
+  clipped to the stage and reached by bounded panning. Reset restores the full slide.
+- Every new chapter has explicit `scenes: SceneDef[]`; see `references/presentation-standard.md`.
+  Each scene has stable id, title, goal, summary, interaction, next and speaker notes.
+  The model composes each body for its own teaching purpose, optionally adapting a visual
+  example from `assets/layout-gallery/` or making a custom composition. Record that choice in
+  the intermediate plan only; no runtime layout name, slot schema, page-family count or
+  evidence-card placement is required. Give every scene its own paper-specific widget so the same
+  scene cannot be silently reused under new titles. Reuse drawing primitives and theme cues.
+  Every scene has a registered, paper-specific `componentId` for its body. The old built-in
+  `intro`, `formula` and `recap` layouts are removed: they produced small split analogies
+  or text-only three-point pages. A formula or takeaway belongs inside a substantive
+  visual scene, not on an automatic template slide.
+  The shared header occupies x=64,y=42,w=1472,h=184; body x=64,y=246,w=1472,h=622.
+  Place the chapter marker at the upper right of that header, opposite the scientific
+  title. It must not consume a separate full-width row above the title. Keep a short
+  goal line only when it adds a learning question that the title does not already state.
+  Compose freely inside the body; do not duplicate headers, player chrome or font rules.
+  The old single-page chapter layout is not part of the generation format.
+- Required chapter content remains accessible across the chapter's pages, not all on one page.
+  Capture page outlines from the same scene data into root `outlines.json`.
+- All required content remains accessible. Reserve space for the longest feedback,
+  inline explanations, controls, and figures. Formula-symbol hints use a viewport-clamped
+  overlay that does not reflow the slide; verify its readability near screen edges. If content does not fit,
+  split into another scene, edit copy, recompose, or use meaningful in-place steps.
+  Do not hide required blocks, truncate text, shrink fonts to evade overflow, create
+  nested scrolling cards, or treat `overflow:hidden` as proof that content fits.
+- Widgets use their allocated slot size, not the browser width. Canvas pointer coordinates
+  must account for the displayed bounding rectangle after stage scaling. Arrow-key controls
+  retain their own keyboard behavior; page shortcuts must not intercept interactive targets.
+- Browser validation is mandatory for final presentation fit: cover, every chapter, optional
+  videos, TOC expanded/collapsed, laptop and large desktop, portrait and landscape mobile.
+  Run bundled `src/lib/slideAudit.ts` `auditSlide()` after fonts/images settle and after
+  exercising longest feedback, formula selection, and all reveal/tab states. The result
+  must be empty. Inspect screenshots for readability and unintended internal overlap;
+  geometry checks cannot judge visual quality. If a browser is unavailable, explicitly
+  report presentation validation as incomplete instead of claiming a pass.
+
+### §2.5 On-slide typography and space
+
+- Inside each teaching-page **body**, use no more than three readable type roles:
+  28px explanation/control/axis text, 34px local concept headings, and 44px focal
+  equations or results. These are design-canvas CSS pixels, not device pixels; use
+  the shared `--ppt-body-text`, `--ppt-body-heading`, and `--ppt-body-emphasis` tokens.
+  Weight, color and spacing can vary without adding another size. The shared page
+  title, optional goal and external player controls are outside this body budget.
+- Remove eyebrow labels, repeated method names, redundant captions, decorative tags,
+  and tiny source labels when the title, graphic or speaker notes already provide the
+  information. A result identifier belongs on the slide only when needed to interpret
+  the result; otherwise put it in notes. Do not solve fit by shrinking a fourth tier.
+- Compose against the full 1472 × 622 body. An intentionally quiet area can focus
+  attention, but a small illustration surrounded by unused space is not a finished
+  slide. Enlarge the manipulable mechanism, readable explanation, result, or
+  comparison before adding decoration.
 
 ---
 
-## §3 Interaction Density (Hard Minimums)
+## §3 Interactive Teaching
 
-| Field                          | Value | Meaning                                                              |
-| ------------------------------ | ----- | -------------------------------------------------------------------- |
-| `activeModulesMin`             | 4     | Total primary active modules across all chapters.                    |
-| `dualModuleChaptersMin`        | 1     | At least one chapter should contain **two** primary active modules.  |
-| `distinctPatternsMin`          | 6     | Distinct interaction patterns (P1–P8) used across the tutorial.      |
-| `p1SliderChaptersMax`          | 4     | Chapters that may use the P1 slider pattern.                         |
-| `mathOrHybridModulesMin`       | 4     | Modules using mathematical/technical **or** hybrid views.            |
-| `lifeOrHybridModulesMin`       | 4     | Modules using life-metaphor **or** hybrid views.                     |
-| `canvasLabelMaxCount`          | 2     | Max short text labels drawn inside one module Canvas (numbers only count once). |
-| `canvasLabelMaxChars`          | 8     | Max chars per in-Canvas label.                                       |
-| `canvasLegendMaxItems`         | 3     | Max entries in one in-Canvas legend.                                 |
+**Core-method interaction takes priority over metric exploration.** The main method segment
+should predominantly consist of learner-operated mechanisms, with readable explanations
+integrated into them. A method page lets the learner change an actual input, intermediate
+representation, operator, architecture choice, objective or constraint and inspect a computed
+consequence of the paper's rule. Evidence-only pages remain useful for reported results.
+Filtering a benchmark, growing bars, revealing a fact or changing a metric label does not
+substitute for teaching how the method works, even when it is an active results module.
+Review coverage of the paper's central contributions, not just the count of registered modules.
 
-Notes:
+Use `references/interaction-patterns.md`'s core-method design test and the assets teaching
+demo when planning and implementing. A life object can be the control surface for the same
+scientific state; it must do causal work rather than decorate a chart. Compute a transparent
+small example or faithful simplified mechanism when full training/inference is impractical.
+Clearly label synthetic demonstrations; never fabricate benchmark changes from controls.
 
-- A "primary active module" requires a learner operation that updates the main graphic
-  **and** feedback immediately. Autoplay-only, hover-only, tooltip-only, formula-symbol
-  clicks, and chapter-loader buttons **do not count**.
-- The one-moving-subject limit applies to **automatic analogy animations**, not to active
-  body modules.
-- `activeModulesMin` is deliberately light: a strong tutorial can carry one rich module per
-  chapter and add a second only where it sharpens the problem→solution contrast (the
-  reference good example uses ~11 modules with one dual-module chapter). Quality comes from
-  focused, well-specified modules, not from hitting a high count.
+Core-method chapters include meaningful learner operations; add another when it teaches a distinct concept. Evidence or boundary chapters may have no active module and use `modules: []`. An active module changes the main graphic and
+immediate feedback from the same state. Passive autoplay, hover-only explanations, tooltip
+clicks, and navigation do not count. A chapter may also contain a pure life-story introduction,
+a scientific principle scene, or a verified result page without forcing those pages into a
+repeated module layout.
+
+Plan the **deck-wide mix** before building pages. Aim for about three quarters of body pages
+(excluding the cover) to use theme-grounded, learner-driven animated interactions. The learner
+operates a recognizable object or action from the selected everyday theme, changing the
+paper-relevant state and visible motion together. Review these pages separately from purely
+paper-native interactions and static pages in the slide ledger. This is a planning target.
+Distribute them through the introduction, main method, result interpretation and
+applicability/limitations. Carry the selected everyday theme through the
+early, middle and late parts with distinct, paper-relevant physical episodes. Vary their
+scale: a full-body event, several linked small interactions, or a compact live scene beside
+substantial scientific explanation. Include a late application or failure-and-repair scene
+that lets the learner use the core method again.
+Each operation changes meaningful motion or a time-evolving scene, a linked paper-relevant
+state, and immediate feedback. Use animated paper-native manipulation where a physical
+analogy would obscure the mechanism.
+
+Individual derivations, original figures and numerical evidence pages may be static when
+that better serves their question. Every page retains a recognizable theme visual: on static
+or paper-native pages, add a modest, clearly legible theme illustration, object or vignette
+related to that page's concept, comparison condition or conclusion. Compose it beside the
+explanation or result so the science stays readable. Vary the object and its state with the
+question. Record the visual and its explanatory link in the page plan; static theme icons
+remain static pages when reviewing animated-interaction coverage. Give each static page a
+teaching reason and plan where the related mechanism interaction resumes. Preserve reported chart values; any adjacent animated
+teaching example uses its own clearly identified state. Review the ordered early, middle and
+late sequences separately for continuity, meaningful operations and varied theme episodes.
+An animated interaction does not mean a decorative entrance, looping background, moving
+photo, or autoplay scene with no learner control. Record the action, motion, scientific
+state change, feedback, and source/analogy limit together.
+
+Both cover methods mount live animations through registered componentIds and share the
+CoverPlayback clock. The cover may introduce an everyday story; later pages may use a
+related life episode, a hybrid scene, or a paper-native technical experiment. Every page
+shows a concept-relevant visual from the selected theme, with the size and amount of motion
+chosen for that page's scientific question. Use small static illustrations for quieter pages
+and varied operable episodes for the animated pages.
+Put formal material where it answers that question, not in a generic evidence panel.
+In active modules, learner input must change a paper-relevant variable, component,
+constraint or measured comparison and a visible scientific consequence. Changing only a
+photo's opacity, sharpness, position or decorative motion does not meet this requirement,
+even if a feedback sentence or formula label changes. Directly manipulate the meaningful
+diagram, curve, feature relation, architecture choice, calculation or evidence when it
+teaches better than a life scene. Keep labels legible at fitted slide size.
 
 ---
 
@@ -123,25 +223,22 @@ Notes:
 
 | Field                | Value                       |
 | -------------------- | --------------------------- |
-| `analogyCanvasSize`  | `560 x 140`                 |
-| `subjects`           | exactly one primary subject |
-| `verbs`              | one physical action verb    |
-| `goals`              | one visible goal            |
-| `staticPropsMax`     | 2                           |
-| `movingSubjects`     | 1 (or 1 per panel in a direct before/after comparison, or the Chapter 10 race) |
+| `analogyCanvasSize`  | chosen for the scene; an analogy may be small, medium or near full-body according to the teaching question |
+| `setting`            | one recognizable everyday activity with recurring visual cues |
+| `actions`            | varied physical episodes related to that activity |
+| `readability`        | scene and operation legible at fitted slide size |
 
-Pass the `one subject + one verb + one goal` test for every analogy. Prohibited patterns
-(packages through workstations, conveyors, assembly lines, handoffs, multi-stage
-processes, abstract particle/heat/grid fields) are listed in
-`references/animation-library.md` and must never appear.
+The theme can contain people, tools, surroundings and related motions when they make the
+real-world activity recognizable. Avoid generic dots, paths, boxes and process flows as the
+main analogy. Choose visual complexity by legibility, not a prop or moving-object quota.
 
 ---
 
 ## §5 Color Semantics (Restrained Palette)
 
-These meanings are **stable across every chapter and every Canvas**. Semantic color
-explains state, not decoration. Neutrals (`#f5f8f0`, `#b8c9a7`, `#76906a`) cover most
-pixels.
+These semantic meanings are **stable across every chapter and drawing**. Semantic color
+explains state, not decoration. Choose quiet theme-specific environment colors; the
+background, terrain and support colors below are examples, not a mandatory green landscape.
 
 | Role                              | Hex       | Meaning                                            |
 | --------------------------------- | --------- | -------------------------------------------------- |
@@ -169,18 +266,13 @@ Invariants:
 
 ---
 
-## §6 Detail Floor (Soft, Field-Completeness Based)
+## §6 Chapter Plan Completeness
 
-The previous hard global character minimum (24,000–60,000 chars) encouraged tail padding
-and token bloat. Replace it with **field completeness**:
-
-- Every chapter plan must contain **all** required fields listed in
-  `references/intermediate-skill-standard.md` and `scripts/chapter-template.md`.
-- `chapterPlanMinChars` (soft): **600** characters of real, paper-specific implementation
-  detail per chapter. Below this, the plan is almost certainly under-specified.
-- There is **no** global character minimum. Length is a symptom, not a quality gate. The
-  automated `scripts/validate-output.js` checks field completeness and structure, not raw
-  length.
+Describe each planned page sufficiently to implement its objective, focal visual, learner
+operation if any, state changes, feedback and paper boundary. Do not pad a chapter to meet a
+character count or repeat the same fields for pages that serve different purposes. The
+automated validator checks project structure and syntax; the agent must review scientific
+accuracy, teaching quality and rendered slides separately.
 
 ---
 
@@ -188,20 +280,16 @@ and token bloat. Replace it with **field completeness**:
 
 Video recommendations are an **optional enrichment**, not a blocking requirement.
 
-- **Verification is NOT a gate.** If a relevant video exists, always include and display it
-  (video + cover + views) — do not omit the strip just because the Bilibili API or metadata
-  fetch failed, or because authenticity could not be verified. Only omit the `bilibili` array
-  entirely when genuinely **no relevant video exists** (a thorough search found nothing
-  on-topic). Never block the pipeline on video lookup.
+- Include a video only when its real BVID and relevance can be established. Never invent a
+  BVID, cover or view count. If lookup is unavailable or no relevant video is found, omit
+  `bilibili` without blocking tutorial generation.
 - Whenever possible, **bake the cover (`pic`) and views (`stat.view`)** into each entry
   (convert `pic` to `https://`). The unsigned `view` API is often rejected in end-user
   browsers, so baking is what makes the thumbnail and 播放量 reliably appear; the runtime
   `useBiliVideos` loader only enriches when it happens to succeed. If the metadata fetch is
   blocked during generation, still include the card (it shows the video link + title with a
   gradient cover fallback) rather than dropping the whole section.
-- Prefer real BVIDs with higher view counts when relevance is comparable; aim for
-  `>= 10,000` views, but a uniquely relevant low-view video is acceptable with a written
-  reason.
+- Prefer relevance over popularity; do not use a view-count threshold.
 - The final React app must tolerate **zero, one, or several** videos.
   `assets/react-template/src/lib/useBiliVideos.ts` and `src/components/BiliVideos.tsx` treat
   an empty `bvid` as nullable: a card with no BVID is hidden, and a failed fetch shows a
@@ -213,22 +301,19 @@ Video recommendations are an **optional enrichment**, not a blocking requirement
 
 ## §8 Validation
 
-Run `scripts/syntax-check.js` and `scripts/validate-output.js` on the generated project folder as hard
-gates (in addition to the agent self-checklist in `scripts/validation-checklist.md`).
-`assemble-chapter-packets.js` already runs the same syntax gate on every assembled source, so a
-truncated widget fails during generation instead of in the repository CI. The scripts check:
+Run `scripts/syntax-check.js` and `scripts/validate-output.js` on the generated project folder,
+in addition to the review in `scripts/validation-checklist.md` and an actual `npm run build`.
+`assemble-chapter-packets.js` also checks syntax during assembly.
 
-- No syntax error in any `src/**` file or the Vite config: `syntax-check.js <folder> --require-parser`
-  parses each file with the project's TypeScript/esbuild and fails on missing brackets, truncation,
-  or unterminated constructs (`--require-parser` also fails when the parser is not installed).
-- `kind: "chapter"` count (in `src/data/tutorial.ts`) is within `[chapterCountMin,
-  chapterCountMax]` (§2).
-- `kind: "module"` count `>= activeModulesMin` (§3), and `>= dualModuleChaptersMin` chapters
-  have two modules.
-- No leftover template placeholders (`__…__`, `__METAPHOR_CSS__`, `TBD`, `TODO`) in
-  `src/data/tutorial.ts`, `src/styles/paper.css`, or `src/modules/*`.
-- Optional: Bilibili entries either have a real `bvid` (`BV…`) or are omitted.
-- The key framework files (`App.tsx`, `types.ts`, `src/styles/tokens.css`) exist.
+Check essential project files, at least one chapter, component ID registration and source syntax. `syntax-check.js <folder> --require-parser` requires the project's
+TypeScript/esbuild parser; install dependencies before the final check.
+
+Report chapter and slide counts for review. Review module coverage, possible placeholders,
+optional video links, headings, scene fields and available outlines. Check scientific coverage,
+visible copy and source accuracy, and correct issues where appropriate.
+
+Use the bundled template as the default starting point. Confirm compatibility, interactions
+and slide fit through an actual build and browser operation.
 
 ---
 
@@ -256,10 +341,12 @@ by `src/types.ts`. The generator (Phase 2) rewrites ONLY these files:
 
 - `src/data/tutorial.ts` — the `tutorial` object; replace every `__XXX__` placeholder.
 - `src/styles/paper.css` — paper-specific `:root {}` overrides; replace `__METAPHOR_CSS__`.
-- `src/modules/*` — paper-specific Canvas widgets, registered in `src/modules/registry.tsx`.
+- `src/modules/*` — paper-specific page bodies and widgets, registered in `src/modules/registry.tsx`.
+- `outlines.json` — derived scene outline, emitted by the packet assembler.
+- `public/thumbnails/*` — local screenshots of finalized scenes.
 - `public/images/*` — optional original figures (see §11).
 
-Framework files (`src/components/*`, `src/lib/*`, `src/styles/{tokens,components}.css`,
+Framework files (`src/components/*`, `src/lib/*`, `src/styles/{tokens,components,presentation}.css`,
 `App.tsx`, `main.tsx`, config files) are copied verbatim by `scaffold.js` and are **never
 edited** by the generator. This keeps token cost low and preserves the shared UI.
 
@@ -277,14 +364,14 @@ Hard rules for the output:
 
 The tutorial **may** embed the paper's original figures. This is optional, never required.
 
+- During planning, consider important method overviews, architecture diagrams and algorithm illustrations when the original clarifies the paper better than a new drawing. Select by teaching value and legibility, not a figure quota. Record the chosen figure ID, source locator, caption and intended slide in the intermediate plan; omission is valid when extraction or readable placement is impractical.
+- An original-method figure may lead a dedicated explanation slide, appear after a life-based introduction, or support a nearby mechanism interaction. Preserve its scientific relationships and aspect ratio. Use local magnification or clearly marked crops/overlays when necessary; retain access to the full figure and do not remove context that changes its meaning. Separate added Chinese annotations from original labels, and explain the key scientific relation visibly rather than inserting an unexplained image. Put full provenance in speaker notes and a concise figure credit where useful.
+- Original figures are supporting scientific material, not a replacement for the deck's core-method interactions. Do not count a static figure, decorative highlight or image zoom alone as a core-method experiment. Existing text inside an original figure may remain unchanged, but it must be readable at the intended viewing scale; enlarge relevant regions or select a different presentation instead of shrinking the figure to fit.
 - To include a figure, copy the image into `public/images/` (e.g. `fig1.png`) and reference it
-  from the data via a `figure` field using a **relative path** (e.g. `./images/fig1.png`) or an
-  absolute URL. Never use a root-absolute path such as `/images/fig1.png`: tutorials are served
-  from a repository sub-path, so a root-absolute path resolves to the site root and 404s.
-- `figure` may appear on a Hero side (`hero.oldMethod.figure` / `hero.newMethod.figure`), an
-  analogy card (`analogy.figure`), or a module (`module.figure`). It is rendered by
-  `src/components/Figure.tsx`; when the field is undefined the figure is simply absent and the
-  canvas widget (if any) or the text stands alone.
-- When no suitable figure exists, omit the field — do not fabricate figures. A best-effort PDF
+  from a paper-specific scene widget using a **page-relative path** (e.g. `./images/fig1.png`)
+  so it works when the tutorial is served from a repository sub-path.
+- A paper-specific scene widget may use the reusable `src/components/Figure.tsx` helper to
+  display the staged original figure. The cover still requires both live, synchronized method animations.
+- When no suitable figure exists, omit it — do not fabricate figures. A best-effort PDF
   figure extraction may place images under `public/images/`, but the absence of figures is
   never a failure.

@@ -43,11 +43,21 @@ function findTemplateDir() {
 
 const TEMPLATE = findTemplateDir();
 
+const demoOnlyFiles = new Set([
+  'src/data/tutorial.ts',
+  'src/modules/registry.tsx',
+  'src/modules/MountainJourney.tsx',
+  'src/modules/MountainJourney.css',
+]);
+
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    if (['node_modules', 'dist', '.git', '.vite'].includes(entry.name)) continue;
     const s = path.join(src, entry.name);
     const d = path.join(dest, entry.name);
+    const relative = path.relative(TEMPLATE, s).replace(/\\/g, '/');
+    if (demoOnlyFiles.has(relative)) continue;
     if (entry.isDirectory()) {
       copyDir(s, d);
     } else if (entry.isFile()) {
@@ -74,6 +84,13 @@ function main() {
 
   copyDir(TEMPLATE, outputDir);
 
+  // Paper-specific content is written once by the packet assembler. Do not seed a
+  // new paper with the mountain demo or an unrelated example widget.
+  fs.writeFileSync(path.join(outputDir, 'src', 'data', 'tutorial.ts'),
+    "import type { TutorialData } from '../types';\n\nexport const tutorial = {} as TutorialData; // Replaced by packet assembly.\n", 'utf8');
+  fs.writeFileSync(path.join(outputDir, 'src', 'modules', 'registry.tsx'),
+    "import React from 'react';\nexport interface WidgetProps { chapterId: string; moduleId: string }\nexport const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};\n", 'utf8');
+
   // --- inject package.json (name + description title) ---
   const pkgPath = path.join(outputDir, 'package.json');
   if (fs.existsSync(pkgPath)) {
@@ -96,6 +113,7 @@ function main() {
   const readmePath = path.join(outputDir, 'README.md');
   if (fs.existsSync(readmePath)) {
     let readme = fs.readFileSync(readmePath, 'utf8');
+    readme = readme.replace(/<!-- DEMO-START -->[\s\S]*?<!-- DEMO-END -->/, '本项目由 paper-skill 的论文专属章节和交互组件生成。');
     readme = readme.split('__PAPER_TITLE_ZH__').join(titleZh);
     readme = readme.split('__PAPER_TITLE_EN__').join(titleEn);
     fs.writeFileSync(readmePath, readme, 'utf8');
@@ -104,6 +122,7 @@ function main() {
   // --- ensure public/images exists for optional original figures ---
   const imagesDir = path.join(outputDir, 'public', 'images');
   fs.mkdirSync(imagesDir, { recursive: true });
+  fs.mkdirSync(path.join(outputDir, 'public', 'thumbnails'), { recursive: true });
 
   console.log('Scaffolded React+TS project at: ' + outputDir);
   console.log('  package name : ' + packageName);

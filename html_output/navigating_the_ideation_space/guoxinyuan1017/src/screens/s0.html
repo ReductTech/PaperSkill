@@ -1,0 +1,116 @@
+<section class="card" id="s0" aria-labelledby="s0-title">
+    <div class="card-head">
+      <span class="tag-no">S0</span>
+      <span class="tag-name">标题页 · 论文定位</span>
+    </div>
+
+    <div class="s0-grid">
+      <div>
+        <div class="chips">
+          <span class="chip">科学文档检索</span>
+          <span class="chip">细粒度表示</span>
+          <span class="chip">新颖性评估</span>
+        </div>
+        <h1 class="title-zh" id="s0-title">导航创意空间：<br>面向科学想法定位的分解式概念表示</h1>
+        <p class="title-en">Navigating Ideation Space: Decomposed Conceptual Representations for Positioning Scientific Ideas</p>
+        <div class="lead">
+          <p>把「论文 = 一个向量」拆成「论文 = 三个功能维度各一个向量」，再用维度间向量差表示推理结构，并在这五个空间上做检索。</p>
+        </div>
+        <p class="authors">Yuexi Shen † · Minqian Liu † · Dawei Zhou · Lifu Huang</p>
+        <p class="meta">† 共同一作 · UC Santa Barbara · Virginia Tech · UC Davis</p>
+        <p class="meta">arXiv 2601.08901v1 · cs.IR · 2026-01-13（预印本，未注明会议）</p>
+        <p class="meta">代码：<a href="https://github.com/PLUM-Lab/IdeationSpace" target="_blank" rel="noopener">github.com/PLUM-Lab/IdeationSpace</a></p>
+      </div>
+
+      <div>
+        <p class="struct-title" style="margin-bottom:8px">核心命题</p>
+        <svg class="diagram" viewBox="0 0 280 152" role="img" aria-labelledby="dgm-t dgm-d">
+          <title id="dgm-t">论文由一个向量分解为三个功能维度向量</title>
+          <desc id="dgm-d">左侧一个灰色方框表示论文的单一向量表示，经「分解」后分为右侧三个方框：研究问题、方法论、核心发现，各自对应一个专用编码器。</desc>
+          <rect x="0" y="52" width="74" height="46" rx="8" fill="var(--surface2)" stroke="var(--bd2)" stroke-width=".5"/>
+          <text x="37" y="72" text-anchor="middle" font-size="12" font-weight="500" fill="var(--tx)">论文</text>
+          <text x="37" y="88" text-anchor="middle" font-size="11" fill="var(--tx3)">1 个向量</text>
+          <text x="105" y="62" text-anchor="middle" font-size="11" fill="var(--tx3)">分解</text>
+          <path d="M84 75 H122" stroke="var(--tx3)" stroke-width=".8" fill="none"/>
+          <path d="M126 75 l-5 -3 l0 6 z" fill="var(--tx3)"/>
+          <path d="M126 75 L140 31" stroke="var(--tx3)" stroke-width=".5" fill="none"/>
+          <path d="M126 75 L140 75" stroke="var(--tx3)" stroke-width=".5" fill="none"/>
+          <path d="M126 75 L140 119" stroke="var(--tx3)" stroke-width=".5" fill="none"/>
+          <rect x="140" y="14" width="140" height="34" rx="8" fill="var(--surface2)" stroke="var(--dim-p)" stroke-width=".5"/>
+          <circle cx="154" cy="31" r="4" fill="var(--dim-p)"/>
+          <text x="166" y="36" font-size="12" fill="var(--tx)">问题 E_problem</text>
+          <rect x="140" y="58" width="140" height="34" rx="8" fill="var(--surface2)" stroke="var(--dim-m)" stroke-width=".5"/>
+          <circle cx="154" cy="75" r="4" fill="var(--dim-m)"/>
+          <text x="166" y="80" font-size="12" fill="var(--tx)">方法论 E_method</text>
+          <rect x="140" y="102" width="140" height="34" rx="8" fill="var(--surface2)" stroke="var(--dim-f)" stroke-width=".5"/>
+          <circle cx="154" cy="119" r="4" fill="var(--dim-f)"/>
+          <text x="166" y="124" font-size="12" fill="var(--tx)">核心发现 E_findings</text>
+        </svg>
+        <p class="cap">三个编码器独立训练（均从 SPECTER2 初始化），各自只吃同维度文本；跃迁向量由跨维度相减得到。</p>
+
+        <div class="struct">
+          <p class="struct-title">论文结构</p>
+          <div class="srow"><span class="k"><span class="bar"></span>表示层</span><span class="v">三维向量 + 跃迁</span></div>
+          <div class="srow"><span class="k"><span class="bar"></span>检索层</span><span class="v">五个专用库</span></div>
+          <div class="srow"><span class="k"><span class="bar"></span>应用层</span><span class="v">推理图 → N(I)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="metrics">
+
+      <div class="metric" role="button" tabindex="0" aria-expanded="false">
+        <div class="m-top">
+          <span class="m-label">节点检索 Recall@30</span>
+          <span class="badge">×3 口径</span>
+        </div>
+        <div class="m-value">
+          <span class="num">0.329</span>
+          <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><rect x="0" y="1" width="6" height="8" rx="1.5" fill="var(--amber)" opacity=".28"/><rect x="8" y="1" width="6" height="8" rx="1.5" fill="var(--amber)" opacity=".28"/><rect x="16" y="1" width="6" height="8" rx="1.5" fill="var(--amber)"/></svg>
+        </div>
+        <p class="m-foot">† 真实 K=10 · 最强基线 0.282<span class="caret">▾</span></p>
+        <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+          <p>口径：表注写明「显示的 K = 9 / 30 / 90，对应真实 K = 3 / 10 / 30」，即放大 3 倍。这个 0.329 是 R@30（显示口径），真实是 R@10。</p>
+          <p>参照：最强基线 SPECTER2（concat）R@30 = 0.282，论文报的 +16.7% 由此算出。</p>
+          <p class="warn">放大规则原文未解释；口径不同的数字不能与外部基准横比。</p>
+        </div></div></div>
+      </div>
+
+      <div class="metric" role="button" tabindex="0" aria-expanded="false">
+        <div class="m-top">
+          <span class="m-label">跃迁检索 HitRate@30</span>
+          <span class="badge">×3 口径</span>
+        </div>
+        <div class="m-value">
+          <span class="num">0.643</span>
+          <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><rect x="0" y="1" width="6" height="8" rx="1.5" fill="var(--amber)" opacity=".28"/><rect x="8" y="1" width="6" height="8" rx="1.5" fill="var(--amber)" opacity=".28"/><rect x="16" y="1" width="6" height="8" rx="1.5" fill="var(--amber)"/></svg>
+        </div>
+        <p class="m-foot">† 真实 K=10 · E5 差距 0.016<span class="caret">▾</span></p>
+        <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+          <p>口径：同一套 ×3 口径，显示 K=30 对应真实 K=10。</p>
+          <p>参照：同表 E5-base-v2 HR@30 = 0.627、P2M = 0.611、M2K = 0.548；Transition Space 只在 R@90 与 HR@90 领先。</p>
+          <p class="warn">与 E5 只差 0.016，且 NDCG 上 E5 有竞争力（作者自己承认）。</p>
+        </div></div></div>
+      </div>
+
+      <div class="metric" role="button" tabindex="0" aria-expanded="false">
+        <div class="m-top">
+          <span class="m-label">新颖性相关 Pearson</span>
+          <span class="badge badge-gray">n=93</span>
+        </div>
+        <div class="m-value">
+          <span class="num">0.370</span>
+          <svg width="16" height="10" viewBox="0 0 16 10" aria-hidden="true" style="color:var(--tx3)"><path d="M1 3.2 C3 1,5 5.4,7 3.2 C9 1,11 5.4,13 3.2" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".6"/><path d="M1 7.2 C3 5,5 9.4,7 7.2 C9 5,11 9.4,13 7.2" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".6"/></svg>
+        </div>
+        <p class="m-foot">† 对标 GPT-5 Mini 0.369<span class="caret">▾</span></p>
+        <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+          <p>口径：这不是检索指标，而是与专家评分的一致性（Pearson 相关），元评估样本只有 93 个想法。</p>
+          <p>参照：GPT-5 Mini Pearson 0.369 / Spearman 0.385，本文 Spearman 0.384。</p>
+          <p class="warn">差距 0.001 无统计意义，Spearman 上反而落后；§6 用 comparable，摘要用 attains。</p>
+        </div></div></div>
+      </div>
+
+    </div>
+  </section>

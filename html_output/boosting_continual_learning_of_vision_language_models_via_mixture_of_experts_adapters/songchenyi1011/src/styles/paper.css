@@ -1,0 +1,57 @@
+/* 论文专用覆盖样式。这是生成器唯一改写的样式表。
+   tokens.css 中的语义色角色保持稳定（见 contract.md §5）：
+   --blue = 引导/当前状态，--green = 成功/本文方法，--red = 失败/旧方法，
+   --orange = 用户可控的强调，--purple = 辅助机制。
+   这里只做两件事：映射水彩主题的场景底色，以及补充交互模块的细节面板。 */
+
+:root {
+  /* 水彩调色与上色主题的场景底色（不替换模板的排版、间距、圆角与阴影） */
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-light: #b8c9a7;
+  --paper-scene-dark: #76906a;
+  --paper-scene-route: #92400e;
+  --paper-canvas-paper: #ffffff;
+}
+
+/* Canvas 使用主题底色，保持安静、不高饱和 */
+canvas {
+  background: var(--paper-scene-bg);
+}
+
+.analogy-visual canvas {
+  background: var(--paper-canvas-paper);
+}
+
+/* 交互模块的稳定细节区（点击热点后只更新文字，不改变布局高度） */
+.wc-detail {
+  min-height: 92px;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  color: var(--ink-2);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: 1.75;
+}
+
+.wc-detail b {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+/* 说明性数值读数：等宽字体，便于对照论文数值 */
+.wc-detail .wc-num {
+  color: var(--green);
+  font-family: var(--ui-font-mono);
+}
+
+/* 步骤控件中的禁用态按钮 */
+.step-ctrl button.tiny:disabled {
+  background: var(--line-2);
+  border-color: var(--line-2);
+  cursor: not-allowed;
+  opacity: 0.6;
+}

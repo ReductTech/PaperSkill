@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Ch1Fog } from './ch1-fog';
+import { Ch1Pos } from './ch1-pos';
+import { Ch10Limits } from './ch10-limits';
+import { Ch10Race } from './ch10-race';
+import { Ch10Summary } from './ch10-summary';
+import { ChAnaNote } from './ch-ana-note';
+import { Ch2Grid } from './ch2-grid';
+import { Ch3Compare } from './ch3-compare';
+import { Ch3Derive } from './ch3-derive';
+import { Ch4Beta } from './ch4-beta';
+import { Ch4Posterior } from './ch4-posterior';
+import { Ch4Sampler } from './ch4-sampler';
+import { Ch5Tools } from './ch5-tools';
+import { Ch6Progressive } from './ch6-progressive';
+import { Ch6Real } from './ch6-real';
+import { Ch6Sampler } from './ch6-sampler';
+import { Ch7Train } from './ch7-train';
+import { Ch8Unet } from './ch8-unet';
+import { Ch9Ema } from './ch9-ema';
+import { Ch9Trick } from './ch9-trick';
+import { HeroWindow } from './hero-window';
+import { WindowAnalogy } from './window-analogy';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ch1-fog'] = Ch1Fog;
+widgetRegistry['ch1-pos'] = Ch1Pos;
+widgetRegistry['ch10-limits'] = Ch10Limits;
+widgetRegistry['ch10-race'] = Ch10Race;
+widgetRegistry['ch10-summary'] = Ch10Summary;
+widgetRegistry['ch-ana-note'] = ChAnaNote;
+widgetRegistry['ch2-grid'] = Ch2Grid;
+widgetRegistry['ch3-compare'] = Ch3Compare;
+widgetRegistry['ch3-derive'] = Ch3Derive;
+widgetRegistry['ch4-beta'] = Ch4Beta;
+widgetRegistry['ch4-posterior'] = Ch4Posterior;
+widgetRegistry['ch4-sampler'] = Ch4Sampler;
+widgetRegistry['ch5-tools'] = Ch5Tools;
+widgetRegistry['ch6-progressive'] = Ch6Progressive;
+widgetRegistry['ch6-real'] = Ch6Real;
+widgetRegistry['ch6-sampler'] = Ch6Sampler;
+widgetRegistry['ch7-train'] = Ch7Train;
+widgetRegistry['ch8-unet'] = Ch8Unet;
+widgetRegistry['ch9-ema'] = Ch9Ema;
+widgetRegistry['ch9-trick'] = Ch9Trick;
+widgetRegistry['hero-window'] = HeroWindow;
+widgetRegistry['window-analogy'] = WindowAnalogy;

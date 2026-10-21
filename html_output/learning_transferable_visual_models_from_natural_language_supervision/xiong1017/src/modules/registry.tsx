@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { ClipAnalogy1 } from './clip-analogy-1';
+import { ClipAnalogy10 } from './clip-analogy-10';
+import { ClipAnalogy2 } from './clip-analogy-2';
+import { ClipAnalogy3 } from './clip-analogy-3';
+import { ClipAnalogy4 } from './clip-analogy-4';
+import { ClipAnalogy5 } from './clip-analogy-5';
+import { ClipAnalogy6 } from './clip-analogy-6';
+import { ClipAnalogy7 } from './clip-analogy-7';
+import { ClipAnalogy8 } from './clip-analogy-8';
+import { ClipAnalogy9 } from './clip-analogy-9';
+import { ClipArchitecture } from './clip-architecture';
+import { ClipEmbedding } from './clip-embedding';
+import { ClipHeroNew } from './clip-hero-new';
+import { ClipHeroOld } from './clip-hero-old';
+import { ClipInference } from './clip-inference';
+import { ClipLoss } from './clip-loss';
+import { ClipOverlap } from './clip-overlap';
+import { ClipPairs } from './clip-pairs';
+import { ClipProbe } from './clip-probe';
+import { ClipPrompt } from './clip-prompt';
+import { ClipResults } from './clip-results';
+import { ClipRobustness } from './clip-robustness';
+import { ClipScope } from './clip-scope';
+import { ClipSimilarity } from './clip-similarity';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['clip-analogy-1'] = ClipAnalogy1;
+widgetRegistry['clip-analogy-10'] = ClipAnalogy10;
+widgetRegistry['clip-analogy-2'] = ClipAnalogy2;
+widgetRegistry['clip-analogy-3'] = ClipAnalogy3;
+widgetRegistry['clip-analogy-4'] = ClipAnalogy4;
+widgetRegistry['clip-analogy-5'] = ClipAnalogy5;
+widgetRegistry['clip-analogy-6'] = ClipAnalogy6;
+widgetRegistry['clip-analogy-7'] = ClipAnalogy7;
+widgetRegistry['clip-analogy-8'] = ClipAnalogy8;
+widgetRegistry['clip-analogy-9'] = ClipAnalogy9;
+widgetRegistry['clip-architecture'] = ClipArchitecture;
+widgetRegistry['clip-embedding'] = ClipEmbedding;
+widgetRegistry['clip-hero-new'] = ClipHeroNew;
+widgetRegistry['clip-hero-old'] = ClipHeroOld;
+widgetRegistry['clip-inference'] = ClipInference;
+widgetRegistry['clip-loss'] = ClipLoss;
+widgetRegistry['clip-overlap'] = ClipOverlap;
+widgetRegistry['clip-pairs'] = ClipPairs;
+widgetRegistry['clip-probe'] = ClipProbe;
+widgetRegistry['clip-prompt'] = ClipPrompt;
+widgetRegistry['clip-results'] = ClipResults;
+widgetRegistry['clip-robustness'] = ClipRobustness;
+widgetRegistry['clip-scope'] = ClipScope;
+widgetRegistry['clip-similarity'] = ClipSimilarity;

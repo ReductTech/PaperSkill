@@ -21,29 +21,31 @@ Make the learner's physical operation embody the concept. The interaction should
 
 Reject controls that are detached from the concept. For example, do not use a generic slider to teach a classification boundary when the learner can manipulate the boundary directly.
 
-Keep every everyday analogy to one physical verb. Select the anchor activity through the scored, paper-specific process in `metaphor-library.md`, then vary preparation, execution, adjustment, inspection, correction, comparison, and completion actions inside it. No activity mentioned in these references is a default. The paper explanation may be complex; each life animation must remain simple.
+Select the anchor activity through the paper-specific comparison in `metaphor-library.md`, then vary useful episodes inside it as concepts warrant. Let other pages manipulate the paper mechanism directly. No activity mentioned in these references is a default. Keep each life scene visually legible without reducing the whole tutorial to one abstract gesture or repeating a single prop.
 
 ## 2. Progressive Concept Disclosure
 
-Use this order unless the paper genuinely requires a small variation:
+Use this progression for the opening when it helps. Later pages follow their teaching question; do not repeat this sequence in every chapter:
 
 ```text
 real-world analogy
   -> learner operates an incomplete or old method
   -> visible limitation
   -> one-sentence insight
-  -> paper method demonstration
-  -> formal term
-  -> interactive equation
+  -> name the paper's core method and formal term
+  -> paper method demonstration with its formula/rule updating from the same action
   -> optional implementation detail
 ```
 
 Rules:
 
-1. Never lead with an equation.
+1. Establish motivation in the opening. A later derivation or mechanism page may lead with its equation when the terms are already introduced.
 2. Introduce one major new concept per chapter.
-3. Name a term only after the learner has seen the problem it solves.
-4. Keep the full architecture out of Chapter 1. Introduce the paper's key structure in Chapter 8 (or its flexible equivalent per `contract.md` §2.2) — for papers with no nontrivial network, Chapter 8 becomes another active technical module instead.
+3. Use paper-grounded method or concept terms in headings. Reveal their meaning after the
+   learner sees the problem they solve; do not use colloquial titles in place of terminology.
+4. Introduce architecture or a technical structure only after the learner has the concepts
+   needed to understand its role. If the paper has no nontrivial network, teach its actual
+   proof, objective or system decision instead.
 5. Make each chapter answer a question left by the previous chapter.
 
 ## 3. Intuitive Learning
@@ -66,12 +68,10 @@ Include limitations and failure cases. Do not spend most of a chapter walking th
 
 ## 4. Lightweight Personalization
 
-The standalone HTML cannot maintain a full learner model, so personalize through presentation and pacing:
+The standalone React tutorial does not need a learner account; personalize through presentation and pacing:
 
-- Use `.inf` for inference or foundation chapters that everyone should read.
-- Use `.trn` for training details that beginners may defer.
-- Use `.both` when both audiences benefit.
-- Reveal one chapter per screen via the slide layout; the learner continues with the bottom nav bar or the sidebar TOC.
+- Put optional training or implementation detail in speaker notes or clearly motivated extra scenes; do not add unsupported audience classes or hidden chapter modes.
+- Reveal one scene per screen; chapters group several pages. The learner continues with the top transport controls or slide-preview rail, using the shared scene-based presentation format.
 - Update feedback immediately when the learner manipulates a control.
 - Change feedback color and wording according to the current state.
 - Let learners repeat interactions without an exam or account system.

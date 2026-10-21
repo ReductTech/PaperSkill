@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { CapabilityLab } from './c1-capability';
+import { RequestLab } from './c1-request';
+import { ResultsLab } from './c10-results';
+import { VisualPromptLab } from './c2-prompt';
+import { SkillRepositoryLab } from './c3-skills';
+import { UnifiedFormatLab } from './c4-format';
+import { CompositionLab } from './c5-composition';
+import { DialogueLab } from './c6-dialogue';
+import { DataRecipeLab } from './c7-data';
+import { LossMaskLab } from './c7-loss';
+import { SystemArchitectureLab } from './c8-system';
+import { AblationLab } from './c9-ablation';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['c1-capability'] = CapabilityLab;
+widgetRegistry['c1-request'] = RequestLab;
+widgetRegistry['c10-results'] = ResultsLab;
+widgetRegistry['c2-prompt'] = VisualPromptLab;
+widgetRegistry['c3-skills'] = SkillRepositoryLab;
+widgetRegistry['c4-format'] = UnifiedFormatLab;
+widgetRegistry['c5-composition'] = CompositionLab;
+widgetRegistry['c6-dialogue'] = DialogueLab;
+widgetRegistry['c7-data'] = DataRecipeLab;
+widgetRegistry['c7-loss'] = LossMaskLab;
+widgetRegistry['c8-system'] = SystemArchitectureLab;
+widgetRegistry['c9-ablation'] = AblationLab;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;

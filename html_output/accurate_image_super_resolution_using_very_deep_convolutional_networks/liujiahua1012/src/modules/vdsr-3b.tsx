@@ -1,0 +1,6 @@
+import { useState } from 'react';
+import { CanvasPlot, clearScene, sketch, line, pencil, text, C } from './vdsr-kit';
+export function VdsrThreeB() {
+ const [view,setView]=useState(0);const labels=['输入 x','残差 r','重建 x+r'];const vectors=['[0.20, 0.50, 0.80]','[+0.10, −0.10, +0.05]','[0.30, 0.40, 0.85]'];const feedback=['输入保留大轮廓。','残差可以为正或负，负责补偿差异。','逐像素相加后才是完整图像。'];
+ return <div className="vdsr-widget" onKeyDown={e=>{if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Home","End"].includes(e.key))e.stopPropagation();}}><div className="vdsr-controls">{labels.map((l,i)=><button key={l} className={view===i?'is-active':''} aria-pressed={view===i} onClick={()=>setView(i)}>{l}</button>)}</div><CanvasPlot label="切换输入轮廓、有符号残差和相加结果；绿色为补偿，红色为减去的响应" draw={(ctx,w,h)=>{clearScene(ctx,w,h);if(view!==1)sketch(ctx,335,25,410,220,view===2?1:0,view===2?C.green:C.blue);if(view!==0){line(ctx,420,100,510,62,C.green,6);line(ctx,570,137,625,137,view===1?C.red:C.green,6);pencil(ctx,510,62,C.green);}text(ctx,labels[view],45,65,view===1?C.orange:C.blue,22);}}/><div className="vdsr-metrics"><span>当前视图 <strong>{labels[view]}</strong></span><span>三个教学像素 <strong>{vectors[view]}</strong></span></div><p className="vdsr-feedback" aria-live="polite">{feedback[view]} 固定例子中第二个残差为 −0.10；这些归一化标量和示意线条不是真实模型的激活。</p></div>;
+}

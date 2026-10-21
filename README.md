@@ -6,6 +6,14 @@ PaperSkill 用于把 AI 与机器学习论文制作成中文交互式教学网�
 
 **在线教程集合：** https://reducttech.github.io/PaperSkill/#start
 
+## News
+
+- **2026-10-20**：`paper-skill` 已推出新版本，采用 PPT 模式生成交互式论文教学网页。
+
+<video src="https://github.com/user-attachments/assets/0848d35b-22f6-4ec0-838c-77fd6e096de0" width="480" controls preload="metadata">
+  <a href="https://github.com/user-attachments/assets/0848d35b-22f6-4ec0-838c-77fd6e096de0">查看展示视频</a>
+</video>
+
 ## 参考案例
 
 [查看参考案例](docs/reference-cases/README.md)

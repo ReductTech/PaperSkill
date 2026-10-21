@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { SymbolGlossary } from './SymbolHint';
 import type { FormulaDef } from '../types';
 
-// Formula block: Unicode formula (no KaTeX) with clickable symbols that reveal meaning.
-// Symbols inside the formula itself are made clickable (not just the list below).
+// Unicode/HTML formula with hover, focus and touch symbol explanations.
 
 const escapeHtmlAttr = (s: string) =>
   s
@@ -19,59 +19,36 @@ const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
  * - Use one combined regex (longest symbols first) so multi-char symbols win over
  *   their single-char substrings, and the replacement is a single non-overlapping pass.
  */
-function makeClickableFormula(html: string, symbols: { sym: string }[]): string {
+function makeClickableFormula(html: string, symbols: { sym: string; desc: string }[]): string {
   if (!symbols.length) return html;
-  const tokens = html.split(/(<[^>]+>)/g);
+  const tokens = html.split(/(<[^>]+>|&(?:#\d+|#x[\da-f]+|\w+);)/gi);
   const sorted = [...symbols].sort((a, b) => b.sym.length - a.sym.length);
   const pattern = sorted.map((s) => escapeRegExp(s.sym)).join('|');
   if (!pattern) return html;
   const re = new RegExp(`(${pattern})`, 'g');
   return tokens
     .map((tok) => {
-      if (tok.startsWith('<')) return tok;
-      return tok.replace(re, (m) => {
+      if (tok.startsWith('<') || /^&(?:#\d+|#x[\da-f]+|\w+);$/i.test(tok)) return tok;
+      return tok.replace(re, (m, _capture, offset: number) => {
+        if ((/^[a-z]/i.test(m) && /[a-z]/i.test(tok[offset - 1] ?? '')) ||
+            (/[a-z]$/i.test(m) && /[a-z]/i.test(tok[offset + m.length] ?? ''))) return m;
         const safe = escapeHtmlAttr(m);
-        return `<span class="sym fe-formula-sym" data-sym="${safe}">${m}</span>`;
+        const meaning = escapeHtmlAttr(symbols.find(s => s.sym === m)!.desc.replace(/<[^>]*>/g, ''));
+        return `<span class="formula-symbol" tabindex="0" role="button" aria-label="${meaning}" data-formula-symbol="${safe}" data-formula-meaning="${meaning}">${m}</span>`;
       });
     })
     .join('');
 }
 
 export function Formula({ formula }: { formula: FormulaDef }) {
-  const [active, setActive] = useState<string | null>(null);
-
   const formulaHtml = useMemo(
     () => makeClickableFormula(formula.unicode, formula.symbols),
     [formula.unicode, formula.symbols]
   );
-
-  const toggle = (sym: string) => setActive((prev) => (prev === sym ? null : sym));
-
-  const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = (e.target as HTMLElement).closest('[data-sym]');
-    if (!el) return;
-    const sym = el.getAttribute('data-sym');
-    if (sym) toggle(sym);
-  };
-
-  // Only the symbol actually clicked in the formula reveals its meaning; no
-  // duplicate clickable chip list is rendered below the formula.
-  const activeSym = formula.symbols.find((s) => s.sym === active) ?? null;
-
-  return (
-    <div className="formula-explain" onClick={onClick}>
-      <p className="fe-hint">点击公式中的符号查看含义</p>
-      <div className="fe-lead" dangerouslySetInnerHTML={{ __html: formula.lead }} />
-      <div className="fe-formula" dangerouslySetInnerHTML={{ __html: formulaHtml }} />
-      {activeSym ? (
-        <div className="fe-explain" key={activeSym.sym}>
-          <span className="fe-explain-sym">{activeSym.sym}</span>
-          <span
-            className="fe-explain-desc"
-            dangerouslySetInnerHTML={{ __html: activeSym.desc }}
-          />
-        </div>
-      ) : null}
-    </div>
-  );
+  return <div className="formula-explain">
+    <div className="fe-lead" dangerouslySetInnerHTML={{ __html: formula.lead }} />
+    <div className="fe-formula"><SymbolGlossary>
+      <span dangerouslySetInnerHTML={{ __html: formulaHtml }} />
+    </SymbolGlossary></div>
+  </div>;
 }

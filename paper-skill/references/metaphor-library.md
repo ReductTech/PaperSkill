@@ -1,10 +1,10 @@
 # Unified Everyday Theme Library
 
-Choose one familiar everyday activity as the anchor theme for the entire tutorial. All `chapterCount` automatic analogy animations (default 10; per `contract.md` §2) must belong to that activity or setting, while each chapter uses a different simple action inside it.
+Choose one familiar everyday activity as the anchor theme for the tutorial's opening and useful analogies. Its recurring people, objects and settings connect the whole deck. Every page includes a recognizable theme visual per contract.md §3; technical and static pages use a modest illustration or object tied to their current explanation. Choose each page's scale and action for its scientific question.
 
 ```text
 one tutorial = one paper-specific everyday theme
-one chapter = one simple action inside that theme
+each slide = a paper question and the most explanatory life, hybrid or paper-native view
 ```
 
 ## Contents
@@ -14,12 +14,11 @@ one chapter = one simple action inside that theme
 3. Candidate activity families
 4. Mechanism prompts
 5. Semantic colors
-6. Ten-chapter theme table
-7. Cross-chapter consistency
+6. Story-beat map
 
 ## Anti-Default Rule
 
-No documented theme is the default. The order, length, or detail of examples in this library conveys no preference. Every listed or newly invented activity enters the same paper-specific scoring process.
+No documented theme is the default. The order, length, or detail of examples in this library conveys no preference. Evaluate every listed or invented activity against the current paper's mechanism and episode variety.
 
 Select the theme from the current paper's teaching mechanics. A valid justification names paper-specific concepts and explains why the chosen activity expresses them better than the rejected candidates. Generic claims such as "the method makes progress" or "the model learns through practice" are insufficient.
 
@@ -30,22 +29,18 @@ Do not reuse a theme from an example, template, or recent output unless it wins 
 Before planning chapters:
 
 1. Extract three to five dominant teaching mechanics from the paper, such as iterative correction, sequence construction, routing, comparison, accumulation, selection, transformation, stabilization, memory, or exploration.
-2. Generate at least three candidate everyday themes from different activity families. At least one candidate should not be copied verbatim from this library.
-3. Sketch 10 distinct simple actions for each candidate.
-4. Score each candidate from 1 to 5 on every criterion below.
-5. Select the highest-scoring candidate. If scores tie, choose the less recently used and less template-associated theme.
-6. Record why the winner fits this paper and why the other two candidates were rejected.
+2. Consider several candidate everyday activities from different families, including an original idea when it suits the paper. Do not start from the nearest demo.
+3. For each plausible candidate, sketch different physical episodes for the main paper questions. Discard a candidate if it can express only one repeated action or needs misleading scientific mappings.
+4. Choose the candidate with the clearest paper-specific mechanism mapping and enough recognizable episode variety. Record a concise reason for the choice and why the main alternative was weaker. This is qualitative judgment, not a numeric scoring exercise.
 
 | Criterion | Question |
 | --- | --- |
 | mechanism fit | Do the paper's key operations map naturally to actions in this activity? |
-| ten-action coverage | Can all 10 chapter roles use distinct, simple, related actions? |
-| visual clarity | Are subject, verb, and goal readable at `560x140`? |
+| episode variety | Could the planned paper concepts use distinct, related everyday episodes? |
+| visual clarity | Is the everyday event recognizable at the intended slide scale? |
 | technical linkability | Can life actions link cleanly to equations, features, curves, architecture, or results? |
 | thematic continuity | Can one setting, drawing kit, and prop family persist across the page? |
 | originality | Does the choice avoid copying the nearest template or repeatedly used theme? |
-
-A candidate fails if any of mechanism fit, ten-action coverage, or visual clarity scores below 3.
 
 ## Candidate Activity Families
 
@@ -97,8 +92,8 @@ Use these prompts to invent candidates rather than as fixed mappings:
 - For representation change, ask which activity changes viewpoint, shape, grouping, detail, or interpretation.
 - For guidance or conditioning, ask which activity uses a cue, reference, plan, rhythm, or constraint.
 - For stabilization, ask which activity uses balance, support, tuning, calibration, or review.
-- For architecture, keep the automatic animation as one life action and place the real structure in a separate active technical module.
-- For results, close the same activity with a verified comparison, completion, or evaluation.
+- For architecture, use a life consequence only if it clarifies the structural choice; otherwise let learners manipulate the actual paper structure.
+- For results, preserve a readable verified comparison and add a compact theme object or outcome that helps interpret its conditions or conclusion.
 
 ## Semantic Colors
 
@@ -111,23 +106,22 @@ of truth). Always preserve these meanings:
 - orange: user-controlled emphasis or threshold;
 - purple: auxiliary or special concepts.
 
-## Build the Theme Table
+## Build the Story-Beat Map
 
-Before writing the temporary paperSkill, create exactly `chapterCount` rows (default 10; per `contract.md` §2):
-
-| Chapter | Paper concept | Theme-related action | Primary subject | One verb | One goal | Static props |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1-10 | one concept | clearly belongs to the selected theme | one | one | one | zero to two |
-
-Check every row for:
-
-1. **Theme fit:** the action obviously belongs to the same activity as the other nine rows.
-2. **Scene simplicity:** the action is understandable without "and then", handoffs, stations, or several independently moving subjects.
-3. **Concept fit:** the physical change expresses this paper concept, not merely generic progress.
-4. **Action diversity:** preparation, execution, adjustment, inspection, correction, comparison, and completion are used to avoid repeating one literal motion.
+Before writing the temporary paperSkill, record each slide's paper question, chosen view mode, focal object, learner action, visible scientific outcome and explanation. For life views, check that episodes belong to the selected activity, express the paper concept and do not repeat the same prop or gesture with new labels. For paper-native views, check that the technical visual can be manipulated or read without a forced metaphor. Preparation, execution, adjustment, inspection, correction, comparison and completion are possible life beats, not slots to fill. The model may invent an activity absent from this library; a familiar theme is useful only when it supports honest mappings.
 
 ## Cross-Chapter Consistency
 
-Preserve continuity through the same activity, setting, drawing kit, background family, stroke style, semantic colors, subject scale, and concise Simplified Chinese labels. Keep one main motion per scene.
+Preserve continuity through selected activity cues, typography and semantic colors. Vary settings, objects, motion and framing when a life scene helps; let technical pages use their own paper-specific visual form.
+
+After selecting the theme, write a scene-beat map before any page layout. For each named PPT
+scene, record its life action, visual setting/props, learner decision, paper mechanism,
+technical representation and resulting feedback. Use different related beats across the
+teaching sequence: preparation, choosing a path or tool, acting, adjusting, inspecting,
+comparing and completing when they fit the paper. Reuse the protagonist and visual language,
+not the same animation or interaction on every slide. Revisit an action only for a deliberate
+controlled comparison, and show what the paper variable or method changes. A mountain-hiking
+theme might include packing, reading a map, climbing and viewing the summit; this is an
+illustration, never the default theme or a required sequence.
 
 Do not create a story in which packages, workers, machines, couriers, or ingredients move through stations. The theme should feel like one coherent life experience, not a disguised data-processing pipeline.

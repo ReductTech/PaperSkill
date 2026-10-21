@@ -1,146 +1,95 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { tutorial } from './data/tutorial';
-import { Hero } from './components/Hero';
-import { ChapterBridge } from './components/ChapterBridge';
-import { AnalogyCard } from './components/AnalogyCard';
-import { Module } from './components/Module';
-import { Formula } from './components/Formula';
-import { InsightBar } from './components/InsightBar';
-import { Takeaway } from './components/Takeaway';
+import { PresentationCover } from './components/PresentationCover';
+import { ScenePage } from './components/ScenePage';
+import { SlideStage } from './components/SlideStage';
 import { BiliVideos } from './components/BiliVideos';
+import { buildDeck } from './lib/scenes';
+import './styles/presentation.css';
 
+const pages = buildDeck(tutorial);
+const query = new URLSearchParams(location.search);
+const initialIndex = Math.max(0, pages.findIndex(page => page.id === query.get('slide')));
 export default function App() {
-  const chapters = tutorial.chapters;
-  const total = chapters.length;
-  const bili = tutorial.bilibili || [];
-  const hasBili = bili.length > 0;
-  const lastSlide = total + (hasBili ? 1 : 0); // 0=hero, 1..total=chapters, total+1=bili
-
-  const [active, setActive] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  const goTo = useCallback(
-    (i: number) => {
-      setActive(Math.max(0, Math.min(i, lastSlide)));
-      setSidebarOpen(false);
-    },
-    [lastSlide]
-  );
-
-  const next = useCallback(() => goTo(active + 1), [active, goTo]);
-  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
-
-  // Reset scroll on every slide change so a long chapter always opens from the top.
+  const [active, setActive] = useState(initialIndex);
+  const [directory, setDirectory] = useState(() => innerWidth > 768);
+  const [compact, setCompact] = useState(() => innerWidth <= 768);
+  const [notes, setNotes] = useState(false);
+  const [presenting, setPresenting] = useState(false);
+  const [notice, setNotice] = useState('');
+  const viewport = useRef<HTMLElement>(null);
+  const selected = useRef<HTMLButtonElement>(null);
+  const page = pages[active];
+  useEffect(() => { document.title = `${tutorial.meta.titleZh} · 交互式教程`; }, []);
+  const goTo = useCallback((index: number) => {
+    const next = Math.max(0, Math.min(pages.length - 1, index));
+    setActive(next);
+    const url = new URL(location.href);
+    url.searchParams.set('slide', pages[next].id);
+    history.replaceState(null, '', url);
+    if (innerWidth <= 768) setDirectory(false);
+  }, []);
+  useEffect(() => { selected.current?.scrollIntoView({ block: 'nearest' }); }, [active, directory]);
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [active]);
-
+    const media = matchMedia('(max-width: 768px)');
+    const change = () => { setCompact(media.matches); setDirectory(!media.matches); };
+    media.addEventListener('change', change);
+    return () => media.removeEventListener('change', change);
+  }, []);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        next();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        prev();
+    const onFullscreen = () => setPresenting(Boolean(document.fullscreenElement));
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (event.key === 'Escape') { setDirectory(innerWidth > 768); setNotes(false); }
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ||
+        target.closest('input, textarea, select, button, a, [contenteditable], [role=slider], [role=tab], [role=button], [data-slide-keys]')) return;
+      if (['ArrowRight', 'ArrowDown', 'PageDown', 'ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+        event.preventDefault(); goTo(active + (['ArrowRight', 'ArrowDown', 'PageDown'].includes(event.key) ? 1 : -1));
       }
     };
+    document.addEventListener('fullscreenchange', onFullscreen);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev]);
-
-  const sidebarItems = [
-    { idx: 0, num: '封面', title: tutorial.meta.titleZh || tutorial.meta.titleEn },
-    ...chapters.map((ch, i) => ({ idx: i + 1, num: `§${i + 1}`, title: ch.title })),
-    ...(hasBili ? [{ idx: total + 1, num: '📺', title: '延伸视频' }] : []),
-  ];
-
-  const currentChapter = active >= 1 && active <= total ? chapters[active - 1] : null;
-
-  return (
-    <div className={`slide-layout ${sidebarOpen ? 'sidebar-open' : ''} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <button className="slide-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-        <span className="slide-sidebar-toggle-icon">{sidebarOpen ? '✕' : '☰'}</span>
-        目录
-      </button>
-
-      {sidebarOpen ? (
-        <div className="slide-sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-      ) : null}
-
-      <aside className="slide-sidebar">
-        <div className="slide-sidebar-header">
-          <div className="slide-sidebar-venue">{tutorial.meta.venue}</div>
-          <div className="slide-sidebar-title">
-            {tutorial.meta.titleZh || tutorial.meta.titleEn}
-          </div>
-        </div>
-        <nav className="slide-sidebar-nav">
-          {sidebarItems.map((item) => (
-            <button
-              key={item.idx}
-              className={`slide-sidebar-item ${active === item.idx ? 'active' : ''}`}
-              onClick={() => goTo(item.idx)}
-            >
-              <span className="slide-sidebar-num">{item.num}</span>
-              <span className="slide-sidebar-text">{item.title}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <button
-        className="slide-sidebar-collapse"
-        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        title={sidebarCollapsed ? '展开目录' : '折叠目录'}
-      >
-        {sidebarCollapsed ? '☰' : '◀'}
-      </button>
-
-      <main className="slide-main">
-        <div className="slide-content" key={active}>
-          {active === 0 ? (
-            <Hero meta={tutorial.meta} hero={tutorial.hero} />
-          ) : currentChapter ? (
-            <section className="chap slide-chap">
-              <h2 className="chap-title">
-                <span className="num">§{active}.</span>
-                {currentChapter.title}
-                <span className={`badge-tag ${currentChapter.badge}`}>
-                  {currentChapter.badgeLabel}
-                </span>
-              </h2>
-              <ChapterBridge text={currentChapter.bridge} />
-              <AnalogyCard analogy={currentChapter.analogy} chapterId={currentChapter.id} />
-              {currentChapter.modules.map((m) => (
-                <Module key={m.id} module={m} chapterId={currentChapter.id} />
-              ))}
-              {currentChapter.insight ? <InsightBar text={currentChapter.insight} /> : null}
-              {currentChapter.formula ? <Formula formula={currentChapter.formula} /> : null}
-              <Takeaway items={currentChapter.takeaways} />
-            </section>
-          ) : hasBili ? (
-            <BiliVideos items={bili} />
-          ) : null}
-        </div>
-
-        <div className="slide-nav">
-          <button className="slide-nav-btn" onClick={prev} disabled={active === 0}>
-            ← 上一章
-          </button>
-          <span className="slide-nav-counter">
-            {active + 1} / {lastSlide + 1}
-          </span>
-          <button
-            className="slide-nav-btn slide-nav-btn-primary"
-            onClick={next}
-            disabled={active === lastSlide}
-          >
-            下一章 →
-          </button>
-        </div>
+    return () => { document.removeEventListener('fullscreenchange', onFullscreen); window.removeEventListener('keydown', onKey); };
+  }, [active, goTo]);
+  const content = page.special === 'cover' ? <PresentationCover meta={tutorial.meta} hero={tutorial.hero} /> :
+    page.special === 'videos' ? <BiliVideos items={tutorial.bilibili || []} /> : <ScenePage page={page} />;
+  if (query.get('capture') === '1') return <div className="ppt-capture" data-slide-canvas>{content}</div>;
+  return <div className="ppt-app">
+    <header className="ppt-toolbar">
+      <div className="ppt-toolbar-group"><button aria-label="切换目录" aria-expanded={directory} onClick={() => setDirectory(!directory)}>☰</button>
+        <span className="ppt-brand" title={tutorial.meta.titleZh}>{tutorial.meta.titleZh}</span></div>
+      <nav className="ppt-pager" aria-label="幻灯片翻页">
+        <button aria-label="上一页" disabled={active === 0} onClick={() => goTo(active - 1)}>‹</button>
+        <span aria-live="polite"><b>{active + 1}</b><span> / {pages.length}</span></span>
+        <button aria-label="下一页" disabled={active === pages.length - 1} onClick={() => goTo(active + 1)}>›</button>
+      </nav>
+      <div className="ppt-toolbar-group ppt-tools"><button aria-pressed={notes} onClick={() => setNotes(!notes)}>讲稿</button>
+        <button className="ppt-present" onClick={async () => {
+          try { await viewport.current?.requestFullscreen(); setNotice(''); }
+          catch { setNotice('当前浏览器无法进入全屏，可继续在窗口中演示。'); }
+        }}>放映</button></div>
+    </header>
+    <div className="ppt-workspace">
+      {directory && <><button className="ppt-scrim" aria-label="关闭目录" onClick={() => setDirectory(false)} />
+        <aside className="ppt-directory" aria-label="页面目录"><div className="ppt-directory-label">幻灯片 <span>{pages.length} 页</span></div>
+          <nav>{pages.map((item, index) => <button key={item.id} ref={index === active ? selected : undefined}
+            className={`ppt-thumb ${index === active ? 'is-active' : ''}`} aria-current={index === active ? 'page' : undefined}
+            aria-label={`第 ${index + 1} 页：${item.title}`} onClick={() => goTo(index)}>
+            <span className="ppt-thumb-preview">{item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" /> :
+              <span className="ppt-thumb-summary"><strong>{item.title}</strong><span>{item.summary}</span><i /></span>}
+              <span className="ppt-thumb-number">{index + 1}</span></span>
+            <span className="ppt-thumb-title">{item.title}</span>
+          </button>)}</nav></aside></>}
+      <main className={`ppt-stage-area ${presenting ? 'is-presenting' : ''}`} ref={viewport}>
+        <SlideStage fitFactor={presenting || compact ? 1 : .88}><React.Fragment key={page.id}>{content}</React.Fragment></SlideStage>
+        {presenting && <nav className="ppt-fullscreen-nav" aria-label="放映翻页">
+          <button disabled={active === 0} aria-label="上一页" onClick={() => goTo(active - 1)}>‹</button><span>{active + 1} / {pages.length}</span>
+          <button disabled={active === pages.length - 1} aria-label="下一页" onClick={() => goTo(active + 1)}>›</button>
+          <button onClick={() => document.exitFullscreen()}>退出</button></nav>}
+        {notice && <p className="ppt-notice" role="status">{notice}</p>}
       </main>
+      {notes && <aside className="ppt-notes"><div className="ppt-directory-label">演讲者备注<button aria-label="关闭讲稿" onClick={() => setNotes(false)}>×</button></div>
+        <h2>{page.title}</h2><p>{page.notes || page.summary}</p>{page.next && <p className="ppt-notes-next">接下来：{page.next}</p>}</aside>}
     </div>
-  );
+  </div>;
 }

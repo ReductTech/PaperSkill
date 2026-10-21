@@ -1,0 +1,455 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 擦窗（起雾玻璃）场景色，仅映射 Canvas 场景背景与主题色，不改动组件布局。 */
+  --paper-scene-bg: #f5f8f0;
+  --paper-glass: #eaf1fb;
+  --paper-glass-line: #d7deea;
+  --paper-fog: #c4d2b6;
+  --paper-frame: #92400e;
+  --paper-outdoor: #6fa96b;
+  --paper-accent-2: #d97706;
+}
+
+/* ---------------------------------------------------------------------------
+   Review-pass additions (P0/P1/P2): source & simulation badges, real-figure
+   blocks, the Figure-6 time cursor, derivation cards, Algorithm-1 pseudocode,
+   chapter guide cards, ablation/table highlighting and long-formula safety.
+   These only ADD paper-specific presentation; they do not alter the template's
+   spacing, typography scale, radii or component layout.
+   --------------------------------------------------------------------------- */
+
+/* Badges: 教学示意 / 教学类比 / 教学图案 vs 来源 tags */
+.sim-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(240, 126, 71, 0.12);
+  color: #b45309;
+  font-size: 0.78em;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.source-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--blue-soft, #eef3fb);
+  color: var(--blue, #27446e);
+  font-size: 0.78em;
+  font-weight: 700;
+}
+
+.source-note {
+  margin: 10px 0 4px;
+  color: var(--slate, #68778f);
+  font-size: 0.86em;
+  line-height: 1.65;
+}
+
+/* Real paper figures embedded inside modules (with captions) */
+.fig-embed {
+  margin: 18px 0 6px;
+}
+.fig-embed img {
+  display: block;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 10px;
+  background: #fff;
+}
+.fig-embed figcaption {
+  max-width: 860px;
+  margin: 8px auto 0;
+  color: var(--slate, #68778f);
+  font-size: 0.86em;
+  line-height: 1.65;
+  text-align: center;
+}
+
+/* Figure 1: two panels side by side */
+.fig-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: flex-start;
+}
+.fig-pair img {
+  width: auto;
+  max-width: calc(50% - 8px);
+  max-height: 420px;
+  margin: 0;
+}
+.fig-pair figcaption {
+  flex-basis: 100%;
+}
+
+/* Figure 6 time-cursor interaction */
+.fig6-stage {
+  position: relative;
+  max-width: 620px;
+  margin: 4px auto 0;
+}
+.fig6-stage img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 8px;
+  background: #fff;
+}
+.fig6-dim {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(238, 242, 247, 0.82);
+}
+.fig6-window {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  border: 3px solid #d97706;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
+  pointer-events: none;
+}
+.fig6-caption {
+  max-width: 860px;
+  margin: 10px auto 6px;
+  color: var(--slate, #68778f);
+  font-size: 0.86em;
+  line-height: 1.65;
+}
+
+/* Derivation / guide cards (chapters 1 and 3 steppers) */
+.derive-card {
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px 20px;
+  margin: 4px 0 12px;
+}
+.derive-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.derive-step-no {
+  font-weight: 800;
+  color: #b45309;
+  white-space: nowrap;
+}
+.derive-title {
+  font-weight: 800;
+  color: var(--ink, #21324a);
+  font-size: 1.05em;
+}
+.derive-formula {
+  font-family: var(--ui-font-mono, Consolas, monospace);
+  font-size: 1.02em;
+  font-weight: 700;
+  color: var(--ink, #21324a);
+  background: var(--paper-2, #f6f8fc);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  line-height: 1.8;
+}
+.derive-why {
+  margin-top: 10px;
+  color: var(--ink-2, #68778f);
+  line-height: 1.7;
+  font-size: 0.95em;
+}
+.derive-source {
+  margin-top: 8px;
+}
+
+/* Algorithm 1 pseudocode block (chapter 7) */
+.algo-code {
+  margin: 12px 0 4px;
+  padding: 14px 18px;
+  background: #0f1c2e;
+  color: #d7e3f4;
+  border-radius: 12px;
+  font-family: var(--ui-font-mono, Consolas, monospace);
+  font-size: 0.9em;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+.algo-line {
+  display: block;
+  white-space: pre;
+  padding: 1px 8px;
+  border-radius: 6px;
+}
+.algo-line.active {
+  background: rgba(240, 126, 71, 0.3);
+  color: #ffe9cf;
+  font-weight: 700;
+}
+.algo-line.done {
+  color: #8fb0d8;
+}
+
+/* Chapter guide card replacing the repeated metaphor in chapters 4/5/7/8/9 */
+.ana-note {
+  padding: 16px 20px;
+  font-size: 0.95em;
+  color: var(--ink, #21324a);
+}
+.ana-note-intro {
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--blue, #27446e);
+}
+.ana-note ul {
+  margin: 0;
+  padding-left: 1.2em;
+  line-height: 1.9;
+}
+
+/* Explanation block (ablation rationale, limitations list) */
+.explain-block {
+  margin-top: 14px;
+  border-left: 4px solid var(--blue, #27446e);
+  background: var(--blue-soft, #eef3fb);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 16px;
+  color: var(--ink, #21324a);
+  line-height: 1.75;
+  font-size: 0.95em;
+}
+.explain-block ul {
+  margin: 8px 0 6px;
+  padding-left: 1.25em;
+}
+.explain-block li {
+  margin: 4px 0;
+}
+
+/* Table highlighting (Tables 1–3 transcriptions) */
+.paper tr.row-active td {
+  background: rgba(240, 126, 71, 0.12);
+  font-weight: 700;
+}
+.paper tr.group-row td {
+  background: var(--paper-2, #f6f8fc);
+  font-weight: 800;
+  color: var(--blue, #27446e);
+}
+
+/* Long-formula safety: never overflow the container */
+.fe-formula {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+   Review round 2 additions: click-to-zoom overlay (projection aid) and the
+   mobile adaptation that activates together with the device-width viewport.
+   The framework already ships ≤768px rules (sidebar drawer, table scroll,
+   compact paddings); the rules below only cover paper-specific widgets.
+   --------------------------------------------------------------------------- */
+
+.zoomable {
+  cursor: zoom-in;
+}
+.fig6-stage {
+  cursor: zoom-in;
+}
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(12, 20, 34, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+}
+.zoom-overlay img {
+  max-width: 96vw;
+  max-height: 86vh;
+  border-radius: 10px;
+  background: #fff;
+}
+.zoom-caption {
+  max-width: 860px;
+  margin-top: 12px;
+  color: #cfe0f4;
+  font-size: 0.92em;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Mobile: canvases scale proportionally; pairs stack; code blocks shrink. */
+@media (max-width: 768px) {
+  .slide-content canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .fig-pair img {
+    max-width: 100%;
+    max-height: none;
+  }
+  .fig6-stage {
+    max-width: 100%;
+  }
+  .algo-code {
+    font-size: 0.72em;
+    padding: 10px 12px;
+  }
+  .derive-formula {
+    font-size: 0.88em;
+    padding: 10px 10px;
+  }
+  .ablation-table td:first-child,
+  .table1-table td:first-child {
+    white-space: normal;
+  }
+  .zoom-overlay {
+    padding: 10px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Review round 3: stacked limits, derivation table, Figure-14 single-sample
+   mode, and a small projection-contrast pass for secondary text.
+   --------------------------------------------------------------------------- */
+
+.lim-stack {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.66em;
+  line-height: 1.02;
+  vertical-align: -0.45em;
+  margin: 0 2px;
+  text-align: center;
+}
+.lim-stack sup,
+.lim-stack sub {
+  display: block;
+  font-size: 1em;
+  line-height: 1.02;
+}
+
+.derive-table {
+  margin-top: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84em;
+}
+.derive-table th,
+.derive-table td {
+  padding: 7px 10px;
+  text-align: left;
+}
+.derive-table th {
+  background: var(--paper-2, #f6f8fc);
+}
+
+/* Figure 14 single-sample mode: crops from the original raster (no new pixels) */
+.fig14-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  margin-top: 8px;
+  scroll-snap-type: x proximity;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 10px;
+  background: #fff;
+}
+.fig14-cell {
+  flex: 0 0 88px;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: 2px solid #d7deea;
+  border-radius: 6px;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  cursor: pointer;
+  scroll-snap-align: center;
+}
+.fig14-cell.active {
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
+}
+.fig14-cell:focus-visible {
+  outline: 2px solid #27446e;
+  outline-offset: 2px;
+}
+.fig14-preview {
+  width: 224px;
+  height: 224px;
+  margin: 6px auto 2px;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 8px;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* Projection contrast: slightly darken secondary text (still subordinate) */
+.derive-why {
+  color: #55657c;
+}
+.source-note,
+.fig6-caption {
+  color: #5b6b82;
+}
+
+/* ---------------------------------------------------------------------------
+   Review round 4: 10.3 jump buttons + defensive mobile hardening of the hero.
+   No overflow masking (no overflow-x:hidden) — containers simply wrap / shrink.
+   --------------------------------------------------------------------------- */
+.derive-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.jump-btn {
+  margin-left: 2px;
+}
+
+@media (max-width: 768px) {
+  .hero-inner {
+    max-width: 100%;
+  }
+  .hero-title,
+  .hero-sub {
+    overflow-wrap: anywhere;
+  }
+  .hero-meta {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .hero-meta a,
+  .hero-meta span,
+  .hero-meta .tag {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .hero-compare > *,
+  .bg-side,
+  .bg-side-body,
+  .fig14-single-head {
+    min-width: 0;
+  }
+}

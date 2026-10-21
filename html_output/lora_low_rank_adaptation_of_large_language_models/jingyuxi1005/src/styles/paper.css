@@ -1,0 +1,135 @@
+/* LoRA paper palette. The shared tutorial layout remains in components.css. */
+:root {
+  --paper-scene-bg: #f7faf8;
+  --paper-accent-2: #208866;
+}
+
+.lora-widget canvas {
+  display: block;
+  width: 100%;
+  max-width: 1080px;
+  height: auto;
+  border: 1px solid #d5e2e8;
+  border-radius: 16px;
+  background: var(--paper-scene-bg);
+}
+.lora-small canvas { border: 0; }
+.lora-figure-label { color: #678097; font-size: 12px; margin: 2px 0 7px; text-align: right; }
+.lora-mobile-summary, .lora-mobile-rank-values { display: none; }
+.lora-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 9px;
+}
+.lora-chip {
+  border: 1px solid #c9d9e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #17324c;
+  padding: 8px 14px;
+  font: 600 14px var(--ui-font-sans);
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+}
+.lora-chip:hover:not(:disabled) { background: #ecf5f0; transform: translateY(-1px); }
+.lora-chip:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.lora-chip.selected { background: #208866; color: #fff; border-color: #208866; }
+.lora-chip:disabled { opacity: .48; cursor: default; }
+.lora-step { color: var(--ink-2); font-size: 14px; min-width: 44px; text-align: center; }
+.hero-abs small { display: inline-block; margin-top: 12px; font-size: 13px; line-height: 1.7; }
+.hero-abs a { color: var(--blue); text-decoration: underline; }
+.hero-authors {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  max-width: 760px;
+  margin: -9px auto 25px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.hero-authors strong { flex: none; color: var(--ink); }
+.hero-start { margin: 30px auto 0; text-align: center; }
+.hero-start p { margin: 0 0 10px; color: var(--ink-2); font-size: 15px; }
+.hero-start-button {
+  min-height: 54px;
+  padding: 12px 30px;
+  border: 0;
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-accent);
+  color: #fff;
+  font: 700 18px var(--ui-font-sans);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+}
+.hero-start-button:hover { background: #1f385d; }
+.hero-start-button:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+.lora-comparison { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+.lora-comparison th, .lora-comparison td { border: 1px solid #dce8e7; padding: 10px 12px; text-align: left; vertical-align: top; }
+.lora-comparison th { background: #eef5f3; color: var(--ink); }
+.lora-comparison tr.active-row td { background: #e4f4eb; color: #126448; font-weight: 600; }
+.experiment-examples { padding: 16px; border: 1px solid #dce8e7; border-radius: 12px; background: #f7faf8; }
+.experiment-examples h3 { margin: 0 0 12px; color: var(--ink); font-size: 18px; }
+.experiment-examples-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.experiment-example { min-width: 0; padding: 13px 14px; border: 1px solid #dce8e7; border-radius: 10px; background: #fff; }
+.experiment-example strong, .experiment-example span { display: block; }
+.experiment-example strong { color: var(--ink); font-size: 15px; }
+.experiment-example span, .experiment-example small { color: var(--ink-2); font-size: 13px; }
+.experiment-example p { margin: 9px 0; color: var(--ink); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.experiment-example b { color: #126448; }
+.experiment-examples-note { margin: 10px 0 0; color: var(--ink-2); font-size: 13px; }
+.paper-figure img { max-width: 100%; image-rendering: auto; }
+@media (max-width: 700px) {
+  .lora-animate-trigger { display: none; }
+  .experiment-examples-grid { grid-template-columns: 1fr; }
+  .lora-widget:not(.lora-small) { max-width: 100%; }
+  .lora-widget:not(.lora-small) > canvas { display: none; }
+  .lora-mobile-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 8px 0 14px;
+  }
+  .lora-mobile-summary > div {
+    min-width: 0;
+    padding: 11px;
+    background: #f2f8f5;
+    border: 1px solid #d5e2e8;
+    border-radius: 10px;
+  }
+  .lora-mobile-summary span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--ink-2);
+    font-size: 12px;
+  }
+  .lora-mobile-summary strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .lora-mobile-rank-values {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    margin: -5px 0 14px;
+  }
+  .lora-mobile-rank-values > div {
+    padding: 6px 1px;
+    border: 1px solid #d5e2e8;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .lora-mobile-rank-values > div.selected { background: #e3f3eb; border-color: #208866; }
+  .lora-mobile-rank-values span,
+  .lora-mobile-rank-values strong { display: block; font-size: 12px; line-height: 1.4; }
+  .hero-authors { flex-direction: column; gap: 3px; }
+  .lora-widget .feedback { font-size: 14px; }
+  .hero-sub { margin-bottom: 16px; }
+  .hero-problem { margin-bottom: 10px; }
+  .hero-abs { margin-bottom: 20px; }
+}

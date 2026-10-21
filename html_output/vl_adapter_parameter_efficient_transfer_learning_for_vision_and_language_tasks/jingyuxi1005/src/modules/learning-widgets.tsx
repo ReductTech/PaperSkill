@@ -174,9 +174,45 @@ export function Limitations() {
     </ul></section>
     <section className="limit-card"><h5>根据本文实验范围可以观察到</h5><ul>
       <li>实验覆盖有限任务与架构，不能据此保证现代大规模 MLLM 的全面适用性。</li>
-      <li>未验证用户特有的人、物品或视觉概念个性化。</li>
-      <li>没有个人长期记忆或用户偏好建模实验。</li>
-    </ul><p className="tool-note">本项目对实验范围的归纳，不是作者原话，也不是新增实验结论。</p></section>
+      <li>不能保证未覆盖任务、模型架构和数据分布获得相同表现。</li>
+    </ul><p className="tool-note">这是对论文实验覆盖范围的归纳，不是作者原话，也不是额外实验结论。</p></section>
+  </div>;
+}
+
+export function ConclusionExplorer() {
+  const [selected, setSelected] = useState(0);
+  const conclusions = [
+    {
+      name: '参数效率',
+      observation: '冻结视觉编码器与语言主干权重，训练语言侧 Adapter、视觉投影与 LayerNorm，可以用少量可更新参数适配本文的视觉语言任务。',
+      condition: '参数比例以排除冻结视觉编码器后的 Full FT 模型参数为参照，更新量包含 Adapter、视觉投影和 LayerNorm。（主 §3.2、Table 1、4；补 §B）',
+      boundary: '少量可训练参数不代表推理零开销；本文的比例不能直接套用到任意模型或配置。（补 §D、§H）',
+    },
+    {
+      name: '图文与视频文本',
+      observation: '本文分别检验 image-text 与 video-text 多任务适配；Single Adapter 的汇总表现可接近对应 Full FT 基线。',
+      condition: '只在同一任务组、架构和预训练条件内比较。主 Table 1、4 与额外联合预训练的 Table 6 分开解读；Avg. 混合 Accuracy 与 CIDEr。',
+      boundary: '汇总接近不等于每项任务都提升，也不能保证实验未覆盖任务或数据分布的效果。',
+    },
+    {
+      name: '任务共享',
+      observation: '论文比较 Multiple、Half-shared、Single Adapter。本文图文主设置中，Single 更省参数，汇总分也高于另外两种共享方式。',
+      condition: '共享发生于不同任务在同一插入位置使用的权重，不是让所有层共用一个 Adapter；主实验 Half-shared 共享升维层。（主 §3.2、Fig. 3、Table 1）',
+      boundary: '共享带来的效果受任务组合、模型和超参数影响，不能据此认定 Single 在所有场景都是最佳选择。（补 §H）',
+    },
+  ];
+  const current = conclusions[selected];
+  return <div className="learning-tool">
+    <div className="vl-controls" role="group" aria-label="选择 VL-Adapter 核心结论">
+      {conclusions.map(({ name }, i) => <button type="button" key={name}
+        className={'vl-chip ' + (selected === i ? 'selected' : '')}
+        aria-pressed={selected === i} onClick={() => setSelected(i)}>{name}</button>)}
+    </div>
+    <div aria-live="polite" aria-atomic="true">
+      <div className="result-card result-card-em"><strong>论文观察 · {current.name}</strong><p className="tool-note">{current.observation}</p></div>
+      <p className="tool-note"><b>比较条件：</b>{current.condition}</p>
+      <div className="feedback"><b>不能据此推出：</b>{current.boundary}</div>
+    </div>
   </div>;
 }
 
@@ -228,8 +264,6 @@ export function MobileEvidence({ moduleId, selected }: { moduleId: string; selec
   if (moduleId === '7.1') parts = [selected < 4 ? 'Image-Text' : 'Video-Text',
     ['VQAv2', 'GQA', 'NLVR²', 'MSCOCO', 'TVQA', 'How2QA', 'TVC', 'YC2C'][selected],
     [0, 1, 2, 4, 5].includes(selected) ? 'Accuracy (%)' : 'CIDEr'];
-  if (moduleId === '10.1') parts = [['LoRA', 'VL-Adapter', 'MyVLM', 'Yo’LLaVA', 'PersonaVLM'][selected],
-    ['低秩权重更新', '视觉语言多任务 PEFT', '用户特有视觉概念', '个性化多模态助手', '长期偏好与记忆'][selected]];
   if (!parts.length) return null;
   return <div className="mobile-evidence" aria-label="当前选项的结构">
     {parts.map((part, i) => <div key={part}><strong>{part}</strong>{i < parts.length - 1 && <span aria-hidden="true">↓</span>}</div>)}

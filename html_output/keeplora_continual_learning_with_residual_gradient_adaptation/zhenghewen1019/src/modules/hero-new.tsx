@@ -1,0 +1,2 @@
+import {StudyCanvas,drawPaper,drawPencil,drawGuide,palette} from './studio-kit';
+export function HeroNew(){return <StudyCanvas width={560} height={140} animate ariaLabel="沿可用方向添加新线" draw={(c,w,h,t)=>{const p=(Math.sin(t*2)+1)/2;drawPaper(c,22,12,516,116);c.strokeStyle=palette.blue;c.lineWidth=3;c.beginPath();c.moveTo(70,98);c.lineTo(150,38);c.lineTo(220,98);c.stroke();drawGuide(c,275,102,215);c.strokeStyle=palette.green;c.beginPath();c.moveTo(280,92);c.lineTo(280+185*p,92);c.stroke();drawPencil(c,295+185*p,92,-.5);}}/>}

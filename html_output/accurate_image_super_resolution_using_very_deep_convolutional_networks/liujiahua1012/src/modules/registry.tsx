@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { VdsrOne } from './vdsr-1';
+import { VdsrResults } from './vdsr-10';
+import { VdsrTwo } from './vdsr-2';
+import { VdsrThree } from './vdsr-3';
+import { VdsrThreeB } from './vdsr-3b';
+import { VdsrFour } from './vdsr-4';
+import { Vdsr5 } from './vdsr-5';
+import { Vdsr6 } from './vdsr-6';
+import { VdsrTrainingEvidence } from './vdsr-7';
+import { Vdsr8 } from './vdsr-8';
+import { VdsrClipping } from './vdsr-9';
+import { KitResource } from './vdsr-kit';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['vdsr-1'] = VdsrOne;
+widgetRegistry['vdsr-10'] = VdsrResults;
+widgetRegistry['vdsr-2'] = VdsrTwo;
+widgetRegistry['vdsr-3'] = VdsrThree;
+widgetRegistry['vdsr-3b'] = VdsrThreeB;
+widgetRegistry['vdsr-4'] = VdsrFour;
+widgetRegistry['vdsr-5'] = Vdsr5;
+widgetRegistry['vdsr-6'] = Vdsr6;
+widgetRegistry['vdsr-7'] = VdsrTrainingEvidence;
+widgetRegistry['vdsr-8'] = Vdsr8;
+widgetRegistry['vdsr-9'] = VdsrClipping;
+widgetRegistry['vdsr-kit'] = KitResource;

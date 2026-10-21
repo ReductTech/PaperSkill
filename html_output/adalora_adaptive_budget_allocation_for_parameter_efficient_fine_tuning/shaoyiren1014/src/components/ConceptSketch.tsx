@@ -1,0 +1,15 @@
+import {useState} from 'react';
+export default function ConceptSketch({name}:{name:string}){
+ const [value,setValue]=useState(2);const rank=['LoRA','Rank','Pruning','Singular Direction','SVD Intuition'].includes(name);
+ const label=name==='Orthogonality'?'方向夹角':name==='Budget Scheduler'?'调度阶段':rank?'工作的方向数':'观察步骤';
+ return <div className="concept-demo" data-source-type="conceptual_simulation"><label>{label}：{value}<input aria-label={`${name} · ${label}`} type="range" min="0" max="3" value={value} onChange={e=>setValue(Number(e.target.value))}/></label>
+ <svg viewBox="0 0 360 115" role="img" aria-label={`${name} 的教学结构示意，观察步骤 ${value}`}>
+ {rank?<><text x="10" y="16">输入 → 可调旁路 → 输出</text>{[0,1,2].map(i=><g key={i} opacity={i<value?1:.25}><path d={`M25 ${40+i*26}h60m155 0h90`} stroke="currentColor"/><rect x="85" y={28+i*26} width="155" height="24" fill="none" stroke="currentColor"/><text x="98" y={45+i*26}>{name==='LoRA'?'小因子 A → B':'Q → 强度 → P'} · {i<value?'参与':'暂停'}</text></g>)}</>:
+ name==='Orthogonality'?<><path d="M65 95V20M65 95L160 95" stroke="currentColor" opacity=".3"/><path d="M65 95L155 95" stroke="currentColor" strokeWidth="3"/><path d="M65 95L155 95" stroke="currentColor" strokeWidth="3" transform={`rotate(${-value*25} 65 95)`}/><text x="180" y="55">从重合到较少重复</text><text x="180" y="80">正则鼓励，非硬保证</text></>:
+ name==='Budget Scheduler'?<><path d="M25 20H95C145 20 155 80 240 80H335" stroke="currentColor" fill="none"/><circle cx={[45,115,205,300][value]} cy={[20,25,72,80][value]} r="7" fill="currentColor"/><text x="15" y="108">预热 → 逐渐收紧 → 固定分配继续优化</text></>:
+ name==='Attention'?<>{['当前词','线索 A','线索 B'].map((t,i)=><g key={t}><circle cx={45+i*130} cy="52" r="24" fill="none" stroke="currentColor"/><text x={25+i*130} y="57">{t}</text></g>)}<path d={value%2?'M70 52H151':'M70 52L283 27'} stroke="currentColor"/><text x="25" y="105">选择线索，观察信息之间的联系</text></>:
+ name==='FFN'?<><text x="15" y="30">每个位置用同一套加工工具</text><path d="M20 60h70m150 0h90" stroke="currentColor"/><rect x="90" y="42" width="150" height="40" fill="none" stroke="currentColor"/><text x="105" y="67">扩展 → 非线性 → 输出</text><circle cx={25+value*100} cy="60" r="6" fill="currentColor"/></>:
+ name==='Ablation'?<><text x="15" y="25">固定条件，观察单项变体</text>{['结构','分配','约束','评分'].map((t,i)=><g key={t} opacity={i===value?.3:1}><rect x={12+i*87} y="40" width="78" height="40" fill="none" stroke="currentColor"/><text x={27+i*87} y="66">{t}</text></g>)}<text x="15" y="110">淡色：本次移除的设计；这里不生成成绩</text></>:
+ <><text x="15" y="20">{name==='Gradient'?'损失附近的调整提示':'多个批次的测量信号'}</text><polyline points="20,70 80,35 140,78 200,40 260,60 330,25" fill="none" stroke="currentColor" opacity=".5"/><circle cx={[20,80,140,200][value]} cy={[70,35,78,40][value]} r="7" fill="currentColor"/>{name==='Importance Score'&&<path d="M20 60Q170 45 330 45" fill="none" stroke="currentColor" strokeWidth="3"/>}<text x="15" y="108">{name==='Importance Score'?'历史与变化共同帮助估计，不是真实准确率':'当前提示会变化，单次测量不是完整判断'}</text></>}
+ </svg><small>教学结构示意 · 不运行训练，不代表论文实验结果</small></div>;
+}

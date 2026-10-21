@@ -1,0 +1,88 @@
+<section class="card" id="s1" aria-labelledby="s1h">
+    <div class="card-head">
+      <span class="tag-no">S1</span>
+      <span class="tag-name">分解 · 一个向量变成三个</span>
+    </div>
+
+    <h2 class="h2" id="s1h">一段摘要，被拆成三种信息</h2>
+
+    <div class="play" id="play">
+      <div class="play-head">
+        <div class="paper-tag">
+          <svg viewBox="0 0 14 18" width="13" height="17" aria-hidden="true" style="display:block">
+            <path d="M1 1h8l4 4v12H1z" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+            <path d="M9 1v4h4" fill="none" stroke="currentColor" stroke-width="1"/>
+            <path d="M3.5 9.5h7M3.5 12h7M3.5 14.5h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+          <span class="paper-tx">论文</span>
+          <span class="paper-sub">摘要（示意）</span>
+        </div>
+        <div class="legend">
+          <span class="lg"><i class="lg-sw" style="background:var(--dim-p)"></i>问题</span>
+          <span class="lg"><i class="lg-sw" style="background:var(--dim-m)"></i>方法</span>
+          <span class="lg"><i class="lg-sw" style="background:var(--dim-f)"></i>发现</span>
+          <span class="lg"><i class="lg-sw" style="background:var(--bd2)"></i>其它内容</span>
+        </div>
+      </div>
+
+      <div class="ppaper">
+        <div class="pp-title" data-part="title"><i style="width:78%"></i><i style="width:46%"></i></div>
+        <div class="pp-authors" data-part="authors"><i style="width:26%"></i><i style="width:17%"></i><i style="width:13%"></i><i style="width:20%"></i></div>
+        <div class="pp-rule"></div>
+        <div class="pp-body">
+        <div class="pp-text">
+        <p class="pp-sec">摘要</p>
+        <p class="abs" id="absBlock"><span class="abs-bg" data-part="body">科学想法很少只有一个维度。</span><span class="u-p" data-src="p">现有嵌入方法把一篇论文的问题、方法与发现压进同一个向量</span><span class="abs-bg" data-part="body">，使细粒度检索无从下手；交给 LLM 评审，又受谄媚偏差拖累。</span><span class="u-m" data-src="m">本文按概念功能把科学知识拆成三个子空间，各自训练专用编码器</span><span class="abs-bg" data-part="body">，并以此支撑多维检索与分解式新颖性评估。</span><span class="u-f" data-src="f">节点检索 Recall@30 达 0.329，较最强基线提升 16.7%</span><span class="abs-bg" data-part="body">，跃迁检索 HitRate@30 为 0.643。</span></p>
+        </div>
+        <div class="pp-fig" data-part="figure">
+          <svg class="pp-fig-svg" viewBox="0 0 140 84" role="img" aria-label="论文被分解为三个子空间">
+            <rect x="60" y="2" width="20" height="14" rx="3" fill="none" stroke="var(--bd2)" stroke-width="1.2"/>
+            <path d="M64.5 6.5h11M64.5 9.5h8" stroke="var(--tx3)" stroke-width="1" stroke-linecap="round"/>
+            <path d="M70 16 C70 30 24 28 24 46" fill="none" stroke="var(--dim-p)" stroke-width="1.4" stroke-dasharray="3 2"/>
+            <path d="M70 16 L70 46" fill="none" stroke="var(--dim-m)" stroke-width="1.4" stroke-dasharray="3 2"/>
+            <path d="M70 16 C70 30 116 28 116 46" fill="none" stroke="var(--dim-f)" stroke-width="1.4" stroke-dasharray="3 2"/>
+            <rect x="16" y="48" width="17" height="17" rx="4" fill="var(--dim-p)"/>
+            <rect x="61.5" y="48" width="17" height="17" rx="4" fill="var(--dim-m)"/>
+            <rect x="107" y="48" width="17" height="17" rx="4" fill="var(--dim-f)"/>
+            <text x="24.5" y="78" text-anchor="middle" font-size="9" fill="var(--tx3)">问题</text>
+            <text x="70" y="78" text-anchor="middle" font-size="9" fill="var(--tx3)">方法</text>
+            <text x="115.5" y="78" text-anchor="middle" font-size="9" fill="var(--tx3)">发现</text>
+          </svg>
+          <span class="pp-fig-l">图 1 · 框架总览（示意）</span>
+        </div>
+        </div>
+      </div>
+
+      <p class="abs-cap">灰字 = 摘要其余内容 · 着色 = 三类信息，交错落在同一段文字里</p>
+
+      <div class="puller">
+        <span class="puller-l"></span>
+        <span class="puller-t">抽取 · Qwen3-8B · exactly 3 sentences</span>
+        <span class="puller-l"></span>
+      </div>
+
+      <div class="slots" id="slots">
+        <div class="slot" data-dim="p"><span class="vblock"></span><span class="slot-k">问题</span></div>
+        <div class="slot" data-dim="m"><span class="vblock"></span><span class="slot-k">方法</span></div>
+        <div class="slot" data-dim="f"><span class="vblock"></span><span class="slot-k">发现</span></div>
+      </div>
+
+      <button class="simline" id="simLine" type="button">三个子空间有多像？</button>
+
+      <p class="hint">悬停暂停并显示说明</p>
+
+      <div class="hover-card" id="hoverCard" role="status" aria-live="polite">
+        <p class="hc-t" id="hcT"></p>
+        <p class="hc-l"><span class="hc-k" id="hcK1"></span><span id="hcV1"></span></p>
+        <p class="hc-l"><span class="hc-k" id="hcK2"></span><span id="hcV2"></span></p>
+      </div>
+
+      <div class="flyers" aria-hidden="true"><span class="flyer"></span><span class="flyer"></span><span class="flyer"></span></div>
+    </div>
+
+    <button class="fold" id="foldBtn" type="button" aria-expanded="false" aria-controls="foldBody">附录 A.1 原文 prompt<span class="caret">▾</span></button>
+    <div class="fold-body" id="foldBody"><div class="fold-in">
+      <p>You are an expert academic writer and editor tasked with creating precise, informative structured summaries of research paper abstracts… <em>Transform the following academic paper abstract into exactly THREE sentences.</em> Each sentence should address one of the required aspects and be self-contained and clear to understand for researchers in related fields. Required Elements to Include (One sentence each): <em>1. Research Question/Problem</em>: What specific challenge, gap, or question does this work uniquely address that distinguishes it from existing research? <em>2. Method/Approach</em>: What novel technique, algorithm, methodology, or experimental design is introduced that sets this work apart from previous approaches? <em>3. Key Findings/Insights/Contributions</em>: What are the main empirical results, theoretical insights, or practical contributions that represent the paper's unique value and impact? <span style="color:var(--tx3)">（节选，全文见附录 A.1）</span></p>
+    </div></div>
+
+  </section>
