@@ -1,0 +1,95 @@
+{
+  "title": "Claude Code 源码泄露分析",
+  "pages": [
+    {
+      "id": "source-boundary",
+      "chapterId": "chap-1",
+      "title": "分析文章与可验证结论",
+      "goal": "先明确来源、作者判断与教学模型的区别。",
+      "summary": "引用原文，区分判断和复现。",
+      "interaction": "静态阅读原文与边界",
+      "next": "发布清单决定暴露范围",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：标题与发布日期\n本页为原创教学模型：无状态。引用原文，区分判断和复现。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "package-manifest",
+      "chapterId": "chap-2",
+      "title": "发布清单决定暴露范围",
+      "goal": "点选桌面文件，加入或移出公开讲义夹",
+      "summary": "含调试映射或草稿时提示暴露风险；移除后提示清单只剩公开文件。",
+      "interaction": "点选桌面文件，加入或移出公开讲义夹",
+      "next": "保密与公开署名分别处理",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 1 节\n本页为原创教学模型：selected 字符串数组，初值 cli.js、cli.js.map；可选 cli.js、README.md、cli.js.map、notes.txt。含调试映射或草稿时提示暴露风险；移除后提示清单只剩公开文件。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "attribution",
+      "chapterId": "chap-3",
+      "title": "保密与公开署名分别处理",
+      "goal": "勾选讲义页上的公开信息字段",
+      "summary": "保密不自动等于省略贡献署名。",
+      "interaction": "勾选讲义页上的公开信息字段",
+      "next": "摘要压缩保留来源标签",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 2 节\n本页为原创教学模型：codeName=false，credit=false；两布尔字段独立。保密不自动等于省略贡献署名。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "trusted-summary",
+      "chapterId": "chap-3",
+      "title": "摘要压缩保留来源标签",
+      "goal": "开启或关闭摘录卡的来源标签",
+      "summary": "无标签时无法追溯；有标签时外部文字仍只作资料。",
+      "interaction": "开启或关闭摘录卡的来源标签",
+      "next": "校验语义与执行语义一致",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 4 节\n本页为原创教学模型：preserve=false；用户卡与外部文件卡各一张。无标签时无法追溯；有标签时外部文字仍只作资料。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "parser-agreement",
+      "chapterId": "chap-4",
+      "title": "校验语义与执行语义一致",
+      "goal": "选择两个字母之间的分隔符",
+      "summary": "空格和制表符时一致；回车时此教学模型不同。",
+      "interaction": "选择两个字母之间的分隔符",
+      "next": "连续失败触发重试熔断",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 5 节\n本页为原创教学模型：separator=CR，可选 space、tab、CR；两组显式分隔规则计算输出数组。空格和制表符时一致；回车时此教学模型不同。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "retry-budget",
+      "chapterId": "chap-5",
+      "title": "连续失败触发重试熔断",
+      "goal": "拖动演练盖章次数的上限",
+      "summary": "限制失败预算，保留错误交由诊断；减少次数不意味着修复原因。",
+      "interaction": "拖动演练盖章次数的上限",
+      "next": "后台任务先检查启动条件",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 6 节\n本页为原创教学模型：limit=3，整数1到8；场景固定八次请求均失败。限制失败预算，保留错误交由诊断；减少次数不意味着修复原因。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "background-gates",
+      "chapterId": "chap-5",
+      "title": "后台任务先检查启动条件",
+      "goal": "设置演讲提醒钟的时间、资料数和锁状态",
+      "summary": "条件不足时列出未满足项；全部满足才开始；这些门槛是教学设定。",
+      "interaction": "设置演讲提醒钟的时间、资料数和锁状态",
+      "next": "运行结果检验实现判断",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 3 节\n本页为原创教学模型：elapsed=5，范围0到20；sessions=1，范围0到5；lock=false；教学门槛时间10且资料2且锁可用。条件不足时列出未满足项；全部满足才开始；这些门槛是教学设定。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "run-verification",
+      "chapterId": "chap-6",
+      "title": "运行结果检验实现判断",
+      "goal": "修改两个数并运行讲义中的算术例子，再勾选修复",
+      "summary": "仅阅读不授予通过；运行可暴露偏差；修复后重新运行验证。",
+      "interaction": "修改两个数并运行讲义中的算术例子，再勾选修复",
+      "next": "发布防线检验最终产物",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 7 节\n本页为原创教学模型：a=2,b=2,repair=false,ran=false；错误实现返回a+b+1，期望a+b。仅阅读不授予通过；运行可暴露偏差；修复后重新运行验证。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    },
+    {
+      "id": "release-defense",
+      "chapterId": "chap-6",
+      "title": "发布防线检验最终产物",
+      "goal": "为封好的公开讲义启用允许清单和最终扫描",
+      "summary": "都未开启会暴露两项；单扫描阻断但没有修复；允许清单移除两项；两层同时启用可发布此样例。",
+      "interaction": "为封好的公开讲义启用允许清单和最终扫描",
+      "next": "回到原文，核验这些设计选择的适用边界。",
+      "snippet": "原文：https://www.sabrina.dev/p/claude-code-source-leak-analysis\n章节：原文第 9 节\n本页为原创教学模型：allowlist=false,scan=false；三个固定文件public.js、debug.map、private-notes.txt；只允许 public.js。都未开启会暴露两项；单扫描阻断但没有修复；允许清单移除两项；两层同时启用可发布此样例。\n边界：不代表 Claude Code 真实执行结果或当前产品行为；未复现原文提出的安全问题。所有示例值都由教学状态计算。"
+    }
+  ]
+}
