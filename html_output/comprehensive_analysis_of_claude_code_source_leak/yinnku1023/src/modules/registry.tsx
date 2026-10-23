@@ -1,7 +1,9 @@
 import React from 'react';
 import { Attribution } from './attribution';
 import { BackgroundGates } from './background-gates';
+import { DefenseTradeoffs } from './defense-tradeoffs';
 import { EditorialCover } from './editorial-cover';
+import { FutureExperiment } from './future-experiment';
 import { PackageManifest } from './package-manifest';
 import { ParserAgreement } from './parser-agreement';
 import { ReleaseDefense } from './release-defense';
@@ -18,7 +20,9 @@ export interface WidgetProps {
 export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
 widgetRegistry['attribution'] = Attribution;
 widgetRegistry['background-gates'] = BackgroundGates;
+widgetRegistry['defense-tradeoffs'] = DefenseTradeoffs;
 widgetRegistry['editorial-cover'] = EditorialCover;
+widgetRegistry['future-experiment'] = FutureExperiment;
 widgetRegistry['package-manifest'] = PackageManifest;
 widgetRegistry['parser-agreement'] = ParserAgreement;
 widgetRegistry['release-defense'] = ReleaseDefense;
