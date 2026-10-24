@@ -1,0 +1,125 @@
+{
+  "title": "骨架之外的灵魂：读完 1884 个源文件之后",
+  "pages": [
+    {
+      "id": "source-cards",
+      "chapterId": "chap-1",
+      "title": "先确认这篇文章的出处",
+      "goal": "哪些是作者亲读，哪些是已有分析？",
+      "summary": "一篇微信文章：作者读了 1884 个源文件，本文只谈“为什么”。",
+      "interaction": "阅读来源卡与三层证据边界",
+      "next": "骨架已经有人拆过了，这篇要看的是什么？",
+      "snippet": "【建议时长】约 65 秒。\n【本页只讲】来源性质：这是一篇微信公众号文章，正文由使用者提供，原文链接需要微信验证才能打开。\n【讲解】文章对象是 Claude Code 2.1.88；起因是 npm 包里的 60MB source map、1906 个文件；作者称自己读了 1884 个源文件。这些数字都是文章自述，本教程没有独立复核。右侧三层边界要分清：作者亲读（引文与文件名）、已经有人做过的架构拆解（本文不再重复）、以及作者对“为什么”的归纳（属于解释，不是官方文档）。\n【演示与停顿】先读来源卡，再逐条读三层。停顿，请听众指出哪一层最容易被当成官方结论。\n【过渡】骨架已经有人拆过了，这篇要看的是什么？\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：开篇与结尾\n本页为来源说明页：无交互；日期与署名原文未标注，抓取时被微信验证页拦截。\n边界：正文由使用者粘贴提供，本教程未核对原文配图与排版；所有数字均按文章表述转述。"
+    },
+    {
+      "id": "why-read",
+      "chapterId": "chap-1",
+      "title": "骨架之外，还剩下什么",
+      "goal": "已经被拆过的部分与本文的问题，边界在哪？",
+      "summary": "已有分析回答“怎么搭”，这篇问“为什么这么想”。",
+      "interaction": "阅读两侧清单",
+      "next": "第一个科室：它怎么防止自己骗自己？",
+      "snippet": "【建议时长】约 60 秒。\n【本页只讲】本文不重复架构拆解，只挑 12 个“值得停下来”的设计。\n【讲解】左侧是已经比较完善的骨架分析：Agent 循环、流式工具执行、四层权限管道、MCP、Skill、Swarm。右侧是本文的 12 个瞬间：反自我欺骗、AI 做梦、缓存经济学、YOLO 分类器、提示词组装、遥测与远程、320 个旋钮、语音、KAIROS、隐藏服务、两种管理智慧、六条教训。教程会挑其中八个展开，其余放进讲稿。\n【演示与停顿】读左右两侧，停一下，问：如果只能保留三个，你选哪三个？\n【过渡】第一个科室：它怎么防止自己骗自己？\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：开篇\n本页为结构整理：12 个条目取自文章小标题，取舍是本教程的安排。\n边界：文章未提供各模块的代码行号，本教程也未逐条核实；它们应被读作“作者读到的现象”。"
+    },
+    {
+      "id": "verification",
+      "chapterId": "chap-2",
+      "title": "它被训练去对抗自己的偷懒",
+      "goal": "一个验证 Agent，凭什么不能说“我看着没问题”？",
+      "summary": "系统提示词把“确认能跑”改成“试着搞崩”，并列出五条自我合理化。",
+      "interaction": "选一条借口，再选检查结果，看裁定如何变化",
+      "next": "连验证都独立了，那“反思”放在哪里做？",
+      "snippet": "【建议时长】约 90 秒。\n【本页只讲】验证角色的目标被重新定义了：不是确认实现能跑，而是试着把它搞崩。\n【讲解】verificationAgent.ts 的提示词开头就是“Your job is not to confirm the implementation works — it’s to try to break it.”。更关键的是后面那张反自我合理化清单：看着对、实现者的测试过了、大概没问题、太花时间、没有浏览器——每一条都被逐句驳回，并要求附上实际命令输出。裁定只有 PASS / FAIL / PARTIAL，阅读只能给 PARTIAL。本页把五条借口做成可点的按钮，再用“有没有执行”切换裁定。\n【演示与停顿】先点“代码我看着是对的”，让裁定停在 PARTIAL；再切到“跑了，通过”，看它变成 PASS。停顿，问：为什么阅读不算验证？\n【过渡】连验证都独立了，那“反思”放在哪里做？\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：01 反自我欺骗\n本页为机制示意：五条借口与三档裁定取自文章引文；按钮与裁定交互是本教程的呈现方式。\n边界：真实提示词的完整内容未公开；本页不模拟模型判断，只演示“证据缺失 → PARTIAL”这条规则。"
+    },
+    {
+      "id": "dream-gates",
+      "chapterId": "chap-2",
+      "title": "AI 也会做梦，但要过三道门",
+      "goal": "三重门控都不满足时，它为什么不动手？",
+      "summary": "24 小时、5 次会话、文件锁，按成本从低到高依次检查。",
+      "interaction": "调节三个门控与“中途打断”，观察启动与回滚",
+      "next": "整理记忆要花时间，系统提示词也要花钱。",
+      "snippet": "【建议时长】约 85 秒。\n【本页只讲】Dream 把“反思”从实时对话里剥离出来，放到后台异步做。\n【讲解】autoDream 在 src/services/autoDream/。触发要过三道门控，按成本从低到高：距上次 ≥ 24 小时、已进行 ≥ 5 次会话、文件锁可用。全满足后，一个后台子 agent 静默启动，回顾历史会话、提取信息、写进 memory；它只有只读 bash 权限（ls、grep、cat），不碰代码；中途打断，文件锁回滚，不留半成品。界面上只有一个不显眼的进度条。\n【演示与停顿】先把三个条件都调低，说明“不动手也不占资源”；再逐个满足，看启动；最后打开“中途打断”，说明回滚。\n【过渡】整理记忆要花时间，系统提示词也要花钱。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：02 AI 也会做梦\n本页为门控示意：24 小时 / 5 次 / 文件锁取自文章；滑块范围与“打断”开关是本教程的演示。\n边界：文章提到这些阈值可通过 tengu_onyx_plover 远程调整；本页把它当作固定值演示，不代表当前线上配置。"
+    },
+    {
+      "id": "cache-economics",
+      "chapterId": "chap-2",
+      "title": "一条分界线，一天省五位数",
+      "goal": "分成两半的系统提示词，账到底差多少？",
+      "summary": "前半段全球共享缓存，后半段每用户重算；缓存读取只要输入价的 10%。",
+      "interaction": "切换模型与缓存开关，看 1M 次调用的日成本",
+      "next": "省下来的钱靠缓存，安全则靠一条由快到慢的管道。",
+      "snippet": "【建议时长】约 85 秒。\n【本页只讲】SYSTEM_PROMPT_DYNAMIC_BOUNDARY 是一条成本分界线。\n【讲解】这个常量的值本身就是一串被双下划线包起来的占位符。标记之前是身份、安全规则、行为准则，全球可缓存、跨组织共享；之后是 memory、语言偏好、MCP 配置、项目上下文，每个用户不同，每轮重算。动态段还有两档：memoized 缓存到 /clear 或 /compact；DANGEROUS_uncachedSystemPromptSection 每轮重算并破坏缓存——前缀 DANGEROUS_ 就是工程师给自己的警告。定价表：Sonnet 4.6 $3/$15，Opus 4.6 $15/$75，Opus 4.6 Fast $30/$150，缓存读取按输入价 10%（写入的 1/12.5）。\n【演示与停顿】先在 Sonnet 下看日成本，再切到 Opus 与 Fast，最后关掉缓存。停顿，让“10 倍价差”和“省下的五位数”同时被看见。\n【过渡】省下来的钱靠缓存，安全则靠一条由快到慢的管道。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：03 提示词缓存的经济学\n本页为成本模型：定价取自文章表格；4,200 + 800 token 是本教程的示例切分；按 1M 次调用/天、只算输入侧计算。\n边界：真实 token 数与调用量未公开，结果只用于比较量级；8K 默认输出与 64K 重试也来自文章。"
+    },
+    {
+      "id": "yolo-classifier",
+      "chapterId": "chap-3",
+      "title": "安全是一条管道，不是一个开关",
+      "goal": "同一条命令，两阶段各花多少预算、各自拦什么？",
+      "summary": "yoloClassifier 先用 64 token 快速拦截，再给 256 token 的复审。",
+      "interaction": "点选命令，观察两阶段判定与最终结果",
+      "next": "拦得住命令，也要说得清该怎么做。",
+      "snippet": "【建议时长】约 90 秒。\n【本页只讲】权限管道的关键不是“有没有检查”，而是“每一层对应哪种攻击”。\n【讲解】文件名叫 yoloClassifier.ts。第一阶段只给 64 token，指令是“Err on the side of blocking”，够输出一个 yes/no 加一句理由；只有第一阶段说“阻止”才触发第二阶段，256 token，要求先 thinking 再 block，相当于一次上诉。bashSecurity.ts 里有 23+ 种攻击模式：命令替换注入、Zsh 危险模块、IFS 注入、反引号逃逸、Unicode 空白伪装。还有一类危险环境变量会被远程管理硬拦：HTTP_PROXY、HTTPS_PROXY、NODE_TLS_REJECT_UNAUTHORIZED、LD_PRELOAD、PATH——防的是管理员被钓鱼后下发配置劫持会话。\n【演示与停顿】先点 ls，说明快判放行；再点 python3，说明先拦后放（复审推翻）；最后点 Unicode 那条，说明伪装也被识别。\n【过渡】拦得住命令，也要说得清该怎么做。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：04 YOLO 分类器\n本页为规则复现：两阶段预算、指令与攻击类型取自文章；六条命令的判定是本教程按这些规则做的教学复现，不是真实分类器输出。\n边界：真实分类器的提示词、模型与阈值未公开；本页不构成任何安全建议。"
+    },
+    {
+      "id": "prompt-assembly",
+      "chapterId": "chap-3",
+      "title": "提示词不是一段话，是一张处方",
+      "goal": "十几段拼起来的提示词，各自在管什么？",
+      "summary": "安全、规则、纪律、风险、工具偏好、简洁、会话，一层层拼。",
+      "interaction": "点选七个组成部分，读它的真实引文",
+      "next": "有了纪律，还要有它自己的节奏。",
+      "snippet": "【建议时长】约 80 秒。\n【本页只讲】系统提示词由十几个函数动态拼装，每一段都在对抗模型的一种天性。\n【讲解】src/constants/prompts.ts 与 src/utils/systemPrompt.ts 揭示的组装过程：安全指令（Safeguards 团队维护的 allow/deny）、系统规则（工具偏好、标签过滤、prompt injection 防御）、任务纪律、风险评估、工具偏好、简洁原则、会话指导。几条值得记住的原文：“Don’t add features beyond what was asked”“Three similar lines of code is better than a premature abstraction”“Use Read instead of cat, Edit instead of sed”“Lead with the answer or action, not the reasoning”。还有内部特供：USER_TYPE === 'ant' 时默认不写注释，报告完成前必须亲自跑一遍。\n【演示与停顿】逐个点开，挑三条读出来；停顿，问听众：这些是在教模型写代码，还是在教它克制？\n【过渡】有了纪律，还要有它自己的节奏。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：05 系统提示词的组装术\n本页为结构示意：七个分类与引文取自文章；函数数量“十几个”是文章描述，本教程未核对具体数量。\n边界：完整提示词未公开；引用均为文章转述的短句，可能经过翻译或节选。"
+    },
+    {
+      "id": "kairos-rhythm",
+      "chapterId": "chap-4",
+      "title": "主动性是知道何时闭嘴",
+      "goal": "同样干完一件事，三种汇报节奏差在哪？",
+      "summary": "先确认、再干活、阶段边界说一声、结束给结果。",
+      "interaction": "切换三种汇报策略，看消息流与打扰次数",
+      "next": "节奏之外，还有一条从云端到终端的控制通道。",
+      "snippet": "【建议时长】约 85 秒。\n【本页只讲】KAIROS 的核心不是“能做事”，而是沟通节奏。\n【讲解】KAIROS 激活时，系统注入“You are in proactive mode…”，并周期性发 <tick> 心跳；没事干就调 Sleep，有事干就主动做再汇报。核心工具 SendUserMessage（旧名 Brief）带 status: normal | proactive——proactive 表示这条是它自己觉得该说的。提示词对节奏的指导是 ack → work → result，中间只在“做了决定、撞上意外、进入新阶段”时发 checkpoint。本页把三种策略放在同一条 40 分钟时间线上对比：每步都汇报、只在阶段边界、憋到最后。\n【演示与停顿】先选“每步都汇报”，数打扰次数；再选“阶段边界”，说明为什么信息更完整但打扰更少；最后选“憋到最后”，指出阻塞无人知晓。\n【过渡】节奏之外，还有一条从云端到终端的控制通道。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：09 KAIROS\n本页为节奏示意：时间线与三条消息流是本教程设计的示例；ack/result 与 checkpoint 的原则取自文章引文。\n边界：真实 tick 间隔、Sleep 语义与 UI 变形细节未在文章中给出完整参数；本页不模拟真实调度。"
+    },
+    {
+      "id": "remote-control",
+      "chapterId": "chap-4",
+      "title": "看不见的手：遥测与远程配置",
+      "goal": "一条配置从云端到终端，谁覆盖谁、哪里会弹窗？",
+      "summary": "六层优先级；危险配置落地前要过人工确认。",
+      "interaction": "选择配置项，看它来自哪一层、是否触发安全对话框",
+      "next": "除了配置，还有三百多个旋钮可以拧。",
+      "snippet": "【建议时长】约 85 秒。\n【本页只讲】遥测是“可观测 + 可控制”两条通道，不只是上报指标。\n【讲解】三个数据端点：/api/claude_code/metrics、organizations 的 opt-out 状态、claude_code_grove 隐私通知；指标每 300 秒批量导出，团队与企业账户默认 opt-in。GrowthBook 收的属性包括 id、sessionId、deviceID、platform、组织与账户 UUID、订阅类型、email、appVersion 等，功能灰度按 hash(userId) 分桶。远程管理设置每 60 分钟轮询，ETag 缓存 + SHA256 校验；优先级是 CCD 桌面端 → 全局 → 用户 → 策略 → 项目 → 本地。对 apiKeyHelper、awsAuthRefresh 这类危险 shell 配置，客户端会弹安全对话框。\n【演示与停顿】依次点默认模型、HTTP_PROXY、apiKeyHelper，看来源层与弹窗；停顿，问：这条通道的正当用途和被滥用时的边界在哪？\n【过渡】除了配置，还有三百多个旋钮可以拧。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：06 看不见的手\n本页为通道示意：端点、300 秒、60 分钟、ETag/SHA256 与优先级链取自文章；四个配置项的来源层是本教程的示例。\n边界：文章未给出企业推送的完整开关列表；本页不评价具体企业的合规做法。"
+    },
+    {
+      "id": "knob-console",
+      "chapterId": "chap-4",
+      "title": "320 个旋钮，真正有用的是少数",
+      "goal": "三类旋钮各管什么，哪些会改变行为？",
+      "summary": "模型行为、功能开关、性能调优；大多数是内部调试用的。",
+      "interaction": "切换分类，点选旋钮看它的作用",
+      "next": "机制看完了，最后看两只手：信息与动机。",
+      "snippet": "【建议时长】约 75 秒。\n【本页只讲】环境变量是隐藏的控制面，按用途分三类才看得清。\n【讲解】逆向出的环境变量有 320+ 个。模型行为类：CLAUDE_CODE_EFFORT_LEVEL（1–5）、DISABLE_THINKING、DISABLE_ADAPTIVE_THINKING、DISABLE_1M_CONTEXT、MAX_OUTPUT_TOKENS、SUBAGENT_MODEL、MAX_THINKING_TOKENS。功能类：COORDINATOR_MODE、EXPERIMENTAL_AGENT_TEAMS、PLAN_MODE_REQUIRED、ENABLE_TOOL_SEARCH、VOICE_STREAM_BASE_URL。性能类：DISABLE_PROMPT_CACHING_OPUS / SONNET、PERFETTO_TRACE、BASH_MAX_TIMEOUT_MS、MCP_TOOL_TIMEOUT。按模型单独禁用缓存这件事说明：不同模型的缓存命中率与成本结构要分开调。\n【演示与停顿】三类各点一个，说明“它改的是行为、功能还是账”。停顿，提醒听众：320 个里大多数不该碰。\n【过渡】机制看完了，最后看两只手：信息与动机。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：07 320 个隐藏旋钮\n本页为清单示意：变量名与作用取自文章表格；分类是本教程的整理，未穷举 320+。\n边界：这些变量多数未在公开文档中承诺，可能随版本失效；本页不构成配置建议。"
+    },
+    {
+      "id": "two-hands",
+      "chapterId": "chap-5",
+      "title": "一只手管信息，一只手管动机",
+      "goal": "同样是“让 Agent 做好”，两种写法差在哪？",
+      "summary": "Context not Control；Don’t Teach, Incentivize。",
+      "interaction": "对照阅读说教与激励的四组写法",
+      "next": "把十二个瞬间压成三条能带走的判断。",
+      "snippet": "【建议时长】约 85 秒。\n【本页只讲】提示词工程的两条线：给什么信息，和怎么让 Agent 想做好。\n【讲解】左手 Context not Control：Explore 给能力描述加禁令清单，Verification 给识别自我合理化的框架，General Purpose 给“Complete the task fully — don’t gold-plate, but don’t leave it half-done.”——都是给原则不给步骤。右手 Don’t Teach, Incentivize：不说“请认真检查”，而说“你的工作就是搞破坏”；不说“搜索要全面”，而说“你擅长在代码库里导航”；不说“空闲别浪费资源”，而说“有用就做，没用就睡”。一个管看到什么，一个管想做什么；只有前者，Agent 会知道但懒得做好；只有后者，Agent 会想做但全是幻觉。\n【演示与停顿】左右对照读两组，停顿，问：如果只能改一组提示词，你会先改哪边？\n【过渡】把十二个瞬间压成三条能带走的判断。\n\n【来源与边界】\n原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA\n章节：11 提示词里的两种管理智慧\n本页为观点整理：两条原则与四组对照取自文章；“左手/右手”是本教程的比喻。\n边界：文章未给出完整的对照实验；“Context 更贵但效果更好”是作者判断，不是测量结果。"
+    },
+    {
+      "id": "closing",
+      "chapterId": "chap-5",
+      "title": "读源码的价值，不是抄实现",
+      "goal": "收束十二个瞬间，留下三条判断。",
+      "summary": "验证对抗偷懒；反思离线做；提示词是管理哲学。",
+      "interaction": "阅读三条结论",
+      "next": "",
+      "snippet": "【建议时长】约 55 秒。\n【本页只讲】十二个瞬间里，真正能带走的是三条判断。\n【讲解】第一，验证者要能对抗自己的偷懒本能：不是给 checklist，而是让它识别自己的合理化。第二，有些认知工作不该在实时对话里做：Dream 把反思放到后台，用门控和文件锁保证安全。第三，提示词是管理哲学：Context not Control 管信息，Don’t Teach, Incentivize 管动机。最后回到文章那句：读源码的价值，从来不是抄实现，而是理解取舍背后的 Why——才能抄得更好。\n【结尾】如果只记一句：先问“它为什么这么想”，再问“我能不能这么做”。\n【来源】原文：https://mp.weixin.qq.com/s/vbigwjX-TBvjDQ8sUdZ3qA（微信文章，正文由作者提供）。本页为教程总结，不复述原文措辞。"
+    }
+  ]
+}
