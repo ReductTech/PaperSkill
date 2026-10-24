@@ -1,0 +1,250 @@
+/* 论文专属样式：印刷厂视觉系统。
+   语义色沿用 tokens.css / contract.md §5：
+   --blue 指导与当前状态，--green 通过或本文方法，--red 失败与风险，
+   --orange 用户可调的强调量。纸张色 #fffdf8 只承担场景环境，不参与语义。 */
+
+:root {
+  --ppt-body-text: 30px;
+  --ppt-body-heading: 36px;
+  --ppt-body-emphasis: 46px;
+
+  --ui-font-sans: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+  --ui-font-mono: "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+
+  /* 印刷厂场景色：纸、裁切线、木台、苔绿。只在场景里出环境，不承担语义。 */
+  --ps-paper: #fdfbf2;
+  --ps-sheet: #fffef9;
+  --ps-edge: #e4dcc6;
+  --ps-edge-strong: #cfc4a6;
+  --ps-wood: #92400e;
+  --ps-wood-soft: #b5651d;
+  --ps-moss: #76906a;
+  --ps-moss-soft: #b8c9a7;
+}
+
+/* 页面本身是印刷台面：暖白纸 + 极淡的裁切网点。 */
+.ppt-page, .ppt-cover {
+  background-color: #fffdf8;
+  background-image: radial-gradient(rgba(146, 64, 14, 0.055) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  background-position: 0 0;
+}
+
+/* ---------- 基础版式 ---------- */
+.ps { height: 100%; min-width: 0; display: grid; gap: 22px; color: #21324a; }
+/* components.css 给所有 p 加了 0.7em 上下外边距；幻灯片版面由 gap 统一控制节奏，
+   这里必须清零，否则每段文字都会多出约 42px，整页被顶出画布。 */
+.ps p, .ps dl, .ps dt, .ps dd, .ps ol, .ps ul, .ps li, .ps h3 { margin: 0; }
+.ps-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.ps-2-wide { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+.ps-2-narrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+.ps-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: 14px; }
+/* 竖排卡片不压缩：宁可让页面级审计报溢出，也不要让内容被裁掉。 */
+.ps-col > * { flex-shrink: 0; }
+.ps-row { display: flex; align-items: center; min-width: 0; gap: 14px; }
+.ps-spread { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 14px; }
+.ps-grow { flex: 1 1 auto; min-width: 0; min-height: 0; }
+
+.ps-card {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 20px 24px;
+  background: var(--ps-paper);
+  border: 1px solid var(--ps-edge);
+  border-radius: 18px;
+}
+.ps-card--plain { background: var(--ps-sheet); }
+.ps-card--ink { background: #f4f0e2; border-color: var(--ps-edge-strong); }
+.ps-card--flush { padding: 0; overflow: hidden; }
+
+/* 三种字号角色：30 说明 / 36 局部标题 / 46 焦点数字。 */
+.ps-h { font-size: 36px; line-height: 1.28; font-weight: 800; letter-spacing: -0.01em; }
+.ps-t { font-size: 30px; line-height: 1.48; font-weight: 500; }
+.ps-t--tight { line-height: 1.35; }
+.ps-muted { color: #68778f; }
+.ps-fig { font-size: 46px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; }
+.ps-nowrap { white-space: nowrap; }
+.ps-center { text-align: center; }
+
+.ps-mono { font-family: var(--ui-font-mono); font-size: 30px; letter-spacing: -0.01em; }
+.ps-code { font-family: var(--ui-font-mono); background: #f2eee0; border-radius: 6px; padding: 0 6px; }
+
+/* ---------- 小部件 ---------- */
+.ps-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 14px; border-radius: 999px;
+  background: #f1ecdb; border: 1px solid var(--ps-edge); color: #4c5a70;
+  font-size: 30px; line-height: 1.3; white-space: nowrap;
+}
+.ps-chip[data-tone="blue"] { background: #e7edf5; border-color: #b9c8da; color: #27446e; }
+.ps-chip[data-tone="green"] { background: rgba(34, 141, 92, 0.12); border-color: rgba(34, 141, 92, 0.38); color: #1c6f49; }
+.ps-chip[data-tone="red"] { background: rgba(196, 63, 82, 0.10); border-color: rgba(196, 63, 82, 0.36); color: #9b2c3d; }
+.ps-chip[data-tone="orange"] { background: rgba(240, 126, 71, 0.14); border-color: rgba(240, 126, 71, 0.42); color: #a34a17; }
+
+.ps-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 10px 20px; border-radius: 12px; border: 1px solid var(--ps-edge-strong);
+  background: var(--ps-sheet); color: #21324a; font-size: 30px; line-height: 1.25;
+  text-align: left;
+}
+.ps-btn:hover { border-color: #a9b8cc; background: #fff; }
+.ps-btn[aria-pressed="true"] { background: #27446e; border-color: #27446e; color: #fff; }
+.ps-btn[aria-pressed="true"] .ps-muted { color: #cdd8e8; }
+.ps-btn[aria-pressed="true"] .ps-chip { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.55); color: #fff; }
+.ps-btn--block { width: 100%; justify-content: space-between; }
+.ps-btn--small { padding: 6px 14px; }
+
+/* 大画布 SVG 只占满自己的格子，避免按固有比例把卡片撑高。 */
+.ps-art { display: block; width: 100%; height: 100%; min-height: 0; }
+
+.ps-switch {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 8px 18px 8px 8px; border-radius: 999px;
+  border: 1px solid var(--ps-edge-strong); background: var(--ps-sheet);
+  font-size: 30px; color: #21324a;
+}
+.ps-switch > i {
+  position: relative; flex: none; width: 64px; height: 34px; border-radius: 999px;
+  background: #ddd6c2; transition: background 160ms ease-out;
+}
+.ps-switch > i::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 26px; height: 26px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(33, 50, 74, 0.28);
+  transition: transform 160ms ease-out;
+}
+.ps-switch[aria-checked="true"] > i { background: #27446e; }
+.ps-switch[aria-checked="true"] > i::after { transform: translateX(30px); }
+
+input.ps-range {
+  width: 100%; height: 14px; margin: 12px 0; border-radius: 999px;
+  background: #e2dbc8;
+  appearance: none; outline: none;
+}
+input.ps-range::-webkit-slider-thumb {
+  appearance: none; width: 34px; height: 34px; border-radius: 50%;
+  background: #fff; border: 4px solid #27446e; box-shadow: 0 2px 8px rgba(33, 50, 74, 0.25);
+}
+input.ps-range::-moz-range-thumb {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #fff; border: 4px solid #27446e; box-shadow: 0 2px 8px rgba(33, 50, 74, 0.25);
+}
+
+.ps-feedback {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 18px; border-radius: 14px;
+  font-size: 30px; line-height: 1.38; border: 1px solid;
+}
+.ps-feedback::before { content: ""; flex: none; width: 14px; height: 14px; margin-top: 16px; border-radius: 50%; background: currentColor; }
+.ps-feedback[data-tone="good"] { background: rgba(34, 141, 92, 0.10); border-color: rgba(34, 141, 92, 0.42); color: #1c6f49; }
+.ps-feedback[data-tone="bad"] { background: rgba(196, 63, 82, 0.09); border-color: rgba(196, 63, 82, 0.40); color: #9b2c3d; }
+.ps-feedback[data-tone="neutral"] { background: #f4f0e0; border-color: var(--ps-edge-strong); color: #4c5a70; }
+
+.ps-meter { display: grid; gap: 6px; }
+.ps-meter > span { display: flex; justify-content: space-between; font-size: 30px; line-height: 1.2; color: #4c5a70; }
+.ps-meter > b { display: block; height: 18px; border-radius: 999px; background: #eae4d2; overflow: hidden; }
+.ps-meter > b > i { display: block; height: 100%; border-radius: 999px; background: #27446e; transition: width 220ms ease-out; }
+.ps-meter[data-tone="green"] > b > i { background: #228d5c; }
+.ps-meter[data-tone="red"] > b > i { background: #c43f52; }
+.ps-meter[data-tone="orange"] > b > i { background: #f07e47; }
+
+.ps-kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 20px; align-items: baseline; }
+.ps-kv > dt { color: #68778f; font-size: 30px; white-space: nowrap; }
+.ps-kv > dd { font-size: 30px; line-height: 1.4; margin: 0; }
+
+.ps-rule { height: 1px; background: var(--ps-edge); border: 0; }
+
+.ps-num {
+  display: inline-grid; place-items: center; flex: none;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #27446e; color: #fff; font-size: 30px; font-weight: 700;
+}
+.ps-num--muted { background: #d9d2be; color: #4c5a70; }
+
+.ps-stamp {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 6px 16px; border: 3px solid currentColor; border-radius: 8px;
+  font-weight: 800; font-size: 30px; letter-spacing: 0.06em;
+  transform: rotate(-4deg); opacity: 0.9;
+}
+
+.ps-shelf-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 30px; color: #4c5a70;
+}
+
+/* ---------- 版面：桌面 / 台面 ---------- */
+.ps-desk {
+  position: relative; height: 100%; min-height: 0;
+  border-radius: 18px; border: 1px solid var(--ps-edge);
+  background: linear-gradient(180deg, #fbf7ea 0%, #f6f0df 100%);
+  padding: 22px 24px 0;
+}
+.ps-desk::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+  border-radius: 0 0 17px 17px;
+  background: linear-gradient(180deg, #a4551f 0%, #92400e 100%);
+  opacity: 0.92;
+}
+.ps-desk-row { position: relative; z-index: 2; display: flex; align-items: flex-end; height: 100%; gap: 16px; padding-bottom: 34px; }
+
+.ps-file {
+  position: relative; flex: 1 1 0; min-width: 0; height: 300px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px;
+  padding: 12px 10px 10px; border: 0; background: transparent;
+  transform: translateY(0); transition: transform 160ms ease-out;
+}
+.ps-file:hover { transform: translateY(-6px); }
+.ps-file[data-on="true"] { transform: translateY(-10px); }
+.ps-file > svg { width: 100%; height: 150px; }
+.ps-file > strong { font-size: 30px; font-weight: 700; line-height: 1.2; }
+.ps-file > span { font-size: 30px; line-height: 1.2; color: #68778f; }
+.ps-file[data-state="risk"] > strong { color: #9b2c3d; }
+.ps-file[data-state="safe"] > strong { color: #1c6f49; }
+
+/* ---------- 表格 ---------- */
+.ps-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.ps-table th, .ps-table td {
+  padding: 10px 16px; text-align: left; vertical-align: middle;
+  border-bottom: 1px solid var(--ps-edge); font-size: 30px; line-height: 1.32;
+}
+.ps-table thead th { color: #68778f; font-weight: 600; border-bottom: 2px solid var(--ps-edge-strong); }
+.ps-table tbody tr:last-child th, .ps-table tbody tr:last-child td { border-bottom: 0; }
+.ps-table tbody th { font-weight: 700; }
+.ps-table tr[data-active="true"] { background: #eef2f8; }
+
+.ps-table--fill { height: 100%; }
+
+/* ---------- 缓存分段 ---------- */
+.ps-seg {
+  display: grid; grid-template-columns: 200px minmax(0, 1fr) 120px 130px;
+  align-items: center; gap: 14px; padding: 9px 16px;
+  border-radius: 12px; border: 1px solid var(--ps-edge); background: #fffef9;
+  font-size: 30px; line-height: 1.2;
+}
+.ps-seg[data-side="cached"] { background: #eef2f8; border-color: #c3d0e0; }
+.ps-seg[data-side="dynamic"] { background: #fdf2ea; border-color: #f0cbb6; }
+.ps-seg[data-alarm="true"] { background: #fbe9ec; border-color: #dfa3ae; }
+.ps-segbar { display: block; height: 18px; border-radius: 9px; background: #e6dfcd; overflow: hidden; }
+.ps-segbar > i { display: block; height: 100%; border-radius: 9px; }
+.ps-boundary {
+  display: flex; align-items: center; gap: 12px; padding: 2px 6px;
+  color: var(--orange); font-size: 30px; line-height: 1.2;
+}
+.ps-boundary::before, .ps-boundary::after {
+  content: ""; flex: 1 1 0; height: 3px; background: currentColor; opacity: 0.55;
+}
+
+/* ---------- 结论带 ---------- */
+.ps-band {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 22px; border-radius: 16px;
+  background: #27446e; color: #fff; font-size: 30px; line-height: 1.35;
+}
+.ps-band strong { color: #ffd9c2; }
+.ps-band[data-tone="paper"] { background: #f1ecdb; color: #21324a; border: 1px solid var(--ps-edge-strong); }
+.ps-band[data-tone="paper"] strong { color: #9b2c3d; }
+
+/* ---------- 封面补充 ---------- */
+.ppt-cover-top > p:first-of-type { font-size: 30px; }
+.ppt-cover-footer > p { font-size: 30px; }
