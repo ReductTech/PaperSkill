@@ -1,0 +1,15 @@
+import React,{useRef,useState} from 'react';
+import {Lab,Stage,Chips,Notice,Stat,Legend,C,book,changingPhoto,photo,box,label,line,arrow} from './maple-kit';
+export function MapleInvariants(){const cardMotion=useRef({kind:0,previous:0,at:-10});const focus=useRef(0);const heights=useRef([[8,13,18,23,28],[8,13,18,23,28]]);const [axis,setAxis]=useState(0),[input,setInput]=useState(0),[cls,setCls]=useState(0);return <Lab><div className="maple-tag">不变量实验 · 假设已完成当前任务的训练</div><Chips items={['固定类别，换图片','固定图片，换类别']} value={axis} onChange={setAxis} label="实验条件"/>{axis===0?<Chips items={['叶片照片','小鸟照片']} value={input} onChange={setInput} label="选择图片"/>:<Chips items={['叶片','小鸟','花朵']} value={cls} onChange={setCls} label="选择类别"/>}<Stage height={320} label="改变输入不会改变训练后固定的 MaPLe 提示参数" draw={(c,w,h,t)=>{
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;focus.current+=(axis-focus.current)*(reduce?1:.14);
+  box(c,29,29,1022,264,'#fff',C.border,22);
+  label(c,'训练后固定 · 换图与换类别都不改变',540,53,13,C.muted,'center');
+  changingPhoto(c,64,111,129,147,input,cardMotion.current,t);box(c,883,134,132,94,'#fff5f8',C.border,15);label(c,['叶片','小鸟','花朵'][cls],949,174,24,C.blue,'center');line(c,906,206,989,206,C.light,3);
+  const fixed=[[19,10,28,16,23],[12,28,18,8,22]];
+  [288,664].forEach((x,k)=>{box(c,x,78,132,70,'#fff5f8',C.green,14);for(let j=0;j<5;j++)box(c,x+19+j*21,124-fixed[k][j],11,fixed[k][j],C.green,undefined,3);label(c,k===0?'F(P)':'P',x+66,166,14,k===0?C.purple:C.green,'center');});
+  arrow(c,653,110,431,110,C.purple,2);box(c,513,90,54,40,'#faf3fd',C.purple,12);label(c,'F',540,110,21,C.purple,'center');
+  const focusX=268+(644-268)*focus.current;c.save();c.globalAlpha=.65;box(c,focusX,185,172,87,'#f8e8ef',C.blue,16);c.restore();
+  [288,664].forEach((x,k)=>{const changed=k===0?input:cls;heights.current[k]=heights.current[k].map((v,j)=>v+((8+(j+changed*2)%5*5)-v)*(reduce?1:.18));box(c,x,195,132,63,'#fff',C.border,12);for(let j=0;j<5;j++){const bar=heights.current[k][j];box(c,x+18+j*21,242-bar,11,bar,C.blue,undefined,3);}line(c,x+66,174,x+66,187,C.green,2);});
+  arrow(c,205,224,275,224,C.blue,2);arrow(c,872,224,809,224,C.blue,2);
+  label(c,axis===0?'图像输出 · 观察这里':'图像输出 · 保持不变',354,282,13,axis===0?C.blue:C.muted,'center');label(c,axis===1?'文字输出 · 观察这里':'文字输出 · 保持不变',730,282,13,axis===1?C.blue:C.muted,'center');
+}}/><Legend items={[{label:'上排：训练后固定的提示向量',color:C.green},{label:'下排：随输入变化的特征示意',color:C.blue},{label:'F：训练后固定的映射',color:C.purple}]}/><div className="maple-grid"><Stat label="Pᵢ 与 Fᵢ" value="保持不变" note="训练后的参数；不是每张图重新生成"/><Stat label="当前发生变化" value={axis===0?'图像编码输出':'类别文字编码输出'} note={axis===0?'固定的类别名仍使用相同文字提示':'视觉提示不依赖当前候选类别名'}/></div><Notice tone="green">{axis===0?'换图片会改变图像特征，但不会触发 MaPLe 重新生成提示。':'换类别名会改变文字输入和类别特征，但不会改变提示 Pᵢ，也不会改变 Fᵢ(Pᵢ)。'} <b>共享参数不等于共享输出。</b></Notice><details><summary>为什么这与 CoCoOp 不同？</summary><p>CoCoOp 根据当前图像特征产生文字提示的条件偏移。MaPLe 在当前任务上训练一组共享的提示及映射，并把提示放进两条分支的多个早期层。这里的色条仅表示“哪个量变化”，不是论文实际向量。</p><p>类别名仍要输入文字编码器。视觉提示是加入视觉编码器的额外向量，不会涂改图片，也不会为图片生成一段自然语言描述。</p></details></Lab>}

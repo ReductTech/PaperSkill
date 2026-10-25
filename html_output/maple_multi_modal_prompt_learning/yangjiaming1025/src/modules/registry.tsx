@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { MapleAnalogy1 } from './maple-analogy-1';
+import { MapleAnalogy10 } from './maple-analogy-10';
+import { MapleAnalogy2 } from './maple-analogy-2';
+import { MapleAnalogy3 } from './maple-analogy-3';
+import { MapleAnalogy4 } from './maple-analogy-4';
+import { MapleAnalogy5 } from './maple-analogy-5';
+import { MapleAnalogy6 } from './maple-analogy-6';
+import { MapleAnalogy7 } from './maple-analogy-7';
+import { MapleAnalogy8 } from './maple-analogy-8';
+import { MapleAnalogy9 } from './maple-analogy-9';
+import { MapleArchitecture } from './maple-architecture';
+import { MapleBudget } from './maple-budget';
+import { MapleCoupling } from './maple-coupling';
+import { MapleDepth } from './maple-depth';
+import { MapleEvidence } from './maple-evidence';
+import { MapleGradients } from './maple-gradients';
+import { MapleHeroNew } from './maple-hero-new';
+import { MapleHeroOld } from './maple-hero-old';
+import { MapleInvariants } from './maple-invariants';
+import { MapleMatching } from './maple-matching';
+import { MapleMethods } from './maple-methods';
+import { MapleProtocol } from './maple-protocol';
+import { MapleResults } from './maple-results';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['maple-analogy-1'] = MapleAnalogy1;
+widgetRegistry['maple-analogy-10'] = MapleAnalogy10;
+widgetRegistry['maple-analogy-2'] = MapleAnalogy2;
+widgetRegistry['maple-analogy-3'] = MapleAnalogy3;
+widgetRegistry['maple-analogy-4'] = MapleAnalogy4;
+widgetRegistry['maple-analogy-5'] = MapleAnalogy5;
+widgetRegistry['maple-analogy-6'] = MapleAnalogy6;
+widgetRegistry['maple-analogy-7'] = MapleAnalogy7;
+widgetRegistry['maple-analogy-8'] = MapleAnalogy8;
+widgetRegistry['maple-analogy-9'] = MapleAnalogy9;
+widgetRegistry['maple-architecture'] = MapleArchitecture;
+widgetRegistry['maple-budget'] = MapleBudget;
+widgetRegistry['maple-coupling'] = MapleCoupling;
+widgetRegistry['maple-depth'] = MapleDepth;
+widgetRegistry['maple-evidence'] = MapleEvidence;
+widgetRegistry['maple-gradients'] = MapleGradients;
+widgetRegistry['maple-hero-new'] = MapleHeroNew;
+widgetRegistry['maple-hero-old'] = MapleHeroOld;
+widgetRegistry['maple-invariants'] = MapleInvariants;
+widgetRegistry['maple-matching'] = MapleMatching;
+widgetRegistry['maple-methods'] = MapleMethods;
+widgetRegistry['maple-protocol'] = MapleProtocol;
+widgetRegistry['maple-results'] = MapleResults;
