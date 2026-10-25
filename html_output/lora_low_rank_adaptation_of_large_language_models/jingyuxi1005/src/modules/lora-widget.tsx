@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { WidgetProps } from './registry';
 
-type State = { choice: string; rank: number; step: number; coverage: number; started: boolean; synced: boolean; focus: string; route: number; round: number };
+type State = { choice: string; rank: number; step: number; coverage: number; started: boolean; synced: boolean; focus: string; round: number };
 const ranks = [1, 2, 4, 8, 64];
 const ink = '#17324c', muted = '#678097', blue = '#355c91', green = '#208866', red = '#c65b61', orange = '#dc9350', lineColor = '#d5e2e8';
 
@@ -131,21 +131,14 @@ function draw(c: CanvasRenderingContext2D, chapterId: string, moduleId: string, 
     txt(c,`r = ${s.rank}`,591,95,27,green,true);txt(c,`验证准确率 ${vals[ranks.indexOf(s.rank)].toFixed(1)}%`,591,146,23,ink,true);txt(c,'更大的 rank 不保证更好',591,199,18,muted);
     txt(c,'纵轴从 73.2% 起；WikiSQL 波动约 ±0.5%',591,238,15,muted);
   } else if(n===10){
-    const names=['rank 与位置','底座仍在','任务切换','文本范围','后续四篇'];
+    const names=['rank 与位置','底座仍在','任务切换','文本范围','核心总结'];
     photo(c,52,49,427,170,s.step===4?.6:0);txt(c,names[s.step],587,85,24,s.step===4?green:ink,true);
-    const info=['需结合任务选择，低 rank 不一定总有效。','基础模型仍需存储和加载。','已合并模块批内动态混用不直接。','原论文未验证视觉语言与长期偏好。','LoRA 与后续四篇构成五篇研究路线。'];
-    txt(c,info[s.step],587,141,18,blue);txt(c,'箭头表示研究问题演进，不表示技术继承。',587,202,16,muted);
+    const info=['需结合任务选择，低 rank 不一定总有效。','基础模型仍需存储和加载。','已合并模块批内动态混用不直接。','原论文未验证视觉语言与长期偏好。','冻结 W₀，以 BA 学习低秩任务增量。'];
+    txt(c,info[s.step],587,141,18,blue);txt(c,s.step===4?'合并缩放后的增量，保留同形状稠密层。':'方法优势需要结合适用条件理解。',587,202,16,muted);
   }
 }
 
 const methodLabels:Record<string,string> = {ft:'Full FT',adapter:'Adapter',prefix:'Prefix / Prompt'};
-const routeNodes = [
-  ['LoRA','如何低成本适配大模型？'],
-  ['VL-Adapter','如何高效适配视觉语言任务？'],
-  ['MyVLM','如何识别用户特有视觉概念？'],
-  ["Yo'LLaVA",'多模态大模型如何学习用户主体？'],
-  ['PersonaVLM','如何维护长期偏好与记忆？']
-] as const;
 const comparisonDetails:Record<string,{train:string;infer:string;storage:string}> = {
   ft:{train:'更新全部原权重',infer:'沿原稠密结构推理',storage:'每任务保存完整权重'},
   adapter:{train:'训练新增小模块',infer:'所测串行结构可增加延迟',storage:'共享底座 + 任务模块'},
@@ -156,7 +149,7 @@ const comparisonDetails:Record<string,{train:string;infer:string;storage:string}
 export const LoraWidget: React.FC<WidgetProps> = ({chapterId,moduleId}) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const dragging = useRef(false);
-  const [s,set] = useState<State>({choice:chapterId==='chap-2'?'adapter':chapterId==='chap-5'?'qv':chapterId==='chap-8'?'gpt3':chapterId==='chap-9'?'mnli':'ft',rank:8,step:0,coverage:0,started:false,synced:false,focus:'train',route:0,round:0});
+  const [s,set] = useState<State>({choice:chapterId==='chap-2'?'adapter':chapterId==='chap-5'?'qv':chapterId==='chap-8'?'gpt3':chapterId==='chap-9'?'mnli':'ft',rank:8,step:0,coverage:0,started:false,synced:false,focus:'train',round:0});
   const isSmall=chapterId==='hero'||moduleId==='ana';
   const w=moduleId==='ana'?560:chapterId==='hero'?460:1080;
   const h=moduleId==='ana'?140:chapterId==='hero'?180:280;
@@ -208,7 +201,7 @@ export const LoraWidget: React.FC<WidgetProps> = ({chapterId,moduleId}) => {
     if(n===8){control=choose([['roberta','RoBERTa'],['deberta','DeBERTa'],['gpt2','GPT-2'],['gpt3','GPT-3']]);feedback=s.choice==='gpt2'?'E2E 的 BLEU 与分类准确率不是同一个指标。':s.choice==='gpt3'?'GPT-3 的 WikiSQL、MNLI、SAMSum 各自有任务指标。':'GLUE 包含多个理解子任务，应逐项看指标。';}
     if(n===9&&moduleId==='9.1'){control=<>{choose([['mnli','MNLI'],['wikisql','WikiSQL'],['e2e','E2E']])}<div className="lora-controls lora-animate-trigger"><button className="lora-chip selected" type="button" onClick={()=>set(prev=>({...prev,started:true,round:prev.round+1}))}>{s.started?'重新比较':'开始比较'}</button></div></>;feedback=s.choice==='wikisql'?'WikiSQL：LoRA 73.4，略低于 FT 73.8；论文报告约 ±0.5% 波动。':s.choice==='e2e'?'E2E：LoRA 70.4±0.1 BLEU（±0.1 为表 3 的置信区间），FT 68.2；FT 值来自既有工作。':'MNLI-m：LoRA 91.7%，FT 89.5%；这是此任务的比较，不代表所有任务。';}
     if(n===9&&moduleId==='9.2'){control=rankControl();feedback=`表 6：r=${s.rank} 的 WikiSQL 验证准确率是 ${([73.4,73.3,73.7,73.8,73.5] as number[])[ranks.indexOf(s.rank)].toFixed(1)}%；结果未随 rank 单调提高，但点差与论文报告约 ±0.5% 波动同量级。`;}
-    if(n===10){control=<>{stepper(4)}<div className="lora-route" role="group" aria-label="五篇论文研究问题路线">{routeNodes.map(([name],i)=><button key={name} type="button" className={s.route===i?'selected':''} aria-pressed={s.route===i} onClick={()=>change({step:4,route:i})}>{name}</button>)}</div><div className="lora-route-detail" aria-live="polite"><strong>{routeNodes[s.route][0]}</strong>：{routeNodes[s.route][1]}<br/>这条路线描述研究问题的扩展，不表示直接技术继承。</div></>;feedback=['rank 和插入位置依任务选择；小 rank 并非万能。','低秩只减少任务更新，基础模型仍需加载。','多个已合并任务权重不便在同一批次动态混用。','论文实验主要是语言任务，未证明视觉语言个性化或长期记忆。','LoRA 加上后续四篇，共五篇；点击节点查看各自的研究问题。'][s.step];}
+    if(n===10){control=stepper(4);feedback=['rank 和插入位置依任务选择；小 rank 并非万能。','低秩只减少任务更新，基础模型仍需加载。','多个已合并任务权重不便在同一批次动态混用。','论文实验主要是语言任务，未证明视觉语言个性化或长期记忆。','LoRA 冻结 W₀、训练低秩因子 A/B；合并缩放后的 BA，可保留同形状稠密推理结构。'][s.step];}
   }
   const compared=comparisonDetails[s.choice]||comparisonDetails.ft;
   const mobileFacts: [string,string][] = (()=>{
@@ -228,7 +221,7 @@ export const LoraWidget: React.FC<WidgetProps> = ({chapterId,moduleId}) => {
       return [['Full FT',pair[0]],['LoRA',pair[1]],['FT 可训练参数',s.choice==='e2e'?'354.92M':'175,255.8M'],['LoRA 可训练参数',s.choice==='e2e'?'0.35M':'4.7M']];
     }
     if(n===9) return [['当前 rank',`r=${s.rank}`],['WikiSQL 验证准确率',`${([73.4,73.3,73.7,73.8,73.5] as number[])[ranks.indexOf(s.rank)].toFixed(1)}%`]];
-    if(n===10) return [['当前边界',['rank 与位置','底座仍在','任务切换','文本范围','后续四篇'][s.step]],['下一问题',routeNodes[s.route][1]]];
+    if(n===10) return [['当前要点',['rank 与位置','底座仍在','任务切换','文本范围','核心总结'][s.step]],['LoRA 要点',feedback]];
     return [];
   })();
   return <div className={`lora-widget ${isSmall?'lora-small':''}`}>

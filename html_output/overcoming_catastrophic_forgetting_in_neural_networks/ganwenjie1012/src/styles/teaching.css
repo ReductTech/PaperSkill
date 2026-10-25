@@ -1,0 +1,47 @@
+/* P1–P9 teaching scale; P10 keeps its own presentation. */
+:is(.p01-page,.p02-page,.p03-page,.p04-page,.p05-page,.p06-page,.p07-page,.p08-page,.p09-page) {
+  --ewc-current: #4d7191;
+  --ewc-anchor: #397f78;
+  --ewc-constraint: #b28a35;
+  --ewc-new-task: #c7613f;
+  font-size: 16px;
+  line-height: 1.7;
+}
+:is(.p01-page,.p02-page,.p03-page,.p04-page,.p05-page,.p06-page,.p07-page,.p08-page,.p09-page) h1 { font-size: clamp(30px, 3.2vw, 40px); line-height: 1.3; }
+:is(.p01-page,.p02-page,.p03-page,.p04-page,.p05-page,.p06-page,.p07-page,.p08-page,.p09-page) h2 { font-size: clamp(24px, 2.1vw, 28px); line-height: 1.4; }
+:is(.p01-page,.p02-page,.p03-page,.p04-page,.p05-page,.p06-page,.p07-page,.p08-page,.p09-page) h3 { font-size: 19px; line-height: 1.5; }
+:is(.p01-page,.p02-page,.p03-page,.p04-page,.p05-page,.p06-page,.p07-page,.p08-page,.p09-page) p { font-size: 16px; line-height: 1.7; }
+.p01-page { --p01-font-micro: 12px; --p01-font-meta: 13px; --p01-font-body: 16px; }
+.p01-parameter-vector__group > span { font-family: inherit; }
+.ewc-reasoning { min-width: 0; padding: 22px 0; border-block: 1px solid var(--line); }
+.ewc-reasoning p, .p06-bayes > p { margin: 14px 0; font: 16px/1.75 "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif; color: var(--ink-soft); }
+.p02-softmax-detail__body, .p02-model-state > b, .p02-dataset-samples > span { font-family: inherit; }
+.p02-origin-table__scroll table { min-width: 630px; width: 100%; border-collapse: collapse; }
+.p02-origin-table__scroll :is(th,td) { padding: 12px; font-size: 15px; text-align: left; }
+.p02-state-row__score b, .p03-candidate-likelihood { font-variant-numeric: tabular-nums; }
+.p02-state-row__model b { color: var(--ewc-current); }
+.p01-movement__anchor, .p06-offset-point--anchor > i { background: var(--ewc-anchor); }
+.p06-offset-point--current > i { background: var(--ewc-current); }
+.p06-offset-point--current > b { color: var(--ewc-current); }
+.p06-junction-branch--task { border-color: var(--ewc-new-task); }
+.p06-junction-branch--constraint { border-color: var(--ewc-constraint); }
+.p03-bayes-node--posterior { grid-column: auto; grid-row: auto; }
+@media (max-width: 1050px) and (min-width: 761px) {
+  .p03-bayes-node--posterior { grid-column: 3; grid-row: 2; }
+}
+@media (max-width: 760px) {
+  .ewc-reasoning { padding-block: 16px; }
+  .p01-model-object { flex-direction: column; align-items: stretch; }
+  .p01-model-object__parameter { display: flex; align-items: center; gap: 12px; }
+  .p01-model-object .p01-network { align-self: center; }
+}
+/* At tablet widths, keep enough room for the teaching diagrams. */
+@media (min-width: 681px) and (max-width: 900px) {
+  .ewc-app:not(.ewc-app--grand) { display: block; }
+  .ewc-app:not(.ewc-app--grand) .ewc-rail { position: static; height: auto; padding: 12px 20px; }
+  .ewc-app:not(.ewc-app--grand) .ewc-brand { padding-bottom: 10px; }
+  .ewc-app:not(.ewc-app--grand) :is(.ewc-rail__section-label,.ewc-rail__scope,.ewc-rail__footer) { display: none; }
+  .ewc-app:not(.ewc-app--grand) .ewc-slice-nav { display: flex; max-height: none; overflow-x: auto; overflow-y: hidden; }
+  .ewc-app:not(.ewc-app--grand) .ewc-slice-nav__item { flex: none; width: auto; min-width: max-content; }
+  .p01-stage__content { grid-template-columns: minmax(0, 1fr); }
+}

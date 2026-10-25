@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Ch1Analogy } from './ch1-analogy';
+import { Ch1Openworld } from './ch1-openworld';
+import { Ch10Analogy } from './ch10-analogy';
+import { Ch10Real } from './ch10-real';
+import { Ch10Rollout } from './ch10-rollout';
+import { Ch2Analogy } from './ch2-analogy';
+import { Ch2Hierarchy } from './ch2-hierarchy';
+import { Ch3Analogy } from './ch3-analogy';
+import { Ch3Sources } from './ch3-sources';
+import { Ch4Analogy } from './ch4-analogy';
+import { Ch4Hybrid } from './ch4-hybrid';
+import { Ch5Analogy } from './ch5-analogy';
+import { Ch5Vi } from './ch5-vi';
+import { Ch6Analogy } from './ch6-analogy';
+import { Ch6Scaling } from './ch6-scaling';
+import { Ch7Ablation } from './ch7-ablation';
+import { Ch7Analogy } from './ch7-analogy';
+import { Ch8Analogy } from './ch8-analogy';
+import { Ch8Compare } from './ch8-compare';
+import { Ch9Analogy } from './ch9-analogy';
+import { Ch9Coach } from './ch9-coach';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ch1-analogy'] = Ch1Analogy;
+widgetRegistry['ch1-openworld'] = Ch1Openworld;
+widgetRegistry['ch10-analogy'] = Ch10Analogy;
+widgetRegistry['ch10-real'] = Ch10Real;
+widgetRegistry['ch10-rollout'] = Ch10Rollout;
+widgetRegistry['ch2-analogy'] = Ch2Analogy;
+widgetRegistry['ch2-hierarchy'] = Ch2Hierarchy;
+widgetRegistry['ch3-analogy'] = Ch3Analogy;
+widgetRegistry['ch3-sources'] = Ch3Sources;
+widgetRegistry['ch4-analogy'] = Ch4Analogy;
+widgetRegistry['ch4-hybrid'] = Ch4Hybrid;
+widgetRegistry['ch5-analogy'] = Ch5Analogy;
+widgetRegistry['ch5-vi'] = Ch5Vi;
+widgetRegistry['ch6-analogy'] = Ch6Analogy;
+widgetRegistry['ch6-scaling'] = Ch6Scaling;
+widgetRegistry['ch7-ablation'] = Ch7Ablation;
+widgetRegistry['ch7-analogy'] = Ch7Analogy;
+widgetRegistry['ch8-analogy'] = Ch8Analogy;
+widgetRegistry['ch8-compare'] = Ch8Compare;
+widgetRegistry['ch9-analogy'] = Ch9Analogy;
+widgetRegistry['ch9-coach'] = Ch9Coach;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;

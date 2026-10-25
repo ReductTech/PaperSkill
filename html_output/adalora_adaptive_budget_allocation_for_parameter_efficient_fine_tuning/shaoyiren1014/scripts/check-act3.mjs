@@ -1,0 +1,30 @@
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {dirname,resolve} from 'node:path';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const root=fileURLToPath(new URL('../',import.meta.url));const cache=new Map();
+function load(path){path=resolve(root,path);if(cache.has(path))return cache.get(path);const module={exports:{}};cache.set(path,module.exports);const js=ts.transpileModule(readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;const native=createRequire(path);new Function('require','module','exports',js)(name=>name.startsWith('.')?load(resolve(dirname(path),name+'.ts')):native(name),module,module.exports);cache.set(path,module.exports);return module.exports;}
+const storage=new Map();globalThis.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};
+const {foundryReducer:r,restoreFoundry,eligibleFoundry}=load('src/store/foundryStore.ts');let s=restoreFoundry();
+for(let i=2;i<=6;i++)assert.equal(r(s,{type:'step',value:i}),s);
+for(const type of ['delete','try-recover','read','complete'])assert.equal(r(s,{type}),s);
+assert.equal(r(s,{type:'strength',index:2,value:0}),s);
+s=r(s,{type:'predict',value:'delete'});assert.equal(r(s,{type:'predict',value:'retain'}).prediction,'delete');
+for(const value of [-1,11,0.5,NaN])assert.equal(r(s,{type:'strength',index:2,value}),s);
+for(const index of [-1,3,0.5])assert.equal(r(s,{type:'strength',index,value:0}),s);
+s=r(s,{type:'strength',index:0,value:0});assert.equal(s.zeroed,false,'Specific direction 3 must be examined');
+s=r(s,{type:'strength',index:2,value:0});assert.equal(s.strengths.length,3,'Zero strength retains direction slots');assert.equal(s.restored,false);assert.equal(eligibleFoundry(s,3),false);
+s=r(s,{type:'strength',index:2,value:2});assert.equal(s.restored,true);assert.equal(eligibleFoundry(s,3),true);
+s=r(s,{type:'delete'});s=r(s,{type:'try-recover'});assert.equal(s.pairDeleted,true,'A strength-only recovery does not restore deleted parameters');
+s=r(s,{type:'observe',value:'memory'});assert.equal(r(s,{type:'read'}),s);
+s=r(s,{type:'observe',value:'retained'});s=r(s,{type:'read'});assert.equal(s.evidenceRead,true);assert.equal(r(s,{type:'observe',value:'accuracy'}),s);
+s=r(s,{type:'reflect',value:'guarantee'});assert.equal(r(s,{type:'complete'}),s);s=r(s,{type:'reflect',value:'exact'});assert.equal(r(s,{type:'complete'}),s);
+s=r(s,{type:'reflect',value:'conditional'});s=r(s,{type:'complete'});assert.equal(s.completed,true);
+storage.set('adaptive-engine:act3:v1',JSON.stringify(s));assert.deepEqual(restoreFoundry(),s);
+for(const invalid of [{strengths:[2,3]},{strengths:[-1,2,3]},{zeroed:false},{recoveryTried:false},{observation:'memory'},{reflection:'guarantee'},{step:8}]){storage.set('adaptive-engine:act3:v1',JSON.stringify({...s,...invalid}));assert.equal(restoreFoundry().completed,false);}
+const {archiveAttempt,readHistory}=load('src/store/learningHistory.ts');for(let i=0;i<3;i++)storage.set(`adaptive-engine:act${i}:v1`,`preserved-${i}`);
+const history=archiveAttempt(3,s,[]);const reset=r(s,{type:'reset'});assert.deepEqual(readHistory(),history);assert.equal(history[0].state.prediction,'delete');assert.equal(reset.prediction,null);assert.equal(reset.completed,false);assert.equal(reset.zeroed,false);assert.equal(reset.pairDeleted,false);assert.deepEqual(reset.strengths,[8,5,2]);for(let i=0;i<3;i++)assert.equal(storage.get(`adaptive-engine:act${i}:v1`),`preserved-${i}`);
+const {foundryEvidence,foundrySimulation}=load('src/data/singularFoundry.ts');const evidence=JSON.parse(readFileSync(resolve(root,'design/paper-evidence.json'),'utf8'));for(const ref of foundryEvidence){const original=evidence.mechanismClaims.find(c=>c.id===ref.id);assert.equal(ref.source.page,original.source.page);assert.equal(ref.source.locator,original.source.locator);assert.equal(ref.source.type,'paper_evidence');}assert.equal(foundrySimulation.source.type,'conceptual_simulation');assert.equal(foundrySimulation.performanceMetrics,null);
+console.log('ACT 3 passed: prerequisite gates, immutable prediction, zero/restore sequence, retained structure, deletion boundary, misconception correction, source verification, persistence validation, isolated reset/history.');

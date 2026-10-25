@@ -1,10 +1,8 @@
 import React from 'react';
-import { ExampleSlider } from './exampleSlider';
+import { MountainCover, MountainPack, MountainMap, MountainClimb, MountainSummit } from './MountainJourney';
 
-// Widget registry: maps a `componentId` (referenced from src/data/tutorial.ts) to a
-// React component. The generator ADDS entries here for every paper-specific canvas
-// widget (hero sides, analogy animations, and interactive modules). A missing id
-// renders a graceful placeholder, so the app never crashes on an unfinished id.
+// Runnable mountain-theme example registry. The scaffolder replaces this file for
+// paper-specific output; the packet assembler writes every generated widget entry.
 //
 // Pattern to add a widget:
 //   import { Ch1Mod1 } from './ch1mod1';
@@ -18,5 +16,8 @@ export interface WidgetProps {
 
 export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
 
-// Example kept so the scaffold runs out-of-the-box. Replace/extend as needed.
-widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['mountain-cover'] = MountainCover;
+widgetRegistry['mountain-pack'] = MountainPack;
+widgetRegistry['mountain-map'] = MountainMap;
+widgetRegistry['mountain-climb'] = MountainClimb;
+widgetRegistry['mountain-summit'] = MountainSummit;

@@ -1,0 +1,2 @@
+import {StudyCanvas,drawPaper,drawPencil,drawGuide,palette} from './studio-kit';
+export function HeroOld(){return <StudyCanvas width={560} height={140} animate ariaLabel="无保护更新越过旧轮廓" draw={(c,w,h,t)=>{const p=(Math.sin(t*2)+1)/2;drawPaper(c,22,12,516,116);c.strokeStyle=palette.blue;c.lineWidth=3;c.beginPath();c.moveTo(110,98);c.lineTo(220,38);c.lineTo(290,98);c.stroke();c.strokeStyle=palette.red;c.beginPath();c.moveTo(85,40);c.lineTo(85+360*p,40+62*p);c.stroke();drawPencil(c,100+360*p,40+62*p,-.5);}}/>}

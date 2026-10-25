@@ -1,0 +1,35 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  /* 旋转实验台场景色：暖纸底 + 旋转强调色（与 src/modules/kit.ts 的 C 常量一致） */
+  --paper-scene-bg: #f5f8f0;
+  --paper-scene-line: #b8c9a7;
+  --paper-rot-green: #228d5c;
+  --paper-rot-purple: #7c3aed;
+}
+
+/* ===== 读图方式脚注（所有交互模块统一使用） ===== */
+.sq-note {
+  margin: 10px auto 0;
+  max-width: 880px;
+  color: var(--slate-2, #68778f);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.sq-note b { color: var(--ink, #21324a); }
+
+/* ===== 反馈条：橙色强调态（ch7 源码口径提示 / ch10 对照组结论） ===== */
+.feedback.warn {
+  color: var(--orange, #f07e47);
+  background: var(--orange-soft, rgba(240, 126, 71, 0.1));
+  border-left-color: var(--orange, #f07e47);
+}
+
+/* ===== 芯片激活兜底态（组件已用内联样式着色，这里只补一致的最小样式） ===== */
+.chip.on {
+  color: #fff;
+}

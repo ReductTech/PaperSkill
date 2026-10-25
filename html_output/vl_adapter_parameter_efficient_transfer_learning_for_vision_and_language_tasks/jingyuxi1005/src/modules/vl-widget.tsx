@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { observeCanvas, setupCanvas } from '../lib/canvasKit';
 import type { WidgetProps } from './registry';
 import { AdapterCalculator, AdapterStructure, TrainableMap, SharingExplorer, ResultExplorer, Limitations,
-  MethodComparison, NumericEvidence, MobileEvidence } from './learning-widgets';
+  MethodComparison, NumericEvidence, MobileEvidence, ConclusionExplorer } from './learning-widgets';
 
 const C = { bg: '#f5f8f6', ink: '#21324a', muted: '#68778f', line: '#d7e3df', blue: '#27446e', green: '#228d5c', red: '#c43f52', orange: '#f07e47', purple: '#7c3aed', pale: '#e7f3ed' };
 const modes: Record<string, string[]> = {
@@ -17,7 +17,6 @@ const modes: Record<string, string[]> = {
   '8.1': ['图文', '视频文本'],
   '8.2': ['VQA', 'NLVR²', 'COCO', 'TVQA', 'TVC', 'YC2C'],
   '9.1': ['共享方式', '模块组成'],
-  '10.1': ['LoRA', 'VL-Adapter', 'MyVLM', 'Yo’LLaVA', 'PersonaVLM'],
 };
 
 function round(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string, stroke = C.line, r = 14) {
@@ -46,7 +45,6 @@ const notes: Record<string, string[]> = {
   '8.1': ['CLIP-BART 图文四任务：100%/77.6 对 4.18%/77.4；论文 Avg. 混合 Accuracy 与 CIDEr。', 'CLIP-BART 视频文本四任务：100%/87.4 对 3.39%/87.4；同样是混合指标的 Avg.。'],
   '8.2': ['VQA Accuracy：67.6 → 65.9，Single Adapter 较低。', 'NLVR² Accuracy：73.0 → 74.2，Single Adapter 较高。', 'COCO CIDEr：112.9 → 114.9，Single Adapter 较高。', 'TVQA Accuracy：76.3 → 76.6，Single Adapter 略高。', 'TVC CIDEr：45.7 → 46.3，Single Adapter 略高。', 'YC2C CIDEr：154.0 → 152.9，Single Adapter 略低。'],
   '9.1': ['共享消融：参数更少时，Single Adapter 在本文图文设置中汇总分更高。', '模块消融：投影与 LayerNorm 有帮助，加入 Adapter 后汇总分进一步提高。'],
-  '10.1': ['通用大模型：低秩权重更新。', '当前论文：V&L 多任务中的 Adapter-based PEFT。', '下一步：用户特有视觉概念。', '后续问题：个性化多模态助手。', '后续问题：长期偏好与记忆。'],
 };
 
 function draw(ctx: CanvasRenderingContext2D, moduleId: string, chapterId: string, selected: number, count: number, w: number, h: number) {
@@ -98,7 +96,6 @@ function draw(ctx: CanvasRenderingContext2D, moduleId: string, chapterId: string
   if (moduleId === '8.1') { const p = selected ? 3.39 : 4.18, f = selected ? 87.4 : 77.6, s = selected ? 87.4 : 77.4; label(ctx, '可更新参数', 70, 73, 23, C.ink, 'left'); bar(ctx, 245, 50, 610, 100, 100, C.red); bar(ctx, 245, 112, 610, p, 100, C.green); label(ctx, '100%', 925, 74, 26, C.red); label(ctx, `${p}%`, 925, 137, 26, C.green); label(ctx, `论文 Avg.：Full ${f} · Single ${s}`, 540, 235, 28, C.blue); return; }
   if (moduleId === '8.2') { const vals = [[67.6,65.9],[73,74.2],[112.9,114.9],[76.3,76.6],[45.7,46.3],[154,152.9]][selected]; const max = Math.max(...vals)*1.1; label(ctx, modes['8.2'][selected], 540, 55, 29); bar(ctx, 235, 95, 650, vals[0], max, C.red); bar(ctx, 235, 160, 650, vals[1], max, C.green); label(ctx, `Full ${vals[0]}`, 110, 118, 22, C.red); label(ctx, `Single ${vals[1]}`, 110, 183, 22, C.green); return; }
   if (moduleId === '9.1') { const names = selected ? ['投影','+ LN','+ Adapter'] : ['Multiple','Half','Single']; const vals = selected ? [47.1,62.9,77.4] : [75.9,75.9,77.4]; names.forEach((n,i) => { const x=110+i*330; label(ctx,n,x+120,80,25); bar(ctx,x,120,240,vals[i],80,i===2?C.green:C.blue); label(ctx,`${vals[i]}`,x+120,207,28,i===2?C.green:C.ink); }); return; }
-  if (moduleId === '10.1') { modes['10.1'].forEach((n,i) => { const x=35+i*215; round(ctx,x,85,175,94,i===selected?'#dff3e7':'#fff',i===selected?C.green:C.line); label(ctx,n,x+87,140,22,i===selected?C.green:C.ink); if(i<4)line(ctx,x+177,131,x+212,131,C.blue,3); }); return; }
 }
 
 export const VlWidget: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
@@ -115,6 +112,7 @@ export const VlWidget: React.FC<WidgetProps> = ({ chapterId, moduleId }) => {
   if (moduleId === '5.1') return <SharingExplorer />;
   if (moduleId === '8.1') return <ResultExplorer />;
   if (moduleId === '10.0') return <Limitations />;
+  if (moduleId === '10.1') return <ConclusionExplorer />;
   if (moduleId === 'ana') return null;
   if (chapterId === 'hero') return <div className={'hero-model ' + (moduleId === 'new' ? 'peft' : '')}>
     <small>图文四任务 → 同一模型</small>

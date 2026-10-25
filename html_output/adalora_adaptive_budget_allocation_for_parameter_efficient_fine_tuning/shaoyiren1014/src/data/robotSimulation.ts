@@ -1,0 +1,4 @@
+import type {RobotState} from '../store/robotStore';
+// Fixed, artificial teaching signals. They are not a model's importance scores or training measurements.
+export function robotScheduleFrame(phase:number){const t=Math.max(0,Math.min(3,phase)),scorePhase=Math.min(2,t),budgets=[18,15,12,12],signals=[[.72,.35,.81,.48],[.4,.9,.75,.6],[.55,.8,.45,.9]];const directions=Array.from({length:24},(_,id)=>({id,group:Math.floor(id/6),score:signals[scorePhase][Math.floor(id/6)]-(id%6)*.065})).sort((a,b)=>b.score-a.score||a.id-b.id).slice(0,budgets[t]);return {sourceType:'conceptual_simulation' as const,budget:budgets[t],ids:directions.map(d=>d.id),allocation:[0,1,2,3].map(group=>directions.filter(d=>d.group===group).length)};}
+export function robotDisplayAllocation(s:RobotState){return s.act===5&&(s.chapters[5].stage===1||s.chapters[5].operated)?robotScheduleFrame(s.time).allocation:s.chapters[5].completed?robotScheduleFrame(3).allocation:s.allocation;}

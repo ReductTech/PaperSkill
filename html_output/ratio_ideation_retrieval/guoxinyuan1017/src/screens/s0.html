@@ -1,0 +1,118 @@
+<section class="card" id="s0" aria-labelledby="s0-title">
+<div class="card-head">
+  <span class="tag-no">S0</span>
+  <span class="tag-name">标题页 · 论文定位</span>
+</div>
+
+<div class="s0-grid">
+  <div>
+    <div class="chips">
+      <span class="chip">检索基准</span>
+      <span class="chip">科学构思</span>
+      <span class="chip">句级全文</span>
+      <span class="chip">时间切分</span>
+    </div>
+    <h1 class="title-zh" id="s0-title">Ratio：跨越三类构思动作的<br>科学灵感检索基准</h1>
+    <p class="title-en">Ratio: A Benchmark for Retrieval Across Typed Ideation Operations in Scientific Literature</p>
+    <div class="lead">
+      <p>「相关」不该只看主题像不像 —— 该看候选句在构思中扮演的<b>角色</b>：回应问题、向上抽象，还是向下实例化。</p>
+    </div>
+    <p class="authors">Maayan Sharon · Tom Hope</p>
+    <p class="meta">希伯来大学耶路撒冷分校 · Allen Institute for AI（AI2）</p>
+    <p class="meta">arXiv 2608.27394v4 · cs.CL · 2026-10-13</p>
+    <p class="meta">数据、代码、模型、标注全部开源</p>
+    <div class="struct">
+      <p class="struct-title">论文结构</p>
+      <div class="srow"><span class="k"><span class="bar"></span>监督层</span><span class="v">语篇标记词 · 远程监督</span></div>
+      <div class="srow"><span class="k"><span class="bar"></span>评测层</span><span class="v">时间切分 · 共享池 · 银标集</span></div>
+      <div class="srow"><span class="k"><span class="bar"></span>实验层</span><span class="v">三动作专用检索器 + 重排</span></div>
+    </div>
+  </div>
+
+  <div>
+    <p class="moves-t">一个查询，三种有用的灵感（论文引言的真实例子）</p>
+    <div class="core-q" id="q0" data-part0="q" tabindex="0">
+      <div class="cq-k">QUERY</div>
+      <p class="cq-t">如何在 RL 训练的 LLM 中防住 reward hacking？</p>
+    </div>
+
+    <div class="mv mv-a" data-part0="a" tabindex="0">
+      <div class="mv-head"><span class="mv-name">Address</span><span class="mv-glyph">→ 应对</span></div>
+      <p class="mv-def">查询句提出问题，候选句是回应它的方法或洞见。</p>
+      <div class="mv-pair">
+        <p>Q：模型容易过拟合<b>怎么办？</b></p>
+        <p class="g">G：我们应用 dropout。<span class="mv-mark">to address this issue</span></p>
+      </div>
+    </div>
+
+    <div class="mv mv-b" data-part0="b" tabindex="0">
+      <div class="mv-head"><span class="mv-name">Broaden</span><span class="mv-glyph">↗ 抽象</span></div>
+      <p class="mv-def">候选句把查询句改写得更一般，查询句是它的特例。</p>
+      <div class="mv-pair">
+        <p>Q：防 reward hacking 的办法？</p>
+        <p class="g">G：Goodhart 定律<span class="mv-mark">more generally</span></p>
+      </div>
+    </div>
+
+    <div class="mv mv-s" data-part0="s" tabindex="0">
+      <div class="mv-head"><span class="mv-name">Specify</span><span class="mv-glyph">↘ 实例</span></div>
+      <p class="mv-def">候选句把查询句落成具体案例、机制或示例。</p>
+      <div class="mv-pair">
+        <p>Q：防 reward hacking 的办法？</p>
+        <p class="g">G：推荐系统刷参与度指标<span class="mv-mark">for example</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="metrics">
+
+  <div class="metric" role="button" tabindex="0" aria-expanded="false">
+    <div class="m-top">
+      <span class="m-label">query–gold 对</span>
+      <span class="badge">全量口径</span>
+    </div>
+    <div class="m-value"><span class="num">3,017,476</span></div>
+    <p class="m-foot">Specify 2,779,177 · Address 222,707 · Broaden 15,592<span class="caret">▾</span></p>
+    <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+      <p>口径：作者挖掘并去重后的全部相邻句对（§4.2），来自 1.1M 篇 CS 全文论文；再按论文发表日期切成训练 / 验证 / 测试。</p>
+      <p class="warn">三个动作差 178 倍：Broaden 只有 15,592 对，是 Specify 的 1/178 —— 后面所有 Broaden 的结果都要带着这个背景读。</p>
+    </div></div></div>
+  </div>
+
+  <div class="metric" role="button" tabindex="0" aria-expanded="false">
+    <div class="m-top">
+      <span class="m-label">命中 / 收录标记词</span>
+      <span class="badge">四来源</span>
+    </div>
+    <div class="m-value"><span class="num">809 / 4,252</span></div>
+    <p class="m-foot">扫 366.6M 相邻句对<span class="caret">▾</span></p>
+    <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+      <p>口径：词表四个来源 —— 人工梳理 169（84/13/72）、前缀扩展、LLM 生成强真 3,779、Hearst 式模板 397（297 新），去重合计 4,252。</p>
+      <p class="warn">只有 809 个真的在语料里命中 —— LLM 生成的词表八成匹配不到语料；两位专家逐一复核 809 个全部有效。</p>
+    </div></div></div>
+  </div>
+
+  <div class="metric" role="button" tabindex="0" aria-expanded="false">
+    <div class="m-top">
+      <span class="m-label">银标查询</span>
+      <span class="badge badge-gray">双 prompt</span>
+    </div>
+    <div class="m-value"><span class="num">17,579</span></div>
+    <p class="m-foot">7,327 / 9,668 / 584 · 对 404K 池排序<span class="caret">▾</span></p>
+    <div class="m-detail"><div class="m-detail-in"><div class="m-detail-box">
+      <p>口径：GPT-5.4 判官每动作用两个 prompt，全过才保留；判官与人类标注者 F1 达 .87–.91（Specify 档）。银标查询对完整 404K 测试池排序。</p>
+      <p class="warn">Broaden 银标只有 584 条 —— 该动作的检索数字天然波动更大。</p>
+    </div></div></div>
+  </div>
+
+</div>
+
+<div class="hover-card" id="hoverCard0" role="status" aria-live="polite">
+  <p class="hc-t" id="h0T"></p>
+  <p class="hc-l"><span class="hc-k" id="h0K1"></span><span id="h0V1"></span></p>
+  <p class="hc-l"><span class="hc-k" id="h0K2"></span><span id="h0V2"></span></p>
+</div>
+</section>

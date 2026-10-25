@@ -1,0 +1,173 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css.
+
+   Paper: Learning to Prompt for Continual Learning (L2P), CVPR 2022.
+   Metaphor: 活字排字房 (letterpress composing room).
+
+   Why this file overrides the token layer instead of only adding new names:
+   every component in components.css reads the *aliased* tokens (--bg, --paper,
+   --paper-2, --ink, --ink-2, --line, --blue, --orange, --green, --red,
+   --purple and their -soft variants), which tokens.css defines as var(--ui-*).
+   Warming only newly-invented names such as --paper-bg would therefore leave the
+   rendered page in its original cool blue-grey. Overriding --ui-* here re-tints
+   the whole surface while keeping every semantic role assignment untouched:
+   red still means failure / old method, green still means success / paper
+   method, blue still means guidance, orange still means user emphasis, purple
+   still means auxiliary. Spacing, type scale, radii, borders, elevation and the
+   component hierarchy are all inherited unchanged. */
+
+:root {
+  /* --- Neutral surface layer: warm kitchen cream --- */
+  --ui-bg-page: #faf6f0;
+  --ui-bg-page-top: #fffdf8;
+  --ui-bg-card: #fffdf8;
+  --ui-bg-muted: #f4efe6;
+  --ui-bg-soft: rgba(201, 123, 58, 0.10);
+
+  /* --- Text layer: warm brown --- */
+  --ui-text-main: #3d2817;
+  --ui-text-muted: #8b7355;
+  --ui-text-light: #a89880;
+
+  /* --- Rules / hairlines --- */
+  --ui-border: #e8dcc8;
+  --ui-border-strong: #c9b896;
+
+  /* --- Semantic roles (assignment unchanged, kitchen warm palette) ---
+     guidance / current state = warm orange */
+  --ui-accent: #c97b3a;
+  /* user emphasis / call to action = deep orange */
+  --ui-accent-alt: #d97706;
+  /* success / paper method = kitchen green */
+  --ui-success: #4a8c5c;
+  --ui-warning: #b8860b;
+  /* failure / old method = chili red */
+  --ui-danger: #b8453c;
+
+  /* soft tints must follow their own base */
+  --green-soft: rgba(74, 140, 92, 0.14);
+  --orange-soft: rgba(217, 119, 6, 0.14);
+  --red-soft: rgba(184, 69, 60, 0.12);
+  --yellow-soft: rgba(176, 125, 46, 0.14);
+
+  /* auxiliary concept = purple */
+  --purple: #8577a8;
+  --purple-soft: rgba(133, 119, 168, 0.12);
+
+  --sky: #6b8fae;
+
+  /* --- Named scene tokens for the letterpress metaphor ---
+     These mirror LP in src/modules/letterpressKit.ts so canvas widgets and any
+     DOM-level metaphor scene agree on one palette. */
+  --paper-bg: #faf9f5;          /* quiet scene background (composing-room paper) */
+  --paper-surface: #fffefb;     /* raised surface: a sheet, a drawer front */
+  --paper-border: #e8e4d8;      /* rule / hairline */
+  --ink-muted: #7b766b;         /* secondary canvas label */
+  --claude-accent: #d97757;     /* warm accent, same role as --orange */
+
+  --paper-scene-bg: #faf9f5;      /* quiet scene background */
+  --paper-scene-light: #e8e4d8;   /* shallow / background environment */
+  --paper-scene-dark: #bfb9a8;    /* deep / distant environment */
+  --paper-scene-support: #8c6a4a; /* physical support: frame, rail, stick */
+  --paper-guide: #5b7fa6;         /* guidance / current selection */
+  --paper-success: #5f8a63;       /* paper method works */
+  --paper-failure: #b0483c;       /* old method fails */
+  --paper-emphasis: #d97757;      /* the value the reader should take away */
+  --paper-aux: #8577a8;           /* auxiliary / secondary concept */
+  --paper-axis: #e0dcd0;          /* technical border, chart axis, gridline */
+}
+
+/* The template ships .feedback / .feedback.good / .feedback.bad only. Several
+   widgets in this tutorial raise a third, genuinely distinct state: not "the
+   paper method works" (green) and not "the old method fails" (red), but "this
+   setting is a real consequence / you have left the paper's configuration"
+   — pulling lambda too hard, a degenerate prompt-usage distribution, or asking
+   for N = 0. Painting those red would misuse the failure role, and leaving them
+   unstyled made them silently neutral. They take the emphasis role instead, so
+   the orange accent keeps meaning "this is the thing to notice", exactly as it
+   does inside the canvases. Purely additive: no existing selector changes. */
+.feedback.warn {
+  color: var(--orange);
+  background: var(--orange-soft);
+  border-left-color: var(--orange);
+  font-style: normal;
+}
+
+/* --- Continuous scroll layout overrides --- */
+.slide-main {
+  padding-bottom: 80px;
+}
+
+.slide-content {
+  animation: none;
+  max-width: 960px;
+  padding: 40px 32px;
+}
+
+/* Each section gets vertical spacing in scroll mode */
+.slide-content > section,
+.slide-content > .dl-related-section {
+  margin-bottom: 64px;
+  scroll-margin-top: 24px;
+}
+
+.slide-content > section.hero {
+  margin-bottom: 48px;
+}
+
+/* Remove slide-chap flex gap (it was for single-slide layout) */
+.slide-chap {
+  display: block;
+}
+
+/* Hide the bottom nav bar (we use back-to-top instead) */
+.slide-nav {
+  display: none;
+}
+
+/* Back to top button */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-bg-card);
+  color: var(--ui-text-main);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top:hover {
+  background: var(--ui-accent);
+  color: white;
+  border-color: var(--ui-accent);
+  transform: translateY(-2px);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .slide-content {
+    padding: 24px 16px;
+  }
+  .slide-content > section {
+    margin-bottom: 40px;
+  }
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+  }
+}

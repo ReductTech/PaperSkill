@@ -8,6 +8,7 @@ import { useBiliVideos, BiliCard } from '../lib/useBiliVideos';
 // enriches with live views/duration and can supply a cover when none is baked in.
 // UI copy is Simplified Chinese.
 export function BiliVideos({ items }: { items: BiliDef[] }) {
+  const [page, setPage] = useState(0);
   const bvids = items.map((i) => i.bvid);
   const [data, setData] = useState<Record<string, BiliCard | null>>({});
   // Track per-card cover load failures so we can fall back to the gradient
@@ -26,7 +27,7 @@ export function BiliVideos({ items }: { items: BiliDef[] }) {
       <h3>延伸学习 · B 站讲解视频</h3>
       <p>推荐几个相关的视频讲解，帮助加深理解。</p>
       <div className="dl-video-strip">
-        {real.map((it) => {
+        {real.slice(page * 4, (page + 1) * 4).map((it) => {
           const d = data[it.bvid];
           // Prefer a baked-in static cover, then the live fetch; else none.
           const cover = it.cover || d?.cover;
@@ -70,6 +71,11 @@ export function BiliVideos({ items }: { items: BiliDef[] }) {
           );
         })}
       </div>
+      {real.length > 4 && <nav aria-label="视频分页" className="dl-video-pagination">
+        <button onClick={() => setPage(p => p - 1)} disabled={page === 0}>上一组</button>
+        <span>{page + 1} / {Math.ceil(real.length / 4)}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={(page + 1) * 4 >= real.length}>下一组</button>
+      </nav>}
     </section>
   );
 }

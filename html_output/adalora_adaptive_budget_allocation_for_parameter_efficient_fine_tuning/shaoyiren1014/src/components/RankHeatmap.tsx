@@ -1,0 +1,15 @@
+import {useRef} from 'react';
+import {motion} from 'framer-motion';
+import {rowsFor,layersFor,rankAt,rankColor,matrixLabels,cellLabel,neighbor,type RankCell} from '../data/rankObservatory';
+import type {useObservatory} from '../store/observatoryStore';
+export default function RankHeatmap({state:s,dispatch:d,reduced}:ReturnType<typeof useObservatory>&{reduced:boolean}){
+ const refs=useRef<Record<string,HTMLButtonElement|null>>({}),rows=rowsFor('all'),layers=layersFor('all');
+ function move(c:RankCell,key:string){const n=neighbor(c,key,s.moduleFilter,s.layerFilter);d({type:'select',value:n});refs.current[`${n.matrix}-${n.layer}`]?.focus();}
+ return <motion.figure className="rank-blueprint" initial={{opacity:reduced?1:0}} animate={{opacity:1}} transition={{duration:reduced?0:.6}} data-source-type="paper_evidence">
+ <figcaption><strong>Figure 3 · 最终保留的 Rank</strong><span>DeBERTaV3-base / MNLI · 原图 72 个格值</span></figcaption>
+ <div className="rank-legend"><span>容量较少</span>{[0,3,6,9,12].map(v=><span key={v} className="rank-swatch" style={{background:rankColor(v)}}>{v}</span>)}<span>容量较多</span></div>
+ <div className="rank-grid-scroll"><table role="grid" aria-label="Figure 3 最终 Rank 热力图，方向键移动"><thead><tr><th scope="col">矩阵 / 层</th>{layers.map(l=><th scope="col" key={l}>{l}</th>)}</tr></thead><tbody>{rows.map(matrix=><tr key={matrix}><th scope="row"><strong>{matrix}</strong><small>{matrix.startsWith('Wf')?'FFN':'Attention'}</small></th>{layers.map(layer=>{const c={matrix,layer},selected=matrix===s.selected.matrix&&layer===s.selected.layer;return <td key={layer} style={{opacity:rowsFor(s.moduleFilter).includes(matrix)&&layersFor(s.layerFilter).includes(layer)?1:.3}} aria-selected={selected}><button ref={el=>{refs.current[`${matrix}-${layer}`]=el;}} tabIndex={selected?0:-1} aria-label={cellLabel(c)} aria-pressed={selected} style={{background:rankColor(rankAt(c))}} disabled={!rowsFor(s.moduleFilter).includes(matrix)||!layersFor(s.layerFilter).includes(layer)} onClick={()=>d({type:'select',value:c})} onKeyDown={e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();move(c,e.key);}}}>{rankAt(c)}</button></td>;})}</tr>)}</tbody></table></div>
+ <p className="rank-map-note">固定色标 0–12。筛选只弱化无关位置，保留全图参照；不改变数值或颜色。横轴是层的位置，不是训练时间。</p>
+ <details className="rank-mobile-reader"><summary>按层查看同一组数据（适合手机）</summary><label>查看层<select aria-label="按层阅读 Rank" value={s.selected.layer} onChange={e=>d({type:'select',value:{matrix:s.selected.matrix,layer:Number(e.target.value)}})}>{layers.map(l=><option disabled={!layersFor(s.layerFilter).includes(l)} key={l} value={l}>第 {l} 层</option>)}</select></label><div className="rank-layer-list">{rows.map(matrix=><button disabled={!rowsFor(s.moduleFilter).includes(matrix)} key={matrix} aria-pressed={matrix===s.selected.matrix} onClick={()=>d({type:'select',value:{matrix,layer:s.selected.layer}})}><span>{matrix} · {matrixLabels[matrix]}</span><strong>{rankAt({matrix,layer:s.selected.layer})}</strong></button>)}</div></details>
+ </motion.figure>;
+}

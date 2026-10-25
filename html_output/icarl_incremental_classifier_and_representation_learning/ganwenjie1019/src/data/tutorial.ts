@@ -1,0 +1,153 @@
+export const pages = [
+  {
+    id: "page-1",
+    number: "01",
+    title: "类别增量学习",
+    subtitle: "类别随时间逐批加入",
+    sceneDescription: "从类别分批到达的约束出发，建立同一个模型持续学习的任务背景。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-1",
+      kind: "module",
+      title: "类别分批到达的约束",
+      scenes: [{ kind: "scene", componentId: "page-1", description: "建立类别增量学习的任务背景。" }],
+    }],
+  },
+  {
+    id: "page-2",
+    number: "02",
+    title: "图像与特征表示",
+    subtitle: "打开模型内部路径",
+    sceneDescription: "观察图像如何经过共享特征提取器形成可比较的表示。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-2",
+      kind: "module",
+      title: "共享特征表示",
+      scenes: [{ kind: "scene", componentId: "page-2", description: "观察图像如何形成可比较的特征。" }],
+    }],
+  },
+  {
+    id: "page-3",
+    number: "03",
+    title: "原型分类",
+    subtitle: "类均值与最近距离",
+    sceneDescription: "用已保存样本计算类别原型，并以最近原型完成预测。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-3",
+      kind: "module",
+      title: "最近原型预测",
+      scenes: [{ kind: "scene", componentId: "page-3", description: "计算类别原型并完成最近距离预测。" }],
+    }],
+  },
+  {
+    id: "page-4",
+    number: "04",
+    title: "代表样本的筛选与管理",
+    subtitle: "Herding、前缀与固定预算",
+    sceneDescription: "沿 Herding 的逐轮贪心过程建立有序代表列表，并在固定预算下保留前缀。",
+    kind: "chapter",
+    modules: [
+      {
+        id: "module-page-4-herding",
+        kind: "module",
+        title: "Herding 逐轮选择",
+        scenes: [{ kind: "scene", componentId: "page-4", description: "逐轮建立有序代表列表。" }],
+      },
+      {
+        id: "module-page-4-budget",
+        kind: "module",
+        title: "固定预算与前缀",
+        scenes: [{ kind: "scene", componentId: "page-4", description: "在固定预算下保留有序前缀。" }],
+      },
+    ],
+  },
+  {
+    id: "page-5",
+    number: "05",
+    title: "让 Exemplars 参与后续更新",
+    subtitle: "训练集 D 与 response Q",
+    sceneDescription: "把旧类代表样本与新类图片合入训练集，并按样本 ID 保存旧模型响应。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-5",
+      kind: "module",
+      title: "Replay 与冻结响应",
+      scenes: [{ kind: "scene", componentId: "page-5", description: "构造 D 并按样本 ID 保存 Q。" }],
+    }],
+  },
+  {
+    id: "page-6",
+    number: "06",
+    title: "训练信号与参数更新",
+    subtitle: "六节点 BCE 与梯度路径",
+    sceneDescription: "为旧节点和新节点构造不同来源的监督目标，并追踪逐节点 BCE 与参数更新。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-6",
+      kind: "module",
+      title: "逐节点监督与更新",
+      scenes: [{ kind: "scene", componentId: "page-6", description: "构造六节点监督并追踪参数更新。" }],
+    }],
+  },
+  {
+    id: "page-7",
+    number: "07",
+    title: "训练后记忆与预测",
+    subtitle: "P_after 与当前原型",
+    sceneDescription: "更新固定容量记忆，在当前表示空间重建原型并完成最近原型预测。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-7",
+      kind: "module",
+      title: "记忆与当前原型",
+      scenes: [{ kind: "scene", componentId: "page-7", description: "重组记忆、重建原型并完成预测。" }],
+    }],
+  },
+  {
+    id: "page-8",
+    number: "08",
+    title: "实验与边界",
+    subtitle: "整体效果·机制证据·记忆边界",
+    sceneDescription: "阅读论文实验，区分整体结果、机制证据、实验条件与方法边界。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-8",
+      kind: "module",
+      title: "实验结果与边界",
+      scenes: [{ kind: "scene", componentId: "page-8", description: "核对实验结果、条件与方法边界。" }],
+    }],
+  },
+  {
+    id: "page-9",
+    number: "09",
+    title: "iCaRL 一次增量学习的完整逻辑",
+    subtitle: "从上一轮状态出发，追踪训练准备、更新、记忆、预测与交接",
+    sceneDescription: "把训练集、旧响应、参数更新、记忆维护、原型预测和下一轮交接串成完整流程。",
+    kind: "chapter",
+    modules: [{
+      id: "module-page-9",
+      kind: "module",
+      title: "完整增量轮次",
+      scenes: [{ kind: "scene", componentId: "page-9", description: "串联一次增量学习的完整状态流。" }],
+    }],
+  },
+] as const;
+
+export type PageId = (typeof pages)[number]["id"];
+
+export const tutorial = {
+  paper: {
+    title: "iCaRL: Incremental Classifier and Representation Learning",
+    url: "https://arxiv.org/abs/1611.07725",
+    authors: [
+      "Sylvestre-Alvise Rebuffi",
+      "Alexander Kolesnikov",
+      "Georg Sperl",
+      "Christoph H. Lampert",
+    ],
+    venue: "CVPR 2017",
+  },
+  chapters: pages,
+} as const;

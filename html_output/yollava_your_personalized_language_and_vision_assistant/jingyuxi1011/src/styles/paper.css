@@ -1,0 +1,140 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --ui-bg-page: #f0f3f5;
+  --ui-bg-page-top: #f8fafb;
+  --ui-bg-soft: #edf3fa;
+  --ui-bg-muted: #f7f9fb;
+  --ui-accent: #27446e;
+  --ui-accent-alt: #f07e47;
+  --ui-success: #228d5c;
+  --ui-danger: #c43f52;
+}
+
+/* Avoid the template's decorative horizontal entrance causing transient overflow. */
+.slide-content { animation: none; }
+
+/* Bound illustrations to the reading column; later chapters reuse a compact key. */
+.analogy-card { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); min-height: 0; }
+.analogy-card .analogy-visual { width: auto; min-width: 0; max-width: 100%; padding: 12px; }
+.analogy-visual > .yl { width: 100%; min-width: 0; }
+.analogy-card .analogy-body { min-width: 0; padding: 16px; }
+.analogy-card:has(.yl-album-compact) { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); }
+.yl .yl-album { max-width: 100%; }
+.yl .yl-album-mobile { display: none; }
+.yl .yl-album-summary { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.yl .yl-album-summary img { width: 60px; height: 56px; object-fit: contain; border-radius: 6px; }
+.yl .yl-album-summary .yl-subject { font-size: 16px; white-space: nowrap; }
+.yl .yl-summary-arrow { color: #9fb0c8; font-size: 16px; }
+.yl .yl-summary-label { font-size: 14px; white-space: nowrap; }
+.yl .yl-album-summary .yl-token-strip { width: 100px; gap: 3px; margin: 4px 0 0; }
+.yl .yl-album-summary .yl-token { height: 13px; border-width: 1px; border-radius: 3px; }
+
+/* Formula guidance occupies its own line, before the lead and clickable formula. */
+.formula-explain .fe-hint { position: static; margin: 0 0 10px; line-height: 1.5; text-align: left; }
+.formula-explain .fe-lead { line-height: 1.65; }
+.formula-explain .fe-formula { max-width: 100%; overflow-wrap: anywhere; }
+.formula-explain .fe-explain { min-width: 0; line-height: 1.65; }
+
+/* Lighter internal regions keep the section/module as the principal card. */
+.yl .yl-card:not(.yl-result-button) { border: 0; border-radius: 8px; padding: 18px; }
+.yl .yl-result-detail { border: 0; border-top: 1px solid #d7deea; border-radius: 0; padding: 20px 0 0; }
+.yl .yl-bubble { border: 0; border-left: 2px solid #d7deea; border-radius: 0 6px 6px 0; padding: 14px 16px; }
+.yl .yl-bubble.answer { border-left-color: #b4d9c5; }
+.yl .yl-bubble.error { border-left-color: #e6b2bc; }
+.yl .yl-route, .yl .yl-branch { border: 0; border-radius: 8px; }
+.yl .yl-architecture-path { padding: 16px; border-radius: 8px; }
+.yl .yl-step-detail { min-height: 160px; }
+.yl .yl-current-result { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; margin-top: 12px; border-bottom: 1px solid #d7deea; }
+.yl .yl-current-result strong, .yl .yl-current-result span { display: block; }
+.yl .yl-current-result span { font-size: 14px; line-height: 1.5; color: #68778f; }
+.yl .yl-current-result > b { color: #27446e; font-size: 26px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.yl .yl-current-result + .yl-result-detail { border-top: 0; margin-top: 0; }
+
+/* Preserve native photo size; plots and complete paper figures retain full width. */
+.yl .yl-photo.scene { width: auto; max-width: 100%; height: auto; max-height: 240px; margin: 0 auto; }
+.yl .yl-hero-img { display: block; width: auto; max-width: 100%; height: auto; max-height: 160px; margin: 0 auto; }
+.yl .yl-hero-mark { margin: 8px 0; font-size: 21px; }
+.bg-side-canvas .yl-token-strip { margin: 10px auto; }
+.hero .hero-meta { gap: 8px; margin-bottom: 24px; }
+.hero .hero-sub { margin-bottom: 16px; }
+.hero .hero-abs { margin-bottom: 18px; }
+
+/* Allow complete chapter names without widening the navigation. */
+.slide-sidebar .slide-sidebar-text { white-space: normal; text-overflow: clip; overflow: visible; line-height: 1.5; }
+.slide-chap .chap-title { display: block; line-height: 1.35; }
+.slide-chap .chap-title .num { margin-right: .35em; white-space: nowrap; }
+.slide-chap .chap-title .badge-tag { margin-left: 10px; }
+
+@media (min-width: 769px) and (max-width: 1199px) {
+  .slide-content { padding: 20px 24px; }
+  .slide-content > section.chap { padding: 24px; }
+  .analogy-card, .analogy-card:has(.yl-album-compact) { grid-template-columns: 1fr; }
+  .analogy-card .analogy-body { padding-top: 8px; }
+  .yl .yl-album-compact { max-width: 300px; margin: auto; }
+  .yl .yl-architecture { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .slide-content { padding: 54px 12px 16px; }
+  .slide-content > section.chap { padding: 18px 14px; }
+  .slide-chap { gap: 14px; }
+  .slide-chap .chap-title { font-size: 28px; line-height: 1.35; }
+  .slide-chap .chap-title .num { font-size: .85em; }
+  .slide-chap .chap-title .badge-tag { display: table; max-width: 100%; margin: 8px 0 0; font-size: 14px; line-height: 1.5; }
+  .chap-bridge { margin: 14px 0 10px; flex-wrap: nowrap; }
+  .chap-bridge .cb-icon { width: 34px; font-size: 21px; }
+  .chap-bridge .cb-body { min-width: 0; padding: 12px; }
+  .analogy-card, .analogy-card:has(.yl-album-compact) { grid-template-columns: 1fr; }
+  .analogy-card .analogy-visual { padding: 10px; }
+  .yl .yl-album:not(.yl-album-compact) > canvas { display: none; }
+  .yl .yl-album-mobile { display: block; }
+  .analogy-card .analogy-body { padding: 8px 12px 12px; }
+  .module .module-head { padding: 12px; }
+  .module .module-body { padding: 12px; }
+  .yl .yl-grid, .yl .yl-architecture, .yl .yl-fact-list { gap: 12px; }
+  .yl .yl-card:not(.yl-result-button), .yl .yl-architecture-path, .yl .yl-route, .yl .yl-branch { padding: 12px; }
+  .yl .yl-tabs { gap: 7px; margin: 14px 0; }
+  .yl .yl-tab { min-height: 44px; }
+  .yl .yl-bubble { padding: 12px; margin: 10px 0; }
+  .yl .yl-feedback { padding: 12px; margin-top: 14px; }
+  .yl .yl-flow { gap: 5px; }
+  .yl .yl-node, .yl .yl-node[aria-pressed=true], .yl .yl-node.on { padding: 10px; }
+  .yl .yl-node small { margin-top: 3px; }
+  .yl .yl-number { margin-bottom: 3px; }
+  .yl .yl-step-detail { min-height: 0; margin-top: 14px; }
+  .yl .yl-results-selectors { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .yl .yl-results-selectors .yl-result-button { padding: 12px; border-radius: 9px; }
+  .yl .yl-results-selectors .yl-result-button.active { padding: 11px; }
+  .yl .yl-results-selectors h5 { font-size: 16px; line-height: 1.4; margin-bottom: 7px; }
+  .yl .yl-results-selectors .yl-big { font-size: 29px; }
+  .yl .yl-results-selectors .yl-unit { margin-left: 2px; font-size: 14px; }
+  .yl .yl-results-selectors p { font-size: 14px; line-height: 1.45; margin: 7px 0; overflow-wrap: anywhere; }
+  .yl .yl-results-selectors .yl-kicker { font-size: 12px; letter-spacing: .02em; margin-bottom: 6px; }
+  .yl .yl-current-result { margin-top: 4px; }
+  /* Keep the active readout adjacent and visible when an upper choice is clicked. */
+  .yl[data-feature="results"] { display: flex; flex-direction: column; }
+  .yl[data-feature="results"] > .yl-fact-list { order: 0; }
+  .yl[data-feature="results"] > .yl-current-result { order: 1; margin: 0 0 10px; }
+  .yl[data-feature="results"] > .yl-results-selectors { order: 2; }
+  .yl[data-feature="results"] > .yl-result-detail { order: 3; }
+  .yl[data-feature="results"] > .yl-source { order: 4; }
+  .yl .yl-result-detail { padding-top: 14px; }
+  .formula-explain { padding: 14px; }
+  .formula-explain .fe-lead { font-size: 17px; }
+  .formula-explain .fe-formula { padding: 10px; font-size: 20px; line-height: 1.7; }
+  .hero { padding-top: 20px; }
+  .hero h1 { font-size: 30px; line-height: 1.2; }
+  .hero .hero-meta { gap: 7px; margin-bottom: 18px; }
+  .hero .hero-meta .tag { padding: 6px 10px; }
+}
+
+/* Closed mobile navigation must not intercept a quick interaction in the chapter. */
+@media (max-width: 768px) {
+  .slide-sidebar { transition: none; pointer-events: none; }
+  .slide-layout.sidebar-open .slide-sidebar { pointer-events: auto; }
+}

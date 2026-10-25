@@ -1,0 +1,80 @@
+<section class="card" id="s4" aria-labelledby="s4-title">
+<div class="card-head">
+  <span class="tag-no">S4</span>
+  <span class="tag-name">评测 · 压量、判官，与三种水位</span>
+</div>
+
+<p class="intro" id="s4-title">挖掘出来的对噪声大：标记词在，但 query 单独读不懂、或 gold 没把动作做好。于是一个 LLM 判官逐对过，<b>两个提示词都点头才留</b> —— 25,430 对里留下 17,579 条，去排那 404,371 句。</p>
+
+<div class="play4" id="play4">
+  <div class="p4-head">
+    <span class="p4-t">一路压量 → 一路看水位</span>
+    <span class="p4-t">MRR@10（%）· ModernBERT-embed-large</span>
+  </div>
+
+  <div class="f4">
+    <div class="f4c" data-part4="samp"><b>10,000</b><span>Specify 分层抽</span></div>
+    <div class="f4c" data-part4="samp"><b>14,020</b><span>Address 全取</span></div>
+    <div class="f4c" data-part4="samp"><b>1,410</b><span>Broaden 全取</span></div>
+  </div>
+
+  <div class="f4-up" id="f4up">↓ 25,430 对，判官逐对过</div>
+
+  <div class="jd4" data-part4="jd">
+    <p class="jd4-t">GPT-5.4 两个提示词<b>都得点头</b>才留</p>
+    <p class="jd4-s" id="jd4s">和人 .89/.75/.78 · 标注者之间 .90/.87/.82</p>
+  </div>
+
+  <div class="f4-up" id="f4up2">↓</div>
+
+  <div class="rs4" data-part4="rs">
+    <span class="rs4-n">17,579</span>
+    <span class="rs4-t">条银 query · 7,327 / 9,668 / 584</span>
+    <span class="rs4-e">保留 69%</span>
+  </div>
+
+  <div class="split4"><i class="hr"></i><span>同一批 query，三种水位</span><i class="hr"></i></div>
+
+  <div class="g4">
+    <div class="g4c" data-part4="gS" style="--mv:var(--mv-s)">
+      <div class="g4-bars">
+        <i class="g4-b g4-b1" style="--h:27px"></i>
+        <i class="g4-b g4-b2" style="--h:47px"></i>
+        <i class="g4-b g4-b3" style="--h:55px"><em class="g4-v">55.1</em></i>
+      </div>
+      <div class="g4-k"><b>Specify</b><span>基线 26.7 · ＋28.4</span></div>
+    </div>
+    <div class="g4c" data-part4="gA" style="--mv:var(--mv-a)">
+      <div class="g4-bars">
+        <i class="g4-b g4-b1" style="--h:10px"></i>
+        <i class="g4-b g4-b2" style="--h:25px"></i>
+        <i class="g4-b g4-b3" style="--h:38px"><em class="g4-v">37.7</em></i>
+      </div>
+      <div class="g4-k"><b>Address</b><span>基线 10.2 · ＋27.5</span></div>
+    </div>
+    <div class="g4c" data-part4="gB" style="--mv:var(--mv-b)">
+      <div class="g4-bars">
+        <i class="g4-b g4-b1" style="--h:17px"></i>
+        <i class="g4-b g4-b2" style="--h:27px"></i>
+        <i class="g4-b g4-b3" style="--h:28px"><em class="g4-v">28.2</em></i>
+      </div>
+      <div class="g4-k"><b>Broaden</b><span>基线 17.3 · ＋10.9</span></div>
+    </div>
+  </div>
+
+  <div class="ce4" data-part4="ce">
+    <div class="ce4-h"><span>重排的天花板 = 一阶段召回</span><span>gold 进 top-100 的比例</span></div>
+    <div class="ce4-r"><span class="ce4-k">S</span><div class="ce4-tr"><i class="ce4-f" style="--w:80.8%"></i></div><span class="ce4-v">80.8%</span></div>
+    <div class="ce4-r"><span class="ce4-k">A</span><div class="ce4-tr"><i class="ce4-f" style="--w:61.3%"></i></div><span class="ce4-v">61.3%</span></div>
+    <div class="ce4-r"><span class="ce4-k">B</span><div class="ce4-tr"><i class="ce4-f" style="--w:57.2%"></i></div><span class="ce4-v">57.2%</span></div>
+  </div>
+
+  <p class="p4-note">Address 与 Broaden 有三到四成 query 的 gold 压根没进 top-100 —— <b>重排再强也补不回来</b>，这就是「远未解决」的位置。</p>
+
+  <div class="hover-card" id="hoverCard4" role="status" aria-live="polite">
+    <p class="hc-t" id="h4T"></p>
+    <p class="hc-l"><span class="hc-k" id="h4K1"></span><span id="h4V1"></span></p>
+    <p class="hc-l"><span class="hc-k" id="h4K2"></span><span id="h4V2"></span></p>
+  </div>
+</div>
+</section>

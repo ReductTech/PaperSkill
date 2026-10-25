@@ -1,0 +1,4 @@
+import React,{useState} from 'react';
+import {Lab,Feedback,Canvas,C,box,line,txt,kitchen,Evidence} from './ui';
+
+export function QueryQuiz(){const [pick,set]=useState<number|null>(null);const opts=['这是一段做饭视频','整段视频中最好看的一个画面','[2,6] 秒和 [10,14] 秒的切番茄片段'];return <Lab><p><strong>你的需求：</strong>“找到正在切番茄的片段。”</p><Canvas label="八格教学录像，两段不连续的切菜画面" draw={c=>{for(let i=0;i<8;i++){kitchen(c,25+i*110,48,96,104,[1,2,5,6].includes(i));if(pick===2&&[1,2,5,6].includes(i)){c.strokeStyle=C.green;c.lineWidth=4;c.strokeRect(25+i*110,48,96,104)}}}}/><div className="md-grid">{opts.map((o,i)=><button key={o} aria-pressed={pick===i} onClick={()=>set(i)}>{o}</button>)}</div>{pick!==null&&<Feedback warn={pick!==2}>{['类别告诉我们“是什么”，却没有告诉我们“哪几秒”。这更接近视频分类的输出。','最精彩的一帧未必与切番茄有关，也不能完整表示一个持续的动作。高光检测与时间段定位有关联，但不能互相替代。','正确。描述对应到时间轴，且允许多个不连续区间，才回答了“在哪里发生”。这些区间是教学例子，不是论文模型的真实输出。'][pick]}</Feedback>}<button onClick={()=>set(null)}>重新判断</button></Lab>}

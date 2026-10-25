@@ -1,0 +1,273 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  "meta": {
+    "titleEn": "Claude Code Architecture",
+    "titleZh": "Claude Code 架构：一座终端里的调度所",
+    "venue": "777genius/claude-code-source-code-full · docs/architecture.md · 2026-10-08",
+    "authors": "claude-code-source-code-full 仓库维护者",
+    "affiliation": "社区整理的泄漏源码仓库；非 Anthropic 官方文档",
+    "domain": "CLI 架构 · Agent Harness · React for Terminal",
+    "coreProblem": "一个终端工具，为什么会有一座应用框架的骨架？",
+    "coreInsight": "四个边界决定形态：进程、渲染、控制、构建。",
+    "keywords": [
+      "单二进制",
+      "React + Ink",
+      "QueryEngine",
+      "工具四件套",
+      "特性开关",
+      "惰性加载"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "一条直线上跑的手推车",
+      "desc": "脚本式 CLI：输入进、输出出，没有中间层。",
+      "componentId": "dispatch-cover"
+    },
+    "newMethod": {
+      "title": "一张有信号机的调度图",
+      "desc": "管线、循环、边界，各自有明确位置。",
+      "componentId": "dispatch-cover"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "全景与来源",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "pipeline-module",
+          "title": "六站管线",
+          "desc": "沿站走一遍，看每站职责与失败模式。",
+          "componentId": "pipeline-flow"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "source-cards",
+          "title": "先确认这份架构说明的出处",
+          "goal": "它说了什么，哪些能被代码验证？",
+          "summary": "社区仓库里的架构文档：事实可用，但不是官方设计说明。",
+          "interaction": "阅读文档卡与三层证据边界",
+          "next": "先看它给出的全景：一次请求要穿过哪几站？",
+          "componentId": "source-cards",
+          "notes": "【建议时长】约 70 秒。\n【本页只讲】这是社区整理的架构说明，不是 Anthropic 官方文档。\n【讲解】文档位于 777genius/claude-code-source-code-full 仓库的 docs/architecture.md，2026 年 10 月 8 日更新，抓取时 419 star，许可未声明。它只有 224 行、约 7.8KB，是通读式的索引，不是设计规格。左侧把来源写全：仓库、路径、日期、体量。右侧三层边界要分清：文档陈述（Bun、46K 行、九个开关）、代码可验证（文件名、注册表、开关名）、本教程模型（耗时与包体都是示意）。\n【演示与停顿】先读来源卡，再逐条读三层。停顿，请听众指出哪一层最容易被当成官方结论。\n【过渡】先看它给出的全景：一次请求要穿过哪几站？\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：全文开头与 High-Level Overview\n本页为来源说明页：无交互；star 数与日期取自抓取当天。\n边界：文档未标注对应的代码版本；本教程没有克隆仓库逐行复核，只把它当作一份公开的架构说明来读。"
+        },
+        {
+          "id": "pipeline-flow",
+          "title": "六站管线，第五站会回头",
+          "goal": "一次请求穿过哪几站，哪一站坏了会怎样？",
+          "summary": "输入 → 解析 → 引擎 → 模型 → 工具循环 → 终端 UI，其中工具结果会回到引擎。",
+          "interaction": "点选任意一站，读它的职责与失败模式",
+          "next": "第一站之前，还有一个问题：这套东西是怎么被装进一个文件的？",
+          "componentId": "pipeline-flow",
+          "moduleId": "pipeline-module",
+          "notes": "【建议时长】约 90 秒。\n【本页只讲】管线不是一条直线：工具循环会把结果送回 QueryEngine，再发一次请求。\n【讲解】文档给出的链路是 User Input → CLI Parser → Query Engine → LLM API → Tool Execution Loop → Terminal UI。逐站读：输入来自 REPL；CLI 解析用 Commander；QueryEngine 组装上下文并发起流式请求；模型返回文本或工具调用；工具循环执行后把结果回灌；Ink 组件树负责渲染。重点在第 4、5 站之间：工具结果不是终点，而是一次新请求的输入。所以“失败定位”要先判断坏在哪一站。\n【演示与停顿】从第 1 站走到第 6 站，每站先让听众猜失败模式，再点开。最后停在第 5 站，说明它为什么会回头。\n【过渡】第一站之前，还有一个问题：这套东西是怎么被装进一个文件的？\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：High-Level Overview；Core Pipeline\n本页为文档结构的可视化：六站名称与文件位置取自文档；失败模式是本教程的工程推断。\n边界：文档只给了一条链式示意，没有画回边；回边来自“Tool Execution Loop”这一命名与工具循环的常规实现，讲稿中已说明这是解释。"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "三个边界：进程 / 渲染 / 控制",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "binary-module",
+          "title": "装配前移到流水线",
+          "desc": "同一批步骤，换一个运行时只是换了发生的位置。",
+          "componentId": "binary-budget"
+        },
+        {
+          "kind": "module",
+          "id": "ink-module",
+          "title": "终端是一块画布",
+          "desc": "同一棵组件树，按尺寸重新布局。",
+          "componentId": "ink-layout"
+        },
+        {
+          "kind": "module",
+          "id": "engine-module",
+          "title": "六件事一个循环",
+          "desc": "关掉其中一件，看回合退化成什么。",
+          "componentId": "engine-turn"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "binary-budget",
+          "title": "把装配提前到发布阶段",
+          "goal": "同一批启动步骤，换一个运行时后去了哪里？",
+          "summary": "Bun 单二进制：用户机器上只剩“启动”一步。",
+          "interaction": "切换运行时，观察步骤在用户机器与流水线之间移动",
+          "next": "进程之外还有一层：它怎么把终端画成一个界面？",
+          "componentId": "binary-budget",
+          "moduleId": "binary-module",
+          "notes": "【建议时长】约 80 秒。\n【本页只讲】单二进制不是“打包得更小”，而是把启动装配从用户机器挪到了发布流水线。\n【讲解】文档写得很清楚：Claude Code 跑在 Bun 上，不是 Node.js；原生支持 JSX/TSX，不需要单独转译；ESM 用 .js 后缀。把四步摆出来——安装运行时、解析依赖、转译 TSX、启动入口——Node 方案里前四步都在用户机器上，Bun 方案里只有启动留在用户机器。这不是性能数字，而是责任位置：出错时，谁来承担定位成本。\n【演示与停顿】先看 Node 的四步全在左边，再切到 Bun，看三步移到右边。停顿，问一句：如果装配出错，哪种模式更容易在发布前发现？\n【过渡】进程之外还有一层：它怎么把终端画成一个界面？\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：Build System → Bun Runtime；Feature Flags；Lazy Loading\n本页为概念对照：四个步骤与“用户机器 / 流水线”的划分是本教程的归纳，不是文档原图。\n边界：Bun 单二进制仍需要下载与平台适配；本页没有声称启动时间或产物体积，文档也未给出这两项数据。"
+        },
+        {
+          "id": "ink-layout",
+          "title": "终端不是 printf，是一棵组件树",
+          "goal": "同一个界面，终端尺寸变了会发生什么？",
+          "summary": "React + Ink 把终端当画布：宽度够了才挂侧栏，行数决定列表高度。",
+          "interaction": "切换 80×24 / 120×40 / 160×48，观察组件挂载与布局",
+          "next": "界面之下，是一个必须独占回合的引擎。",
+          "componentId": "ink-layout",
+          "moduleId": "ink-module",
+          "notes": "【建议时长】约 75 秒。\n【本页只讲】CLI 的界面可以用组件树描述，布局由可用尺寸决定。\n【讲解】文档说整个 UI 层用 React + Ink 写，组件、hooks、状态管理都是 Web 那套，只是渲染到终端；约 140 个组件、约 80 个 hooks，还有 REPL、Doctor、ResumeConversation 三个全屏界面，配色用 Chalk，并启用了 React Compiler。本页把“布局由尺寸决定”演示出来：80 列时没有侧栏，120 列才挂上；行数决定消息列表能放几条。\n【演示与停顿】从 80×24 切到 120×40，让听众先说出“会多出什么”，再观察侧栏出现；再切到 160×48，看只是变宽而不是重排。\n【过渡】界面之下，是一个必须独占回合的引擎。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：UI Layer（Components / Screens / Hooks）\n本页为布局示意：终端画面是 HTML 模拟，不是 Ink 的真实渲染；组件名与三个屏幕名取自文档。\n边界：140 与 80 是文档给出的约数，本教程未重新统计；Ink 的具体布局算法未在文档中展开。"
+        },
+        {
+          "id": "engine-turn",
+          "title": "一个回合，六件事",
+          "goal": "把六项能力逐个关掉，这一回合会退化成什么？",
+          "summary": "流式、思考预算、工具循环、重试、计费、上下文，都由同一个循环持有。",
+          "interaction": "切换六项能力，观察回合的退化方式",
+          "next": "引擎调用的每个能力，都要遵守同一份工具契约。",
+          "componentId": "engine-turn",
+          "moduleId": "engine-module",
+          "notes": "【建议时长】约 90 秒。\n【本页只讲】QueryEngine 之所以大，是因为六件回合级的事必须由同一个循环持有。\n【讲解】文档列了六项：流式响应、工具调用循环、思考模式与预算、重试与退避、token 计数与成本、上下文管理，并给出约 46K 行的量级。逐项关掉看退化：没有工具循环，它就只是个会聊天的终端；没有重试，一次网络抖动就结束回合；没有上下文管理，长会话迟早溢出；没有计费，/cost 没有数据。由此解释“为什么是一个大文件”：这些状态彼此耦合，拆开就要跨模块传递回合状态。\n【演示与停顿】先只关工具循环，说明能力消失；再关重试，说明稳定性消失；最后全关，指出它退化成一次性问答。\n【过渡】引擎调用的每个能力，都要遵守同一份工具契约。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：Core Pipeline → Query Engine\n本页为机制示意：六项能力取自文档原文；退化后果是本教程的工程推断，不是文档结论。\n边界：46K 行是文档给出的量级，未复核；“一个大文件”是文档的描述，不代表这是唯一合理的组织方式（见迁移页）。"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "两个协议：工具 / 状态",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "tool-module",
+          "title": "工具四件套",
+          "desc": "卸掉任一件，失败方式就换一种。",
+          "componentId": "tool-contract"
+        },
+        {
+          "kind": "module",
+          "id": "state-module",
+          "title": "谁订阅了什么",
+          "desc": "全局广播与选择器订阅的重渲染差三倍。",
+          "componentId": "state-graph"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "tool-contract",
+          "title": "工具不是函数，是四件套",
+          "goal": "卸掉输入校验、权限、执行或 UI，各会怎么坏？",
+          "summary": "每个工具自带 schema、权限模型、执行逻辑与终端渲染。",
+          "interaction": "逐个卸掉部件，并切换是否只调度可并发工具",
+          "next": "工具之外，还有一层状态：改一个字段，谁会跟着动？",
+          "componentId": "tool-contract",
+          "moduleId": "tool-module",
+          "notes": "【建议时长】约 85 秒。\n【本页只讲】工具是一个自带四件的单位，缺一件不是少个字段，而是换一种失败方式。\n【讲解】文档说每个工具都包含输入 schema（Zod 校验）、权限模型（哪些要用户批准）、执行逻辑、以及终端 UI 组件，注册在 tools.ts 里，由引擎在工具循环中发现。逐个卸掉看后果：没有 schema，模型给什么就执行什么；没有权限，危险操作直接落地；没有执行，调用返回空；没有 UI，结果在终端里不可见。并发部分：每个工具声明 isConcurrencySafe()，只有声明过的才能并排跑，其余排队。\n【演示与停顿】先卸权限，说明风险；再卸 UI，说明“能力存在但看不见”；最后打开并发调度，看两辆车从一条轨道变成两条。\n【过渡】工具之外，还有一层状态：改一个字段，谁会跟着动？\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：Core Pipeline → Tool System；Concurrency Model\n本页为契约示意：四件套与 isConcurrencySafe 取自文档；哪个具体工具声明了并发，文档未给全表，本页只用 Read / Bash 作示例，不声称它们的真实声明值。\n边界：本页不模拟真实权限弹窗或 Zod 校验，只说明缺失后的失败类型。"
+        },
+        {
+          "id": "state-graph",
+          "title": "改一个字段，谁跟着动",
+          "goal": "全局广播与选择器订阅，重渲染差多少？",
+          "summary": "AppState 是全局可变对象，但消费者应该只订阅自己需要的字段。",
+          "interaction": "切换广播/订阅模式，点字段看哪些组件被唤醒",
+          "next": "代码什么时候进入产物？这是构建期的预算。",
+          "componentId": "state-graph",
+          "moduleId": "state-module",
+          "notes": "【建议时长】约 75 秒。\n【本页只讲】“全局状态”不是问题，“谁订阅了什么”才是。\n【讲解】文档给的结构是：AppState 是全局可变对象（state/AppStateStore.ts），React context 提供通知、统计、帧率等能力，selectors 做派生状态，onChangeAppState 处理变更副作用。本页把两种订阅方式并排：全局广播时改一个字段四个消费者都重渲染；选择器订阅时只有相关的那一个被唤醒。终端 UI 的帧预算很小，这个差别会直接体现在输入延迟上。\n【演示与停顿】先在广播模式下改 messages，看四个卡片同时变橙；再切到订阅模式，重复一次。停顿，让听众说出“省下来的是什么”。\n【过渡】代码什么时候进入产物？这是构建期的预算。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：State Management\n本页为机制示意：四组消费者与字段映射是本教程为了对比而设的最小模型；文档只说明存在 AppState、context、selectors 与 onChangeAppState。\n边界：文档没有给出重渲染次数，也没有性能数据；本页的“4 次 vs 1 次”是订阅关系的直接结果，不是实测。"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "两笔预算：构建 / 启动",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "flags-module",
+          "title": "构建期决定存不存在",
+          "desc": "关掉的开关，代码根本不进产物。",
+          "componentId": "feature-flags"
+        },
+        {
+          "kind": "module",
+          "id": "startup-module",
+          "title": "启动期决定何时加载",
+          "desc": "常用并行预取，重依赖推到首用。",
+          "componentId": "startup-budget"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "feature-flags",
+          "title": "未发布的功能，连代码都不在",
+          "goal": "关掉一个特性开关，产物里少的是什么？",
+          "summary": "feature() 在构建期做死代码消除：关掉的模块被整段删除。",
+          "interaction": "开关九组特性，观察产物里模块的增减",
+          "next": "构建期删掉之后，剩下的还要决定什么时候加载。",
+          "componentId": "feature-flags",
+          "moduleId": "flags-module",
+          "notes": "【建议时长】约 80 秒。\n【本页只讲】特性开关做的是构建期删除，不是运行期隐藏。\n【讲解】文档给出的写法是 import { feature } from 'bun:bundle'，然后 if (feature('VOICE_MODE')) { require('./commands/voice/index.js') }；未启用时，这段代码在构建期被整段剥掉。文档列了九组开关：PROACTIVE、KAIROS、BRIDGE_MODE、DAEMON、VOICE_MODE、AGENT_TRIGGERS、MONITOR_TOOL、COORDINATOR_MODE、WORKFLOW_SCRIPTS。逐个个打开，产物里的模块才增加。这说明为什么泄漏版本里能看到尚未发布的能力：它们确实被编译进了某些构建。\n【演示与停顿】先只留两个开关，说明产物里只有两段可选代码；再打开语音与协调模式，看它们出现在产物列表。停顿，问一句：如果代码不存在，用户还能通过配置打开它吗？\n【过渡】构建期删掉之后，剩下的还要决定什么时候加载。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：Build System → Feature Flags（Dead Code Elimination）\n本页为构建模型：九个开关名与示例写法取自文档；模块路径是本教程按命名推断的示意，不是仓库的完整清单。\n边界：文档没有说明每个开关的默认值与发布状态；本页不声称某个开关在公开版本中可用。"
+        },
+        {
+          "id": "startup-budget",
+          "title": "启动只背必需的东西",
+          "goal": "把重依赖推迟到首次使用，启动时省下了什么？",
+          "summary": "启动并行预取三件事；OpenTelemetry 与 gRPC 默认不背在身上。",
+          "interaction": "为两个重依赖选择加载时机，并开关启动预取",
+          "next": "看完机制，该判断哪些结论能直接用、哪些可以搬到自己的项目。",
+          "componentId": "startup-budget",
+          "moduleId": "startup-module",
+          "notes": "【建议时长】约 80 秒。\n【本页只讲】启动预算花在用户马上要用的东西上，其余延迟到首次使用。\n【讲解】文档说启动时会先并行发起 MDM 设置读取、钥匙串预取、API 预连接，然后才做重模块 import；而 OpenTelemetry（约 400KB）和 gRPC（约 700KB）这类重依赖通过动态 import 推迟到首次使用。本页把两个依赖的加载时机做成可选项：启动加载、首次使用、不加载。两个 KB 数来自文档，除此之外不编造耗时。预取开关演示“并行”与“串行”的差别：三件事并行发起，首屏交互不用等它们串完。\n【演示与停顿】先全部设为启动加载，指出启动就要背 1.1MB；再切到首次使用，问听众“第一次用到遥测时会发生什么”。最后关掉预取，说明串行等待。\n【过渡】看完机制，该判断哪些结论能直接用、哪些可以搬到自己的项目。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：Build System → Lazy Loading；Core Pipeline → Entrypoint\n本页为加载策略示意：400KB 与 700KB 来自文档；启动耗时、内存占用文档未给，本页不编造。\n边界：真实加载时机还受平台与打包方式影响；本页只比较“启动 / 首用 / 不加载”三种策略的取舍。"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "判断与迁移",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "transfer-module",
+          "title": "能不能搬到自己项目",
+          "desc": "按前提、风险与最小验证分三堆。",
+          "componentId": "transfer-map"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "evidence-table",
+          "title": "哪些结论可以直接用",
+          "goal": "同一份文档里，哪些能被代码验证？",
+          "summary": "单二进制、四件套、并发声明可直接引用；行数与组件数是量级。",
+          "interaction": "阅读六条主张的证据与强度",
+          "next": "把“能抄什么”拆成三堆，每条都给一个最小验证。",
+          "componentId": "evidence-table",
+          "notes": "【建议时长】约 65 秒。\n【本页只讲】文档内部的可验证程度不一样，引用前要分开。\n【讲解】第一行单二进制跑在 Bun 上：文档明写 not Node.js，构建配置也能查，强。第二行 46K 行：文档给的行数，当量级用。第三、四行工具四件套与 isConcurrencySafe：文档明确，且能在 Tool.ts 与工具目录里核对，强。第五行 140 组件 / 80 hooks：文档统计，需重新数。第六行九个开关：名字可在代码里搜，但会随版本增减。底部标出未纳入项：性能、内存、构建耗时，文档都没有。\n【演示与停顿】从上往下读，每行问一句“这句话能不能直接写进设计评审”。\n【过渡】把“能抄什么”拆成三堆，每条都给一个最小验证。\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：全文\n本页为证据分级：强度依据是“能否被独立复核”，不是统计显著性；未克隆仓库逐条核对。\n边界：这是社区整理的文档，未标注对应版本；同一句话在不同版本可能已经变化。"
+        },
+        {
+          "id": "transfer-map",
+          "title": "我的思考：哪些能搬，哪些不能",
+          "goal": "把文档里的架构拆成三堆，每堆给一个最小验证。",
+          "summary": "四件套与选择器可以直接抄；单二进制与 Ink 要付迁移成本；大文件与九组开关不建议照搬。",
+          "interaction": "点选条目，查看前提、风险与最小验证",
+          "next": "回到最初的问题：这份文档真正给了我们什么？",
+          "componentId": "transfer-map",
+          "moduleId": "transfer-module",
+          "notes": "【建议时长】约 90 秒。\n【本页只讲】架构能不能搬，取决于前提而不是看起来是否高级。\n【讲解】三堆：直接可抄是工具四件套、选择器加观察者、重依赖惰性加载；有条件可抄是单二进制（要 Bun 生态）和 React + Ink（要团队会 React）；不建议照搬是把六件事塞进一个 46K 行文件，以及九组特性开关（没有 CI 矩阵就会变成永远关着的死代码）。每条都给出前提、风险和最小验证：例如先给两个工具补齐四件，看新增工具是否变快；先把一个 ≥400KB 的依赖挪到首用，测首用路径。\n【演示与停顿】先点“工具四件套”，说明为什么它最值得先做；再点“六件事塞进一个文件”，说明为什么同样的做法在小团队里会变成负债。\n【过渡】回到最初的问题：这份文档真正给了我们什么？\n\n【来源与边界】\n原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md\n章节：全文；Concurrency Model；Build System\n本页为独立分析：三堆分类、前提、风险与验证设计都是本教程的判断，文档没有给出迁移建议。\n边界：最小验证只是提案，没有实施；不同团队规模下结论可能相反。"
+        },
+        {
+          "id": "closing",
+          "title": "一个终端工具，长成了一座应用框架",
+          "goal": "收束四个边界，留下一个可复用的判断。",
+          "summary": "边界决定形态；能力要回到一个循环；未发布的功能最好不存在。",
+          "interaction": "阅读三条结论",
+          "next": "",
+          "componentId": "closing",
+          "notes": "【建议时长】约 55 秒。\n【本页只讲】这份架构文档真正值得带走的，是四个边界的位置，而不是某一行代码。\n【讲解】三句话收束：边界决定形态——进程、渲染、控制、构建，每一处都在回答“这件事放在哪一层”；能力要回到一个循环，否则回合状态没有人持有；未发布的功能最好连代码都不存在，开关在构建期就把它删掉。回到封面：左边是只跑一辆手推车的直线，右边是有信号机的调度图——差别不在复杂度，而在每个位置是否清楚。\n【结尾】如果只记一句：先画边界，再写模块。\n【来源】原文：https://github.com/777genius/claude-code-source-code-full/blob/main/docs/architecture.md（社区整理，2026-10-08 更新）。本页为教程总结，不复述原文措辞。"
+        }
+      ]
+    }
+  ]
+};

@@ -1,0 +1,24 @@
+import React, {useEffect,useRef} from 'react';
+import {setupCanvas,observeCanvas} from '../lib/canvasKit';
+export const COLORS={bg:'#f5f8f0',light:'#b8c9a7',dark:'#76906a',support:'#92400e',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#f07e47',purple:'#7c3aed',ink:'#21324a',muted:'#68778f',axis:'#d7deea'};
+export const C=COLORS;
+export function line(c:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number,color:string=C.ink,width=3){c.strokeStyle=color;c.lineWidth=width;c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();}
+export function box(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,fill:string,stroke?:string){c.fillStyle=fill;c.fillRect(x,y,w,h);if(stroke){c.strokeStyle=stroke;c.lineWidth=2;c.strokeRect(x,y,w,h);}}
+export function dot(c:CanvasRenderingContext2D,x:number,y:number,r:number,color:string){c.fillStyle=color;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+export function text(c:CanvasRenderingContext2D,value:string|number,x:number,y:number,color:string=C.ink,size=22){c.fillStyle=color;c.font=`${size}px system-ui,sans-serif`;c.fillText(String(value),x,y);}
+export function clearScene(c:CanvasRenderingContext2D,w:number,h:number){c.clearRect(0,0,w,h);box(c,0,0,w,h,C.bg);}
+export function pencil(c:CanvasRenderingContext2D,x:number,y:number,color:string=C.blue,angle=-.6){c.save();c.translate(x,y);c.rotate(angle);box(c,0,-6,68,12,color);box(c,62,-6,12,12,C.light);c.fillStyle=C.support;c.beginPath();c.moveTo(0,-6);c.lineTo(-15,0);c.lineTo(0,6);c.fill();line(c,-15,0,-10,0,C.ink,3);c.restore();}
+export function sketch(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,detail=0,color:string=C.blue){c.save();c.translate(x,y);c.scale(w/360,h/200);box(c,0,0,360,200,'#ffffff',C.axis);line(c,20,176,340,176,C.light,2);line(c,50,90,175,30,color,3);line(c,175,30,305,90,color,3);line(c,65,85,65,174,color,3);line(c,289,84,289,174,color,3);line(c,65,174,289,174,color,3);box(c,140,115,57,59,'#fff',color);box(c,88,105,34,32,'#fff',color);box(c,226,105,34,32,'#fff',color);const a=Math.max(0,Math.min(1,detail));c.globalAlpha=a;line(c,72,93,288,93,color,3);for(let i=0;i<7;i++){const xx=91+i*26;line(c,xx,72-((i<3)?i*11:(6-i)*10),xx+28,89,color,2);}line(c,105,108,105,135,color,2);line(c,91,122,120,122,color,2);line(c,243,108,243,135,color,2);line(c,230,122,258,122,color,2);dot(c,182,145,2,color);c.restore();}
+type PlotProps={draw:(c:CanvasRenderingContext2D,w:number,h:number,time:number)=>void;label:string;width?:number;height?:number;onPointer?:(x:number,y:number)=>void;onKey?:(key:string)=>void;animate?:boolean};
+export function CanvasPlot({draw,label,width=1080,height=280,onPointer,onKey,animate=false}:PlotProps){
+ const ref=useRef<HTMLCanvasElement>(null),drawRef=useRef(draw);drawRef.current=draw;
+ useEffect(()=>{const canvas=ref.current;if(!canvas)return;const ctx=setupCanvas(canvas,width,height);canvas.style.width='100%';canvas.style.height='auto';let raf=0,visible=true;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const render=(ms:number)=>{drawRef.current(ctx,width,height,ms/1000);canvas.classList.add('is-ready');};const tick=(ms:number)=>{render(ms);raf=visible?requestAnimationFrame(tick):0;};const stop=()=>{visible=false;cancelAnimationFrame(raf);raf=0;};const start=()=>{visible=true;render(performance.now());if(animate&&!raf)raf=requestAnimationFrame(tick);};
+ // Reduced-motion keeps numeric/active feedback current while sampling ambient motion more gently.
+ const timer=reduced&&animate?window.setInterval(()=>render(performance.now()),250):0;
+ const disconnect=observeCanvas(canvas,start,stop);render(performance.now());return()=>{stop();disconnect();clearInterval(timer);};},[width,height,animate]);
+ useEffect(()=>{const canvas=ref.current;if(!canvas)return;const ctx=canvas.getContext('2d');if(!ctx)return;const dpr=window.devicePixelRatio||1;ctx.setTransform(dpr,0,0,dpr,0,0);draw(ctx,width,height,performance.now()/1000);canvas.classList.add('is-ready');},[draw,width,height]);
+ const point=(e:React.PointerEvent<HTMLCanvasElement>)=>{if(!onPointer)return;const r=e.currentTarget.getBoundingClientRect();onPointer(Math.max(0,Math.min(width,(e.clientX-r.left)*width/r.width)),Math.max(0,Math.min(height,(e.clientY-r.top)*height/r.height)));};
+ return <canvas ref={ref} role="img" aria-label={label} tabIndex={onKey?0:undefined} style={{touchAction:onPointer?'none':undefined,cursor:onPointer?'grab':undefined}} onPointerDown={e=>{if(onPointer){e.currentTarget.setPointerCapture(e.pointerId);point(e);}}} onPointerMove={e=>{if(e.buttons||e.currentTarget.hasPointerCapture(e.pointerId))point(e);}} onPointerUp={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}} onKeyDown={e=>{if(onKey&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();onKey(e.key);}}}/>;
+}
+export function KitResource(){return null;}

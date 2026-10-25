@@ -1,202 +1,54 @@
-# Validation Checklist
+# Paper Tutorial Validation Checklist
 
-Run Phase 1 and Phase 2 in the same invocation. Fix every failed item before continuing. Clean up the exact task-scoped temporary root before any final response or blocker report.
+Use this checklist at the end of each phase. `contract.md` defines the hard canvas
+constraints and flexible deck-planning guidance; this file records the review that
+scripts cannot perform. Automated validation never rejects a project for its chapter
+or slide count.
 
-The deliverable is a **React + TypeScript (Vite) project folder** `<paper-short-name>_output/`,
-not a single HTML file. `scripts/scaffold.js` copies `assets/react-template/` into the caller's
-working directory; the generator then fills `src/data/tutorial.ts`, `src/styles/paper.css`,
-`src/modules/*`, and `public/images/*`. See `contract.md` §10.
+## Phase 1: Paper-Specific Plan
 
-## Phase 1: Temporary PaperSkill
+- [ ] The canonical source cache passes `validate-source-cache.js`; every core claim, formula, figure and reported result has a source locator and valid conditions.
+- [ ] The paper's actual problem, contribution, mechanism, experiments and limits are represented. Inferences are marked as interpretations.
+- [ ] Several everyday-theme candidates were considered. The chosen theme has a paper-specific mechanism and episode-variety advantage; no demo theme is adopted by default.
+- [ ] The chosen activity has recognizable people, objects and settings where used. Each slide chooses a life, hybrid or paper-native view; no recurring photo or prop is repeated merely with new labels.
+- [ ] Each planned slide records its scientific objective, focal visual, unique widget ID, learner action when interactive, scientific explanation, feedback, source/analogy boundary, and `layoutRef: L01…L08` or `custom` with a reason and geometry sketch.
+- [ ] A deck-wide scene ledger records the chosen teaching-slide count (usually about 10–15 including the cover), the role of each page, its learner operation, meaningful motion if any, and the linked paper state. Any shorter or longer plan is explained by the paper, not adjusted to pass a count gate.
+- [ ] Theme-grounded animated interactions meet the planning target in contract.md §3; review their coverage separately from purely paper-native interactions and static theme illustrations. Distinct theme episodes and scientific consequences are present in the early, middle and late sequences, including a later application or failure-and-repair interaction. Direct technical manipulation and evidence pages remain where they explain better. Passive loops, cosmetic image effects and CSS entrances are not counted.
+- [ ] Every page has a recognizable theme visual linked to its scientific question. Static/technical pages use a small, readable illustration or object beside the explanation or evidence.
+- [ ] The full-deck contact sheet varies according to the concepts. Repeated left-animation/right-card silhouettes, one photo reused through the deck, generic dots/flows, generic evidence headings and large unpurposeful blank areas have been redesigned.
+- [ ] Core methods have meaningful interactive coverage; evidence or boundary chapters may use `modules: []`. Additional modules, formal views and result pages exist only where the paper benefits from them.
+- [ ] Central contributions map to core-method experiments, distinguished from supporting result/chart controls. Method pages predominantly let learners operate the actual mechanism. Each has a causal specification with an executable relation, visible intermediate/output consequences and two contrasting expected states; no core concept is covered only by benchmark selection or a bar animation.
+- [ ] Planning uses both the L01–L08 compositions and relevant runnable assets demo functions. Their causal behavior is adapted to the paper; demo theme/content is not inherited.
+- [ ] The temporary `SKILL.md` is fully paper-specific and contains enough implementation detail for the planned pages. It has no unfinished placeholders or copied demo scenes.
+- [ ] `stage-template.js` produced a demo-free scaffold, neutral layout gallery and complete global Markdown guides in the temporary skill. Any original paper figures were staged from the validated cache before Phase 2.
+- [ ] Optional videos have real, relevant BVIDs; covers and view counts are recorded only when actually retrieved. No video lookup blocks generation.
 
-### Canonical Source Cache
+## Phase 2: Project and Interaction
 
-- [ ] One task-scoped temporary root was created before reading the paper, and its exact resolved path is recorded.
-- [ ] `source-cache/manifest.json`, `content.md`, and `evidence.json` exist beneath that root.
-- [ ] `content.md` contains the complete normalized source with stable page markers for PDF input or file/section markers for LaTeX input.
-- [ ] `manifest.json` records source kind, origin, SHA-256 digest, locator scheme, page count when applicable, metadata, and a figure inventory.
-- [ ] Every exported original figure stays under `source-cache/figures/`; a figure that could not be exported retains its locator and caption with `file: null`.
-- [ ] `evidence.json` contains the same claim, locator, conditions, protocol, and allowed wording rows used by the intermediate Skill.
-- [ ] `node scripts/validate-source-cache.js <source-cache>` passes before tutorial planning continues.
-- [ ] After cache validation, no Phase 1 step reopens or reparses the original paper; all evidence comes from the canonical cache.
+- [ ] `scaffold.js` created one `<paper-short-name>_output/` project, with the official English paper title on the cover and natural Simplified Chinese teaching copy.
+- [ ] Chapter packets own disjoint IDs; `assemble-chapter-packets.js` wrote `tutorial.ts`, widget files, `registry.tsx` and the derived `outlines.json` once.
+- [ ] Selected life scenes use the chosen world; technical pages directly expose the paper mechanism without a forced life prop. The cover's two method animations share one clock and comparable starting conditions. Each page was implemented after inspecting its chosen gallery reference or custom sketch; no gallery sample text leaks into the app.
+- [ ] The generated pages were reviewed against the intermediate slide plan, staged global skill rules, gallery and actual React schema together; any disagreement was resolved before final validation.
+- [ ] Every primary module is mounted on a named scene. Its learner operation changes a paper-relevant variable, component, constraint or measured comparison, the main scientific visual and immediate feedback. A photo effect or moving prop alone does not count.
+- [ ] For each planned animated interaction, the learner action causes the intended motion and the linked scientific visual/value and feedback to change; inspect initial, intermediate and result states. Review the later result-interpretation and applicability pages as well as the early method pages; operate their planned interactions and confirm where each static page reconnects to the mechanism.
+- [ ] Exercise both planned contrasting inputs for each core-method module and check the computed intermediate/output states against its rule. Scene, formal view and feedback derive from the same scientific state. Theme objects expose that state; cosmetic motion, fixed number reveals and benchmark filters do not masquerade as method experiments. Toy results are identified as demonstrations, never reported as measured paper benchmarks.
+- [ ] The reference-only `assets/layout-gallery/teaching-demo/` was inspectable in Phase 2 but its demo modules/data were not copied into the generated runtime.
+- [ ] Scientific terminology appears in titles. Equations, architecture details, figures and measured results are readable where they help the explanation. Some pages give text/formal material more area than life animation; animation is not enlarged merely to fill a template.
+- [ ] Chapter markers sit at the upper right of slide headers. Within each teaching body, computed text uses no more than the three roles in contract.md §2.5; redundant tiny labels are removed. Important content uses the available body area without clipping or gratuitous blank space.
+- [ ] Sources and analogy limits are traceable in the evidence matrix and notes. Exact figures/numbers have on-slide attribution only where needed; no generic “论文机制 / 证据” or “论文出处” heading appears.
+- [ ] Formula symbols, assumptions, shapes and signs match the paper. Result comparisons use compatible protocols, units, baselines and metric directions.
+- [ ] Numerical experiment tables are visualized with suitable statistical charts unless a table better serves the stated learning objective. Check plotted values against the selected source rows, metric direction, units, zero-based bars, comparable scales, readable labels and uncertainty handling per presentation-standard.md. Result graphics do not substitute for core-method interactions.
+- [ ] Visible formula terms have contextual Chinese meanings on hover/focus and mobile tap, including custom bodies. Hints remain inside the viewport without shifting slide content; Escape and outside click dismiss them. Symbol hints do not count as core method interactions.
+- [ ] Use the staged framework as the default starting point. Keep paper content primarily in `src/data/tutorial.ts`, `src/modules/*`, `src/styles/paper.css` and staged media.
+- [ ] Interaction works by mouse, keyboard where feasible, and touch. Two-pointer pinch and bounded pan still work in mobile emulation without reflowing the slide.
+- [ ] No slide or card scrolls. The 1600×900 canvas fits with readable text in desktop, mobile, notes and fullscreen states; longest feedback and expanded details do not overlap or clip.
+- [ ] Capture and inspect the cover, every teaching page and optional video page. Run `auditSlide()` after fonts/images settle and after exercising meaningful interaction states; require no errors. If browser review is unavailable, report slide-fit validation as incomplete.
 
-### Structure
+## Automated Checks and Delivery
 
-- [ ] `SKILL.md` exists and is fully populated under the task-scoped temporary paperSkill directory.
-- [ ] The temporary directory is outside `skills/`, and the workspace.
-- [ ] `assets/react-template/` exists and contains the full Vite + React + TS scaffold (`src/`, `index.html`, `package.json`, `vite.config.ts`, `tsconfig*.json`).
-- [ ] `scripts/scaffold.js`, `scripts/assemble-chapter-packets.js`, `scripts/syntax-check.js`, and `scripts/validate-output.js` are copied beside the temporary `SKILL.md` (they sit beside `assets/` in the intermediate skill directory).
-- [ ] `SKILL.md` follows the reference template order exactly: introduction and tree; metadata with source-cache provenance; source-evidence and boundary matrix; unified theme; `chapterCount` detailed chapters; symbol table; Bilibili table (optional); Hero design; project-generation instructions.
-- [ ] Every selected original figure was copied from the validated cache into the temporary scaffold's `public/images/`; no figure requires Phase 2 to reopen the paper or source cache.
-
-### Plan Quality
-
-- [ ] One immutable shared chapter contract locks evidence boundaries, chapter order and dependencies, terminology, formula symbols, theme/colors, Canvas helpers, state conventions, widget naming, and chapter ownership before any parallel work.
-- [ ] Every chapter and `componentId` has exactly one owner; Phase 1 workers wrote only to isolated plan-packet directories and never edited another packet.
-- [ ] When parallel execution was unavailable, the same packet format was produced sequentially rather than bypassing isolation.
-- [ ] The coordinator reviewed all plan packets for terminology, symbols, evidence wording, transitions, duplication, theme consistency, interaction-pattern coverage, and result coverage before materializing the temporary Skill.
-- [ ] Paper title, short name, venue, authors, problem, insight, architecture, training, inference, results, and limitations are recorded.
-- [ ] A source-evidence matrix anchors every core tutorial claim to a page plus section, equation, figure, or table when available.
-- [ ] Explicit paper statements are separated from interpretation; unsupported causal wording and universal claims have been removed.
-- [ ] Architecture choices and interaction states include their dimensional, training, inference, or evaluation preconditions; technically impossible combinations are disabled and explained.
-- [ ] Every formula records symbol meaning, type or shape where meaningful, sign, normalization, and assumptions.
-- [ ] Every reported result records dataset, split or protocol, baseline, unit, and whether higher or lower is better; incompatible protocols are not compared directly.
-- [ ] Major ablations, transfer results, failure cases, and limitations reported by the paper are represented or explicitly scoped out with a reason.
-- [ ] One familiar anchor everyday theme is selected for the entire tutorial.
-- [ ] At least three candidate themes from different activity families were scored on mechanism fit, ten-action coverage, visual clarity, technical linkability, thematic continuity, and originality.
-- [ ] At least one candidate was newly invented rather than copied verbatim from the library, and the winner has a paper-specific justification plus rejection reasons for the other candidates.
-- [ ] Theme selection does not cite documentation order, example detail, a previous tutorial, or generic progress. Every candidate is treated equally, and the winner has a concrete paper-specific advantage over the rejected candidates.
-- [ ] The winning theme was locked before any paper-specific structural exemplar was read and remained unchanged afterward; no exemplar objects, actions, or scene mappings leaked into the plan.
-- [ ] The scene table has `chapterCount` rows (default 10; per `contract.md` §2); every row clearly belongs to the anchor theme and records one related action, one primary subject, one action verb, one visible goal, and no more than two static props.
-- [ ] The `chapterCount` actions are meaningfully varied within the theme through preparation, tool use, decisions, practice, safety checks, progress, or results rather than repeating the same literal motion.
-- [ ] No planned scene uses packages, conveyors, workstations, factory or kitchen assembly lines, delivery chains, handoffs, or multiple independent actors.
-- [ ] The unified-theme section defines one reusable Canvas drawing kit: recurring subject or manipulated object, target motif, shared setting, three to six props, named draw helpers, line weights, label style, and restrained scene palette.
-- [ ] A `chapterCount`-row visual interaction storyboard records each analogy action, dominant module operation, main graphic, technical evidence, shared state, and feedback transition.
-- [ ] Exactly `chapterCount` chapter plans exist, each with one main concept, badge, scene, active interaction, feedback, and takeaways.
-- [ ] Detail floor met per `contract.md` §6: every required field filled, `chapterPlanMinChars` (soft, 600) per chapter, and no global character minimum.
-- [ ] No chapter uses shorthand such as "same as above", "follow the schema", or `complete-chapter-N-plan`.
-- [ ] At least `activeModulesMin` active modules are fully specified, and at least `dualModuleChaptersMin` chapters contain two modules (per `contract.md` §3).
-- [ ] Every module records title, purpose, presentation mode, exact operation, initial state, controls and state space, Canvas composition, state transitions, exact feedback copy and colors, evidence, and learner judgment.
-- [ ] Every module also records state variable names and valid values, named Canvas regions, back-to-front draw order, reusable primitives, explicit visual encoding, synchronized outputs, responsive behavior, and pointer or keyboard behavior when applicable.
-- [ ] Every module has one dominant operation. That operation updates the main graphic plus feedback and, when meaningful, a value, dimensions, output, active path, curve, distribution, or comparison bar.
-- [ ] At least `mathOrHybridModulesMin` (4) modules use mathematical/technical or hybrid views, and at least `lifeOrHybridModulesMin` (4) use life-metaphor or hybrid views (per `contract.md` §3).
-- [ ] At least `distinctPatternsMin` (6) interaction patterns are used; P1 appears in no more than `p1SliderChaptersMax` (4) chapters (per `contract.md` §3).
-- [ ] Bilibili videos are optional (per `contract.md` §7): when present, three or four real BVIDs are displayed with cover + views; verification of the Bilibili API is NOT required to display them. Selected videos normally exceed 10,000 views; lower-view direct explanations include a written exception reason. If absent, the video section is omitted only because no relevant video exists — this is not a failure.
-- [ ] No template placeholder remains.
-
-## Phase 2: Final React + TS Project
-
-### Instructional Design
-
-- [ ] The operation itself expresses the concept.
-- [ ] Every chapter exposes a limitation before introducing the solution.
-- [ ] Every chapter introduces only one major new concept.
-- [ ] Equations appear after analogy and interaction.
-- [ ] Every chapter communicates the use case, applicability, and core intuition.
-- [ ] All chapter analogies visibly belong to one coherent everyday activity while remaining individually simple and direct.
-
-### File and Project Structure
-
-- [ ] Exactly one `<paper-short-name>_output/` folder is produced in the caller's working directory.
-- [ ] `scaffold.js` created the folder from `assets/react-template/`; `package.json` name and `index.html` title reflect the paper.
-- [ ] `chapter-work/shared.json` contains the single global `meta`, `hero`, and optional `bilibili` records.
-- [ ] Every packet owns disjoint chapter IDs and contains a valid `packet.json`, chapter JSON files, and its own widget TSX files.
-- [ ] Workers never wrote directly to the output project; `assemble-chapter-packets.js` was the only writer of `tutorial.ts`, packet widget copies, and `registry.tsx`.
-- [ ] Packet assembly completed without duplicate/missing chapter IDs, duplicate module/widget IDs, path escapes, missing exports, or unregistered `componentId`s.
-- [ ] Packet assembly parsed `tutorial.ts`, `registry.tsx`, and every copied widget with the project's TypeScript/esbuild and reported no syntax error (a truncated widget missing its final brace is rejected here, before any Pull Request).
-- [ ] No KaTeX, MathJax, CDN, external font, or local media folder is required; the only dependencies are `react` and `react-dom`.
-- [ ] The only permitted network-backed feature is the optional Bilibili metadata loader (per `contract.md` §7).
-- [ ] `src/data/tutorial.ts` is fully filled: `meta`, `hero`, exactly `chapterCount` (`kind:"chapter"`) entries, and `bilibili` (optional). Every `module` entry has `kind:"module"` and a `componentId` registered in `src/modules/registry.tsx`.
-- [ ] The Hero (`tutorial.hero`) contains title metadata and old-vs-new contrast (each side may use a canvas widget and/or a figure).
-- [ ] `src/styles/paper.css` overrides the `:root{}` scene colors; the `__METAPHOR_CSS__` placeholder is replaced (or removed if no override is needed).
-- [ ] The slide layout works end to end (owned by `App.tsx`): sidebar TOC switches chapters, one chapter per screen, bottom nav bar pins to the viewport; videos (if any) appear as the last slide.
-
-### Framework File Integrity
-
-- [ ] Framework files are NOT edited by the generator: `src/components/*`, `src/lib/*`,
-  `src/styles/tokens.css`, `src/styles/components.css`, `App.tsx`, `main.tsx`,
-  `vite.config.ts`, `tsconfig*.json`, `package.json` (beyond the scaffold-time injection).
-- [ ] `src/data/tutorial.ts` is the single content source; no JSX/HTML is hand-written for chapter
-  content.
-- [ ] Every `componentId` referenced in `tutorial.ts` exists in `src/modules/registry.tsx`; an
-  unknown id degrades gracefully (the `Module` component shows a notice) but should still be
-  registered for a complete tutorial.
-- [ ] Optionally, paper-specific widgets live under `src/modules/*` and are registered in
-  `registry.tsx` via `widgetRegistry['id'] = Component`.
-- [ ] `src/data/tutorial.ts` and `src/modules/registry.tsx` were assembled once by the coordinator; no parallel worker modified either file or `src/styles/paper.css`.
-
-### UI and Responsive Behavior
-
-- [ ] Design tokens and component CSS load unchanged (imported by `main.tsx`); paper overrides come from `paper.css` only.
-- [ ] The DOM shell is rendered by the bundled components: slide layout with sidebar TOC and bottom nav, Hero as the cover slide with one `.hero-inner`, compact comparison-panel headers, and the original component class hierarchy (`chap`, `chap-title`, `module`, `analogy-card`, `formula`, `takeaway`, `dl-related-section`, etc.).
-- [ ] Chapters retain the white surface, border, radius, shadow, spacing, and numbered serif title accent from `components.css`.
-- [ ] Every `.module` retains its muted header band, white body, border, and bundled padding; paper overrides do not redesign shared components.
-- [ ] The video section uses `.dl-related-section`, is outside the chapter count, and keeps the four-item horizontal strip / two-item narrow-screen strip.
-- [ ] Body text and component text retain the enlarged typography from the source assets.
-- [ ] Hover, active, and `focus-visible` states remain available for interactive elements.
-- [ ] Transitions use the provided duration and easing tokens.
-- [ ] Canvas widgets fade in through an `is-ready` style after their first successful draw.
-- [ ] Paragraphs contain one to three Simplified Chinese sentences and avoid walls of text.
-- [ ] Semantic colors remain red for error, green for repair, blue for guidance, orange for emphasis, and purple for auxiliary concepts.
-- [ ] Canvas scenes use one restrained tutorial-wide palette and reusable drawing primitives rather than ten unrelated visual styles.
-- [ ] Layout does not overflow or overlap on desktop or mobile.
-
-### Interaction
-
-- [ ] Every chapter includes an active operation, not only passive animation.
-- [ ] The project contains at least `activeModulesMin` primary active modules, with at least `dualModuleChaptersMin` chapters containing two (per `contract.md` §3).
-- [ ] At least `distinctPatternsMin` (6) P1–P8 patterns are used, with P1 in no more than `p1SliderChaptersMax` (4) chapters (per `contract.md` §3).
-- [ ] Every control updates values, canvas state, or feedback immediately.
-- [ ] Every primary module completes `learner action -> visible state change -> immediate feedback -> conceptual judgment`.
-- [ ] Each module has one dominant operation and a compact composition: one main Canvas or synchronized comparison, one control row or direct-manipulation target, one stable detail region when needed, and one feedback bar.
-- [ ] The main graphic, technical evidence, value labels, selected controls, and feedback are driven by the same state; no decorative animation sits beside an unrelated chart.
-- [ ] Automatic analogy animations are life-based; body modules may use the unified life metaphor, mathematical/technical views, or linked hybrid views.
-- [ ] Coordinate grids, feature maps, vectors, architecture graphs, equations, curves, and charts appear only when actively operated or linked to an active control, not as passive filler.
-- [ ] Feedback color matches good, intermediate, and poor states.
-- [ ] Buttons, chips, and custom hit targets remain keyboard accessible where feasible.
-- [ ] The page contains no visible operation tutorial, replay instruction, or next-section instruction copy.
-
-### Canvas / Widget Implementation
-
-- [ ] Automatic analogy animations and Hero animations use recognizable real-world objects rather than abstract fields, grids, heat maps, particle clouds, or mathematical wave plots.
-- [ ] Every analogy can be described as `one subject + one verb + one goal`.
-- [ ] Every analogy uses no more than two static supporting props and only one independently moving subject, except one subject per panel in a direct comparison and the Chapter 10 result race.
-- [ ] Motion is one continuous action from the selected paper-specific theme, such as writing, watering, tuning, stirring, running, pouring, driving, shining, shaping, rolling, or stacking; the list is illustrative rather than a theme preference.
-- [ ] No analogy contains packages through workstations, conveyors, assembly lines, delivery chains, multiple workers or machines, labeled-box sequences, or multi-stage handoffs.
-- [ ] Every nontrivial network structure appears in a dedicated interactive module rather than only as a static diagram. The module may be life-metaphor, mathematical/technical, or hybrid.
-- [ ] The architecture module supports a meaningful click, switch, step, or drag operation and immediately updates component highlighting, the active path, values or output, and feedback.
-- [ ] Widgets use `canvasKit.ts` (`setupCanvas` / `observeCanvas`) for sizing and off-screen pausing; each widget has independent state.
-- [ ] Every Canvas/widget adds `is-ready` after its first successful draw.
-- [ ] No widget draws replay instructions.
-- [ ] Canvas drawing order keeps background, environment or axes, inactive paths, active paths, subject or selected component, target or value, and sparse labels visually legible.
-- [ ] Active states use at least two visible cues such as color plus stroke, fill plus outline, or position plus label; semantic meaning does not rely on color alone.
-- [ ] Technical curves, distributions, feature views, bars, dimensions, and architecture marks are evidence-backed and respond to an active state unless they are exact result records below the interaction.
-
-### Content and Figures
-
-- [ ] Visible explanatory prose is natural Simplified Chinese.
-- [ ] Formula cards use Unicode and HTML, with clickable symbols and matching descriptions.
-- [ ] Results and limitations match the paper and are not invented.
-- [ ] Core claims retain the scope and boundary recorded in the source-evidence matrix; analogy language does not overstate causality or applicability.
-- [ ] Architecture controls expose only technically valid combinations and explain unavailable choices.
-- [ ] Formula symbols, dimensions, signs, normalization, and assumptions match the paper.
-- [ ] Result labels include the correct protocol and metric direction; higher-is-better and lower-is-better comparisons use the correct visual and verbal conclusion.
-- [ ] When the paper reports them, major ablations, cross-task transfer results, failure cases, and limitations are covered rather than replaced by a single headline benchmark.
-- [ ] Bilibili videos are optional: when present, every `bvid` is real and displayed with a baked-in `cover` and `views` (the runtime `useBiliVideos` loader is best-effort enrichment only, since the unsigned `view` API is often rejected in end-user browsers). Verification of accessibility is not required to display. When absent, the video section is simply omitted because no relevant video exists.
-- [ ] Original paper figures are optional (per `contract.md` §11): when included, the image lives in `public/images/` and is referenced via a `figure` field (`./images/...` relative path or absolute URL); when omitted, no figure is fabricated.
-- [ ] No root-absolute local asset path (`/images/...`, `/videos/...`) appears in any string inside `src/**` — write `./images/...` instead, otherwise the image only loads when the tutorial is served from the site root and 404s on the deployed sub-path. (CSS `url('/images/...')` is the exception: Vite rewrites it, leave it alone. `npm run fix:assets` in the PaperSkill repository rewrites the wrong form automatically.)
-- [ ] Every local original figure came from the validated Phase 1 cache and was already staged in the temporary scaffold before Phase 2 began.
-- [ ] No unnecessary template or implementation comments remain in `src/data/tutorial.ts`.
-
-## Automated Validator Gate
-
-Run the syntax gate and the structural validator against the produced project folder as hard gates
-(in addition to the self-checks above):
-
-```bash
-node scripts/syntax-check.js <path-to>/<paper-short-name>_output --require-parser
-node scripts/validate-output.js <path-to>/<paper-short-name>_output
-```
-
-`--require-parser` makes the syntax gate exit non-zero when the project's TypeScript/esbuild is not
-installed, so the final sources cannot pass by skipping the parse; install dependencies with
-`npm install` first. This is the same compile-time check the repository CI runs, moved forward to
-the generation stage.
-
-- [ ] Every `src/**` file and the Vite config parse cleanly under TypeScript/esbuild; no truncated or unbalanced `.tsx` widget reaches the output folder.
-- [ ] `kind: "chapter"` count is within `[chapterCountMin, chapterCountMax]` (6–10) per `contract.md` §2.
-- [ ] `kind: "module"` count `>= activeModulesMin`; `>= dualModuleChaptersMin` chapters have two modules (per `contract.md` §3).
-- [ ] No leftover template placeholders (`__…__`, `__METAPHOR_CSS__`, `TBD`, `TODO`) in `src/data/tutorial.ts`, `src/styles/paper.css`, or `src/modules/*`.
-- [ ] Every Bilibili entry (if any) has a real `bvid` (`BV…`) or is omitted.
-- [ ] `src/data/tutorial.ts` and `src/styles/paper.css` exist and parse without a leftover placeholder.
-- [ ] Both commands were run against the final, unmodified project folder; any edit after the gates requires re-running them.
-
-The script exits non-zero on any failure; treat that as a blocker.
-
-## Cleanup Gate
-
-- [ ] The recorded task root, source-cache path, packet-work paths, and intermediate path were resolved again before cleanup.
-- [ ] The source cache, plan packets, chapter-work packets, and intermediate skill were confirmed as children of the exact task-scoped root created before source parsing.
-- [ ] Only that exact task-scoped root was recursively removed; no wildcard, unresolved variable, or broad system temporary directory was used.
-- [ ] The task root, source cache, packet work, and temporary paperSkill no longer exist.
-- [ ] The final response exposes only the project folder, never the intermediate path or contents.
+- [ ] After `npm install`, run `node syntax-check.js <outputDir> --require-parser` and `node validate-output.js <outputDir>` on the final folder. Both pass; any edit afterward triggers both again.
+- [ ] The validator reports chapter and scene counts for inspection but applies no numeric page-count or chapter-count range.
+- [ ] Local images, thumbnails, media and data use page-relative `./...` URLs from `public/`, Vite imports from `src/`, or stylesheet-relative CSS URLs. Check loading from a nested deployment path.
+- [ ] `npm run build` passes in the generated project. Review content warnings and correct visible placeholders, demo content or invalid video links as appropriate.
+- [ ] The exact task-scoped temporary root is removed after success or failure, unless `PAPER_SKILL_DEBUG=true`. Confirm the resolved target is the task root before recursive removal; never delete a broad temp parent.
+- [ ] Deliver the final project folder only. In debug mode, also return the preserved task root path.

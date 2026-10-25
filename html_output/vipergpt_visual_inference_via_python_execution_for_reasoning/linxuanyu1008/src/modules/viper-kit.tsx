@@ -1,0 +1,23 @@
+import React, { useEffect, useRef } from 'react';
+import { setupCanvas, observeCanvas } from '../lib/canvasKit';
+
+export const C = { bg:'#f5f8f0', light:'#b8c9a7', dark:'#76906a', support:'#92400e', blue:'#27446e', green:'#228d5c', red:'#c43f52', orange:'#f07e47', purple:'#7c3aed', text:'#21324a', muted:'#68778f', border:'#d7deea' };
+export function box(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,fill:string,stroke:string=C.border,r=12){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=2.5;ctx.stroke();}
+export function line(ctx:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number,color:string=C.support,width=3){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.stroke();}
+export function label(ctx:CanvasRenderingContext2D,text:string,x:number,y:number,color:string=C.text,size=20){ctx.fillStyle=color;ctx.font=`600 ${size}px system-ui, sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,x,y);}
+export function clearScene(ctx:CanvasRenderingContext2D,w:number,h:number){ctx.clearRect(0,0,w,h);ctx.fillStyle=C.bg;ctx.fillRect(0,0,w,h);}
+export function drawDesk(ctx:CanvasRenderingContext2D,w:number,h:number){ctx.fillStyle=C.light;ctx.fillRect(0,h-18,w,18);line(ctx,0,h-18,w,h-18,C.dark,2);}
+export function drawCard(ctx:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string=C.border){box(ctx,x,y,w,h,'#ffffff',color,10);}
+export function drawLoupe(ctx:CanvasRenderingContext2D,x:number,y:number,color:string=C.blue,scale=1){ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);line(ctx,20,20,52,52,C.support,11);ctx.beginPath();ctx.arc(0,0,31,0,Math.PI*2);ctx.fillStyle='#ffffffb0';ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=6;ctx.stroke();ctx.restore();}
+export function drawPencil(ctx:CanvasRenderingContext2D,x:number,y:number,color:string=C.orange,scale=1){ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.rotate(-0.7);box(ctx,-6,-60,12,55,color,C.support,2);ctx.beginPath();ctx.moveTo(-6,-5);ctx.lineTo(0,9);ctx.lineTo(6,-5);ctx.fillStyle=C.support;ctx.fill();ctx.restore();}
+export function drawRuler(ctx:CanvasRenderingContext2D,x:number,y:number,w=180){box(ctx,x,y,w,24,'#f3e6c7',C.support,3);for(let i=10;i<w;i+=10)line(ctx,x+i,y,x+i,y+(i%50===0?15:8),C.support,1.5);}
+export function drawBook(ctx:CanvasRenderingContext2D,x:number,y:number,w=160,h=85,color:string=C.blue){drawCard(ctx,x,y,w/2,h,color);drawCard(ctx,x+w/2,y,w/2,h,color);line(ctx,x+w/2,y,x+w/2,y+h,C.support,3);for(let j=0;j<3;j++){line(ctx,x+15,y+20+j*18,x+w/2-15,y+20+j*18,C.light,3);line(ctx,x+w/2+15,y+20+j*18,x+w-15,y+20+j*18,C.light,3);}}
+export function drawTarget(ctx:CanvasRenderingContext2D,x:number,y:number,color:string=C.green,r=15){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();line(ctx,x-r*.45,y,x-r*.1,y+r*.35,'white',3);line(ctx,x-r*.1,y+r*.35,x+r*.5,y-r*.4,'white',3);}
+
+type CanvasProps={draw:(ctx:CanvasRenderingContext2D,timeMs:number)=>void; width?:number;height?:number;animate?:boolean;ariaLabel?:string;onPointerDown?:React.PointerEventHandler<HTMLCanvasElement>;onPointerMove?:React.PointerEventHandler<HTMLCanvasElement>;onPointerUp?:React.PointerEventHandler<HTMLCanvasElement>;onPointerCancel?:React.PointerEventHandler<HTMLCanvasElement>;style?:React.CSSProperties};
+export function ViperCanvas({draw,width=1080,height=280,animate=false,ariaLabel='交互图示',...props}:CanvasProps){
+ const ref=useRef<HTMLCanvasElement>(null);
+ useEffect(()=>{const canvas=ref.current;if(!canvas)return;const ctx=setupCanvas(canvas,width,height);canvas.style.width='100%';canvas.style.height='auto';let raf=0,active=false;const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;const epoch=performance.now();const paint=(now:number)=>{draw(ctx,reduced?1500:now-epoch);canvas.classList.add('is-ready');if(active&&animate&&!reduced)raf=requestAnimationFrame(paint);};const start=()=>{if(active)return;active=true;paint(performance.now());};const stop=()=>{active=false;cancelAnimationFrame(raf);};const disconnect=observeCanvas(canvas,start,stop);return()=>{stop();disconnect();};},[draw,width,height,animate]);
+ return <canvas ref={ref} aria-label={ariaLabel} role="img" {...props} style={{display:'block',width:'100%',maxWidth:'100%',height:'auto',aspectRatio:`${width}/${height}`,...props.style}}/>;
+}
+export const ViperScene:React.FC=()=> <ViperCanvas draw={(ctx)=>{clearScene(ctx,1080,280);drawDesk(ctx,1080,280);drawCard(ctx,200,40,680,180);drawLoupe(ctx,530,115);}}/>;

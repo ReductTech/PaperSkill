@@ -83,14 +83,14 @@ export const tutorial: TutorialData = {
       modules: [{ kind:'module', id:'9.1', title:'切换共享与模块消融', desc:'共享：Multiple / Half-shared / Single 的 Avg. 为 75.9 / 75.9 / 77.4。模块：仅视觉投影 / 加 LayerNorm / 加 Adapter 的 Avg. 为 47.1 / 62.9 / 77.4。选择对照看它验证的问题。', componentId:'vl-widget' }],
       insight: '另一个单独 VQA 实验中，训练 CLIP+BART 为 65.6，冻结 CLIP 只训 BART 为 64.7（主 Table 3）；它与主多任务设置不同。',
       takeaways: t(['🤝','共享','本文设置中 Single 更省参数。'],['🔬','模块','Adapter 在投影与 LN 之上带来明显增量。'],['⚠️','条件','消融结论受任务与超参数限制。']) },
-    { kind: 'chapter', id: 'chap-10', title: '边界与五篇研究路线', badge: 'both', badgeLabel: 'Research Path',
-      bridge: '先区分作者明确写出的限制，与本项目根据实验范围总结的边界，再把本篇放回研究问题演进路线。',
-      analogy: a('共用模板还不是私人助手', '共用批注可帮助多门课，但仍不知道某位同学的照片、习惯和长期目标。'),
+    { kind: 'chapter', id: 'chap-10', title: '局限与总结', badge: 'both', badgeLabel: 'Conclusions',
+      bridge: 'VL-Adapter 检验语言侧 Adapter-based PEFT 对视觉语言任务的适配，以及不同任务之间共享 Adapter 的效果。总结时应把参数效率、实验条件与适用边界一起看，并区分作者明确报告的局限与根据实验范围归纳的边界。（主 §3.2、§5；补 §D、§H）',
+      analogy: a('批注有效，也要看测验范围', '薄批注能帮助共用教材完成多门课的测验；测验中的表现不能保证它适合所有课程和题型。'),
       modules: [
-        { kind:'module', id:'10.0', title:'哪些是作者限制，哪些是项目归纳？', desc:'边界说明用于约束结论，不能把未做的实验写成已证明的能力。', componentId:'vl-widget' },
-        { kind:'module', id:'10.1', title:'点击五篇路线中的节点', desc:'LoRA → VL-Adapter → MyVLM → Yo’LLaVA → PersonaVLM 表示<b>本项目组织的研究问题演进</b>，不代表未经核实的直接技术继承。下一篇才开始用户特有视觉概念。', componentId:'vl-widget' }
+        { kind:'module', id:'10.0', title:'作者局限与实验覆盖边界', desc:'区分作者明确报告的限制和对实验范围的归纳；尚未验证的场景不能写成已证明的能力。', componentId:'vl-widget' },
+        { kind:'module', id:'10.1', title:'切换结论，核对条件与边界', desc:'选择参数效率、图文与视频文本适配，或任务共享，回顾论文观察到什么、比较条件是什么，以及不能据此推出什么。', componentId:'vl-widget' }
       ],
-      insight: 'LoRA 是低秩权重更新；VL-Adapter 检验 Adapter-based PEFT 在视觉语言多任务中的使用。',
-      takeaways: t(['✅','已验证','论文设置中的图文与视频文本适配。'],['🚧','未验证','现代大规模 MLLM 的全面适用性、用户级长期个性化。'],['➡️','过渡','从通用 PEFT 走向视觉语言 PEFT。']) },
+      insight: '少量参数适配和跨任务共享在本文设置中有效，但参数效率不等于推理零开销，汇总表现接近也不等于每项任务都提升。',
+      takeaways: t(['🧩','方法','语言侧 Adapter、视觉投影与 LayerNorm 支持 V&L 适配。'],['🤝','观察','本文比较 Multiple、Half-shared、Single；共享效果需结合实验条件。'],['🚧','边界','图文与视频文本结果不能保证未覆盖任务、架构和数据分布的表现。']) },
   ],
 };

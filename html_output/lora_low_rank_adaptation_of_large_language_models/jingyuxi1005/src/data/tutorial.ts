@@ -479,12 +479,12 @@ export const tutorial: TutorialData = {
     {
       "kind": "chapter",
       "id": "chap-10",
-      "title": "LoRA 的局限与后续四篇",
+      "title": "优势、局限与总结",
       "badge": "both",
       "badgeLabel": "关键",
-      "bridge": "把 LoRA 的贡献放在适用范围内，也看清下一篇为什么要走向视觉语言。",
+      "bridge": "回顾 LoRA 如何降低全量微调的成本，并把它的优势放在适用范围内理解。",
       "analogy": {
-        "title": "LoRA 的局限与后续四篇",
+        "title": "优势、局限与总结",
         "text": "装框时写清作品的适用范围：这张图解释适配成本，但不能证明所有交互需求已解决。",
         "componentId": "lora-widget"
       },
@@ -492,12 +492,12 @@ export const tutorial: TutorialData = {
         {
           "kind": "module",
           "id": "10.1",
-          "title": "逐项看边界与后续问题",
-          "desc": "上方已列出四项边界。这里逐步查看它们如何影响使用情境，再点选五篇路线的节点，阅读每篇要追问的问题。<br/><small>依据：论文 §4.2、§5、§7；路线为本项目组织方式。</small>",
+          "title": "逐项看边界，回顾核心贡献",
+          "desc": "逐步查看 rank 与位置、基础模型、任务切换和语言任务验证范围四项边界，最后回顾低秩增量与合并推理的贡献。<br/><small>依据：论文 §4.2、§5、§7；图为自制教学示意。</small>",
           "componentId": "lora-widget"
         }
       ],
-      "insight": "LoRA 回答“如何低成本适配大模型”。后续页面将依次研究视觉语言适配、用户特有视觉概念、多模态助手、长期个性化。",
+      "insight": "为降低全量微调的训练与存储成本，LoRA 冻结 W₀，用 BA 表示低秩任务增量，只训练 r(d+k) 个因子参数；将缩放后的 BA 合并回 W₀ 后，可与同形状稠密层比较推理延迟。论文语言任务实验表明其效果具有竞争力，但 rank 与插入位置仍需按任务选择。",
       "takeaways": [
         {
           "icon": "✅",
@@ -510,9 +510,9 @@ export const tutorial: TutorialData = {
           "desc": "原论文主要验证语言模型，没有长期记忆与用户偏好机制。"
         },
         {
-          "icon": "➡️",
-          "title": "后续四篇",
-          "desc": "VL-Adapter → MyVLM → Yo'LLaVA → PersonaVLM。"
+          "icon": "🎯",
+          "title": "选择与验证",
+          "desc": "rank 并非越大越好，插入位置也没有适用于所有任务的最优配置。"
         }
       ]
     }

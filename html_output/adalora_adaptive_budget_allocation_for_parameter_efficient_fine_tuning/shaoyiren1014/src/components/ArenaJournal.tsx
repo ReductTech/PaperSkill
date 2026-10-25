@@ -1,0 +1,3 @@
+import {rooms,predictions} from '../data/performanceArena';
+import type {ArenaState} from '../store/arenaStore';
+export default function ArenaJournal({state:s}:{state:ArenaState}){return <div className="journal-lines">{rooms.map(c=><div key={c.id}><span>{c.name} · {s.rooms[c.id].completed?'已完成':'进行中'}</span><p>最初预测：{predictions.find(p=>p.id===s.rooms[c.id].prediction)?.label||'尚未提交。'}</p><p>{s.rooms[c.id].revealed?`已读 ${c.table.replace('table-','Table ')}；查看 ${s.rooms[c.id].seen.length} 个预算档位。`:'尚未揭示论文结果。'}{s.rooms[c.id].exceptionRead?'已核对例外。':'尚未核对例外。'}</p></div>)}<div><span>本章发现</span><p>{s.completed?'有限预算下，重要性感知分配通常更有竞争力；收益和例外必须放回具体实验条件。':'完成三个任务的预测、预算比较、例外与修正后记录。'}</p></div></div>;}

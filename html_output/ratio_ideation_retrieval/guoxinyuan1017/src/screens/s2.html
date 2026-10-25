@@ -1,0 +1,51 @@
+<section class="card" id="s2" aria-labelledby="s2-title">
+<div class="card-head">
+  <span class="tag-no">S2</span>
+  <span class="tag-name">构造 · 从相邻句对里抠训练样本</span>
+</div>
+
+<p class="intro" id="s2-title">后句以标记词开头 → 前句当查询，<b>去掉标记词的后句</b>当 gold。整条流水线只赌一件事：作者自己写下的转折词，等于他承认两句之间的构思关系。</p>
+
+<div class="play2" id="play2">
+  <div class="p2-head">
+    <span class="p2-t">四路来源 → 一个互斥词表 → 扫全文</span>
+    <span class="p2-t">Semantic Scholar CS 全文</span>
+  </div>
+
+  <div class="src2" id="srcs2">
+    <div class="src" data-part2="s1"><b>人工梳理</b><span>169 · 84/13/72</span></div>
+    <div class="src" data-part2="s2"><b>前缀扩展</b><span>并入条目</span></div>
+    <div class="src" data-part2="s3"><b>LLM 生成</b><span>强真 3,779</span></div>
+    <div class="src" data-part2="s4"><b>模板扩展</b><span>397 · 297 新</span></div>
+  </div>
+
+  <div class="p2-flow" id="flow2">↓ 去重合并</div>
+
+  <div class="lex2" data-part2="lex">
+    <span class="lex2-n">4,252</span>
+    <span class="lex2-t">个标记词 · 三张表互斥，一个词只归一个动作</span>
+  </div>
+
+  <div class="scan2" data-part2="scan">
+    <div class="scan2-row">
+      <span>扫 366.6M 相邻句对</span>
+      <span class="scan2-hit">命中 809 <em>19%</em></span>
+    </div>
+    <div class="scan2-track" id="track2"><i class="scan2-fill"></i></div>
+  </div>
+
+  <div class="tri2" data-part2="tri">
+    <div class="tri-cell"><span class="tri-k">u(i)</span><span class="tri-v">前句 → 查询 q</span></div>
+    <div class="tri-cell"><span class="tri-k">ℓ</span><span class="tri-v">标记词 → 只留元数据</span></div>
+    <div class="tri-cell"><span class="tri-k">g</span><span class="tri-v">后句去掉 ℓ → gold</span></div>
+  </div>
+
+  <p class="p2-note">标记词必须从 gold 句里剥掉：<b>否则检索器认出句首短语就能作弊</b>，学到的只是「找 to address this issue」。</p>
+
+  <div class="hover-card" id="hoverCard2" role="status" aria-live="polite">
+    <p class="hc-t" id="h2T"></p>
+    <p class="hc-l"><span class="hc-k" id="h2K1"></span><span id="h2V1"></span></p>
+    <p class="hc-l"><span class="hc-k" id="h2K2"></span><span id="h2V2"></span></p>
+  </div>
+</div>
+</section>

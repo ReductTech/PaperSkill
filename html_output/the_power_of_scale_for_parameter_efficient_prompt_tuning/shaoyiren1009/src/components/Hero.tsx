@@ -1,0 +1,4 @@
+import React from 'react';
+import type {Meta,HeroConfig} from '../types';
+import {RobotStory} from '../modules/GardenKit';
+export function Hero({meta}:{meta:Meta;hero:HeroConfig}){return <section className="story-cover"><div className="cover-copy"><div className="cover-eyebrow">桃花源 · 人机交互实验空间</div><h1>不必重写大脑，<br/>先学会<span>引导它。</span></h1><p className="cover-role">你的身份：<strong>Robot Prompt Trainer</strong></p><p className="cover-intro">你得到一位知识丰富、理解语言的机器人。<br/>它却还不知道，此刻你希望它完成什么。</p><p className="cover-question">{meta.coreProblem}</p><div className="cover-seal"><span>◌ 核心冻结</span><span>⌁ 只训练 Soft Prompt</span></div></div><div className="cover-world"><RobotStory hero/><span className="world-caption">一颗不被改写的大脑，与一段可以学习的引导。</span></div><div className="cover-paper"><a href="https://arxiv.org/abs/2104.08691v2" target="_blank" rel="noreferrer">{meta.titleEn} ↗</a><span>{meta.authors} · Google Research · 2021</span><p>十章交互故事 · 以论文实验为证据 · 教学模拟不运行真实 T5</p></div></section>}

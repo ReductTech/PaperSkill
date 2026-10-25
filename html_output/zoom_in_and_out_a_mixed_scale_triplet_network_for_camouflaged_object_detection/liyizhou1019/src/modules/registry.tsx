@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { KitAnchor } from './kit-anchor';
+import { Zoom1 } from './zoom-1';
+import { Zoom10 } from './zoom-10';
+import { Zoom2 } from './zoom-2';
+import { Zoom3 } from './zoom-3';
+import { Zoom4 } from './zoom-4';
+import { Zoom5 } from './zoom-5';
+import { Zoom6 } from './zoom-6';
+import { Zoom7 } from './zoom-7';
+import { Zoom7b } from './zoom-7b';
+import { Zoom8 } from './zoom-8';
+import { Zoom9 } from './zoom-9';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['kit-anchor'] = KitAnchor;
+widgetRegistry['zoom-1'] = Zoom1;
+widgetRegistry['zoom-10'] = Zoom10;
+widgetRegistry['zoom-2'] = Zoom2;
+widgetRegistry['zoom-3'] = Zoom3;
+widgetRegistry['zoom-4'] = Zoom4;
+widgetRegistry['zoom-5'] = Zoom5;
+widgetRegistry['zoom-6'] = Zoom6;
+widgetRegistry['zoom-7'] = Zoom7;
+widgetRegistry['zoom-7b'] = Zoom7b;
+widgetRegistry['zoom-8'] = Zoom8;
+widgetRegistry['zoom-9'] = Zoom9;

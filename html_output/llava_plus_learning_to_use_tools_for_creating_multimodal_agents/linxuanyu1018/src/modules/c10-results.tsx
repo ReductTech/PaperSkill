@@ -1,0 +1,37 @@
+import {useState} from 'react';
+import {C,Choices,Feedback,Scene,clearScene,round} from './llava-kit';
+const data={"table4a": {"columns": ["COCO Conv.", "COCO Detail", "COCO Reasoning", "COCO All", "Wild Conv.", "Wild Detail", "Wild Reasoning", "Wild All"], "rows": [["LLaVA", [82.0, 69.1, 92.6, 81.2, 42.6, 51.9, 68.9, 57.1]], ["LLaVA (Tools in Test)", [56.2, 67.9, 53.3, 59.1, 40.7, 48.1, 51.2, 47.5]], ["LLaVA-Plus (All Tools)", [81.6, 74.5, 95.7, 83.9, 65.5, 56.8, 79.1, 69.5]], ["LLaVA-Plus (Fly)", [76.2, 72.2, 92.3, 80.4, 45.2, 50.4, 72.6, 59.1]], ["Fly (no thoughts)", [76.6, 70.4, 90.7, 79.4, 38.8, 39.8, 59.8, 48.7]], ["GPT4Tools", [75.3, 53.8, 86.9, 72.1, 31.1, 27.1, 54.1, 40.7]]]}, "table4b": {"columns": ["Scene", "Identity", "Attr.", "Loc", "Count", "Spatial", "Interact.", "Reason.", "Text", "Average"], "rows": [["LLaVA", [59.5, 54.29, 56.06, 42.54, 39.35, 33.03, 43.3, 41.39, 30.59, 44.45]], ["LLaVA (Tools in Test)", [67.13, 56.85, 45.24, 47.24, 45.69, 40.18, 60.82, 70.09, 30.59, 51.54]], ["LLaVA-Plus (All Tools)", [68.94, 56.8, 58.89, 47.34, 48.14, 45.21, 60.82, 71.3, 37.65, 55.01]], ["LLaVA-Plus (Fly)", [68.43, 56.47, 59.69, 45.4, 41.68, 44.14, 59.79, 69.49, 34.12, 53.25]]]}, "table5": {"columns": ["Grounding", "Tagging", "Caption", "OCR", "All"], "rows": [["LLaVA", [47.1, 87.1, 77.0, 23.6, 58.7]], ["LLaVA (Tools in Test)", [41.7, 48.5, 72.0, 31.9, 48.5]], ["LLaVA-Plus (All Tools)", [89.3, 94.4, 96.7, 48.8, 82.3]], ["LLaVA-Plus (Fly)", [88.6, 88.9, 90.2, 38.4, 76.5]], ["Bard (0730)", [36.5, 105.3, 103.3, 60.0, 76.3]], ["Bing Chat (0730)", [56.0, 84.0, 96.0, 44.8, 70.2]], ["MM-REACT", [30.2, 94.7, 103.8, 77.3, 76.5]], ["All Tools + GPT4", [77.5, 95.6, 95.2, 39.3, 76.9]]]}, "table6": {"columns": ["Rec", "OCR", "Knowledge", "Generation", "Spatial", "Math", "Total"], "rows": [["OpenFlamingo-9B", [24.6, 14.4, 13.0, 12.3, 18.0, 15.0, 21.8], "±0.1", "reported"], ["BLIP-2-12B", [27.5, 11.1, 11.8, 7.0, 16.2, 5.8, 22.4], "±0.2", "reported"], ["LLaVA-7B (reported)", [28.0, 17.1, 16.3, 18.9, 21.2, 11.5, 23.8], "±0.6", "reported"], ["MiniGPT-4-14B", [29.9, 16.1, 20.4, 22.1, 22.2, 3.8, 24.4], "±0.4", "reported"], ["Otter-9B", [28.4, 16.4, 19.4, 20.7, 19.3, 15.0, 24.6], "±0.2", "reported"], ["InstructBLIP-14B", [30.8, 16.0, 9.8, 9.0, 21.1, 10.5, 25.6], "±0.3", "reported"], ["MM-ReAct-GPT-3.5", [24.2, 31.5, 21.5, 20.7, 32.3, 26.2, 27.9], "±0.1", "system reference"], ["LLaMA-Adapter v2-7B", [32.9, 20.1, 19.0, 20.1, 22.9, 3.9, 31.4], "±0.1", "reported"], ["LLaVA-13B (V1.3,336px)", [38.1, 22.3, 25.2, 25.8, 31.3, 11.2, 32.5], "±0.1", "reported"], ["MM-ReAct-GPT-4", [33.1, 65.7, 29.0, 35.0, 56.8, 69.2, 44.6], "±0.2", "system reference"], ["LLaVA-7B (own)", [30.4, 13.3, 19.2, 20.1, 18.7, 8.1, 24.1], "±0.0", "own"], ["LLaVA-Plus-7B (All Tools)", [30.5, 23.6, 20.5, 22.5, 28.5, 7.7, 27.5], "±0.3", "own"], ["LLaVA-Plus-13B (All Tools,V1.3,336px)", [37.5, 29.4, 22.3, 24.5, 37.3, 11.5, 35.0], "±0.0", "own"], ["LLaVA-1.5-13B", [38.0, 25.0, 22.6, 25.0, 30.9, 3.8, 33.3], "±0.1", "own"], ["LLaVA-1.5-Plus-13B (All Tools)", [40.6, 30.9, 25.7, 29.8, 34.5, 15.0, 36.8], "±0.4", "own"]]}, "table7": {"columns": ["Elo", "Matches", "Win rate vs human reference"], "date": "2023-09-27", "rows": [["Human Reference", [1382, 5880, null]], ["LLaVA-Plus 13B", [1203, 678, 35.07]], ["LLaVA 13B", [1095, 5420, 18.53]], ["mPLUG-Owl 7B", [1087, 5440, 15.83]], ["LlamaAdapter-v2 13B", [1066, 5469, 14.14]], ["Lynx 8B", [1037, 787, 11.43]], ["Idefics 9B", [1020, 794, 9.72]], ["InstructBLIP 13B", [1000, 5469, 14.12]], ["Otter 8B", [962, 5443, 7.01]], ["Visual GPT", [941, 5437, 1.57]], ["MiniGPT-4 11B", [926, 5448, 3.36]], ["Octopus V2", [925, 790, 8.9]], ["OpenFlamingo V1", [851, 5479, 2.95]], ["PandaGPT 13B", [775, 5465, 2.7]], ["MultimodalGPT", [731, 5471, 0.19]]]}};
+const protocols=['COCO 汇总','Wild 汇总','SEED 平均','工具使用','MM-Vet 7B','MM-Vet 1.5','VisIT Elo'];
+type Row={name:string,value:number,note?:string};
+function rowsFor(p:number):Row[]{
+ if(p<4){const table=p<2?data.table4a:p===2?data.table4b:data.table5;const col=p===0?3:p===1?7:p===2?9:4;return table.rows.slice(0,4).map(r=>({name:r[0] as string,value:(r[1] as number[])[col]}));}
+ if(p===4||p===5){const ix=p===4?[10,11]:[13,14];return ix.map(i=>{const r=data.table6.rows[i];return {name:r[0] as string,value:(r[1] as number[])[6],note:r[2] as string};});}
+ return data.table7.rows.slice(0,3).map(r=>({name:r[0] as string,value:(r[1] as number[])[0]}));
+}
+const notes=[
+ 'Table 4(a)，相对 GPT-4 评分。All Tools 为 83.9；Fly 为 80.4，低于原始 LLaVA 的 81.2。收益取决于策略，不能写成全部提升。',
+ 'Table 4(a)，Wild 相对 GPT-4 评分。All Tools 为 69.5，原始 LLaVA 为 57.1；该分数不能与 SEED 准确率直接相加。',
+ 'Table 4(b)，SEED 准确率（%）。仅测试时加工具也从 44.45 提升到 51.54，说明这一策略并非在所有协议都变差。',
+ 'Table 5，44 个工具使用样本，相对 GPT-4 评分；不是准确率。10 定位、12 标签、12 描述、10 OCR。完整表中的部分子项超过 100，保留原值。',
+ 'Table 6，同组自测 7B：24.1 ±0.0 → 27.5 ±0.3。不要用另一报告组的 23.8 替代该基线。',
+ 'Table 6，同组 LLaVA-1.5 13B：33.3 ±0.1 → 36.8 ±0.4；分值来自 MM-Vet，保持原文不确定性。',
+ 'Table 7，2023-09-27 的 VisIT 历史快照。Plus 比 LLaVA 高 108 Elo，仍低于 Human Reference。对局数不同；相对人类参考胜率不是总体准确率。'
+];
+const titles=['Table 4(a) · COCO 与 Wild 相对评分（PDF p11）','Table 4(b) · SEED 准确率 %（PDF p11）','Table 5 · 工具使用相对评分，允许超过 100（PDF p11）','Table 6 · MM-Vet 各组结果（PDF p12）','Table 7 · VisIT Elo，2023-09-27（PDF p13）'];
+export function ResultsLab(){
+ const [protocol,setProtocol]=useState(0);
+ const rows=rowsFor(protocol),ceiling=protocol===6?1400:protocol===4||protocol===5?50:100;
+ return <>
+ <style>{`.ll-result-row{display:grid;grid-template-columns:minmax(145px,230px) minmax(0,1fr) 58px;align-items:center;gap:12px;min-height:68px}@media(max-width:640px){.ll-result-row{grid-template-columns:minmax(0,1fr) 58px;gap:5px 10px;margin:18px 0}.ll-result-name{grid-column:1/-1}}`}</style>
+ <Choices items={protocols} value={protocol} label="实验协议" onChange={setProtocol}/>
+ <Feedback tone="blue">{notes[protocol]}</Feedback>
+ <p className="ll-step" style={{margin:'18px 0 8px'}}>{protocol===6?'Elo':protocol===2?'准确率 %':protocol===4||protocol===5?'MM-Vet 分数':'相对评分'} · 越高越好 · 横轴从 0 开始</p>
+ <div role="group" aria-label="同一协议的分数对照">{rows.map(r=><div key={r.name} className="ll-result-row">
+ <div className="ll-result-name" style={{fontSize:17,color:r.name.includes('Plus')?C.green:C.text}}>{r.name}</div>
+ <Scene width={700} height={72} label={r.name+' 的零起点条形图'} draw={(ctx,w,h)=>{clearScene(ctx,w,h);round(ctx,8,16,w-16,39,'#e4e9e0');round(ctx,8,16,(w-16)*r.value/ceiling,39,r.name.includes('Plus')?C.green:C.blue);}}/>
+ <div style={{fontSize:18,fontWeight:650}}>{r.value.toFixed(protocol===6?0:2)}</div>
+ </div>)}</div>
+ <div className="ll-table-wrap"><table className="ll-table"><thead><tr><th>方法</th><th>{protocols[protocol]}</th><th>原文条件</th></tr></thead><tbody>{rows.map(r=><tr key={r.name} data-paper={r.name.includes('Plus')}><td>{r.name}</td><td>{r.value}</td><td>{r.note||'见下方原表'}</td></tr>)}</tbody></table></div>
+ {[data.table4a,data.table4b,data.table5,data.table6,data.table7].map((table,k)=><details className="ll-source" key={k}><summary>{titles[k]} · 完整原表</summary><div className="ll-table-wrap"><table className="ll-table"><thead><tr><th>方法</th>{table.columns.map(c=><th key={c}>{c}</th>)}{k===3&&<><th>Total 不确定性</th><th>报告组</th></>}</tr></thead><tbody>{table.rows.map((row,i)=><tr key={i} data-paper={String(row[0]).includes('Plus')}><td>{row[0] as string}</td>{(row[1] as (number|null)[]).map((v,j)=><td key={j}>{v===null?'—':v}</td>)}{k===3&&<><td>{String(row[2])}</td><td>{String(row[3])}</td></>}</tr>)}</tbody></table></div></details>)}
+ </>;
+}

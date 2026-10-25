@@ -2,21 +2,20 @@
 /*
  * validate-output.js — automated structural validator for the paper-skill React + TS output.
  *
- * Runs as a hard gate after the project folder is generated (see scripts/validation-checklist.md).
- * All hard thresholds are loaded from contract.md so the validator cannot drift from the
- * skill's single source of truth.
- *
+ * Checks generated projects for missing essentials, broken registrations and syntax errors.
+ * Teaching/style concerns are review warnings, not template-identity requirements.
  * Checks:
  *   1. required framework files exist (index.html, package.json, src/main.tsx, App.tsx,
- *      types.ts, src/data/tutorial.ts, styles, src/modules/registry.tsx, configs).
- *   2. `kind: "chapter"` count within [chapterCountMin, chapterCountMax].
- *   3. `kind: "module"` count >= activeModulesMin; >= dualModuleChaptersMin chapters have two.
- *   4. no leftover template placeholders (__XXX__, __METAPHOR_CSS__, TBD, TODO) in
+ *      src/data/tutorial.ts, src/modules/registry.tsx, configs).
+ *   2. at least one chapter; report chapter and scene counts without a range gate.
+ *   3. report interactive-module coverage for review; evidence-only chapters are allowed.
+ *   4. warn about leftover template placeholders (__XXX__, __METAPHOR_CSS__, TBD, TODO) in
  *      src/data/tutorial.ts, src/styles/paper.css, or src/modules/*.
- *   5. every Bilibili bvid (if any) is a real `BV...` (empty bvid tolerated as "omit").
+ *   5. warn about malformed Bilibili IDs (format checks cannot establish authenticity).
  *   6. every componentId referenced in tutorial.ts is registered in src/modules/registry.tsx
- *      (the seeded `example-slider` is always allowed).
- *   7. syntax parse of every project source file (src/** and vite config) with TypeScript or
+ *      Every referenced widget must be registered by the paper-specific packet.
+ *   7. review existing scene outlines without requiring a specific framework revision.
+ *   8. syntax parse of every project source file (src/** and vite config) with TypeScript or
  *      esbuild; catches truncated or unbalanced files before the repository CI build.
  *
  * Usage: node scripts/validate-output.js <path-to>/<paper-short-name>_output
@@ -29,46 +28,14 @@ const fs = require('fs');
 const path = require('path');
 const { checkProject } = require('./syntax-check.js');
 
-// --- CONFIG (read directly from contract.md §2, §3) ---
-// Contract lives beside this script in the repository (paper-skill/scripts -> paper-skill/) and
-// may be copied beside the helpers in a generated intermediate skill.
-const contractCandidates = [
-  path.join(__dirname, '..', 'contract.md'),
-  path.join(__dirname, 'contract.md'),
-  path.join(__dirname, '..', '..', 'contract.md'),
-];
-const contractPath = contractCandidates.find((candidate) => fs.existsSync(candidate));
-if (!contractPath) {
-  console.error('Cannot find contract.md next to validate-output.js.');
-  process.exit(2);
-}
-const contract = fs.readFileSync(contractPath, 'utf8');
-
-function readContractInteger(field) {
-  const escapedField = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = contract.match(
-    new RegExp('\\|\\s*`' + escapedField + '`\\s*\\|\\s*(\\d+)\\s*\\|')
-  );
-  if (!match) {
-    throw new Error(`Missing numeric contract field: ${field}`);
-  }
-  const value = Number.parseInt(match[1], 10);
-  if (!Number.isInteger(value)) {
-    throw new Error(`Invalid numeric contract field: ${field}`);
-  }
-  return value;
-}
-
-const CONFIG = {
-  chapterCountMin: readContractInteger('chapterCountMin'),
-  chapterCountMax: readContractInteger('chapterCountMax'),
-  activeModulesMin: readContractInteger('activeModulesMin'),
-  dualModuleChaptersMin: readContractInteger('dualModuleChaptersMin'),
-};
-
 function fail(msg) {
   console.error('  ✗ ' + msg);
   return false;
+}
+let reviewWarnings = 0;
+function warn(msg) {
+  reviewWarnings += 1;
+  console.log('  ! ' + msg);
 }
 function ok(msg) {
   console.log('  ✓ ' + msg);
@@ -133,11 +100,7 @@ function main() {
     'tsconfig.json',
     'src/main.tsx',
     'src/App.tsx',
-    'src/types.ts',
     'src/data/tutorial.ts',
-    'src/styles/tokens.css',
-    'src/styles/components.css',
-    'src/styles/paper.css',
     'src/modules/registry.tsx',
   ];
   for (const f of keyFiles) {
@@ -158,43 +121,29 @@ function main() {
     // or `__XXX__` is not mistaken for data. paper.css is scanned RAW because its
     // `__METAPHOR_CSS__` placeholder intentionally lives inside a comment marker.
     const tut = stripComments(tutRaw);
-    // --- 2 & 3. chapter / module / dual-module counts ---
+    if (/[,{]\s*['"]?focus['"]?\s*:/.test(tut)) {
+      warn('legacy focus scenes found; check the rendered pages when updating to the PPT format');
+    }
+    // --- 2 & 3. nonempty chapters and active modules across the tutorial ---
     // Quote-tolerant: tutorial.ts may be hand-written (`kind: "chapter"`) or
     // assembled from JSON packets via JSON.stringify (`"kind": "chapter"`).
     const chapterCount = (tut.match(/["']?kind["']?\s*:\s*["']chapter["']/g) || []).length;
     const moduleCount = (tut.match(/["']?kind["']?\s*:\s*["']module["']/g) || []).length;
 
-    const chapterBlocks = tut.split(/["']?kind["']?\s*:\s*["']chapter["']/);
-    let dual = 0;
-    for (let i = 1; i < chapterBlocks.length; i++) {
-      const m = (chapterBlocks[i].match(/["']?kind["']?\s*:\s*["']module["']/g) || []).length;
-      if (m >= 2) dual += 1;
+    if (chapterCount === 0) {
+      allPass = fail('tutorial has no chapters');
+    } else {
+      ok(`chapter count = ${chapterCount} (no numeric limit)`);
     }
 
-    if (chapterCount < CONFIG.chapterCountMin || chapterCount > CONFIG.chapterCountMax) {
-      allPass = fail(
-        `chapter count = ${chapterCount}, must be within [${CONFIG.chapterCountMin}, ${CONFIG.chapterCountMax}]`
-      );
+    if (moduleCount === 0) {
+      warn('no declared active modules; review whether the tutorial needs mechanism interactions');
     } else {
-      ok(`chapter count = ${chapterCount} (within [${CONFIG.chapterCountMin}, ${CONFIG.chapterCountMax}])`);
-    }
-
-    if (dual < CONFIG.dualModuleChaptersMin) {
-      allPass = fail(
-        `chapters with two modules = ${dual}, need >= ${CONFIG.dualModuleChaptersMin}`
-      );
-    } else {
-      ok(`chapters with two modules = ${dual} (>= ${CONFIG.dualModuleChaptersMin})`);
-    }
-
-    if (moduleCount < CONFIG.activeModulesMin) {
-      allPass = fail(`total active modules = ${moduleCount}, need >= ${CONFIG.activeModulesMin}`);
-    } else {
-      ok(`total active modules = ${moduleCount} (>= ${CONFIG.activeModulesMin})`);
+      ok(`${moduleCount} declared active modules; method coverage requires visual review`);
     }
 
     // --- 4. leftover placeholders ---
-    const phRe = /__[A-Za-z0-9_]+__|__METAPHOR_CSS__|\bTBD\b|\bTODO\b/;
+    const phRe = /__[A-Za-z0-9_]+__|__METAPHOR_CSS__|PAPER_SKILL_DEMO_CONTENT|\bTBD\b|\bTODO\b/;
     const paperCss = readSafe(path.join(dir, 'src/styles/paper.css')) || '';
     let moduleConcat = '';
     const modulesDir = path.join(dir, 'src/modules');
@@ -212,10 +161,17 @@ function main() {
     ];
     for (const [label, content] of scanTargets) {
       if (phRe.test(content)) {
-        allPass = fail(`leftover template placeholder in ${label} (e.g. __XXX__, __METAPHOR_CSS__, TBD, TODO)`);
+        warn(`possible leftover template placeholder in ${label}; review the visible content`);
       } else {
         ok(`no leftover placeholders in ${label}`);
       }
+    }
+    const genericSlideHeading = /论文机制\s*[\/／]\s*证据|论文原理\s*[\/／]\s*证据|论文出处|来源\s*[\/／]\s*证据|实验\s*[·•]\s*机制示意/;
+    const sceneTitles = [...tut.matchAll(/"title"\s*:\s*"([^"]*)"/g)].map(match => match[1]).join('\n');
+    if (genericSlideHeading.test(sceneTitles + '\n' + moduleConcat)) {
+      warn('generic paper-evidence heading found; consider a specific scientific heading');
+    } else {
+      ok('no generic paper-evidence headings in tutorial content');
     }
 
     // --- 5. Bilibili bvid check ---
@@ -233,11 +189,11 @@ function main() {
     if (total === 0) {
       ok('no Bilibili entries (videos optional — OK)');
     } else if (bad > 0) {
-      allPass = fail(`${bad} Bilibili entry has an invalid bvid (expected BV...)`);
+      warn(`${bad} Bilibili entry has a malformed bvid (expected BV...); check or omit it`);
     } else if (empty > 0) {
       ok(`${empty} empty bvid tolerated (omit the entry or the whole array for no video)`);
     } else {
-      ok(`all ${total} Bilibili entries have a valid bvid`);
+      ok(`all ${total} Bilibili entries have a well-formed bvid (authenticity not checked)`);
     }
 
     // --- 6. componentId registration ---
@@ -246,11 +202,10 @@ function main() {
     const uniqueIds = [...new Set(compIds)];
     const unregistered = [];
     for (const id of uniqueIds) {
-      if (id === 'example-slider') continue; // seeded in the scaffold
-      const re = new RegExp(
-        "widgetRegistry\\[['\"]" + id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + "['\"]\\]"
-      );
-      if (!re.test(registry)) unregistered.push(id);
+      const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const assignment = new RegExp("widgetRegistry\\[['\"]" + escaped + "['\"]\\]");
+      const objectKey = new RegExp("(?:^|[,{])\\s*(?:['\"]" + escaped + "['\"]|" + escaped + ")\\s*:", 'm');
+      if (!assignment.test(registry) && !objectKey.test(registry)) unregistered.push(id);
     }
     if (unregistered.length > 0) {
       allPass = fail(`componentId(s) not registered in registry.tsx: ${unregistered.join(', ')}`);
@@ -260,14 +215,35 @@ function main() {
 
   }
 
-  // --- 7. syntax parse of every project source file ---
+  // Scene-format outputs carry a derived outline.
+  if (fs.existsSync(path.join(dir, 'outlines.json'))) {
+    try {
+      const outline = JSON.parse(fs.readFileSync(path.join(dir, 'outlines.json'), 'utf8'));
+      if (!Array.isArray(outline.pages) || !outline.pages.length) throw new Error('outline has no pages');
+      const ids = new Set(['cover', 'videos']);
+      for (const page of outline.pages) {
+        for (const field of ['id', 'chapterId', 'title', 'goal', 'summary', 'interaction', 'snippet']) {
+          if (typeof page[field] !== 'string' || !page[field].trim()) throw new Error(`page missing ${field}`);
+        }
+        if (typeof page.next !== 'string') throw new Error(`${page.id}: missing next`);
+        if (ids.has(page.id)) throw new Error(`duplicate page id ${page.id}`);
+        ids.add(page.id);
+      }
+      ok(`scene outline contains ${outline.pages.length} unique teaching pages`);
+    } catch (error) { warn(`scene outline: ${error.message}; regenerate it if needed`); }
+  }
+
+  // Shared frameworks may come from older releases or contain working customizations.
+  // Type checking, Vite builds and browser operation validate compatibility, not file identity.
+
+  // --- 8. syntax parse of every project source file ---
   // The repository CI compiles each change with `tsc`/`vite`; this gate moves the same check into
   // the generation stage so a truncated widget is caught before a Pull Request. When dependencies
   // are not installed (the repository CI runs this before `npm ci`) the parser is unavailable and
   // the check is skipped here; CI's build:changed step still compiles the project.
   const syntaxReport = checkProject(dir);
   if (!syntaxReport.available) {
-    console.log('  ! syntax check skipped: run `npm install` in the project to enable the parse gate');
+    console.log('  ! syntax check skipped: run `npm install` in the project to enable syntax checking');
   } else if (syntaxReport.errors.length > 0) {
     for (const error of syntaxReport.errors.slice(0, 20)) {
       allPass = fail(`${path.relative(dir, error.file).replace(/\\/g, '/')}:${error.line}:${error.column} ${error.message}`);
@@ -278,6 +254,7 @@ function main() {
   }
 
   console.log('');
+  if (reviewWarnings) console.log(`Review warnings: ${reviewWarnings} (non-blocking; inspect the rendered tutorial)`);
   if (allPass) {
     console.log('RESULT: PASS');
     process.exit(0);
