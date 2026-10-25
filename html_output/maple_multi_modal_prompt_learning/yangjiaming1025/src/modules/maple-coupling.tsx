@@ -34,7 +34,7 @@ export function MapleCoupling(){
    paths.forEach(points=>{c.beginPath();c.moveTo(points[0][0],points[0][1]);points.slice(1).forEach(a=>c.lineTo(a[0],a[1]));c.strokeStyle=C.purple;c.lineWidth=2;c.lineJoin='round';c.stroke();});
    box(c,663,139,62,62,'#f7f0fc',C.purple,16);label(c,'Fᵢ',694,171,27,C.purple,'center');
    label(c,'联动',694,236,15,C.purple,'center');
-   if(progress<1){const track=[[625,176],[650,176],[665,160],[694,169],[744,169],[762,190]];const lengths=track.slice(1).map((v,i)=>Math.hypot(v[0]-track[i][0],v[1]-track[i][1]));let left=lengths.reduce((sum,n)=>sum+n,0)*progress;let x=625,y=176;for(let i=0;i<lengths.length;i++){const f=Math.min(1,left/lengths[i]);x=track[i][0]+(track[i+1][0]-track[i][0])*f;y=track[i][1]+(track[i+1][1]-track[i][1])*f;left-=lengths[i];if(left<=0)break;}if(x<663||x>725){c.beginPath();c.arc(x,y,4,0,Math.PI*2);c.fillStyle=C.purple;c.fill();}} 
+   if(progress<1){const track=[[625,176],[650,176],[665,160],[694,169],[744,169],[762,190]];const lengths=track.slice(1).map((v,i)=>Math.hypot(v[0]-track[i][0],v[1]-track[i][1]));let left=lengths.reduce((sum,n)=>sum+n,0)*progress;let x=625,y=176;for(let i=0;i<lengths.length;i++){const f=Math.min(1,left/lengths[i]);x=track[i][0]+(track[i+1][0]-track[i][0])*f;y=track[i][1]+(track[i+1][1]-track[i][1])*f;left-=lengths[i];if(left<=0)break;}if(x<663||x>725){c.beginPath();c.arc(x,y,4,0,Math.PI*2);c.fillStyle=C.purple;c.fill();}}
   }else{
    line(c,633,185,674,185,C.border,2,[4,5]);line(c,714,185,755,185,C.border,2,[4,5]);
    c.beginPath();c.arc(694,185,16,0,Math.PI*2);c.strokeStyle=C.border;c.lineWidth=2;c.stroke();
