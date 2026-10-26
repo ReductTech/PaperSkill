@@ -1,0 +1,7 @@
+import React, { useState } from 'react';
+import { Canvas, Chips, Steps, Feedback, Detail, clearScene, drawPhoto, drawCard, drawBars, drawPen, colors, softmax, projectionStep } from './llava-kit';
+export function M6B(){const [mode,setMode]=useState(0);return <>
+ <Canvas label="训练标准前缀与推理自生成前缀并排对照" draw={ctx=>{clearScene(ctx);[0,1].forEach(panel=>{const x=panel===0?35:560;drawCard(ctx,x,35,485,210,panel===mode);for(let i=0;i<4;i++){const xx=x+25+i*110;ctx.fillStyle=i===0?(panel===0?colors.blue:colors.red):i===1?colors.orange:colors.light;ctx.fillRect(xx,100,80,55);if(i>1){ctx.strokeStyle=colors.red;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(xx,100);ctx.lineTo(xx+80,155);ctx.stroke();}}ctx.fillStyle=colors.ink;ctx.font='24px sans-serif';ctx.fillText(panel===0?'训练':'推理',x+25,72);ctx.strokeStyle=panel===mode?colors.orange:colors.line;ctx.lineWidth=panel===mode?5:2;ctx.strokeRect(x+125,88,98,82);});}}/>
+ <Chips labels={['训练：标准前缀','推理：自己生成的前缀']} value={mode} onChange={setMode} label="当前查看条件"/>
+ <Detail>{mode===0?<><div><b>已给条件：</b>图片＋问题＋标准前缀“船”。</div><div><b>当前预测目标：</b>“在”。这个目标只在比较预测、计算损失时使用。</div><div><b>该预测不能读取：</b>目标“在”及后续“房屋右侧”。</div></>:<><div><b>已给条件：</b>图片＋问题＋自己误生成的“树”（故意构造的错误）。</div><div><b>当前操作：</b>继续预测下一个标记，没有标准答案可查询。</div><div><b>前缀的作用：</b>接下来是在“树”后面续写；前缀变了，模型用来预测下一个标记的条件也随之改变。</div></>}</Detail>
+ <Feedback tone={mode===1?'bad':''}>{mode===0?'把它想成填空题：“船____”。输入给出“船”，答案栏写“在”。因果遮罩负责盖住答案栏，让每个位置根据已有前缀练习续写。':'这个练习故意把第一步换成“树”。模型会把已经写出的“树”接回输入，后续每一步都沿着这个新前缀继续。'}</Feedback></>}

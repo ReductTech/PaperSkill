@@ -1,0 +1,11 @@
+import React, { useState } from 'react';
+import { Canvas, Chips, Steps, Feedback, Detail, clearScene, drawPhoto, drawCard, drawBars, drawPen, colors, softmax, projectionStep } from './llava-kit';
+const nodeNames=['视觉编码器','线性连接层','语言模型'];
+const trainable=[[false,true,false],[false,true,true],[false,false,false]];
+const stageNames=['第一阶段：对齐','第二阶段：指令微调','实际使用：推理'];
+const nodeNotes=['CLIP ViT-L/14仍会计算图块特征；原论文两个训练阶段都不更新它的权重。','W把视觉特征变成语言模型输入所需的长度，两个训练阶段都更新它。','Vicuna仍会计算每个答案位置的分数；第一阶段不更新它自己的参数，第二阶段才更新。'];
+export function M8A(){const [stage,setStage]=useState(0);const [node,setNode]=useState(0);return <>
+ <Canvas label="原始LLaVA的计算路径与参数更新范围" onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect();const x=(e.clientX-r.left)*1080/r.width;setNode(Math.max(0,Math.min(2,Math.floor(x/360))));}} draw={ctx=>{clearScene(ctx);ctx.strokeStyle=colors.blue;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(155,140);ctx.lineTo(925,140);ctx.stroke();for(let i=0;i<3;i++){const x=35+i*360;drawCard(ctx,x,60,290,150,i===node);ctx.strokeStyle=trainable[stage][i]?colors.green:colors.dark;ctx.lineWidth=trainable[stage][i]?6:2;ctx.strokeRect(x+9,69,272,132);if(trainable[stage][i]){ctx.fillStyle=colors.green;ctx.beginPath();ctx.arc(x+145,135,28,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x+130,135);ctx.lineTo(x+142,147);ctx.lineTo(x+161,122);ctx.stroke();}else{ctx.strokeStyle=colors.dark;ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+145,122,17,Math.PI,0);ctx.stroke();ctx.fillStyle=colors.dark;ctx.fillRect(x+124,122,42,34);}}}}/>
+ <Chips labels={stageNames} value={stage} onChange={setStage} label="切换阶段"/><Chips labels={nodeNames} value={node} onChange={setNode} label="查看组件"/>
+ <Detail><b>{stageNames[stage]} · {nodeNames[node]}：{trainable[stage][node]?'更新参数':'参数保持不变'}</b><div>{stage===2?'推理只使用已经训练好的权重，不用这次问题更新任何模块。':nodeNotes[node]}</div><div>{stage===0?'训练材料：筛选后的595K图文对，配简短描述请求；目标是原图片配文。':stage===1?'训练材料：聊天分支的158K图文指令样本；ScienceQA另有任务专门微调。':'输入新图片和问题；没有标准答案来执行本次训练更新。'}</div><div>从左到右：视觉编码器 → 线性连接层 → 语言模型。连线始终存在；绿色带勾表示更新，锁形表示冻结。</div></Detail>
+ <Feedback>{stage===0?'对齐阶段：视觉模型与语言模型都冻结，只更新连接矩阵。损失仍要经过语言模型的计算关系影响W。':stage===1?'指令阶段：视觉模型继续提供稳定的图像特征，连接层和语言模型一起根据问答练习的损失调整参数。':'推理阶段：只算回答，不根据当前问题更新权重。'}</Feedback></>}
