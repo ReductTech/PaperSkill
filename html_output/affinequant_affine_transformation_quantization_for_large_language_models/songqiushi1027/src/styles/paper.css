@@ -1,0 +1,54 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-accent-2: #e0a14f;
+}
+
+/* ---- AffineQuant scene widgets (shared layout) ---- */
+.aq-layout { position: relative; box-sizing: border-box; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; gap: 24px; }
+.aq-two { grid-template-columns: 1.52fr 1fr; }
+.aq-stack { grid-template-rows: minmax(0, 1fr) auto; }
+
+.aq-panel { box-sizing: border-box; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-soft); padding: 20px 24px; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.aq-panel.grow { flex: 1 1 auto; }
+
+.aq-heading { margin: 0; font-size: var(--ppt-body-heading); font-weight: 800; line-height: 1.18; letter-spacing: -0.01em; color: #21324a; }
+.aq-body { margin: 0; font-size: var(--ppt-body-text); line-height: 1.5; color: #33415a; }
+.aq-body.muted { color: #68778f; }
+.aq-emphasis { margin: 0; font-size: var(--ppt-body-emphasis); font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; color: #21324a; font-variant-numeric: tabular-nums; }
+
+.aq-formula { margin: 0; font-family: "Cambria Math", "Times New Roman", serif; font-size: var(--ppt-body-text); line-height: 1.55; text-align: center; color: #21324a; }
+
+.aq-feedback { box-sizing: border-box; min-height: 64px; display: block; flex-shrink: 0; padding: 12px 18px; border-radius: var(--radius-sm); font-size: var(--ppt-body-text); font-weight: 700; line-height: 1.4; background: var(--blue-soft); color: var(--blue); border: 1px solid rgba(39, 68, 110, 0.18); overflow-wrap: anywhere; }
+.aq-feedback-text { display: block; min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.aq-feedback.good { background: var(--green-soft); color: var(--green); border-color: rgba(34, 141, 92, 0.28); }
+.aq-feedback.bad { background: var(--red-soft); color: var(--red); border-color: rgba(196, 63, 82, 0.28); }
+.aq-feedback.warn { background: var(--orange-soft); color: #b3541e; border-color: rgba(240, 126, 71, 0.32); }
+
+.aq-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+.aq-btn { padding: 10px 18px; border: 1px solid var(--line-2); border-radius: var(--radius-sm); background: #fff; color: #33415a; font-size: var(--ppt-body-text); font-weight: 700; line-height: 1.2; }
+.aq-btn:hover { border-color: var(--blue); color: var(--blue); }
+.aq-btn.is-active { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 6px 16px rgba(39, 68, 110, 0.25); }
+
+.aq-slider { display: grid; grid-template-columns: 168px minmax(0, 1fr) 92px; gap: 14px; align-items: center; }
+.aq-slider strong { font-size: var(--ppt-body-text); font-weight: 700; color: #33415a; }
+.aq-slider small { font-size: var(--ppt-body-text); color: #68778f; }
+.aq-slider b { font-family: var(--ui-font-mono); font-weight: 700; text-align: right; color: var(--blue); font-size: var(--ppt-body-text); }
+
+.aq-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.aq-legend span { display: inline-flex; align-items: center; gap: 7px; font-size: var(--ppt-body-text); color: #68778f; }
+.aq-dot { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+
+.aq-matrix { display: grid; align-self: center; width: max-content; }
+.aq-cell { display: flex; align-items: center; justify-content: center; border-radius: 10px; font-family: var(--ui-font-mono); font-weight: 800; font-size: var(--ppt-body-text); border: 1px solid var(--line); background: #fbfcfe; transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out); }
+
+.aq-note { margin: 0; font-size: var(--ppt-body-text); line-height: 1.5; color: #68778f; }
+.aq-note b { color: #33415a; }
+
+.aq-photo { width: 100%; height: 100%; min-height: 0; display: block; }
