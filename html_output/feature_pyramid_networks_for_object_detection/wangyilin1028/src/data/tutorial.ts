@@ -1,0 +1,318 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  "meta": {
+    "titleEn": "Feature Pyramid Networks for Object Detection",
+    "titleZh": "FPN：用于目标检测的特征金字塔网络",
+    "venue": "CVPR 2017",
+    "authors": "Tsung-Yi Lin · Piotr Dollár · Ross Girshick · Kaiming He · Bharath Hariharan · Serge Belongie",
+    "affiliation": "Facebook AI Research · Cornell University · Cornell Tech",
+    "domain": "计算机视觉 · 目标检测",
+    "coreProblem": "远处行人需要精细位置，深层特征却越来越粗；怎样兼顾细节与语义？",
+    "coreInsight": "一次提取图像特征，再通过自顶向下与横向连接，让不同尺度都获得语义增强的表示。",
+    "keywords": [
+      "多尺度特征",
+      "自顶向下",
+      "横向连接",
+      "RPN / RoI"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "单层深层特征",
+      "desc": "同一街景只用一张粗特征图，远处目标可用位置更少。",
+      "componentId": "fpn-cover"
+    },
+    "newMethod": {
+      "title": "FPN 多尺度特征",
+      "desc": "结合深层语义与浅层空间信息，在多个尺度分别预测。",
+      "componentId": "fpn-cover"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "尺度问题",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "scale-module",
+          "title": "目标尺度与下采样",
+          "desc": "拖动行人距离，改变目标像素高度",
+          "componentId": "fpn-scale"
+        },
+        {
+          "kind": "module",
+          "id": "semantics-module",
+          "title": "空间分辨率与语义表达",
+          "desc": "选择C2-C5查看分辨率、加工层级及不同表示",
+          "componentId": "fpn-semantics"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "scale",
+          "title": "目标尺度与下采样",
+          "goal": "移动行人，观察同一目标在不同步长下占据多少位置。",
+          "summary": "16像素在步长32上仅0.5格，128像素占4格；格数不是检测概率",
+          "interaction": "拖动行人距离，改变目标像素高度",
+          "next": "继续追问：这个表示怎样用于实际预测？",
+          "notes": "原文PDF第3页第3节，C2-C5相对输入步长4、8、16、32。h/s仅是几何覆盖的粗略计算，不是检测概率；像素高度与实际距离不是同一个量。\n原论文：https://arxiv.org/abs/1612.03144 。导读作者：王艺霖（zhixiu-feng）。",
+          "componentId": "fpn-scale",
+          "moduleId": "scale-module"
+        },
+        {
+          "id": "semantics",
+          "title": "空间分辨率与语义表达",
+          "goal": "浅层保留细节，是否就已经理解目标类别？",
+          "summary": "空间位置多不保证类别理解；低分辨率不代表语义由缩小自动产生",
+          "interaction": "选择C2-C5查看分辨率、加工层级及不同表示",
+          "next": "接下来比较四种多尺度表示方案，看FPN如何同时兼顾分辨率、语义与计算。",
+          "notes": "原文PDF第2页引言、第3页第3节。分辨率与语义能力不同；普通骨干的下采样与语义加工常同时发生，但前者不是后者的原因。街景及网格是示意，不是真实激活。\n原论文：https://arxiv.org/abs/1612.03144 。导读作者：王艺霖（zhixiu-feng）。",
+          "componentId": "fpn-semantics",
+          "moduleId": "semantics-module"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "方法比较与融合",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "comparison-module",
+          "title": "FPN与其他多尺度方法",
+          "desc": "切换四类方案，比较输入、骨干计算与多尺度语义。",
+          "componentId": "fpn-comparison"
+        },
+        {
+          "kind": "module",
+          "id": "strategies-module",
+          "title": "FPN：细节与上层信息叠合",
+          "desc": "拖动叠合演示进度，观察横向细节与上采样特征在同一位置相加。",
+          "componentId": "fpn-strategies"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "comparison",
+          "title": "FPN与其他多尺度方法",
+          "goal": "同样面对远近目标，FPN把改进重点放在哪里？",
+          "summary": "图像金字塔重复骨干计算；单层深层特征较粗；骨干多层仍有语义差距；FPN一次提取后增强多尺度语义。",
+          "interaction": "切换图像金字塔、单层深层特征、骨干多层特征与FPN，比较路径和输出。",
+          "next": "为什么自顶向下与横向连接能够互补？下一页展开融合过程。",
+          "notes": "依据论文PDF第1页图1、第2页引言与第3页第3节。图像金字塔以三个输入尺度举例，实际尺度数量并非固定为三。骨干运行次数只表示示例中的前向计算次数，不能作为耗时倍数。C2至C5代表不同骨干阶段；FPN将上层语义通过自顶向下通路与横向特征结合。图中简化省略1×1与3×3卷积，下一页展开；连线的中间节点对应M，下面方框对应P，P不直接作为下一级融合输入。这里比较表示结构，不是实验性能排名。",
+          "componentId": "fpn-comparison",
+          "moduleId": "comparison-module"
+        },
+        {
+          "id": "strategies",
+          "title": "FPN：细节与上层信息叠合",
+          "goal": "同一位置的两路信息，怎样共同进入当前层？",
+          "summary": "C经1×1卷积对齐为L，上层M经2倍上采样，逐元素相加得到当前M，再经3×3得到P。",
+          "interaction": "拖动上层信息叠合进度，或比较只看细节与完整相加。",
+          "next": "相加后保留了什么？下一页将图与同一局部数值对应起来。",
+          "notes": "依据原文PDF第3页第3节与图3：L_l=Conv1x1(C_l)，M_l=L_l+Up(M_l+1)，P_l=Conv3x3(M_l)。通道对齐仍保留一句说明，原论文统一256通道。所有响应为手工构造的单通道教学示意，不是真实网络激活或类别概率。滑块只控制演示的上层贡献比例，到100%对应完整相加；它不是FPN新增的可学习权重。上采样不恢复丢失信息；相加不保证去除背景或提高任意通道的可视清晰度。",
+          "componentId": "fpn-strategies",
+          "moduleId": "strategies-module"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "特征融合",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "3.1",
+          "title": "特征融合：图像直觉与局部计算",
+          "desc": "先看同一组特征图，再切到橙框局部计算，开关横向连接进行对照。",
+          "componentId": "fpn-fusion"
+        },
+        {
+          "kind": "module",
+          "id": "3.2",
+          "title": "多层输出与中间融合量",
+          "desc": "操作目标尺度和输出层，观察M的递归融合与P的独立输出。",
+          "componentId": "fpn-pyramid"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "fusion",
+          "title": "特征融合：图像直觉与局部计算",
+          "goal": "先看提示与边界如何同时保留，再核对同一位置的加法。",
+          "summary": "特征图与局部数组使用相同状态；可以开关横向连接，并编辑输入数字观察图像变化。",
+          "interaction": "先查看图像，点击选择位置，再切到局部数组修改数值；开关横向连接比较。",
+          "next": "融合量M继续向下传递，输出P又怎样参与多尺度检测？",
+          "notes": "依据原文PDF第3页第3节、图3与第5页横向连接消融。教学特征为16×16横向数组和8×8上层数组；最近邻上采样为16×16；显示的4×4橙框局部严格对应同一组状态。图像视图方向键或点击选择位置，数值视图编辑2×2上层和4×4横向局部，修改反映回整幅特征示意。关闭横向后输出只有上采样支路。数值、颜色和轮廓都是构造例子，不代表真实CNN通道、检测框或性能。背景响应仍可能保留，融合不等于照片修复或自动去噪。",
+          "componentId": "fpn-fusion",
+          "moduleId": "3.1"
+        },
+        {
+          "id": "pyramid",
+          "title": "多层输出与中间融合量",
+          "goal": "融合量M已经形成，为什么还要生成多个输出P？",
+          "summary": "比较骨干C、中间M和输出P的用途，并计算同一目标在各步长上的覆盖。",
+          "interaction": "点击P2至P5，调整行人高度，或关闭除P2外的预测层。",
+          "next": "接下来分别看RPN多层候选与RoI选层怎样使用这些输出。",
+          "notes": "原文第3页第3节、图2及图3；第5页关于金字塔表示的消融讨论。以M表示1×1横向特征与上层上采样结果的中间融合量，P为其后3×3卷积的输出；向更精细层继续上采样中间量，不递归上采样最终平滑输出。ResNet步长为4/8/16/32；教学几何覆盖=目标像素高度/步长，例如96像素在P3约12格、P5约3格。该值不是激活或精度，也不是RPN的标签分配。仅保留P2是论文消融的一种结构变化，不能从本图计算AP。图中只演示P2至P5；RPN还会增加P6，留到下一章说明。",
+          "componentId": "fpn-pyramid",
+          "moduleId": "3.2"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "接入检测器",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "4.1",
+          "title": "RPN 多层锚框与标签分配",
+          "desc": "改变真值尺寸与中心偏移，直接计算不同层锚框的IoU和正负标签。",
+          "componentId": "fpn-rpn"
+        },
+        {
+          "kind": "module",
+          "id": "4.2",
+          "title": "RoI 尺度分层",
+          "desc": "调整区域宽高，用原论文公式计算尺度与所选金字塔层。",
+          "componentId": "fpn-roi"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "rpn",
+          "title": "RPN：多层锚框与IoU标签",
+          "goal": "目标变大或偏离锚框中心后，哪些参考框应该参与学习？",
+          "summary": "RPN在P2至P6分别配置不同尺度的锚框，使用IoU规则产生训练标签，而不是先给每个目标指定唯一层。",
+          "interaction": "调整方形真值边长和中心横移，选择一层查看锚框与真值的重叠，比较五层的精确IoU和标签。",
+          "next": "候选区域已经产生；第二阶段如何选择一张特征图来检查这个区域？",
+          "notes": "依据FPN PDF第4页第4.1节：P2至P6锚框面积分别为32²、64²、128²、256²、512²，每层另有1:2、1:1、2:1三种宽高比，跨层共享预测头。正样本为对某真值具有最高IoU的锚框，或IoU>0.7的锚框；不满足正样本规则且与全部真值IoU<0.3的为负，其余忽略。本页仅演示一个真值、同中心的五个方形锚框子集；真实网络在各层所有位置预测。真值横移是相对于锚框中心的输入图像像素；图形统一缩放便于阅读。所有IoU由交集/并集实际计算，不是置信度或模型输出，也不是实测检测结果。对照：真值边长32且横移0时P2的IoU为1；真值边长128且横移0时P4的IoU为1。边长96且居中时P4的IoU为0.5625，仍因最高IoU而为正；说明0.7并非正样本的唯一入口。并列最高采用同一最高IoU规则。滑杆支持键盘，按钮可聚焦；所有反馈和框几何来自同一React状态。",
+          "componentId": "fpn-rpn",
+          "moduleId": "4.1"
+        },
+        {
+          "id": "roi",
+          "title": "RoI：按区域尺度选择特征层",
+          "goal": "同一面积、不同形状的候选区域，会被分到不同层吗？",
+          "summary": "用输入图像坐标中的区域宽高计算面积平方根，经原论文公式选层，再限制在P2至P5。",
+          "interaction": "分别调整RoI的宽、高；观察面积平方根、取整前编号、取整结果及P2至P5的同步高亮，也可比较相同面积的224×224与112×448。",
+          "next": "结构已经接入检测器；接下来用论文消融实验检查这些连接是否确实有用。",
+          "notes": "依据FPN PDF第4页第4.2节公式(1)：k=floor(k0+log2(sqrt(wh)/224))，k0=4。宽w、高h均以输入图像坐标的像素为单位；有效RoI层为P2至P5，P6仅用于RPN。界面显示取整前值与取整结果，并夹取到有效范围。浮点数取整时仅加1e-12，避免理论整数边界因浮点误差误分层，不改变正常值。对照：112×112得到P3；224×224和112×448面积相同，均得到P4；28×28原始编号1夹取为P2；896×896原始编号6夹取为P5。矩形位置仅为街景取景示意；没有运行检测器或特征提取。原论文使用RoI Pooling；本地torchvision模型可能使用RoIAlign，不能混称。RoI选层是区域特征提取规则，与上一页RPN锚框标签分配为不同步骤。公式符号以SymbolHint提供中文hover、focus和tap解释。",
+          "componentId": "fpn-roi",
+          "moduleId": "4.2"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "实验证据",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "5.1",
+          "title": "候选召回消融比较",
+          "desc": "选取组件配置，比较固定实测 AR 并查看结构差异。",
+          "componentId": "fpn-ablation"
+        },
+        {
+          "kind": "module",
+          "id": "5.2",
+          "title": "检测协议对照",
+          "desc": "区分固定候选与一致骨干两组检测实验。",
+          "componentId": "fpn-detection"
+        },
+        {
+          "kind": "module",
+          "id": "5.3",
+          "title": "候选输出的迁移",
+          "desc": "比较矩形候选与像素掩码，理解通用特征与任务预测头的分工。",
+          "componentId": "fpn-transfer"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ablation",
+          "title": "候选召回：哪些组件不可省略",
+          "goal": "选取一个组件配置，判断结构变化与候选召回的关系。",
+          "summary": "完整FPN在相同候选评测设置下优于各结构消融，但AR不是最终检测AP。",
+          "interaction": "点击任一横条，查看对应连接和预测层配置。",
+          "next": "候选更好以后，怎样区分候选与区域检测各自的贡献？",
+          "notes": "原论文PDF第6页表1，ResNet-50，COCO trainval35k训练、minival评估，每图1000候选，AR越高越好。选取C4 48.3、完整FPN 56.3、无自顶向下49.5、无横向46.1、只P2 51.3，所有条形从零开始，数值固定。完整FPN与无横向的差为10.2点。右侧街景只是统一场景提示，不是论文原图或模型输出。初始选择完整FPN；切换无横向应改变选择轮廓、配置说明与反馈，不改变任何原始实测数字。此页属于支持性实验证据，不能代替前面特征融合的实际计算交互。",
+          "componentId": "fpn-ablation",
+          "moduleId": "5.1"
+        },
+        {
+          "id": "detection",
+          "title": "固定候选与完整检测的区别",
+          "goal": "同样是33.9 AP，为什么提升幅度可以不同？",
+          "summary": "表2固定FPN候选；表3让候选与检测采用一致特征，二者基线条件不同。",
+          "interaction": "切换表2与表3，观察对照组高亮和对应提升幅度。",
+          "next": "这些多尺度特征能否用于矩形检测之外的任务？",
+          "notes": "原论文PDF第6页表2、表3及第5.2.1、5.2.2节。ResNet-50、trainval35k训练、minival评估，COCO AP越高越好。表2固定FPN RPN候选，C4+conv5头31.9，FPN+2fc头33.9，差2.0点。表3RPN与检测骨干一致，强化C4基线31.6，FPN33.9，差2.3点。不得把跨表差异解释为单个组件的因果效应；也不能忽略预测头差别。街景橙框表示固定候选的示意，绿色对应一致系统的示意，不表示学习后的真实框。初始表2，切换表3应改变协议说明、图形选中状态和幅度。未将论文特定M40计时直接与本地笔记本比较。",
+          "componentId": "fpn-detection",
+          "moduleId": "5.2"
+        },
+        {
+          "id": "transfer",
+          "title": "从检测框到分割候选",
+          "goal": "保持特征金字塔，改变任务预测头，会得到什么不同的候选？",
+          "summary": "FPN可作为通用多尺度表示；掩码头进一步给出类别无关的轮廓候选。",
+          "interaction": "切换矩形框与人形掩码，观察矩形背景和目标像素的区别。",
+          "next": "多尺度表示更强，是否意味着缩小目标后仍然不会漏检？",
+          "notes": "原论文第6节与表6。FPN用于类别无关分割候选；不是完整实例分类系统，也不是FPN本身直接输出掩码。ResNet-50，COCO train训练，在前5000张val评估，每图1000个掩码候选，segment AR越高越好。基础单5×5 MLP为43.4；最佳48.1还加入双MLP、加倍掩码分辨率和训练日程，不将两数差全部归于FPN结构。人形14×14掩码为透明手工示意，未模拟训练，不声称对应真实预测。框状态包括矩形背景；切换掩码时选择目标格子，图形、网格说明与反馈同步变化。",
+          "componentId": "fpn-transfer",
+          "moduleId": "5.3"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-6",
+      "title": "适用边界",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "boundary-module",
+          "title": "尺度退化与FPN的能力边界",
+          "desc": "切换本地固定画布1,1/2,1/4；观察测得AP与目标高度",
+          "componentId": "fpn-boundary"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "boundary",
+          "title": "尺度退化与FPN的能力边界",
+          "goal": "固定模型与画布，场景缩小后会发生什么？",
+          "summary": "这是MobileNetV3-FPN不微调对照，不能归因FPN；多尺度不等于跨帧关联",
+          "interaction": "切换本地固定画布1,1/2,1/4；观察测得AP与目标高度",
+          "next": "回看方法，并对照原文核验。",
+          "notes": "本地detection_B实验报告第2、3节，2026-10-21，固定Faster R-CNN MobileNetV3-FPN COCO预训练权重，不微调；PennFudan170图。原画布AP0.705843，缩至1/2为0.521190，1/4为0.143432；输入目标高度中位数213.86、106.93、53.58像素。这里没有移除FPN，不能判断FPN独立贡献；也不是原论文ResNet消融结果。画面仅示意缩放条件。\n原论文：https://arxiv.org/abs/1612.03144 。导读作者：王艺霖（zhixiu-feng）。",
+          "componentId": "fpn-boundary",
+          "moduleId": "boundary-module"
+        }
+      ]
+    }
+  ],
+  "thumbnails": {
+    "cover": "./thumbnails/cover.jpg",
+    "scale": "./thumbnails/scale.jpg",
+    "semantics": "./thumbnails/semantics.jpg",
+    "strategies": "./thumbnails/strategies.jpg",
+    "fusion": "./thumbnails/fusion.jpg",
+    "pyramid": "./thumbnails/pyramid.jpg",
+    "rpn": "./thumbnails/rpn.jpg",
+    "roi": "./thumbnails/roi.jpg",
+    "ablation": "./thumbnails/ablation.jpg",
+    "detection": "./thumbnails/detection.jpg",
+    "transfer": "./thumbnails/transfer.jpg",
+    "comparison": "./thumbnails/comparison.jpg"
+  }
+};
