@@ -1,0 +1,34 @@
+/* Explicit stage actions, scoped to the two encoder workbenches. */
+.enc-workbench > .experiment-step-nav,
+.enc-focus-workbench > .experiment-step-nav {
+  display:flex; align-items:center; justify-content:space-between; gap:12px 20px;
+  margin:0 0 18px; padding:12px; min-width:0; border:1px solid #cbd4e9;
+  border-radius:12px; background:#fffefa; box-shadow:0 5px 16px -12px #26364a40;
+}
+.experiment-step-nav .esn-position { display:flex; align-items:center; gap:14px; flex-shrink:0; }
+.experiment-step-nav button { display:inline-flex; align-items:center; justify-content:center; gap:14px; min-height:46px; padding:10px 16px; border:1px solid transparent; border-radius:9px; font-size:16px; line-height:1.6; font-weight:650; }
+.experiment-step-nav .esn-previous { color:#53617a; background:#f3f4f8; border-color:#dce0e9; }
+.experiment-step-nav .esn-previous:disabled { opacity:.48; }
+.experiment-step-nav .esn-count { color:#6b7487; font-size:15px; line-height:1.6; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.experiment-step-nav .esn-count b { color:#334b87; font-weight:700; }
+.experiment-step-nav .esn-next { justify-content:space-between; min-width:210px; color:#fff; background:#5365ad; border-color:#5365ad; box-shadow:0 5px 12px -8px #33498390; }
+.experiment-step-nav .esn-next > span:last-child { font-size:20px; line-height:1; flex-shrink:0; }
+.experiment-step-nav .esn-next.is-return { color:#43568d; background:#edf0f9; border-color:#c9d2e8; box-shadow:none; }
+.experiment-step-nav button:focus-visible { outline:3px solid #8997cd; outline-offset:3px; }
+.enc-focus-lab .enc-flow-detail:focus { outline:none; }
+.enc-focus-lab .enc-flow-detail:focus-visible { outline:3px solid #8997cd; outline-offset:3px; }
+@media(hover:hover) {
+  .experiment-step-nav .esn-next:hover { background:#435594; border-color:#435594; }
+  .experiment-step-nav .esn-next.is-return:hover,.experiment-step-nav .esn-previous:hover:not(:disabled) { background:#e6ebf7; border-color:#9caed7; }
+}
+@media(min-height:600px) {
+  .enc-workbench > .experiment-step-nav,
+  .enc-focus-workbench > .experiment-step-nav { position:sticky; top:calc(var(--header-offset) + 8px); z-index:5; }
+}
+@media(max-width:560px) {
+  .enc-workbench > .experiment-step-nav,
+  .enc-focus-workbench > .experiment-step-nav { flex-wrap:wrap; gap:10px; padding:10px; }
+  .experiment-step-nav .esn-position { justify-content:space-between; width:100%; }
+  .experiment-step-nav .esn-previous { min-height:40px; padding:7px 12px; }
+  .experiment-step-nav .esn-next { min-width:0; width:100%; }
+}

@@ -1,0 +1,65 @@
+/* Motion encodes a completed calculation; numeric readouts never wait for it. */
+.gt-update-segment { stroke-dasharray:1; stroke-dashoffset:0; animation:gt-draw-update .52s cubic-bezier(.22,.7,.2,1) both; }
+.gt-update-new-point { transform-box:fill-box; transform-origin:center; animation:gt-mark-update .25s .3s ease-out both; }
+@keyframes gt-draw-update { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+@keyframes gt-mark-update { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
+.experiment-body .wb-update .gt-update-change { display:block; font:500 14px/1.6 var(--reading-font,sans-serif); letter-spacing:0; color:#667186; margin:2px 0 0; }
+.gt-update-distribution { margin:0 0 16px; }
+.gt-update-distribution-rail { display:flex; height:12px; border-radius:5px; overflow:hidden; background:#eceef5; }
+.gt-update-distribution-rail > i { min-width:0; height:100%; background:#5365ad; transition:width .52s cubic-bezier(.22,.7,.2,1); }
+.gt-update-distribution-rail > i:nth-child(2) { background:#bd9254; }
+.gt-update-distribution-rail > i:nth-child(3) { background:#93a0b4; }
+.gt-update-distribution-labels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:7px; }
+.gt-update-distribution-labels > span { display:flex; flex-wrap:wrap; gap:3px 7px; align-items:baseline; color:#667186; font-size:14px; }
+.gt-update-distribution-labels b { color:#5365ad; font-size:15px; font-variant-numeric:tabular-nums; font-weight:650; }
+.gt-update-distribution-labels > span:nth-child(2) b { color:#99743d; }
+.gt-update-distribution-labels > span:nth-child(3) b { color:#66778f; }
+/* Keep the newly drawn segment beside the action, ahead of supplementary data. */
+.experiment-body .wb-update .gt-trajectory-panel { container-type:inline-size; padding:20px; }
+.experiment-body .wb-update .gt-trajectory-panel > .gt-panel-title { margin-bottom:14px; }
+.experiment-body .wb-update .gt-update-controls { padding:0; gap:4px 12px; }
+.experiment-body .wb-update .gt-update-controls > .gt-primary-button { align-self:center; min-height:54px; padding:12px 14px; }
+.experiment-body .wb-update .gt-update-step { margin:4px 0 12px; }
+.gt-update-feedback { display:grid; grid-template-columns:minmax(145px,.82fr) minmax(0,1.55fr); gap:16px; align-items:start; }
+.gt-update-plot { grid-column:2; grid-row:1; min-width:0; }
+.gt-update-numbers { grid-column:1; grid-row:1; min-width:0; }
+.experiment-body .wb-update .gt-update-feedback .gt-current-stats { grid-template-columns:1fr; gap:10px; padding:13px; margin:0 0 12px; }
+.experiment-body .wb-update .gt-update-feedback .gt-current-stats > div + div { border-left:0; padding-left:0; border-top:1px solid #d8dfee; padding-top:10px; }
+.experiment-body .wb-update .gt-update-feedback .gt-current-stats strong { font-size:27px; line-height:1.3; margin:2px 0; }
+.experiment-body .wb-update .gt-update-feedback .gt-chart-label { margin:0 0 4px; font-size:14px; }
+.experiment-body .wb-update .gt-update-feedback .gt-loss-chart { height:180px; max-height:180px; }
+.experiment-body .wb-update .gt-update-feedback .gt-svg-axis { font-size:18px; }
+.experiment-body .wb-update .gt-update-feedback .gt-chart-readout { padding:9px 10px; gap:3px 8px; font-size:14px; }
+.experiment-body .wb-update .gt-update-feedback .gt-chart-readout strong { font-size:18px; }
+.experiment-body .wb-update .gt-update-feedback .gt-chart-readout > span:last-child { flex-basis:100%; }
+.experiment-body .wb-update .gt-update-feedback .gt-chart-controls { font-size:14px; line-height:1.6; margin-top:8px; gap:6px; }
+.gt-update-numbers .gt-update-distribution { margin:0; }
+.gt-update-numbers .gt-update-distribution-labels { grid-template-columns:1fr; gap:3px; }
+.gt-update-numbers .gt-update-distribution-labels > span { justify-content:space-between; }
+@container (max-width:510px) {
+  .gt-update-feedback { grid-template-columns:1fr; gap:14px; }
+  .gt-update-plot,.gt-update-numbers { grid-column:1; grid-row:auto; }
+  .experiment-body .wb-update .gt-update-feedback .gt-current-stats { grid-template-columns:1fr 1fr; }
+  .experiment-body .wb-update .gt-update-feedback .gt-current-stats > div + div { border-top:0; padding-top:0; border-left:1px solid #d8dfee; padding-left:12px; }
+  .gt-update-numbers .gt-update-distribution-labels { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .gt-update-numbers .gt-update-distribution-labels > span { justify-content:flex-start; }
+}
+@media(max-width:480px) {
+  .experiment-body .wb-update .gt-trajectory-panel { padding:14px 12px; }
+  .experiment-body .wb-update .gt-update-feedback .gt-loss-chart { height:170px; max-height:170px; }
+}
+.enc-focus-lab .enc-linked-vectors :is(path,line,circle) { transition:none; }
+.enc-focus-lab .enc-matrix-label.is-tracked { color:#43558d; background:#edf0f8; border-radius:5px; font-weight:750; }
+.enc-focus-lab .enc-matrix-label.is-tracked[data-branch=text] { color:#8f6d3a; background:#f5eee2; }
+.enc-projection-guide { display:flex; gap:9px; align-items:flex-start; margin:12px 0 0; color:#667186; font-size:14px; line-height:1.65; }
+.enc-projection-guide > i { width:12px; height:12px; border:2px solid #5365ad; border-radius:50%; flex:none; margin-top:5px; background:white; }
+.enc-projection-scale { margin-top:12px; }
+.enc-projection-scale > div { position:relative; height:8px; border-radius:4px; background:linear-gradient(90deg,#e9decc,#eaedf4 50%,#a7b1d4); }
+.enc-projection-scale > div::after { content:''; position:absolute; top:-3px; left:50%; width:1px; height:14px; background:#a7aebc; }
+.enc-projection-scale i { display:block; position:absolute; top:50%; width:13px; height:13px; border-radius:50%; background:#5365ad; border:2px solid white; box-shadow:0 0 0 1px #5365ad; transform:translate(-50%,-50%); transition:left .52s cubic-bezier(.22,.7,.2,1); z-index:1; }
+.enc-projection-scale > span { display:flex; justify-content:space-between; margin-top:7px; color:#718096; font-size:12px; font-variant-numeric:tabular-nums; }
+.enc-projection-scale em { font-style:normal; }
+@media(prefers-reduced-motion:reduce) {
+  .gt-update-segment,.gt-update-new-point { animation:none!important; opacity:1; transform:none; stroke-dashoffset:0; }
+  .gt-update-distribution-rail > i,.enc-projection-scale i { transition:none!important; }
+}

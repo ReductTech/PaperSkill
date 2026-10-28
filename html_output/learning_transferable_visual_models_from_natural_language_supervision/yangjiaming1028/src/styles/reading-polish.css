@@ -1,0 +1,450 @@
+/* A shared reading scale for prose and controls. KaTeX internals, SVG text,
+   diagrams, and numeric instruments retain their own font and geometry rules. */
+:root {
+  --reading-font: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  --reading-ink: #193332;
+  --reading-muted: #4c625a;
+  --reading-subtle: #536960;
+  --ui-text-muted: #4c625a;
+  --ink-2: #4c625a;
+  font-family: var(--reading-font);
+}
+body {
+  min-width: 0;
+  font-family: var(--reading-font);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.85;
+  color: var(--reading-ink);
+}
+button, input, select, textarea { font-family: var(--reading-font); }
+.site-main :is(h1, h2, h3, h4, h5) {
+  font-weight: 700;
+  color: #172f2e;
+  overflow-wrap: break-word;
+}
+.hero-copy h1, .chapter-header h1 {
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.hero-copy h1 { word-break: normal; }
+.chapter-header h1 { max-width: 100%; }
+.site-main :is(.chapter-lead, .hero-lead, .experiment-instruction,
+  .question-strip p, .formula-explain, .evidence-copy, .evidence-copy p,
+  .section-heading > p) {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.9;
+  color: var(--reading-muted);
+}
+.chapter-lead, .hero-lead { max-width: 44em; }
+/* Keep Chinese headings open and long explanations easy to track. */
+.site-main :is(.hero-copy h1, .chapter-header h1, .section-heading h2,
+  .experiment-heading h2, .formula-heading h2, .takeaway-item h3) {
+  text-wrap: balance;
+}
+.site-main :is(.chapter-lead, .hero-lead, .experiment-instruction,
+  .formula-explain, .evidence-copy p, .takeaway-item p, .insight-note p) {
+  text-wrap: pretty;
+}
+.site-main :is(.experiment-instruction, .fe-lead, .evidence-copy p) {
+  max-width: 44em;
+}
+.site-main :is(.chapter-lead, .hero-lead, .experiment-instruction,
+  .formula-explain, .evidence-copy p, .takeaway-item p) strong {
+  font-weight: 700;
+}
+.site-main :is(.section-heading h2, .experiment-heading h2, .formula-heading h2) {
+  font-size: clamp(25px, 2.4vw, 30px);
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+.site-main .evidence-copy h3 {
+  font-size: 22px;
+  line-height: 1.65;
+}
+.site-main :is(.eyebrow, .read-time, .data-badge, .formula-hover-hint,
+  .formula-heading > p:last-child, .equation-caption,
+  .hero-facts,
+  .chapter-footer > span, .training-next > span) {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.8;
+  color: var(--reading-muted);
+}
+.site-main .eyebrow { font-weight: 650; letter-spacing: .06em; }
+.site-main .data-badge.evidence { color: #076e65; }
+.site-main .data-badge { white-space: normal; }
+.site-header :is(.stage-nav button, .contents-button),
+.site-main :is(.primary-button, .secondary-button, .text-button, .back-link,
+  .chapter-steps button, .source-links, .training-next > button) {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+.site-header :is(.brand > span, .stage-nav button, .contents-button) { color: #425d53; }
+.site-header .stage-nav button.active { color: #076e65; font-weight: 700; }
+.contents-panel .contents-heading h2 { font-size: 25px; font-weight: 700; line-height: 1.6; overflow-wrap: break-word; }
+.contents-panel .eyebrow { font-size: 15px; font-weight: 650; color: #4c625a; }
+.contents-panel .contents-grid b { font-size: 17px; font-weight: 650; line-height: 1.8; color: #193332; }
+.contents-panel .contents-grid small { font-size: 15px; font-weight: 500; line-height: 1.8; color: #4c625a; }
+.site-main .question-strip {
+  background: #eaf3eb;
+  border-color: #cadbce;
+}
+.site-main .question-strip > span:first-child {
+  font-size: 15px;
+  font-weight: 700;
+  color: #36654f;
+}
+.experiment-card, .formula-section {
+  border-color: #cfded4;
+  box-shadow: 0 10px 30px -22px #234b3c3d;
+}
+.experiment-heading > div, .formula-heading, .chapter-header,
+.gt-lab-heading > div, .gt-panel-title > div { min-width: 0; }
+
+/* Cover text only: scene layout and its animation are intentionally untouched. */
+.hero-copy .hero-lead { color: #466157; }
+.hero-facts > span, .brand > span { font-weight: 500; }
+.clip-cover .cca-caption > p { font-size: 18px; font-weight: 650; line-height: 1.7; }
+.clip-cover .cca-status { font-size: 18px; font-weight: 500; line-height: 1.8; color: #466157; }
+.clip-cover .cca-top > span { font-size: 15px; font-weight: 650; }
+.clip-cover .cca-steps button > b { font-size: 16px; font-weight: 650; line-height: 1.65; }
+.clip-cover :is(.cca-play, .cca-scenes button) { font-size: 16px !important; font-weight: 650; line-height: 1.6; }
+.clip-cover :is(.cca-note, .cca-ranking-label, .cca-match-label, .cca-cosine) { font-size: 15px; font-weight: 500; }
+.clip-cover .cca-note { color: #536960; line-height: 1.7; }
+.site-footer, .site-footer button { font-size: 15px; font-weight: 500; color: #4c625a; }
+
+/* Actual laboratory selectors override their earlier compact text rules. */
+.experiment-body :is(.concept-lab, .clip-lab, .enc-lab, .gt-lab) {
+  font-family: var(--reading-font);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.85;
+}
+.experiment-body .clip-lab { --m-muted: #4c625a; }
+.experiment-body .enc-lab { --enc-muted: #4c625a; }
+.experiment-body .gt-lab { --gt-muted: #4c625a; }
+.experiment-body :is(.concept-lab, .clip-lab, .enc-lab, .gt-lab) p {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.9;
+}
+.experiment-body :is(.concept-response p, .method-result,
+  .template-minimum, .evidence-delta > p, .enc-lab p,
+  .gt-lab-heading p, .gt-insight p, .gt-update-explanation,
+  .m-section-intro p, .m-action-feedback, .m-matrix-reading p,
+  .m-reading-detail, .m-challenge p, .m-notice p,
+  .m-temperature-panel p, .m-prediction-explanation p, .m-calculation p) {
+  color: var(--reading-muted);
+}
+.experiment-body .quiz-feedback {
+  font-size: 18px !important;
+  font-weight: 500;
+  line-height: 1.9 !important;
+}
+.experiment-body .quiz-feedback.correct { color: #2b6848; }
+.experiment-body .quiz-feedback.incorrect { color: #93552d; }
+.experiment-body :is(.clip-lab h3, .gt-lab .gt-lab-heading h3) {
+  font-size: clamp(23px, 2vw, 27px);
+  line-height: 1.6;
+  font-weight: 700;
+  letter-spacing: -.015em;
+}
+.experiment-body :is(.gt-panel-title h4, .clip-lab h4,
+  .enc-branch-heading h5, .enc-observation h5,
+  .enc-flow-branch-head h5, .enc-flow-section-heading h5,
+  .enc-flow-detail h5, .enc-detail-title h5) {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.65;
+}
+.experiment-body :is(.method-heading b, .protocol-quiz h3,
+  .protocol-flow > div > b, .enc-step-status,
+  .m-caption-option strong, .m-challenge > strong,
+  .m-notice strong, .m-prediction-explanation strong, .gt-insight strong) {
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.8;
+}
+
+/* Text controls stay a clear 16px; numeric outputs keep their existing size. */
+.experiment-body :is(.concept-choice button, .candidate-add,
+  .prompt-option b, .protocol-options b, .result-datasets button b,
+  .quiz-heading > button, .table-toggle, .claim-check button,
+  .gt-segmented > button, .gt-control-heading label, .gt-details summary,
+  .m-button, .m-text-button, .m-view-switch button, .m-input-switch button,
+  .m-direction-switch b, .m-candidate-toggle, .m-candidate-footer .m-text-button,
+  .m-temperature-heading label, .enc-choice-group, .enc-step-button strong,
+  .enc-flow-timeline button > strong) {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.75;
+}
+.experiment-body :is(.gt-reset, .gt-preset, .gt-primary-button, .enc-button) {
+  font-size: 16px !important;
+  font-weight: 650;
+  line-height: 1.75;
+}
+.experiment-body :is(.prompt-option, .claim-check button, .protocol-options button,
+  .result-datasets button, .m-caption-option, .enc-step-button,
+  .gt-segmented > button) { min-width: 0; overflow-wrap: break-word; }
+.experiment-body :is(.gt-control-heading, .gt-panel-title, .gt-stage-top) {
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+.experiment-body :is(.prompt-option code, .interface-method > code) {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* Secondary copy is smaller by one step, with sufficient contrast. */
+.experiment-body :is(.input-scene small, .method-heading > span,
+  .interface-method > small, .concept-response > span, .prompt-source > span,
+  .micro-label, .vector-output small, .protocol-options small,
+  .budget-card small, .budget-card span, .protocol-flow > div > span,
+  .protocol-flow > div > small, .quiz-heading > span,
+  .result-datasets button span, .chart-heading, .chart-heading > span:last-child,
+  .result-bar-row > div > span, .chart-scale, .evidence-delta > span,
+  .evidence-delta > small, .result-table-wrap caption, .result-table-wrap thead th,
+  .enc-eyebrow, .enc-boundary, .enc-quiet, .enc-step-button small,
+  .enc-branch-heading > div > span, .enc-operation-label > span:not(.math-inline),
+  .enc-unit-check > span:last-child, .enc-phase-note,
+  .enc-network-node > small, .enc-node-status,
+  .enc-output-node > span, .enc-output-node small, .enc-parameter-note > span,
+  .enc-flow-node-heading > small, .enc-flow-node-footer,
+  .enc-flow-branch-head > small, .enc-flow-inputs small, .enc-flow-live-label,
+  .enc-flow-loss-parts small, .enc-flow-detail > small,
+  .m-simulation, .m-photo-caption > span, .m-bank-heading > span,
+  .m-caption-option-top, .m-english, .m-pair-rule, .m-check-hint,
+  .m-direction-switch span, .m-heatmap caption, .m-heatmap th,
+  .m-heat-cell > span, .m-eyebrow, .m-matrix-key, .m-input-label,
+  .m-input-description, .m-candidate-count, .m-candidate-values,
+  .m-candidate-footer, .m-temperature-scale,
+  .m-prediction-result > span, .m-prediction-result small,
+  .gt-eyebrow, .gt-mini-label, .gt-legend, .gt-scale-labels,
+  .gt-mini-metrics > div > span, .gt-control-heading label small,
+  .gt-equation > small, .gt-subtle, .gt-matrix-corner,
+  .gt-matrix-header span, .gt-matrix-cell > span, .gt-range-ends,
+  .gt-current-stats > div > span, .gt-details summary > span,
+  .gt-gradient-table caption, .gt-gradient-table thead th,
+  .gt-gradient-table tbody th > span, .gt-gradient-table td > small,
+  .gt-update-step, .gt-chart-label, .gt-chart-controls) {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.8;
+  color: var(--reading-subtle);
+}
+.experiment-body :is(.enc-lab .enc-stage-caption, .enc-lab .enc-footnote,
+  .enc-flow-lab .enc-flow-reduced-note, .enc-flow-lab .enc-flow-matrix-caption,
+  .enc-flow-lab .enc-flow-probabilities p,
+  .gt-lab p.gt-keyboard-tip, .gt-lab p.gt-microcopy,
+  .gt-lab p.gt-method-note, .gt-scroll-tip, .m-scroll-hint) {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.85;
+  color: var(--reading-subtle);
+}
+.experiment-body .lab-disclaimer {
+  font-size: 15px !important;
+  font-weight: 500;
+  line-height: 1.85 !important;
+  color: var(--reading-subtle) !important;
+}
+.experiment-body :is(.gt-matrix-header strong, .gt-prob-label,
+  .gt-breakdown-row, .gt-gradient-table, .result-table-wrap table,
+  .enc-flow-pair-readout, .enc-flow-loss-parts) {
+  font-size: 16px;
+  line-height: 1.8;
+}
+.experiment-body :is(.gt-pill, .gt-prob-label em, .m-winner-label) {
+  font-size: 15px;
+  font-weight: 650;
+}
+.experiment-body .enc-step-button.is-active small { color: inherit; opacity: 1; }
+.experiment-body .enc-flow-branch-head > small { color: var(--flow-color); }
+.experiment-body .m-input-label { color: #0a6e64; }
+.experiment-body .m-simulation, .experiment-body .enc-eyebrow { color: #08766c; }
+
+/* Formula prose and explanations use UI fonts; rendered formula glyphs do not. */
+.site-main :is(.equation-caption, .fe-hint, .fe-explain-desc) {
+  color: #375d4d;
+  font-weight: 500;
+  line-height: 1.85;
+}
+.site-main .equation-caption { font-size: 16px; }
+.site-main .equation-caption b { font-weight: 700; }
+.site-main .fe-explain-desc { font-size: 18px; }
+.math-tooltip {
+  font-family: var(--reading-font);
+  font-size: 16px;
+  font-weight: 500;
+  color: #234638;
+}
+.math-tooltip strong { font-size: 19px; font-weight: 700; }
+.math-tooltip p { font-size: 16px; font-weight: 500; }
+.math-tooltip :is(.math-tooltip-heading, small) {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4c6659;
+}
+
+/* Calm context panels lead into more distinctive chapter takeaways. */
+.site-main .insight-note {
+  background: #e8f3eb;
+  border: 1px solid #c8ddcf;
+  border-left: 5px solid #087f75;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px -18px #235c404d;
+}
+.site-main .insight-note small {
+  font-size: 15px;
+  font-weight: 700;
+  color: #22664e;
+}
+.site-main .insight-note p {
+  font-size: 19px;
+  font-weight: 500;
+  color: #284f40;
+  line-height: 1.9;
+}
+.site-main .deep-dive {
+  background: #fcfdfb;
+  border-color: #ccdbd1;
+  border-radius: 16px;
+}
+.site-main .deep-dive > summary {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.7;
+  gap: 18px;
+}
+.site-main .deep-dive > summary > span:first-child { min-width: 0; }
+.site-main .deep-dive > summary > span:last-child { flex-shrink: 0; }
+.site-main .deep-dive > summary small {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4c6657;
+}
+.site-main .deep-dive[open] > summary { background: #f1f6ef; margin-bottom: 24px; }
+.site-main .takeaway-grid { gap: 22px; align-items: stretch; }
+.site-main .takeaway-item {
+  --takeaway-bg: #eaf5ee;
+  --takeaway-border: #c7dfd0;
+  --takeaway-accent: #087f75;
+  --takeaway-text: #254b3d;
+  min-width: 0;
+  padding: 26px 24px 28px;
+  background: var(--takeaway-bg);
+  border: 1px solid var(--takeaway-border);
+  border-left: 5px solid var(--takeaway-accent);
+  border-radius: 16px;
+  box-shadow: 0 7px 20px -18px #1e443e50;
+}
+.site-main .takeaway-item:nth-child(3n + 2) {
+  --takeaway-bg: #fff2e6;
+  --takeaway-border: #ecd7bf;
+  --takeaway-accent: #9c5425;
+  --takeaway-text: #67472f;
+}
+.site-main .takeaway-item:nth-child(3n + 3) {
+  --takeaway-bg: #f0f0fb;
+  --takeaway-border: #d9d9eb;
+  --takeaway-accent: #6f6bae;
+  --takeaway-text: #4b4b70;
+}
+.site-main .takeaway-item > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 36px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--takeaway-accent);
+  color: #fff;
+  font-family: var(--reading-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.site-main .takeaway-item h3 {
+  margin: 20px 0 12px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.65;
+  color: var(--takeaway-text);
+}
+.site-main .takeaway-item p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.9;
+  color: var(--takeaway-text);
+  overflow-wrap: break-word;
+}
+.site-main .training-steps > button strong { font-size: 19px; font-weight: 700; }
+.site-main .training-steps > button small { font-size: 15px; font-weight: 500; color: #4c625a; }
+
+@media (max-width: 1000px) {
+  .site-main .takeaway-grid { grid-template-columns: 1fr; gap: 18px; }
+  .site-main .takeaway-item { padding: 24px 26px; }
+  .site-main .takeaway-item h3 { margin-top: 16px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 18px; }
+  .site-main .chapter-header h1 { font-size: clamp(29px, 7.5vw, 36px); }
+  .site-main .hero-copy h1 { font-size: clamp(32px, 8vw, 42px); }
+  .site-main .takeaway-item { padding: 22px 20px 24px; }
+  .site-main .takeaway-item h3 { font-size: 21px; }
+  .site-main .takeaway-item p { font-size: 17px; }
+  .site-main .insight-note p { font-size: 18px; }
+  .site-main .deep-dive > summary { font-size: 18px; padding: 22px 20px; }
+  .site-main .training-steps > button { padding: 18px 16px; }
+  .site-main .training-steps > button strong { font-size: 17px; }
+  .experiment-body .gt-lab-heading { flex-wrap: wrap; }
+  .experiment-body .gt-lab-heading > div { flex: 1 1 240px; }
+  .experiment-body .gt-panel-title h4 { font-size: 20px; }
+}
+@media (max-width: 380px) {
+  .site-main .training-steps { grid-template-columns: 1fr; gap: 12px; }
+  .site-main .training-steps > button { flex-direction: row; gap: 14px; }
+  .site-main .takeaway-item { padding-inline: 18px; }
+  .site-main .chapter-footer { grid-template-columns: 1fr; }
+  .site-main .chapter-footer > span { grid-column: 1; grid-row: auto; }
+  .site-main .chapter-footer :is(.primary-button, .secondary-button) {
+    width: 100%;
+    justify-content: space-between;
+    padding-inline: 16px;
+  }
+}
+
+/* Final layout refinements: give the illustration space without stretching the cover. */
+.site-main .landing-hero { min-height:calc(100svh - 90px); padding-block:32px 40px; gap:48px; }
+.site-main .hero-copy h1 { line-height:1.4; margin-block:24px; }
+.site-main .hero-copy h1 span { display:inline; }
+.site-main .hero-lead { max-width:29em; }
+.site-main .hero-facts { margin-top:32px; }
+.site-main .formula-explain { max-width:none; }
+.site-main .deep-dive .evidence-toggle { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:#e6eee5; color:#087f75; font-size:24px; transition:transform .2s ease; }
+.site-main .deep-dive[open] .evidence-toggle { transform:rotate(45deg); }
+.contents-panel { scrollbar-gutter:stable; box-shadow:0 20px 70px -22px #14382a40; }
+.contents-panel .contents-grid button { transition:background .18s,border-color .18s; }
+@media (max-width:1000px) and (min-width:761px) {
+  .site-main .landing-hero { grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:28px; }
+  .site-main .hero-copy h1 { font-size:clamp(32px,4vw,38px); }
+}
+@media (max-width:760px) {
+  .site-main .landing-hero { min-height:0; gap:30px; padding-block:36px; }
+}
+@media (max-width:380px) {
+  .site-main .hero-copy h1 { font-size:30px; }
+  .contents-panel .contents-grid > button { padding-inline:10px; gap:10px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .experience .chapter-page, .contents-panel, .experience .evidence-toggle { animation:none!important; transition:none!important; }
+}

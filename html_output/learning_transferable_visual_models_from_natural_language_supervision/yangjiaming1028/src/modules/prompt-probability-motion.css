@@ -1,0 +1,74 @@
+/* Finite, state-driven explanations for prompt averaging and probability allocation. */
+.experiment-body .wb-prompts .prompt-space.prompt-composition { display:block; padding:20px; background:linear-gradient(145deg,#faf9f5,#f0f2f8); }
+.experiment-body .prompt-composition .prompt-motion-heading { display:flex; justify-content:space-between; align-items:baseline; gap:8px; color:#34465f; font-size:15px; font-weight:600; }
+.experiment-body .prompt-composition .prompt-motion-heading small { font-size:12px; font-weight:400; white-space:nowrap; }
+.experiment-body .wb-prompts .prompt-composition svg { width:100%; height:auto; max-height:235px; margin:4px 0 0; }
+/* RAF supplies exact intermediate geometry; a second CSS interpolation would lag behind it. */
+.experiment-body .wb-prompts .prompt-composition svg :is(path,circle) { transition:none; }
+.experiment-body .prompt-composition .prompt-reference-vector { transition:opacity .25s ease; }
+.experiment-body .prompt-composition .prompt-motion-steps { display:flex; align-items:center; justify-content:center; gap:4px; flex-wrap:wrap; font-size:13px; line-height:1.6; color:#7a8495; }
+.experiment-body .prompt-composition .prompt-motion-steps span { padding:4px 6px; border-radius:5px; background:#e8ebf2; transition:background .3s,color .3s; white-space:nowrap; }
+.experiment-body .prompt-composition .prompt-motion-steps span.is-active { color:#fff; background:#5365ad; }
+.experiment-body .prompt-composition .prompt-motion-steps i { font-style:normal; }
+.experiment-body .prompt-composition .prompt-motion-status { margin:9px 0 10px; min-height:24px; font-size:14px; line-height:1.65; text-align:center; color:#536079; }
+.experiment-body .wb-prompts .prompt-composition .vector-output { display:flex; flex-direction:row; justify-content:space-between; align-items:baseline; gap:6px 10px; flex-wrap:wrap; padding:10px 12px; margin:0; background:#fffdf9; border-color:#d4dbea; }
+.experiment-body .wb-prompts .prompt-composition .vector-output small { font-size:13px; }
+.experiment-body .wb-prompts .prompt-composition .vector-output b { font-size:19px; white-space:nowrap; }
+.experiment-body .prompt-composition .prompt-norm-readout { display:flex; align-items:center; justify-content:space-between; gap:5px; margin-top:8px; font-size:12px; color:#6c778b; }
+.experiment-body .prompt-composition .prompt-norm-readout b { font:600 13px/1.5 ui-monospace,Consolas,monospace; color:#4b5f98; }
+.experiment-body .prompt-composition .prompt-norm-readout i { font-style:normal; color:#a1aabc; }
+.experiment-body .wb-zero .probability-redistribution { padding:11px 0 0; margin-top:8px; border-top:1px solid #d7ddef; }
+.experiment-body .wb-zero .probability-flow-heading { display:flex; align-items:baseline; justify-content:space-between; gap:6px 12px; flex-wrap:wrap; }
+.experiment-body .wb-zero .probability-flow-heading strong { font-size:14px; font-weight:600; color:#465982; }
+.experiment-body .wb-zero .probability-flow-heading > span { font-size:12px; color:#6b7892; font-variant-numeric:tabular-nums; }
+.experiment-body .wb-zero .probability-flow-chart { display:grid; grid-template-columns:46px minmax(0,1fr); gap:7px; margin-top:9px; }
+.experiment-body .wb-zero .probability-flow-labels { display:flex; flex-direction:column; justify-content:space-between; font-size:12px; line-height:1; color:#6d7890; padding:0; }
+.experiment-body .wb-zero .probability-flow-chart svg { display:block; width:100%; height:64px; overflow:visible; border-radius:3px; }
+.experiment-body .wb-zero .probability-flow-chart svg * { transition:none; }
+.experiment-body .wb-zero .probability-flow-cause { font-size:13px; color:#596986; line-height:1.6; min-height:21px; margin:9px 0 0; }
+.experiment-body .wb-zero .wb-temperature-preview { border-top:0; padding-top:0; margin-top:8px; gap:9px; }
+.experiment-body .wb-zero .wb-temperature-preview > div { display:grid; grid-template-columns:auto 1fr; gap:1px 6px; align-items:baseline; padding:6px 8px; border:1px solid #dce1ed; background:#f9faff; border-radius:7px; }
+.experiment-body .wb-zero .wb-temperature-preview > div.is-leading { border-color:#b9c3e0; background:#fff; }
+.experiment-body .wb-zero .wb-temperature-preview > div > span { display:flex; align-items:center; gap:4px; font-size:13px; }
+.experiment-body .wb-zero .wb-temperature-preview em { width:6px; height:6px; border-radius:2px; background:var(--probability-color); flex:none; }
+.experiment-body .wb-zero .wb-temperature-preview b { margin-left:auto; font-size:14px; }
+.experiment-body .wb-zero .wb-temperature-preview small { grid-column:1/-1; font-size:11px; line-height:1.5; color:#75819a; }
+.experiment-body .wb-zero .m-probability-track { position:relative; }
+.experiment-body .wb-zero .m-candidate .m-probability-track > span { background:var(--probability-color); transition:width .72s cubic-bezier(.16,1,.3,1); }
+.experiment-body .wb-zero .probability-before-marker { position:absolute; top:0; height:100%; width:2px; transform:translateX(-1px); background:#26364a; opacity:.5; }
+.experiment-body .wb-zero .probability-winner-label { animation:probability-winner-arrive .7s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes probability-winner-arrive { from { opacity:.2; transform:translateY(3px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:760px) {
+ .experiment-body .wb-prompts .prompt-space.prompt-composition { padding:8px 12px; }
+ /* The current phase replaces the duplicated title and three-step strip on a phone. */
+ .experiment-body .wb-prompts .prompt-composition :is(.prompt-motion-heading,.prompt-motion-steps) { display:none; }
+ .experiment-body .wb-prompts .prompt-composition svg { height:164px; max-height:164px; margin:0; }
+ .experiment-body .prompt-composition .prompt-motion-status { margin:4px 0; min-height:21px; line-height:1.5; }
+ .experiment-body .wb-prompts .prompt-composition .vector-output { justify-content:center; padding:4px 10px; }
+ .experiment-body .wb-prompts .prompt-composition .vector-output small { display:none; }
+ .experiment-body .wb-prompts .prompt-composition .vector-output b { font-size:17px; }
+ .experiment-body .wb-prompts .prompt-composition .prompt-norm-readout { margin-top:5px; line-height:1.5; }
+ .experiment-body .wb-prompts .prompt-option { min-height:57px; padding:7px 12px; margin-bottom:6px; }
+ .experiment-body .wb-prompts .prompt-controls .prompt-option { scroll-margin-top:calc(var(--header-offset) + 290px); }
+ .experiment-body .wb-prompts .prompt-option b { margin-bottom:2px; }
+ .experiment-body .wb-prompts .template-minimum { padding:8px 10px; margin-top:8px; }
+ .experiment-body .wb-prompts .prompt-controls > .micro-label { margin-bottom:8px; }
+ .experiment-body .wb-prompts .prompt-controls > .wb-live-pair { margin-bottom:10px; padding:8px 12px; }
+}
+@media(max-width:480px) {
+ .experiment-body .wb-zero .m-temperature-panel { padding:10px; }
+ .experiment-body .wb-zero .wb-temperature-preview { gap:5px; }
+ .experiment-body .wb-zero .wb-temperature-preview > div { grid-template-columns:1fr; padding:5px; }
+ .experiment-body .wb-zero .wb-temperature-preview b { margin-left:0; font-size:13px; }
+ .experiment-body .wb-zero .wb-temperature-preview small { font-size:11px; }
+ .experiment-body .wb-zero .probability-flow-chart { grid-template-columns:40px minmax(0,1fr); gap:4px; }
+ .experiment-body .wb-zero .probability-flow-chart svg { height:52px; }
+ .experiment-body .wb-zero .probability-flow-heading strong { font-size:13px; }
+ .experiment-body .wb-zero .probability-flow-heading > span { font-size:11px; }
+ .experiment-body .prompt-composition .prompt-motion-heading { font-size:14px; }
+ .experiment-body .prompt-composition .prompt-motion-heading small { font-size:11px; }
+ .experiment-body .prompt-composition .prompt-norm-readout { flex-wrap:wrap; justify-content:center; gap:4px 10px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .experiment-body :is(.prompt-composition,.wb-zero) :is(.prompt-reference-vector,.prompt-motion-steps span,.probability-winner-label,.m-probability-track > span) { animation:none!important; transition:none!important; }
+}

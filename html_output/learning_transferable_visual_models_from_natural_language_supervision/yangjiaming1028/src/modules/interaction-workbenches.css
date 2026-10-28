@@ -1,0 +1,251 @@
+/* Action and consequence share a compact workbench. All rules are module-scoped. */
+.experiment-body :is(.wb-vector,.wb-prompts,.wb-zero,.wb-loss,.wb-update) {
+  --gt-teal:#5365ad; --gt-soft:#f2f3f8; --gt-ink:#26364a;
+  --m-teal:#5365ad; --m-bg:#f6f4ef; --m-ink:#26364a; --m-line:#dadde5;
+}
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-panel { border-color:#dce0e8; padding:22px; border-radius:16px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-panel-title { margin-bottom:16px; gap:12px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-panel-title h4 { margin-top:4px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-range { accent-color:#5365ad; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) input.gt-range { margin:5px 0; height:36px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-range::-webkit-slider-thumb { background:#5365ad; box-shadow:0 0 0 5px #5365ad14; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-range::-moz-range-thumb { background:#5365ad; box-shadow:0 0 0 5px #5365ad14; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-segmented { background:#eff0f5; padding:4px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-segmented button { padding:9px 10px; }
+.experiment-body :is(.wb-vector,.wb-loss,.wb-update) .gt-segmented button[aria-pressed=true],
+.experiment-body .wb-loss .gt-preset[aria-pressed=true] { background:#5365ad; border-color:#5365ad; color:white; box-shadow:0 3px 8px #35457018; }
+.experiment-body .wb-live-pair { display:flex; align-items:center; justify-content:space-between; gap:8px 16px; flex-wrap:wrap; padding:12px 14px; margin-bottom:16px; background:#edf0fa; border:1px solid #d5dcef; border-radius:10px; color:#536079; font-size:15px; }
+.experiment-body .wb-live-pair strong { color:#3e518d; font:600 20px/1.5 ui-monospace,Consolas,monospace; font-variant-numeric:tabular-nums; }
+.experiment-body .wb-vector .gt-geometry-grid { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:start; gap:20px; }
+.experiment-body .wb-vector .gt-geometry-stage { position:sticky; top:calc(var(--header-offset) + 10px); background:linear-gradient(145deg,#f4f3ef,#eef0f7); }
+.experiment-body .wb-vector .gt-geometry-controls { gap:14px; }
+.experiment-body .wb-vector .gt-vector-svg { max-height:320px; }
+.experiment-body .wb-vector .gt-mini-metrics { margin-top:14px; padding-top:12px; }
+.experiment-body .wb-vector .gt-number-hero { font-size:42px; }
+.experiment-body .wb-vector .gt-length-heading { margin-top:18px; }
+.experiment-body .wb-vector .gt-control-card { background:#fafbfe; border-color:#cbd4ed; }
+.experiment-body .wb-vector .gt-keyboard-tip { margin-bottom:0; }
+.experiment-body .wb-prompts .concept-choice { margin-bottom:16px; }
+.experiment-body .wb-prompts .concept-choice button[aria-pressed=true] { background:#5365ad; border-color:#5365ad; color:#fff; }
+.experiment-body .wb-prompts .prompt-builder { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:20px; align-items:start; }
+.experiment-body .wb-prompts .prompt-controls { padding:18px; border:1px solid #d5dcef; border-radius:15px; background:#fafbfe; }
+.experiment-body .wb-prompt-source { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.experiment-body .wb-prompt-source > svg { width:72px; height:62px; flex:none; object-fit:cover; border-radius:10px; }
+.experiment-body .wb-prompt-source strong { display:block; font-size:17px; color:#26364a; line-height:1.5; }
+.experiment-body .wb-prompt-source span { display:block; font-size:14px; color:#667184; line-height:1.6; margin-top:4px; }
+.experiment-body .wb-prompts .prompt-option { min-height:68px; margin-bottom:8px; border-color:#d9dfeb; background:#fff; padding:10px 14px; transition:background .2s,border-color .2s,box-shadow .2s; }
+.experiment-body .wb-prompts .prompt-option.selected { border-color:#5365ad; background:#eef1fc; box-shadow:inset 3px 0 #5365ad; }
+.experiment-body .wb-prompts .prompt-option > span { color:#5365ad; }
+.experiment-body .wb-prompts .prompt-option code { color:#667184; }
+.experiment-body .wb-prompts .prompt-space { position:sticky; top:calc(var(--header-offset) + 10px); padding:24px; border:1px solid #dce0e8; background:linear-gradient(145deg,#f7f6f2,#eef0f8); }
+.experiment-body .wb-prompts .prompt-space svg { max-height:265px; }
+.experiment-body .wb-prompts .prompt-space svg path, .experiment-body .wb-prompts .prompt-space svg circle { transition:opacity .3s, cx .38s cubic-bezier(.2,.8,.2,1), cy .38s cubic-bezier(.2,.8,.2,1); }
+.experiment-body .wb-prompts .vector-output { padding:16px 12px; background:white; border:1px solid #dce0e8; border-radius:10px; }
+.experiment-body .wb-prompts .vector-output b { font-size:22px; color:#5365ad; }
+.experiment-body .wb-prompts .template-minimum { margin-bottom:0; }
+.experiment-body .wb-zero .m-zero-layout { grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr); gap:24px; align-items:start; }
+.experiment-body .wb-zero .m-input-panel { position:sticky; top:calc(var(--header-offset) + 10px); }
+.experiment-body .wb-zero .m-panel-heading { margin-bottom:14px; gap:10px; flex-wrap:wrap; }
+.experiment-body .wb-zero .m-panel-heading h4 { font-size:20px; }
+.experiment-body .wb-zero .m-input-art { max-height:230px; }
+.experiment-body .wb-zero .m-input-art svg { height:230px; width:100%; object-fit:cover; }
+.experiment-body .wb-zero .m-input-switch button[aria-pressed=true] { background:#5365ad; border-color:#5365ad; color:#fff; }
+.experiment-body .wb-live-prediction { display:grid; grid-template-columns:1fr auto; align-items:baseline; gap:3px 12px; padding:16px; margin-top:12px; background:#26364a; border-radius:12px; color:#fff; }
+.experiment-body .wb-live-prediction > span { grid-column:1/-1; font-size:14px; color:#cbd4e8; }
+.experiment-body .wb-live-prediction strong { font-size:26px; line-height:1.5; color:#fff; }
+.experiment-body .wb-live-prediction b { font:600 23px/1.5 ui-monospace,Consolas,monospace; }
+.experiment-body .wb-live-prediction small { grid-column:1/-1; font-size:14px; color:#cbd4e8; }
+.experiment-body .wb-zero .m-candidates-panel { padding:20px; border:1px solid #dce0e8; border-radius:16px; background:#fafbfe; }
+.experiment-body .wb-zero .m-temperature-panel { margin:0 0 12px; padding:12px 14px; background:#eef1fb; border-color:#d5dcef; }
+.experiment-body .wb-zero .m-temperature-heading { margin:0; }
+.experiment-body .wb-zero .m-temperature-heading output { font-size:18px; padding:3px 8px; background:#fff; color:#5365ad; }
+.experiment-body .wb-zero .m-temperature-panel input[type=range] { height:32px; }
+.experiment-body .wb-zero .m-temperature-scale { margin:0; font-size:14px; }
+.experiment-body .wb-zero .m-challenge { border:0; margin:0 0 12px; padding:0; }
+.experiment-body .wb-zero .m-challenge .m-button { min-height:44px; padding:9px 14px; border-color:#aa8c5e; background:#f7f0e4; color:#735a36; }
+.experiment-body .wb-zero .m-candidate-list { gap:8px; }
+.experiment-body .wb-zero .m-candidate { padding:12px 14px; border-radius:11px; }
+.experiment-body .wb-zero .m-candidate-heading { gap:8px; align-items:center; flex-wrap:nowrap; }
+.experiment-body .wb-zero .m-candidate-heading > div { flex:1; }
+.experiment-body .wb-zero .m-candidate-heading strong { font-size:19px; }
+.experiment-body .wb-zero .m-candidate-toggle { margin:0; min-height:38px; min-width:64px; padding:6px 10px; color:#445b9b; background:#edf1fc; border-color:#cbd4ed; }
+.experiment-body .wb-zero .m-candidate-values { margin:6px 0; font-size:14px; gap:8px; }
+.experiment-body .wb-zero .m-candidate-values > strong { font-size:20px; }
+.experiment-body .wb-zero .m-english { font-size:14px; line-height:1.5; }
+.experiment-body .wb-zero .m-winner-label { font-size:12px; margin-left:6px; padding:1px 4px; }
+.experiment-body .wb-zero .m-candidate.is-winner { background:#edf0fa; border-color:#8f9bc5; }
+.experiment-body .wb-zero .m-probability-track > span { background:#8898ce; transition:width .45s cubic-bezier(.2,.8,.2,1); }
+.experiment-body .wb-zero .is-winner .m-probability-track > span { background:#5365ad; }
+.experiment-body .wb-zero .is-missing .m-probability-track > span { background:#bd9254; }
+.experiment-body .wb-zero .m-candidate-footer { margin-top:12px; font-size:14px; }
+.experiment-body .wb-zero .wb-temperature-help { font-size:15px; line-height:1.7; margin:12px 0 0; color:#667184; }
+.experiment-body .wb-loss .gt-training-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; }
+.experiment-body .wb-loss .gt-probability-panel { background:#fafbfe; border-color:#cbd4ed; }
+.experiment-body .wb-loss .gt-scenario-bar { margin-bottom:12px; }
+.experiment-body .wb-loss .gt-preset-group { gap:7px; }
+.experiment-body .wb-loss .gt-preset { padding:8px 12px; }
+.experiment-body .wb-loss .gt-matrix { grid-template-columns:54px repeat(3,minmax(58px,1fr)); min-width:266px; gap:7px; margin:16px 0; }
+.experiment-body .wb-loss .gt-matrix-cell { min-height:76px; }
+.experiment-body .wb-loss .gt-matrix-cell strong { font-size:23px; }
+.experiment-body .wb-loss .gt-cell-editor { padding-top:0; border-top:0; }
+.experiment-body .wb-loss .gt-temperature { margin-top:12px; padding-top:12px; }
+.experiment-body .wb-loss .gt-temperature .gt-microcopy { margin:4px 0 10px; }
+.experiment-body .wb-loss .gt-current-stats { margin:14px 0; padding:14px; gap:12px; }
+.experiment-body .wb-loss .gt-current-stats strong { font-size:30px; margin:2px 0; }
+.experiment-body .wb-loss .gt-probabilities { gap:14px; }
+.experiment-body .wb-loss .gt-prob-label { margin-bottom:5px; }
+.experiment-body .wb-update .gt-update-grid { grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:20px; align-items:start; }
+.experiment-body .wb-update .gt-trajectory-panel { background:#fafbfe; border-color:#cbd4ed; }
+.experiment-body .wb-update .gt-update-controls { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px 16px; padding:0; }
+.experiment-body .wb-update .gt-update-controls > .gt-control-heading, .experiment-body .wb-update .gt-update-controls > input { grid-column:1; }
+.experiment-body .wb-update .gt-update-controls > .gt-primary-button { grid-column:2; grid-row:1/3; margin:0; align-self:stretch; background:#5365ad; border:1px solid #5365ad; box-shadow:0 5px 14px #5365ad26; padding:12px 16px; }
+.experiment-body .wb-update .gt-update-controls > .gt-microcopy { grid-column:1; margin:0; }
+.experiment-body .wb-update .gt-update-step { grid-column:1/-1; margin:7px 0 14px; }
+.experiment-body .wb-update .gt-current-stats { margin:0 0 14px; padding:14px; gap:12px; }
+.experiment-body .wb-update .gt-current-stats strong { font-size:30px; margin:2px 0; }
+.experiment-body .wb-update .gt-loss-chart { max-height:235px; }
+.experiment-body .wb-update .gt-update-formula { padding:18px 12px; margin-bottom:14px; }
+.experiment-body .wb-update .gt-gradient-panel { background:#f8f7f3; }
+.experiment-body .wb-update .gt-chart-marker { transition:r .2s; }
+@media(max-width:1000px) {
+ .experiment-body .wb-zero .m-zero-layout { grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr); gap:16px; }
+ .experiment-body .wb-zero .m-candidates-panel { padding:15px; }
+ .experiment-body .wb-zero .m-candidate-count { margin-left:0; }
+ .experiment-body .wb-update .gt-update-grid { grid-template-columns:1fr; }
+ .experiment-body .wb-update .gt-trajectory-panel { order:-1; }
+ .experiment-body .wb-loss .gt-training-grid { grid-template-columns:1fr; }
+ .experiment-body .wb-loss .gt-matrix-panel { display:grid; grid-template-columns:1fr; }
+}
+@media(max-width:760px) {
+ .experiment-body .wb-vector .gt-geometry-grid { grid-template-columns:1fr; }
+ .experiment-body .wb-vector .gt-geometry-stage { position:static; padding:14px; }
+ .experiment-body .wb-vector .gt-vector-svg { max-height:235px; }
+ .experiment-body .wb-vector .gt-geometry-controls { display:grid; grid-template-columns:1fr; }
+ .experiment-body .wb-vector .gt-similarity-card { display:none; }
+ .experiment-body .wb-vector .gt-control-card { padding:16px; }
+ .experiment-body .wb-zero .m-zero-layout { grid-template-columns:1fr; gap:18px; }
+ .experiment-body .wb-zero .m-input-panel { position:static; display:grid; grid-template-columns:100px minmax(0,1fr); gap:8px 12px; }
+ .experiment-body .wb-zero .m-input-panel > .m-panel-heading { grid-column:1/-1; margin:0; }
+ .experiment-body .wb-zero .m-input-switch { grid-column:2; grid-row:2; margin:0; }
+ .experiment-body .wb-zero .m-input-art { grid-column:1; grid-row:2/4; height:100%; max-height:150px; margin:0; }
+ .experiment-body .wb-zero .m-input-art svg { height:100%; min-height:100px; }
+ .experiment-body .wb-zero .m-input-label { display:none; }
+ .experiment-body .wb-live-prediction { grid-column:2; padding:10px 12px; margin:0; }
+ .experiment-body .wb-live-prediction > span { display:none; }
+ .experiment-body .wb-live-prediction strong { font-size:22px; }
+ .experiment-body .wb-live-prediction b { font-size:19px; }
+ .experiment-body .wb-live-prediction small { font-size:13px; }
+ .experiment-body .wb-zero .m-input-description { grid-column:1/-1; margin:0; }
+ .experiment-body .wb-prompts .prompt-builder { grid-template-columns:1fr; gap:16px; }
+ .experiment-body .wb-prompts .prompt-space { position:static; order:-1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:center; padding:14px; }
+ .experiment-body .wb-prompts .prompt-space > .micro-label { grid-column:1/-1; margin-bottom:6px; }
+ .experiment-body .wb-prompts .prompt-space svg { max-height:160px; }
+ .experiment-body .wb-prompts .vector-output { padding:10px 6px; }
+ .experiment-body .wb-prompts .vector-output b { font-size:16px; white-space:nowrap; }
+ .experiment-body .wb-prompts .prompt-controls { padding:14px; }
+ .experiment-body .wb-prompts .wb-prompt-source { display:none; }
+ .experiment-body .wb-prompts .prompt-option { min-height:62px; }
+}
+@media(max-width:480px) {
+ .experiment-body :is(.wb-loss,.wb-update) .gt-panel { padding:16px 12px; }
+ .experiment-body .wb-zero .m-input-panel { grid-template-columns:76px minmax(0,1fr); gap:8px; }
+ .experiment-body .wb-zero .m-input-switch button { padding-inline:7px; min-width:0; }
+ .experiment-body .wb-zero .m-input-switch { gap:4px; }
+ .experiment-body .wb-zero .m-candidates-panel { padding:12px; }
+ .experiment-body .wb-zero .m-panel-heading h4 { font-size:18px; }
+ .experiment-body .wb-zero .m-candidate { padding:10px; }
+ .experiment-body .wb-zero .m-winner-label { display:none; }
+ .experiment-body .wb-zero .m-candidate-heading strong { font-size:17px; }
+ .experiment-body .wb-zero .m-candidate-values { flex-wrap:wrap; }
+ .experiment-body .wb-zero .m-candidate-toggle { min-width:57px; padding:6px 8px; font-size:14px; }
+ .experiment-body .wb-loss .gt-current-stats,.experiment-body .wb-update .gt-current-stats { grid-template-columns:1fr 1fr; padding:12px; gap:10px; }
+ .experiment-body .wb-loss .gt-current-stats > div + div,.experiment-body .wb-update .gt-current-stats > div + div { border-top:0; padding-top:0; border-left:1px solid #d8dfee; padding-left:10px; }
+ .experiment-body :is(.wb-loss,.wb-update) .gt-current-stats strong { font-size:25px; }
+ .experiment-body .wb-update .gt-update-controls { grid-template-columns:1fr; }
+ .experiment-body .wb-update .gt-update-controls > .gt-primary-button { grid-column:1; grid-row:auto; margin:4px 0; }
+ .experiment-body .wb-update .gt-update-controls > .gt-microcopy { grid-row:3; }
+ .experiment-body .wb-prompts .wb-live-pair strong { font-size:17px; }
+ .experiment-body .wb-prompts .vector-output b { font-size:14px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .experiment-body :is(.wb-vector,.wb-prompts,.wb-zero,.wb-loss,.wb-update) * { animation:none!important; transition:none!important; }
+}
+
+.experiment-body .wb-vector .gt-dot.gt-orange { background:#bd9254; }
+.experiment-body :is(.wb-vector,.wb-loss) .gt-range-orange::-webkit-slider-thumb { background:#bd9254; box-shadow:0 0 0 5px #bd925414; }
+.experiment-body :is(.wb-vector,.wb-loss) .gt-range-orange::-moz-range-thumb { background:#bd9254; box-shadow:0 0 0 5px #bd925414; }
+
+/* Compact candidate rows and an immediate temperature readout. */
+.experiment-body .wb-zero .m-candidate { padding:9px 12px; }
+.experiment-body .wb-zero .m-candidate-heading { min-height:34px; }
+.experiment-body .wb-zero .m-candidate-heading > div { display:flex; align-items:center; gap:6px; }
+.experiment-body .wb-zero .m-candidate-heading .wb-candidate-prob { margin-left:auto; color:#3e518d; font:600 19px/1.3 ui-monospace,Consolas,monospace; white-space:nowrap; }
+.experiment-body .wb-zero .m-candidate-heading .m-winner-label { margin:0; font-size:12px; line-height:1.5; }
+.experiment-body .wb-zero .m-candidate-toggle { min-height:32px; height:32px; min-width:62px; padding:4px 8px; font-size:14px; line-height:1.5; }
+.experiment-body .wb-zero .m-candidate-values { display:flex; justify-content:space-between; margin:3px 0 6px; gap:4px 10px; font-size:14px; line-height:1.5; }
+.experiment-body .wb-zero .m-candidate-values :is(span,b) { font-size:14px; line-height:1.5; }
+.experiment-body .wb-zero .m-candidate-values .m-english { margin:0; }
+.experiment-body .wb-zero .m-probability-track { height:5px; }
+.experiment-body .wb-zero .wb-live-prediction > :is(span,small) { color:#d4dcef!important; }
+.experiment-body .wb-temperature-preview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:12px; padding-top:11px; border-top:1px solid #d5dcef; }
+.experiment-body .wb-temperature-preview > div { display:flex; flex-wrap:wrap; align-items:baseline; gap:3px 7px; color:#667184; font-size:14px; }
+.experiment-body .wb-temperature-preview b { margin-left:auto; color:#3e518d; font:600 15px/1.5 ui-monospace,Consolas,monospace; }
+.experiment-body .wb-temperature-preview i { display:block; width:100%; height:5px; background:#dce2f0; border-radius:4px; overflow:hidden; }
+.experiment-body .wb-temperature-preview i > span { display:block; height:100%; background:#a6b1d4; transition:width .4s cubic-bezier(.2,.8,.2,1); }
+.experiment-body .wb-temperature-preview .is-leading i > span { background:#5365ad; }
+@media(max-width:480px) {
+ .experiment-body .wb-zero .m-candidate { padding:9px; }
+ .experiment-body .wb-zero .m-candidate-heading { gap:6px; }
+ .experiment-body .wb-zero .m-candidate-heading .wb-candidate-prob { font-size:16px; }
+ .experiment-body .wb-zero .m-candidate-toggle { min-width:52px; padding-inline:5px; }
+ .experiment-body .wb-zero .m-candidate-values { flex-wrap:wrap; }
+ .experiment-body .wb-temperature-preview { gap:7px; }
+ .experiment-body .wb-temperature-preview > div { display:grid; grid-template-columns:1fr; gap:2px; }
+ .experiment-body .wb-temperature-preview b { margin-left:0; font-size:13px; }
+}
+@media(prefers-reduced-motion:reduce) { .experiment-body .wb-temperature-preview i > span { transition:none; } }
+
+/* Protocol controls and their immediate budget/flow feedback. */
+.experiment-body .wb-protocol .wb-protocol-workbench { border:1px solid #d8deeb; border-radius:16px; background:#fafbfe; padding:20px; }
+.experiment-body .wb-protocol .wb-protocol-action > span { display:block; color:#536079; font-size:15px; font-weight:600; margin-bottom:12px; }
+.experiment-body .wb-protocol .wb-protocol-select { display:none; }
+.experiment-body .wb-protocol .protocol-options { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:16px; }
+.experiment-body .wb-protocol .protocol-options > button { padding:12px 14px; grid-template-columns:1fr; gap:2px; border-radius:10px; background:white; border-color:#d5dcef; min-height:76px; transition:background .2s,border-color .2s; }
+.experiment-body .wb-protocol .protocol-options > button > span { display:none; }
+.experiment-body .wb-protocol .protocol-options b { color:#34445a; font-size:16px; line-height:1.6; }
+.experiment-body .wb-protocol .protocol-options small { color:#667184; font-size:14px; line-height:1.5; }
+.experiment-body .wb-protocol .protocol-options > button[aria-pressed=true] { background:#5365ad; border-color:#5365ad; box-shadow:0 4px 12px #5365ad20; }
+.experiment-body .wb-protocol .protocol-options > button[aria-pressed=true] b { color:#fff; }
+.experiment-body .wb-protocol .protocol-options > button[aria-pressed=true] small { color:#e3e8f7; }
+.experiment-body .wb-protocol .protocol-detail { grid-template-columns:1fr; gap:16px; }
+.experiment-body .wb-protocol .budget-card { display:flex; flex-direction:row; align-items:center; justify-content:flex-start; gap:10px 18px; min-height:0; padding:12px 18px; background:#edf0fa; border-color:#d3daee; border-radius:10px; }
+.experiment-body .wb-protocol .budget-card small { font-size:15px; color:#536079; }
+.experiment-body .wb-protocol .budget-card strong { font-size:30px; line-height:1.3; margin:0 0 0 auto; color:#435792; letter-spacing:0; }
+.experiment-body .wb-protocol .budget-card > span { font-size:15px; color:#536079; }
+.experiment-body .wb-protocol .protocol-flow { grid-template-columns:1fr auto 1fr auto 1fr; gap:10px; }
+.experiment-body .wb-protocol .protocol-flow > div { min-height:130px; padding:16px; border-color:#d8deeb; background:#fff; border-radius:11px; gap:7px; }
+.experiment-body .wb-protocol .protocol-flow > div > span { color:#7a86a8; font-size:14px; letter-spacing:0; }
+.experiment-body .wb-protocol .protocol-flow > div > b { color:#26364a; font-size:18px; line-height:1.5; }
+.experiment-body .wb-protocol .protocol-flow > div > small { font-size:15px; color:#657083; line-height:1.6; }
+.experiment-body .wb-protocol .protocol-flow > div.learnable { background:#f7f0e4; border-color:#d8c4a5; }
+.experiment-body .wb-protocol .protocol-flow > div.learnable > span { color:#937343; }
+.experiment-body .wb-protocol .protocol-flow > i { color:#9aa5c4; font-size:20px; }
+.experiment-body .wb-protocol > .concept-response { background:#f6f4ef; border-color:#e0ded5; }
+@media(max-width:650px) {
+ .experiment-body .wb-protocol .wb-protocol-workbench { padding:14px; }
+ .experiment-body .wb-protocol .protocol-options { display:none; }
+ .experiment-body .wb-protocol .wb-protocol-action > span { font-size:15px; margin-bottom:10px; }
+ .experiment-body .wb-protocol .wb-protocol-select { display:flex; align-items:center; gap:10px; padding:10px 12px; margin-bottom:12px; background:#5365ad; border-radius:10px; color:#fff; }
+ .experiment-body .wb-protocol .wb-protocol-select > span { font-size:14px; flex:none; }
+ .experiment-body .wb-protocol .wb-protocol-select > select { flex:1; min-width:0; max-width:100%; border:0; background:transparent; color:white; font-family:inherit; font-size:16px; font-weight:600; line-height:1.6; height:32px; cursor:pointer; }
+ .experiment-body .wb-protocol .wb-protocol-select option { color:#26364a; background:#fff; }
+ .experiment-body .wb-protocol .budget-card { flex-wrap:wrap; gap:3px 12px; padding:12px; }
+ .experiment-body .wb-protocol .budget-card small { flex-basis:100%; }
+ .experiment-body .wb-protocol .budget-card strong { margin:0; font-size:29px; }
+ .experiment-body .wb-protocol .protocol-detail { gap:12px; }
+ .experiment-body .wb-protocol .protocol-flow { grid-template-columns:1fr; gap:8px; }
+ .experiment-body .wb-protocol .protocol-flow > div { display:grid; grid-template-columns:1fr; min-height:0; padding:12px 14px; gap:4px; }
+ .experiment-body .wb-protocol .protocol-flow > div > b { font-size:17px; }
+ .experiment-body .wb-protocol .protocol-flow > i { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .experiment-body .wb-protocol .protocol-options > button { transition:none; } }
