@@ -8,6 +8,8 @@ import { TransformToggle } from './transformToggle';
 import { LayerStep } from './layerStep';
 import { QuantRace } from './quantRace';
 import { GridAnalog } from './gridAnalog';
+import { GroupSize } from './groupSize';
+import { OrderShare } from './orderShare';
 
 export interface WidgetProps {
   chapterId: string;
@@ -25,3 +27,5 @@ widgetRegistry['transform-toggle'] = TransformToggle;
 widgetRegistry['layer-step'] = LayerStep;
 widgetRegistry['quant-race'] = QuantRace;
 widgetRegistry['grid-analog'] = GridAnalog;
+widgetRegistry['group-size'] = GroupSize;
+widgetRegistry['order-share'] = OrderShare;
