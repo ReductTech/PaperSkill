@@ -1,0 +1,329 @@
+import type { TutorialData } from '../types';
+export const tutorial:TutorialData = {
+  "meta": {
+    "titleEn": "Restormer: Efficient Transformer for High-Resolution Image Restoration",
+    "titleZh": "Restormer：高分辨率图像复原的高效 Transformer",
+    "venue": "CVPR 2022",
+    "authors": "Syed Waqas Zamir, Aditya Arora, Salman Khan, Munawar Hayat, Fahad Shahbaz Khan, Ming-Hsuan Yang",
+    "affiliation": "IIAI · MBZUAI · Monash · Linköping · UC Merced · Yonsei · Google Research",
+    "domain": "计算机视觉 · 图像复原",
+    "coreProblem": "高分辨率复原需要全局上下文；逐像素空间注意力却会产生巨大的关系矩阵。",
+    "coreInsight": "先聚合局部上下文，再用通道关系建模全局信息；MDTA 与 GDFN 共同服务高分辨率复原。",
+    "keywords": [
+      "MDTA",
+      "GDFN",
+      "图像复原",
+      "通道注意力"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "空间自注意力",
+      "desc": "空间位置两两配对，关系数按平方增长。",
+      "componentId": "rest-cover"
+    },
+    "newMethod": {
+      "title": "MDTA 转置注意力",
+      "desc": "观察全幅特征，在通道之间建立关联。",
+      "componentId": "rest-cover"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "高分辨率复原的代价",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "1.1",
+          "title": "空间自注意力的平方开销",
+          "desc": "固定通道时，MDTA避免HW×HW矩阵。",
+          "componentId": "rest-complexity"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "complexity",
+          "title": "空间自注意力的平方开销",
+          "goal": "把相片变大，比较需要存下多少关系。",
+          "summary": "固定通道时，MDTA避免HW×HW矩阵。",
+          "interaction": "选择边长，比较空间关系矩阵和固定通道矩阵。",
+          "next": "MDTA：先把局部上下文放进特征",
+          "notes": "p3 §3.1；固定通道与头数，只比较矩阵大小，不等于网络显存或耗时。",
+          "componentId": "rest-complexity",
+          "thumbnail": "./thumbnails/complexity.jpg",
+          "moduleId": "1.1"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "MDTA：局部与全局",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "2.1",
+          "title": "MDTA：先把局部上下文放进特征",
+          "desc": "局部空间混合与通道混合承担不同角色。",
+          "componentId": "rest-local"
+        },
+        {
+          "kind": "module",
+          "id": "2.2",
+          "title": "MDTA：跨通道建立全局关系",
+          "desc": "Q为N×C、K为C×N，得到C×C关系。",
+          "componentId": "rest-channel"
+        },
+        {
+          "kind": "module",
+          "id": "2.3",
+          "title": "缩放参数决定注意力的集中程度",
+          "desc": "缩放改变归一化分布，不能独立保证质量。",
+          "componentId": "rest-alpha"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "local",
+          "title": "MDTA：先把局部上下文放进特征",
+          "goal": "先跨通道组合，再查看邻近位置怎样参与输出。",
+          "summary": "局部空间混合与通道混合承担不同角色。",
+          "interaction": "点选网格位置，切换是否加入3×3卷积。",
+          "next": "MDTA：跨通道建立全局关系",
+          "notes": "p4 §3.1。1×1使用固定权重[0.55,0.30,0.15]，再加入3×3均值逐通道卷积，边界零填充。均值核非训练权重。中心值仅投影0.7225，加入邻域后0.5791667。",
+          "componentId": "rest-local",
+          "thumbnail": "./thumbnails/local.jpg",
+          "moduleId": "2.1"
+        },
+        {
+          "id": "channel",
+          "title": "MDTA：跨通道建立全局关系",
+          "goal": "改变一条特征模式，观察权重与混合结果。",
+          "summary": "Q为N×C、K为C×N，得到C×C关系。",
+          "interaction": "调整特征模式，点击矩阵列，重算输出。",
+          "next": "缩放参数决定注意力的集中程度",
+          "notes": "p4 Eq(1)。本例N=6、C=3、K=Q转置，通道先作单位范数归一化；K为3×6、Q为6×3，α=1，Softmax按列归一。输出通道j为本地V=[0.2,0.8,0.5]与A第j列的内积。特征不是RGB或训练模型激活。",
+          "componentId": "rest-channel",
+          "thumbnail": "./thumbnails/channel.jpg",
+          "moduleId": "2.2"
+        },
+        {
+          "id": "alpha",
+          "title": "缩放参数决定注意力的集中程度",
+          "goal": "分数不变，只调节 α；观察权重和输出。",
+          "summary": "缩放改变归一化分布，不能独立保证质量。",
+          "interaction": "调节α，比较权重与加权输出。",
+          "next": "GDFN：两路特征相乘，控制信息",
+          "notes": "p4 Eq(1)。沿用mdtaToy(0.15,α,false)，分数固定只变α，V固定[0.2,0.8,0.5]；输出列权重和为1。手动控制用于说明可学习缩放，不把分布尖锐度等同于质量。",
+          "componentId": "rest-alpha",
+          "thumbnail": "./thumbnails/alpha.jpg",
+          "moduleId": "2.3"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "GDFN 与多尺度复原",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "3.1",
+          "title": "GDFN：两路特征相乘，控制信息",
+          "desc": "GELU不是概率门，输出可负或大于1。",
+          "componentId": "rest-gdfn"
+        },
+        {
+          "kind": "module",
+          "id": "3.2",
+          "title": "多尺度结构：缩小空间，扩展通道",
+          "desc": "多尺度压缩空间、扩展通道，跳接辅助恢复细节。",
+          "componentId": "rest-scale"
+        },
+        {
+          "kind": "module",
+          "id": "3.3",
+          "title": "残差预测：只学习需要修正的部分",
+          "desc": "输出为输入与预测残差相加。",
+          "componentId": "rest-residual"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "gdfn",
+          "title": "GDFN：两路特征相乘，控制信息",
+          "goal": "编辑两条支路，观察乘积的符号和幅度。",
+          "summary": "GELU不是概率门，输出可负或大于1。",
+          "interaction": "改变a、b，重算GELU(a)及乘积。",
+          "next": "多尺度结构：缩小空间，扩展通道",
+          "notes": "p4 Eq(2)。GELU采用tanh近似，a∈[-3,3]、b∈[-1,1]代表两路投影及局部卷积后的特征；保留负数和大于1的乘积。实际乘积再经1×1投影并加残差，扩展比2.66。",
+          "componentId": "rest-gdfn",
+          "thumbnail": "./thumbnails/gdfn.jpg",
+          "moduleId": "3.1"
+        },
+        {
+          "id": "scale",
+          "title": "多尺度结构：缩小空间，扩展通道",
+          "goal": "选择编码层，检查分辨率、通道与注意力头数。",
+          "summary": "多尺度压缩空间、扩展通道，跳接辅助恢复细节。",
+          "interaction": "选择编码层，读取形状、块数与头数。",
+          "next": "残差预测：只学习需要修正的部分",
+          "notes": "p3 Fig2与Overall Pipeline；p5 Implementation Details。编码通道48/96/192/384、头1/2/4/8、块4/6/6/8；顶层解码为2C。",
+          "componentId": "rest-scale",
+          "thumbnail": "./thumbnails/scale.jpg",
+          "moduleId": "3.2"
+        },
+        {
+          "id": "residual",
+          "title": "残差预测：只学习需要修正的部分",
+          "goal": "比较同一条像素带的输入、修正、输出和目标。",
+          "summary": "输出为输入与预测残差相加。",
+          "interaction": "调整修正强度，重算像素和均方误差。",
+          "next": "渐进训练：从小裁块到大上下文",
+          "notes": "p3 Overall Pipeline。本页用已知12像素目标与固定扰动构造输入，修正量gain×(target-input)；gain=1时MSE为0。真实推理未知目标，不能把此教学误差当作Restormer性能。",
+          "componentId": "rest-residual",
+          "thumbnail": "./thumbnails/residual.jpg",
+          "moduleId": "3.3"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "训练策略",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "4.1",
+          "title": "渐进训练：从小裁块到大上下文",
+          "desc": "训练逐步扩大裁块，推理无需重复该课程。",
+          "componentId": "rest-training"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "training",
+          "title": "渐进训练：从小裁块到大上下文",
+          "goal": "沿训练课程扩大视野，并观察 batch 怎样变化。",
+          "summary": "训练逐步扩大裁块，推理无需重复该课程。",
+          "interaction": "选择阶段，联动裁框、batch和起始迭代。",
+          "next": "运动去模糊：在同协议下比较",
+          "notes": "p4 §3.3、p5 Implementation Details；128/64起步，92K160/40、156K192/32、204K256/16、240K320/8、276K384/8；AdamW L1 300K；任务分别训练。 表9是另一个100K次消融：固定128²为29.71dB/22.5h，渐进为29.78dB/23.1h；不与上方300K默认课程混同，不插值阶段分数。",
+          "componentId": "rest-training",
+          "thumbnail": "./thumbnails/training.jpg",
+          "moduleId": "4.1"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "实验证据",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "5.1",
+          "title": "运动去模糊：在同协议下比较",
+          "desc": "GoPro训练后直接测试其他三个数据集。",
+          "componentId": "rest-motion"
+        },
+        {
+          "kind": "module",
+          "id": "5.2",
+          "title": "模块消融：质量增益从哪里来",
+          "desc": "更准确、FLOPs更低和推理更快不是同一个结论。",
+          "componentId": "rest-ablations"
+        },
+        {
+          "kind": "module",
+          "id": "5.3",
+          "title": "深度与宽度：准确率和速度的取舍",
+          "desc": "窄深更准、宽浅更快，依据论文消融和计时条件。",
+          "componentId": "rest-tradeoff"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "motion",
+          "title": "运动去模糊：在同协议下比较",
+          "goal": "同时看原分数与提升量，区分测试域。",
+          "summary": "GoPro训练后直接测试其他三个数据集。",
+          "interaction": "选择数据集行，查看测试条件。",
+          "next": "三类复原任务，各自怎样比较",
+          "notes": "p5 Table2、p6 §4.2。MPRNet32.66/30.96/35.99/28.70，Restormer32.92/31.22/36.19/28.96；PSNR dB↑，分组点图不暗示误差条。",
+          "componentId": "rest-motion",
+          "thumbnail": "./thumbnails/motion.jpg",
+          "moduleId": "5.1"
+        },
+        {
+          "id": "tasks",
+          "title": "三类复原任务，各自怎样比较",
+          "goal": "保留任务、数据集和输入模态，再看分数差值。",
+          "summary": "任务条件与输入模态决定比较是否有效。",
+          "interaction": "阅读三组独立协议的结果。",
+          "next": "模块消融：质量增益从哪里来",
+          "notes": "p5 Table1去雨五数据集Y通道平均；p6 Table3 DPDD combined S单图/D双像素；p7 Table6 SIDD训练DND直测。对照分别SPAIR32.91、Uformer39.77/39.96、IFAN25.37/25.99，Restormer33.96/40.02/40.03/25.98/26.66，PSNR dB↑。",
+          "componentId": "rest-tasks",
+          "thumbnail": "./thumbnails/tasks.jpg"
+        },
+        {
+          "id": "ablations",
+          "title": "模块消融：质量增益从哪里来",
+          "goal": "点选配置，同时检查质量、参数与计算量。",
+          "summary": "更准确、FLOPs更低和推理更快不是同一个结论。",
+          "interaction": "点选配置，读取PSNR、FLOPs和参数。",
+          "next": "深度与宽度：准确率和速度的取舍",
+          "notes": "p8 Table7(a)(b)(c)(f)(g)、Table8。Urban100彩噪σ50，128裁块100K，FLOPs用256²计量，B/G均为十亿次。PSNR=[29.11,29.28,29.43,29.54,29.62,29.66,29.71]，FLOPs=[83.4,83.7,85.3,86.2,87.7,110,141]G，参数=[24.53,24.84,25.02,25.12,25.31,25.65,26.12]M。Table8的+Concat是保留顶层拼接后的2C，去掉后续1×1降维；不是首次增加跳接。点图不连接无序配置。Table7d的σ50异常单元格未用。",
+          "componentId": "rest-ablations",
+          "thumbnail": "./thumbnails/ablations.jpg",
+          "moduleId": "5.2"
+        },
+        {
+          "id": "tradeoff",
+          "title": "深度与宽度：准确率和速度的取舍",
+          "goal": "FLOPs 相近时，实际延迟仍可能不同。",
+          "summary": "窄深更准、宽浅更快，依据论文消融和计时条件。",
+          "interaction": "选择散点或宽度按钮，读取质量与延迟。",
+          "next": "全局统计怎样改变一个本地输出",
+          "notes": "p8 Table10、§4.5。调整块数保持参数与FLOPs相近。宽48/64/80：PSNR29.71/29.63/29.56dB，训练22.5/15.5/13.5h，推理0.115/0.080/0.069s；256×256图像。不得外推为任意硬件性能，不添加不存在的误差条。",
+          "componentId": "rest-tradeoff",
+          "moduleId": "5.3",
+          "thumbnail": "./thumbnails/tradeoff.jpg"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-6",
+      "title": "机制边界",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "6.1",
+          "title": "全局统计怎样改变一个本地输出",
+          "desc": "远处影响通道统计，不代表任意退化都有解。",
+          "componentId": "rest-boundary"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "boundary",
+          "title": "全局统计怎样改变一个本地输出",
+          "goal": "近处不动，只改远处，再计算一次通道关系。",
+          "summary": "远处影响通道统计，不代表任意退化都有解。",
+          "interaction": "点击远处特征，比较本地混合值。",
+          "next": "结合原论文查看来源，并用新的输入重新检验机制。",
+          "notes": "p4 Eq1及实验范围、p8 §4.5。6位置3通道示例：前4位置及本地V=[0.2,0.8,0.5]保持不变，只改第2通道最后两项为1；再作单位范数归一、列Softmax与VA。全局通道调制不等同于显式全像素注意力。未知退化/硬件的边界是基于实验范围的教学归纳。",
+          "componentId": "rest-boundary",
+          "thumbnail": "./thumbnails/boundary.jpg",
+          "moduleId": "6.1"
+        }
+      ]
+    }
+  ],
+  "thumbnails": {
+    "cover": "./thumbnails/cover.jpg"
+  }
+};
