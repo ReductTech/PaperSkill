@@ -1,0 +1,75 @@
+/* §1 only: one continuous teaching scene and its sampled frames. */
+.eg-intro,
+.eg-conclusion,
+.eg-transition { margin: 0; color: var(--ui-text-main); font-size: 18px; line-height: 1.8; }
+.eg-intro { max-width: 660px; }
+.eg-conclusion { font-weight: 800; }
+.eg-conclusion + p { margin: 10px 0 0; font-size: 16px; line-height: 1.75; }
+.eg-transition { margin-top: 20px; color: var(--ui-accent); font-weight: 750; }
+#evidence-gap .eg-intro,
+#evidence-gap .eg-conclusion { color: var(--ui-text-main); }
+#evidence-gap .eg-transition { color: var(--ui-accent); }
+
+.eg-intro-section { display: grid; gap: 22px; }
+#evidence-gap .eg-intro { max-width: none; font-size: clamp(19px, 2vw, 23px); font-weight: 650; line-height: 1.6; }
+.eg-video { width: min(100%, 740px); margin-inline: auto; }
+.eg-video-stage { overflow: hidden; border-radius: 10px; background: #e6eef4; }
+.eg-video-stage svg,
+.eg-sample-frame svg { display: block; width: 100%; height: auto; }
+.eg-video-note { display: block; margin-top: 8px; color: var(--ui-text-muted); font-size: 12px; text-align: right; }
+
+.eg-experiment { display: grid; gap: 24px; min-width: 0; color: var(--ui-text-main); }
+.eg-experiment * { box-sizing: border-box; }
+.eg-sample-heading,
+.eg-timeline-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+
+.eg-fps-control { display: grid; gap: 9px; min-width: 0; margin: 0; padding: 16px 18px 18px; border: 0; border-radius: 10px; background: #edf3f8; }
+.eg-fps-control legend { margin-bottom: 2px; padding: 0; color: var(--ui-accent); font-size: 18px; font-weight: 800; }
+#evidence-gap .eg-fps-control p { margin: 0 0 4px; color: var(--ui-text-muted); font-size: 14px; line-height: 1.5; }
+.eg-fps-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.eg-fps-options button { min-width: 118px; min-height: 48px; padding: 9px 19px; border: 1px solid var(--ui-border-strong); border-radius: var(--ui-radius-sm); background: #fff; color: var(--ui-accent); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.eg-fps-options button:hover { background: var(--ui-bg-soft); }
+.eg-fps-options button.is-active { border-color: var(--ui-accent); background: var(--ui-accent); color: #fff; }
+.eg-fps-options button:focus-visible { outline: 3px solid rgba(39, 68, 110, .45); outline-offset: 3px; }
+
+.eg-timeline { min-width: 0; }
+.eg-timeline-heading { margin-bottom: 16px; font-size: 16px; }
+.eg-timeline-heading strong { color: var(--ui-accent); }
+.eg-timeline-heading span { color: var(--ui-text-muted); font-family: var(--ui-font-mono); font-size: 13px; }
+.eg-timeline-track { position: relative; height: 12px; margin: 0 7px; border-radius: 8px; background: #d9e2ed; }
+.eg-timeline-window { position: absolute; top: -6px; bottom: -6px; border-radius: 4px; background: rgba(240, 126, 71, .48); }
+.eg-timeline-sample { position: absolute; top: 50%; z-index: 1; width: 13px; height: 13px; transform: translate(-50%, -50%); border: 2px solid #fff; border-radius: 50%; background: var(--ui-accent); box-shadow: 0 0 0 1px var(--ui-accent); }
+.eg-timeline-sample.is-hit { z-index: 2; background: var(--ui-accent-alt); box-shadow: 0 0 0 2px var(--ui-accent-alt); }
+.eg-timeline-labels { display: flex; justify-content: space-between; margin-top: 14px; color: var(--ui-text-muted); font-family: var(--ui-font-mono); font-size: 12px; }
+.eg-timeline-key { margin: 10px 0 0; color: var(--ui-text-muted); font-size: 13px; line-height: 1.5; }
+
+.eg-sample-section { display: grid; gap: 13px; min-width: 0; }
+.eg-sample-heading strong { color: var(--ui-accent); font-size: 16px; }
+.eg-sample-heading span { color: var(--ui-text-muted); font-size: 13px; }
+.eg-sample-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 11px; min-width: 0; }
+.eg-sample-frame { min-width: 0; }
+.eg-frame-time { margin-bottom: 6px; color: var(--ui-text-muted); font-family: var(--ui-font-mono); font-size: 12px; }
+.eg-sample-frame.is-hit .eg-frame-time { color: var(--ui-orange-ink, #924415); font-weight: 800; }
+.eg-sample-frame svg { border-radius: 7px; }
+.eg-sample-frame.is-hit svg { outline: 3px solid var(--ui-accent-alt); outline-offset: -3px; }
+.eg-feedback { display: grid; gap: 3px; padding: 13px 16px; border-left: 4px solid; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.6; }
+.eg-feedback strong { font-size: 16px; }
+.eg-feedback.is-covered { border-color: var(--ui-success); background: #eaf6ef; color: #216847; }
+.eg-feedback.is-missed { border-color: var(--ui-accent-alt); background: var(--ui-orange-soft); color: var(--ui-orange-ink, #924415); }
+
+@media (max-width: 650px) {
+  .eg-intro-section { gap: 18px; }
+  .eg-experiment { gap: 22px; }
+  .eg-fps-control { padding: 14px 14px 16px; }
+  .eg-sample-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 9px; }
+  .eg-fps-options { gap: 7px; }
+  .eg-fps-options button { flex: 1 1 0; min-width: 0; padding-inline: 4px; font-size: 14px; }
+}
+
+@media (max-width: 390px) {
+  .eg-conclusion,
+  .eg-transition { font-size: 17px; }
+  #evidence-gap .eg-intro { font-size: 19px; }
+  .eg-timeline-heading { margin-bottom: 16px; }
+  .eg-frame-time { font-size: 11px; }
+}

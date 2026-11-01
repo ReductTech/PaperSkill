@@ -1,0 +1,58 @@
+/* §2 only: one shared cup scene and one action choice. */
+#evidence-decision .ed-evidence,
+#evidence-decision .ed-decision { min-width: 0; }
+#evidence-decision .ed-intro { margin: 0 0 14px; font-size: 17px; line-height: 1.6; }
+#evidence-decision .ed-scenarios { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+#evidence-decision .ed-scenarios button { min-height: 36px; padding: 5px 13px; border: 1px solid var(--line); border-radius: var(--ui-radius-pill); background: #fff; color: var(--slate); font-size: 13px; font-weight: 750; }
+#evidence-decision .ed-scenarios button:hover { border-color: var(--blue); color: var(--blue); }
+#evidence-decision .ed-scenarios button.is-active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
+#evidence-decision .ed-question { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 12px; margin: 0 0 13px; line-height: 1.45; }
+#evidence-decision .ed-question span { color: var(--slate-2); font-size: 13px; font-weight: 750; }
+#evidence-decision .ed-question strong { color: var(--ink); font-size: 20px; font-weight: 800; }
+#evidence-decision .ed-visual { min-width: 0; padding: 13px 15px 15px; border-radius: var(--ui-radius-sm); background: var(--paper-2); }
+#evidence-decision .ed-visual-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 3px 12px; margin-bottom: 10px; }
+#evidence-decision .ed-visual-head strong { color: var(--blue); font-size: 15px; }
+#evidence-decision .ed-visual-head span { color: var(--slate-2); font-size: 12px; }
+#evidence-decision .ed-frames { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; align-items: start; }
+#evidence-decision .ed-frames.has-extra { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#evidence-decision .ed-frame { min-width: 0; margin: 0; }
+#evidence-decision .ed-image { position: relative; overflow: hidden; aspect-ratio: 360 / 220; border: 1px solid #d1dce6; border-radius: 8px; background: #e6eef4; }
+#evidence-decision .ed-scene-svg { display: block; width: 100%; height: 100%; }
+#evidence-decision .ed-scene-svg > svg { width: 100%; height: 100%; }
+#evidence-decision .ed-frame figcaption,
+#evidence-decision .ed-empty-caption { display: block; margin-top: 5px; color: var(--slate); font-size: 12px; line-height: 1.4; font-weight: 700; }
+#evidence-decision .ed-marker { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#evidence-decision .ed-frame--retrieved .ed-image { border: 2px solid var(--green); }
+#evidence-decision .ed-frame--hypothesis .ed-image { border: 2px dashed var(--orange); }
+#evidence-decision .ed-image-tag { position: absolute; top: 7px; left: 7px; padding: 2px 6px; border-radius: 4px; background: var(--green); color: #fff; font-size: 11px; font-weight: 800; line-height: 1.3; }
+#evidence-decision .ed-frame--hypothesis .ed-image-tag { background: #9a4d20; }
+#evidence-decision .ed-empty-image { display: grid; place-items: center; border: 2px dashed var(--orange); background: repeating-linear-gradient(135deg, #fff7f1, #fff7f1 10px, #ffede1 10px, #ffede1 20px); }
+#evidence-decision .ed-empty-line { position: absolute; width: 62%; border-top: 3px dashed rgba(154, 77, 32, .45); transform: rotate(-13deg); }
+#evidence-decision .ed-empty-image strong { z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #9a4d20; font-size: 24px; line-height: 1; }
+#evidence-decision .ed-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+#evidence-decision .ed-actions button { min-width: 0; min-height: 46px; padding: 8px 10px; border: 1px solid var(--line-2); border-radius: var(--ui-radius-sm); background: #fff; color: var(--blue); font-size: 16px; font-weight: 800; }
+#evidence-decision .ed-actions button:hover { border-color: var(--blue); background: var(--blue-soft); }
+#evidence-decision .ed-actions button.is-active { border-color: var(--blue); background: var(--blue); color: #fff; }
+#evidence-decision .ed-result { margin-top: 10px; }
+#evidence-decision .ed-result p { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 11px; margin: 0; padding: 9px 12px; border-left: 3px solid; border-radius: 0 7px 7px 0; font-size: 14px; line-height: 1.55; }
+#evidence-decision .ed-result strong { white-space: nowrap; }
+#evidence-decision .ed-result .is-correct { border-color: var(--green); background: var(--green-soft); color: #216847; }
+#evidence-decision .ed-result .is-incorrect { border-color: var(--orange); background: var(--orange-soft); color: #864616; }
+#evidence-decision .ed-mechanism { margin: 17px 0 0; color: var(--slate); font-size: 14px; line-height: 1.7; }
+
+@media (max-width: 680px) {
+  #evidence-decision .ed-frames,
+  #evidence-decision .ed-frames.has-extra { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #evidence-decision .ed-visual { padding: 12px; }
+  #evidence-decision .ed-actions button { font-size: 14px; padding-inline: 5px; }
+}
+
+@media (max-width: 390px) {
+  #evidence-decision .ed-scenarios { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  #evidence-decision .ed-scenarios button { padding: 4px 3px; font-size: 11px; line-height: 1.35; }
+  #evidence-decision .ed-question strong { font-size: 18px; }
+  #evidence-decision .ed-actions { gap: 5px; }
+  #evidence-decision .ed-actions button { font-size: 12px; padding-inline: 3px; }
+  #evidence-decision .ed-frame figcaption,
+  #evidence-decision .ed-empty-caption { font-size: 11px; }
+}
