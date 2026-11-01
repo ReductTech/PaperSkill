@@ -1,0 +1,279 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  "meta": {
+    "titleEn": "π0.5: a Vision-Language-Action Model with Open-World Generalization",
+    "titleZh": "π0.5：面向开放世界泛化的视觉-语言-动作模型",
+    "venue": "arXiv:2504.16054 · Physical Intelligence · 2025",
+    "authors": "Physical Intelligence：Kevin Black、Noah Brown、Danny Driess、Chelsea Finn、Sergey Levine 等",
+    "affiliation": "Physical Intelligence",
+    "domain": "机器人学习 · 视觉-语言-动作模型",
+    "coreProblem": "视觉-语言-动作模型在实验室之外仍难泛化，而单靠目标机器人的数据覆盖不了长程家务任务。",
+    "coreInsight": "把其他机器人、高层子任务标注、语言示范与网络数据一起协同训练，并让同一个模型先报下一步、再出动作块。",
+    "keywords": [
+      "VLA",
+      "协同训练",
+      "高层子任务",
+      "FAST token",
+      "流匹配",
+      "开放世界泛化"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "π0：总指令直接驱动低层动作",
+      "desc": "没有中间层级，一句总要求直接落到手腕上。",
+      "componentId": "cover-old-pi0"
+    },
+    "newMethod": {
+      "title": "π0.5：先预测子任务，再输出动作块",
+      "desc": "同一个模型先说下一步，再按这一步生成动作块。",
+      "componentId": "cover-new-pi05"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "第一章 · 为什么只练目标机器人数据不够",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "1.1",
+          "title": "陌生厨房的抓握",
+          "desc": "拖动学徒的手去拉抽屉：同一个动作，在自家厨房和陌生厨房里结果不同。",
+          "componentId": "c1s1-stranger-kitchen"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "c1s1",
+          "title": "陌生厨房里的第一件事：拉开抽屉",
+          "goal": "先看到失败：环境一换，连最基础的动作都要重学。",
+          "summary": "同一只手臂、同样的指令，在熟悉的厨房里一次拉开抽屉，在陌生的厨房里第一次会滑手。",
+          "interaction": "拖动手臂圆点按到抽屉把手上松手；用「自家厨房 / 陌生厨房」切换环境。",
+          "next": "既然单靠目标平台的数据不够，那还缺什么？",
+          "notes": "论文把「陌生抽屉把手、难开的柜门」列为持续失败的环境因素（p.11 §VI），并用多环境非移动机器人数据（ME）扩大环境覆盖（p.6 §IV-C）。这里的场景只表达「需要多样经验」，不证明数据量阈值。",
+          "componentId": "c1s1-stranger-kitchen",
+          "moduleId": "1.1"
+        },
+        {
+          "id": "c1s2",
+          "title": "六类训练数据各供养哪一层",
+          "goal": "看清协同训练的配方：哪些数据喂高层的判断，哪些喂低层的动作。",
+          "summary": "MM、ME、CE、HL、WD、VI 六类来源，分别对应不同的抽象层级；第一阶段 97.6% 的样本不来自移动机械臂。",
+          "interaction": "点击任意一张来源卡片，查看它的作用、供养层级与出处。",
+          "next": "把「下一步」和「怎么动手」拆开，是不是就能各用各的数据？",
+          "notes": "MM 约 400 小时、约 100 个家庭；ME 多环境固定臂；CE 实验室跨具身含 OXE；HL 人工子任务标注并先预测框；WD 描述/视觉问答/定位；VI 为后训练阶段的语言示范。97.6% 来自 p.2 §I。",
+          "componentId": "c1s2-five-sources"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "第二章 · 层级推理：先报下一步，再动手",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "2.1",
+          "title": "子任务预测驱动低层动作",
+          "desc": "拖动盘子、开合抽屉，看子任务分布如何重排，手臂跟着改道。",
+          "componentId": "c2s1-subtask-gate"
+        },
+        {
+          "kind": "module",
+          "id": "2.2",
+          "title": "高层与低层的节奏",
+          "desc": "调整高层更新间隔，看子任务滞后如何在动作块上显形。",
+          "componentId": "c2s2-level-rhythm"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "c2s1",
+          "title": "子任务决定手往哪走",
+          "goal": "明白联合分布被拆成两层，且低层只以子任务为条件。",
+          "summary": "把盘子拖远、或让抽屉敞着，候选子任务的概率就会重排，师傅报的那句话变了，手臂轨迹也随之改道。",
+          "interaction": "拖动盘子到近/中/远三个台面位置；点击抽屉切换开合。",
+          "next": "两个层级各自要跑多快？",
+          "notes": "论文的分解式见 p.5 §IV-A：πθ(a,ℓ̂|o,ℓ)=πθ(a|o,ℓ̂)πθ(ℓ̂|o,ℓ)，动作分布只依赖 ℓ̂。页面上的概率是手写玩具打分（softmax），仅用于教学，不代表模型真实输出。",
+          "componentId": "c2s1-subtask-gate",
+          "moduleId": "2.1"
+        },
+        {
+          "id": "c2s2",
+          "title": "高层报多快，动作块才不掉队",
+          "goal": "理解同一模型两个层级的频率差异，以及滞后会带来什么代价。",
+          "summary": "5 秒窗口里，动作按 50 Hz 走、每 50 步一块；高层更新间隔一旦超过一块，子任务就落在动作块后面。",
+          "interaction": "拖动「高层更新间隔」滑块，观察气泡数、滞后步数与时间轴上的红区。",
+          "next": "两个层级怎么在同一套权重里共存？",
+          "notes": "50 Hz 控制与 50 步动作块见 p.7 §IV-E、p.19 App.E；高层频率更低见 p.3 §II。滞后是时间轴上的教学示意，不是论文测量的指标。",
+          "componentId": "c2s2-level-rhythm",
+          "moduleId": "2.2"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "第三章 · 两阶段训练：先把动作写成 token，再学会连续出招",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "3.1",
+          "title": "流匹配去噪",
+          "desc": "推动去噪步数，看一团噪声如何收敛成一条连续动作块。",
+          "componentId": "c3s1-flow-denoise"
+        },
+        {
+          "kind": "module",
+          "id": "3.2",
+          "title": "双表示与单向注意力",
+          "desc": "点开注意力矩阵，调整 α，看两种动作表示如何共存而不互相偷看。",
+          "componentId": "c3s2-attention-dual"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "c3s1",
+          "title": "连续动作怎么从噪声里出来",
+          "goal": "看清流匹配推理：10 步去噪把含噪动作块推向目标轨迹。",
+          "summary": "从纯噪声出发，每一步沿预测的向量场走一小段，第 10 步得到 50 步的连续动作块。",
+          "interaction": "拖动「去噪步数」0→10，观察轨迹颜色、抖动幅度与 τ 的变化。",
+          "next": "既然存在两种动作表示，它们会不会互相干扰？",
+          "notes": "预训练用 FAST 离散 token 训练更快，但自回归解码不适合实时；后训练改为流匹配动作专家，推理 10 步去噪（p.5 §IV-B、p.4 Fig.3）。曲线为教学插值示意。",
+          "componentId": "c3s1-flow-denoise",
+          "moduleId": "3.1"
+        },
+        {
+          "id": "c3s2",
+          "title": "两种动作表示如何共存",
+          "goal": "理解注意力掩码为什么必须切断 FAST token 与动作专家之间的联系，以及 α 在训练目标里的位置。",
+          "summary": "FAST token 自回归预测、动作专家并行去噪，两者互不可见；α 决定交叉熵项与流匹配项的相对分量。",
+          "interaction": "点击矩阵任意一行查看可见性；拖动 α 从 0 到 10。",
+          "next": "这些配方到底在真实厨房里值多少分？",
+          "notes": "掩码规则与 2B VLM + 300M 动作专家见 p.19 App.E 与 Fig.18；α=10.0 见 p.7 §IV-D。条形比例是线性换算的示意。",
+          "componentId": "c3s2-attention-dual",
+          "moduleId": "3.2"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "第四章 · 场景数量：去过多少家厨房才够",
+      "modules": [],
+      "scenes": [
+        {
+          "id": "c4s1",
+          "title": "训练环境数与泛化",
+          "goal": "看清论文的核心经验结论：环境数量是泛化的主因，而且能逼近见过测试住宅的对照。",
+          "summary": "从 3 到 104 个训练环境，四个模拟住宅任务的平均完成度整体上升；104 环境模型与见过测试住宅的对照相当，而两个没有预训练的对照明显更差。",
+          "interaction": "点击右侧六档环境数，查看对应规模的结论；左侧为论文原始 Fig.8。",
+          "next": "多出来的环境带来的到底是什么？看数据配比消融。",
+          "notes": "协议：4 个模拟住宅任务 × 每策略每任务 10 次试验，评分表得分百分比，越高越好；这些实验先在机器人动作数据上预训练（不含 MM），再用不同环境数的数据后训练 40k 步以控制样本量（p.8–9 §V-B）。页面不给具体数值，只引用论文的文字趋势。",
+          "componentId": "c4s1-location-scale"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "第五章 · 配比与对手：哪段经历真的在起作用",
+      "modules": [],
+      "scenes": [
+        {
+          "id": "c5s1",
+          "title": "少一段经历会退步多少",
+          "goal": "分清四类协同训练成分各自的贡献，尤其是网络数据到底影响什么。",
+          "summary": "去掉跨具身来源（ME 或 CE）都会显著掉分，两个都去掉掉得最多；去掉网络数据在端到端任务上差异不显著，却显著影响分布外物体的语言跟随。",
+          "interaction": "选择一种消融，看学徒今天缺了哪段经历，并切换右侧的端到端 / 语言跟随两张原始图。",
+          "next": "那和上一代 π0 比呢？",
+          "notes": "数据来自 p.9–10 §V-C 与 Fig.10、Fig.11。协议：模拟住宅四个任务、每策略每任务 10 次试验，评分表得分百分比，越高越好；语言跟随分见过/未见类别，越高越好。",
+          "componentId": "c5s1-ingredient-ablation"
+        },
+        {
+          "id": "c5s2",
+          "title": "与 π0 相比，以及语言跟得上吗",
+          "goal": "理解对比是在什么条件下做的，以及语言跟随随环境数如何改善。",
+          "summary": "相同数据与可比步数下，π0.5 明显优于 π0 与 π0-FAST+Flow；语言跟随率与成功率随训练环境数稳步上升，见过类别涨得更快。",
+          "interaction": "在「与 π0 对比」和「语言跟随 vs 环境数」之间切换，查看对应原始图。",
+          "next": "既然高层推理看起来最像“思考”，它到底有多重要？",
+          "notes": "π0.5 额外使用 HL 与 WD，并采用离散预训练 + 流匹配后训练的混合流程；π0-FAST+Flow 用同样的混合流程但只有动作数据（p.10 §V-D）。语言跟随见 p.9 Fig.9。",
+          "componentId": "c5s2-model-duel"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-6",
+      "title": "第六章 · 谁来报下一步：高层推理值多少",
+      "modules": [],
+      "scenes": [
+        {
+          "id": "c6s1",
+          "title": "七种高层方案的排序",
+          "goal": "理解显式高层推理的价值，以及「训练里有子任务数据」本身带来的意外收益。",
+          "summary": "完整 π0.5 最好，甚至超过人类神谕；implicit HL 第二；去掉 VI、WD 或 HL 都显著变差；零样本 GPT-4 最差。",
+          "interaction": "点击任意一位「指挥者」，看它会报出什么、以及论文给出的排序位置。",
+          "next": "这套配方在什么情况下会失败？",
+          "notes": "所有方案共用同一套低层推理，只替换高层策略（p.11 §V-E）。VI 约占高层移动机械臂样本 11%。人类神谕是专家实时给高层，仍需界面与人的成本，论文只把它当上界使用。",
+          "componentId": "c6s1-who-commands"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-7",
+      "title": "第七章 · 失败与边界",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "7.1",
+          "title": "高层被干扰时的失败",
+          "desc": "调高干扰强度，看子任务推理如何让手臂在抽屉前后反复做无用功。",
+          "componentId": "c7s1-drawer-loop"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "c7s1",
+          "title": "反复开合的抽屉",
+          "goal": "看见失败模式：高层子任务被场景细节带走时，动作块再准也没用。",
+          "summary": "干扰一高，师傅不断改口「再打开抽屉看看」，手臂在抽屉前后空转，完成度停在低位；压住干扰后，一句稳定的子任务就让动作块生效。",
+          "interaction": "拖动「干扰强度」，并在「当前上下文 / 更丰富的上下文」之间切换。",
+          "next": "那这套配方到底在什么条件下成立？",
+          "notes": "论文自述：某些环境持续失败（陌生抽屉把手、难开的柜门），部分行为受部分可观测影响（机械臂挡住要擦的污渍），高层子任务推理容易被干扰（放东西时反复开关抽屉）。「更丰富的上下文」是 §VI 的未来方向，不是已验证的修复。",
+          "componentId": "c7s1-drawer-loop",
+          "moduleId": "7.1"
+        },
+        {
+          "id": "c7s2",
+          "title": "这套配方在什么条件下成立",
+          "goal": "把结论钉在它的证据范围里，分清哪些是论文证过的、哪些只是直觉。",
+          "summary": "评测协议、成立条件、不能外推的宣称，以及「师徒」这个类比在哪里失效。",
+          "interaction": "阅读即可；本页是收束页，机制交互在前一页已经完成。",
+          "next": "回到任意一页，用那台机器重新提问。",
+          "notes": "协议见 p.17 App.B；系统参数见 p.7 §IV-E 与 p.19 App.E；局限见 p.11 §VI。类比边界：真实系统是同一个 Transformer 的两层输出，不是两个主体。",
+          "componentId": "c7s2-recipe-boundary"
+        }
+      ]
+    }
+  ],
+  "thumbnails": {
+    "cover": "./thumbnails/cover.jpg",
+    "c1s1": "./thumbnails/c1s1.jpg",
+    "c1s2": "./thumbnails/c1s2.jpg",
+    "c2s1": "./thumbnails/c2s1.jpg",
+    "c2s2": "./thumbnails/c2s2.jpg",
+    "c3s1": "./thumbnails/c3s1.jpg",
+    "c3s2": "./thumbnails/c3s2.jpg",
+    "c4s1": "./thumbnails/c4s1.jpg",
+    "c5s1": "./thumbnails/c5s1.jpg",
+    "c5s2": "./thumbnails/c5s2.jpg",
+    "c6s1": "./thumbnails/c6s1.jpg",
+    "c7s1": "./thumbnails/c7s1.jpg",
+    "c7s2": "./thumbnails/c7s2.jpg"
+  }
+};

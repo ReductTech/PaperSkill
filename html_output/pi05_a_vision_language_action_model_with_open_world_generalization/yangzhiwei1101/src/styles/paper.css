@@ -1,0 +1,198 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Theme: 家常菜师徒档（师傅报下一步，学徒动手）. Semantic roles stay as in tokens.css. */
+
+:root {
+  --paper-scene-bg: #f7f3ec;
+  --paper-counter: #d8c7ad;
+  --paper-wood: #92400e;
+  --paper-steel: #cfd8e3;
+  --paper-note: #fdf6e6;
+  --pi-gap: 24px;
+}
+
+/* ---------- layout primitives ---------- */
+/* Canvas widgets size themselves with inline width/height; keep them inside the
+   fixed body region so the stage scale stays exact. */
+.ppt-body canvas { width: 100% !important; height: auto !important; max-width: 100% !important; }
+.pi-col { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+.pi-row { display: flex; align-items: center; gap: 20px; flex-wrap: nowrap; }
+.pi-row-tight { gap: 18px; }
+.pi-split { display: flex; gap: 26px; height: 100%; align-items: flex-start; }
+.pi-split > .pi-left { flex: 1.12; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.pi-split > .pi-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.pi-col > canvas,
+.pi-left > canvas { display: block; width: 100%; max-width: 1472px; height: auto; }
+
+/* ---------- text ---------- */
+.pi-lead { margin: 0; font-size: var(--ppt-body-text); line-height: 1.35; color: var(--ink); }
+.pi-body { margin: 0; font-size: 26px; line-height: 1.42; color: var(--ink); }
+.pi-muted { color: var(--ink-2); }
+.pi-heading-sm { margin: 0; font-size: var(--ppt-body-heading); font-weight: 800; color: var(--ink); }
+.pi-feedback { margin: 0; font-size: 26px; line-height: 1.38; font-weight: 600; min-height: 38px; }
+.pi-note { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-2); }
+.pi-caption { margin: 0; font-size: 19px; line-height: 1.35; color: var(--ink-2); }
+.pi-locator { margin: 0; font-size: 19px; color: var(--ink-2); font-family: var(--ui-font-mono); }
+.pi-formula {
+  margin: 0; font-size: 27px; line-height: 1.45; color: var(--ink);
+  background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 10px 14px;
+}
+
+/* ---------- cards ---------- */
+.pi-grid6 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pi-grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pi-card {
+  display: flex; flex-direction: column; justify-content: center; gap: 6px; text-align: left;
+  min-height: 112px;
+  padding: 12px 14px; background: #fff; border: 2px solid var(--line);
+  border-radius: 12px; cursor: pointer; font: inherit; color: var(--ink);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.pi-card:hover { border-color: var(--line-2); }
+.pi-card.is-sel { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+.pi-card-sm { padding: 9px 12px; }
+.pi-card-title { font-size: 22px; font-weight: 700; line-height: 1.2; }
+.pi-card-short { font-size: 18px; color: var(--ink-2); line-height: 1.3; }
+.pi-tags { display: flex; gap: 8px; margin-top: 2px; }
+.pi-tag {
+  font-size: 15px; padding: 2px 8px; border-radius: 999px;
+  background: #eef1f5; color: var(--ink-2); border: 1px solid var(--line);
+}
+.pi-tag.is-high { background: var(--blue-soft); color: var(--blue); border-color: var(--blue); }
+.pi-tag.is-low { background: var(--green-soft); color: var(--green); border-color: var(--green); }
+
+.pi-mini { display: flex; align-items: center; gap: 14px; margin-top: auto; }
+.pi-mini svg { width: 360px; height: auto; flex: none; }
+
+/* ---------- controls ---------- */
+.pi-choice { display: flex; gap: 10px; }
+.pi-choice button {
+  font: inherit; font-size: 21px; padding: 8px 16px; border-radius: 999px;
+  border: 2px solid var(--line); background: #fff; color: var(--ink-2); cursor: pointer;
+}
+.pi-choice button.is-on { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+
+.pi-slider { display: flex; align-items: center; gap: 14px; font-size: 22px; color: var(--ink); flex: 1; min-width: 0; }
+.pi-slider > span { white-space: nowrap; }
+.pi-slider input[type='range'] { flex: 1; min-width: 120px; accent-color: var(--blue); }
+.pi-slider > b { white-space: nowrap; font-size: 22px; color: var(--blue); }
+.pi-slider-wide { max-width: 520px; }
+
+.pi-stats { display: flex; gap: 16px; font-size: 20px; color: var(--ink-2); white-space: nowrap; }
+.pi-stats b { color: var(--ink); }
+
+/* ---------- weights / bars ---------- */
+.pi-weights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.pi-weights li { display: grid; grid-template-columns: 230px 1fr 54px; gap: 10px; align-items: center; font-size: 20px; color: var(--ink-2); }
+.pi-weights li.is-best { color: var(--blue); font-weight: 700; }
+.pi-w-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pi-w-bar { display: block; height: 14px; background: #e9edf3; border-radius: 999px; overflow: hidden; }
+.pi-w-bar > span { display: block; height: 100%; background: var(--blue); border-radius: 999px; transition: width var(--t-med); }
+.pi-weights li.is-best .pi-w-bar > span { background: var(--green); }
+.pi-w-val { text-align: right; font-variant-numeric: tabular-nums; }
+.pi-bars { display: flex; flex-direction: column; gap: 10px; }
+.pi-bar { display: grid; grid-template-columns: 296px 1fr 54px; gap: 10px; align-items: center; font-size: 19px; color: var(--ink-2); }
+.pi-bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pi-bar .pi-w-bar { height: 16px; }
+
+/* ---------- attention mask ---------- */
+.pi-mask {
+  display: grid; grid-template-columns: 170px repeat(5, 1fr);
+  gap: 6px; background: #fff; border: 2px solid var(--line);
+  border-radius: 14px; padding: 14px;
+}
+.pi-mask-head { font-size: 17px; color: var(--ink-2); text-align: center; line-height: 1.2; }
+.pi-mask-row {
+  font: inherit; background: transparent; border: 2px solid transparent; border-radius: 8px;
+  padding: 6px 4px; cursor: pointer; text-align: left;
+}
+.pi-mask-row.is-sel { border-color: var(--blue); color: var(--blue); font-weight: 700; background: var(--blue-soft); }
+.pi-mask-cell {
+  display: flex; align-items: center; justify-content: center;
+  height: 46px; border-radius: 8px; font-size: 18px; font-weight: 700;
+}
+.pi-mask-cell.is-on { background: var(--blue-soft); color: var(--blue); border: 1.5px solid var(--blue); }
+.pi-mask-cell.is-off { background: #f4f6f9; color: #b3bccb; border: 1.5px dashed var(--line); }
+.pi-mask-cell.is-active-row { outline: 2px solid rgba(240, 126, 71, 0.55); outline-offset: 1px; }
+
+/* ---------- figures ---------- */
+.pi-figure { display: block; width: 100%; height: auto; max-height: 470px; object-fit: contain; border-radius: 10px; background: #fff; border: 1px solid var(--line); }
+
+/* ---------- location ladder ---------- */
+.pi-ladder { display: flex; flex-direction: column; gap: 6px; }
+.pi-step {
+  display: grid; grid-template-columns: 18px 118px 1fr; gap: 12px; align-items: center;
+  font: inherit; font-size: 21px; text-align: left; background: #fff;
+  border: 2px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; color: var(--ink-2);
+}
+.pi-step.is-sel { border-color: var(--orange); color: var(--ink); font-weight: 700; background: var(--orange-soft); }
+.pi-step-dot { width: 12px; height: 12px; border-radius: 999px; background: var(--line-2); }
+.pi-step.is-sel .pi-step-dot { background: var(--orange); }
+.pi-step-val { white-space: nowrap; }
+.pi-step-kitchens { display: flex; gap: 4px; }
+.pi-kitchen { width: 14px; height: 14px; border-radius: 3px; background: #e6eaf0; border: 1px solid var(--line); }
+.pi-kitchen.is-on { background: var(--green-soft); border-color: var(--green); }
+
+/* ---------- kitchen strip / stickers ---------- */
+.pi-kitchen-strip { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 6px; }
+
+/* ---------- plates ---------- */
+.pi-plates { display: flex; gap: 12px; }
+.pi-plate {
+  font: inherit; font-size: 20px; padding: 8px 18px; border-radius: 999px;
+  border: 2px solid var(--line); background: #fff; color: var(--ink-2); cursor: pointer;
+}
+.pi-plate.is-on { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+
+/* ---------- duel ---------- */
+.pi-duel { display: flex; align-items: center; gap: 18px; }
+.pi-duel-side {
+  flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 16px;
+  border-radius: 14px; background: #fff; border: 2px solid var(--line);
+}
+.pi-duel-side.is-old { border-color: rgba(196, 63, 82, 0.45); }
+.pi-duel-side.is-new { border-color: rgba(34, 141, 92, 0.5); }
+.pi-duel-name { font-size: 24px; font-weight: 800; color: var(--ink); }
+.pi-duel-sub { font-size: 19px; color: var(--ink-2); }
+.pi-duel-plate { display: block; height: 16px; border-radius: 999px; margin-top: 8px; }
+.pi-duel-plate.is-low { width: 34%; background: var(--red); }
+.pi-duel-plate.is-high { width: 86%; background: var(--green); }
+.pi-duel-vs { font-size: 22px; font-weight: 800; color: var(--ink-2); }
+
+/* ---------- commanders ---------- */
+.pi-cmd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.pi-bubble {
+  display: flex; align-items: center; gap: 14px; background: #fff;
+  border: 2px solid var(--blue); border-radius: 14px; padding: 12px 16px;
+}
+.pi-bubble-who {
+  font-size: 19px; color: var(--blue); font-weight: 700; white-space: nowrap;
+  border-right: 2px solid var(--line); padding-right: 14px;
+}
+.pi-bubble-text { font-size: 26px; color: var(--ink); font-weight: 700; }
+.pi-bubble-note { margin-left: auto; font-size: 17px; color: var(--ink-2); white-space: nowrap; }
+
+/* ---------- note card ---------- */
+.pi-note-card {
+  background: #fdf6e6; border: 2px solid #e8d9b8; border-radius: 14px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.pi-note-row { display: grid; grid-template-columns: 116px 1fr; gap: 14px; align-items: start; }
+.pi-note-key { font-size: 22px; font-weight: 800; }
+.pi-note-val { font-size: 21px; line-height: 1.38; color: var(--ink); }
+
+/* ---------- symbol hint context ---------- */
+.pi-formula .formula-symbol { color: var(--blue); border-bottom: 2px dotted var(--blue); cursor: help; }
+.pi-formula sub,
+.pi-formula sup { font-size: 0.6em; line-height: 0; position: relative; vertical-align: baseline; }
+.pi-formula sub { bottom: -0.28em; }
+.pi-formula sup { top: -0.5em; }
+
+/* ---------- cover fit for a long English title ---------- */
+.ppt-cover-top:not(.is-long-title):not(.is-very-long-title) .ppt-type-display { font-size: 42px; line-height: 1.12; }
+/* The display line box clips descenders at 1.12 leading; give it room without moving layout. */
+.ppt-cover-top .ppt-type-display { padding-bottom: 6px; }
+.ppt-cover-top .ppt-type-subtitle { font-size: 20px; line-height: 1.45; }
+.ppt-cover-top.is-long-title { height: 196px; }
+.ppt-cover-footer { height: 84px; top: 792px; align-items: flex-start; }
+.ppt-cover-footer .ppt-type-small { font-size: 19px; line-height: 1.5; }
