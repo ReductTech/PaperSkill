@@ -37,6 +37,8 @@ export interface HeroConfig {
 
 export interface SymbolDef {
   sym: string;
+  /** Optional rendered label (HTML allowed) shown in the explanation before the meaning. */
+  label?: string;
   desc: string;
 }
 

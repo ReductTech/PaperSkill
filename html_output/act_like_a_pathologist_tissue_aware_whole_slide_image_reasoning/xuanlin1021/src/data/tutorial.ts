@@ -95,18 +95,21 @@ export const tutorial: TutorialData = {
       "insight": "有了组织标签，<b>「相关」才有落点</b>：问题指向哪类组织，就先看哪类。",
       "formula": {
         "lead": "每个片块归到与提示特征最相似的那一类：",
-        "unicode": "l_i = argmax_{j∈{1..M}} ( x_i · t_j ) / ( ‖x_i‖ · ‖t_j‖ )",
+        "unicode": "<div><span class='sym fe-formula-sym' data-sym='l_i'>l<sub>i</sub></span> = argmax<sub>j</sub> ( <span class='sym fe-formula-sym' data-sym='x_i'>x<sub>i</sub></span> · <span class='sym fe-formula-sym' data-sym='t_j'>t<sub>j</sub></span> ) / ( ‖<span class='sym fe-formula-sym' data-sym='x_i'>x<sub>i</sub></span>‖ · ‖<span class='sym fe-formula-sym' data-sym='t_j'>t<sub>j</sub></span>‖ )，其中 j = 1 … <span class='sym fe-formula-sym' data-sym='M'>M</span></div>",
         "symbols": [
           {
             "sym": "x_i",
+            "label": "x<sub>i</sub>",
             "desc": "第 i 个片块的特征向量（CONCH 视觉编码器给出）"
           },
           {
             "sym": "t_j",
+            "label": "t<sub>j</sub>",
             "desc": "第 j 类组织提示的特征向量（CONCH 文本编码器给出）"
           },
           {
             "sym": "l_i",
+            "label": "l<sub>i</sub>",
             "desc": "第 i 个片块的组织标签，取值 1 到 13"
           },
           {
@@ -157,27 +160,41 @@ export const tutorial: TutorialData = {
       "insight": "先按类别分预算，再在类别里挑块：<b>粗选比细选便宜得多</b>。",
       "formula": {
         "lead": "每类的名额由三件事决定：组原型、采样率、类内片块数。",
-        "unicode": "g_j = (1/N_j) · Σ_{i∈I_j} x_i    r_j = σ( F_group([g_j; q]) )    k_j = ⌈ r_j · N_j ⌉",
+        "unicode": "<div><span class='sym fe-formula-sym' data-sym='g_j'>g<sub>j</sub></span> = (1/<span class='sym fe-formula-sym' data-sym='N_j'>N<sub>j</sub></span>) · Σ<sub>i∈I<sub>j</sub></sub> <span class='sym fe-formula-sym' data-sym='x_i'>x<sub>i</sub></span></div><div><span class='sym fe-formula-sym' data-sym='r_j'>r<sub>j</sub></span> = σ( <span class='sym fe-formula-sym' data-sym='F_group'>F<sub>组</sub></span>([<span class='sym fe-formula-sym' data-sym='g_j'>g<sub>j</sub></span>; <span class='sym fe-formula-sym' data-sym='q'>q</span>]) )</div><div><span class='sym fe-formula-sym' data-sym='k_j'>k<sub>j</sub></span> = ⌈ <span class='sym fe-formula-sym' data-sym='r_j'>r<sub>j</sub></span> · <span class='sym fe-formula-sym' data-sym='N_j'>N<sub>j</sub></span> ⌉</div>",
         "symbols": [
           {
             "sym": "g_j",
+            "label": "g<sub>j</sub>",
             "desc": "第 j 组的组原型：组内所有片块特征的平均，代表「这类组织长什么样」"
           },
           {
             "sym": "N_j",
+            "label": "N<sub>j</sub>",
             "desc": "第 j 组内的片块总数"
           },
           {
             "sym": "r_j",
+            "label": "r<sub>j</sub>",
             "desc": "第 j 组的采样率，取值在 0 到 1 之间，由两层线性层加 sigmoid 给出"
           },
           {
             "sym": "k_j",
+            "label": "k<sub>j</sub>",
             "desc": "第 j 组实际抽取的片块数，向上取整"
           },
           {
             "sym": "q",
             "desc": "问题的文本特征"
+          },
+          {
+            "sym": "x_i",
+            "label": "x<sub>i</sub>",
+            "desc": "组内第 i 个片块的特征向量"
+          },
+          {
+            "sym": "F_group",
+            "label": "F<sub>组</sub>",
+            "desc": "组采样器：两层线性层，输出经 sigmoid 变成该组的采样率"
           }
         ]
       },
@@ -216,7 +233,7 @@ export const tutorial: TutorialData = {
           "kind": "module",
           "id": "4.1",
           "title": "六个名额，你会圈哪几块",
-          "desc": "这是同一类组织里的 24 块候选（示意）。预算只允许留 6 块（此处 k=6 仅为示意，论文的 k_j 随组织与问题变化），论文按概率从高到低取前 k_j 块；名额满了以后每多圈一块，都要先点掉一块。",
+          "desc": "这是同一类组织里的 24 块候选（示意）。预算只允许留 6 块（此处 k=6 仅为示意，论文的 k<sub>j</sub> 随组织与问题变化），论文按概率从高到低取前 k<sub>j</sub> 块；名额满了以后每多圈一块，都要先点掉一块。",
           "componentId": "m4-patch"
         },
         {
@@ -229,16 +246,36 @@ export const tutorial: TutorialData = {
       ],
       "insight": "排名不是装饰：<b>它决定哪些证据能进模型</b>，也决定压缩该在哪儿停。",
       "formula": {
-        "lead": "组内按概率排序取前 k_j 块；压缩项是两个伯努利分布之间的 KL 距离。",
-        "unicode": "s_i = σ( F_patch([x_i; q]) )    D_KL( B(π) ‖ B(p) ) = π·log(π/p) + (1−π)·log((1−π)/(1−p))",
+        "lead": "组内按概率排序取前 k<sub>j</sub> 块；压缩项是两个伯努利分布之间的 KL 距离。",
+        "unicode": "<div><span class='sym fe-formula-sym' data-sym='s_i'>s<sub>i</sub></span> = σ( <span class='sym fe-formula-sym' data-sym='F_patch'>F<sub>片块</sub></span>([<span class='sym fe-formula-sym' data-sym='x_i'>x<sub>i</sub></span>; <span class='sym fe-formula-sym' data-sym='q'>q</span>]) )</div><div><span class='sym fe-formula-sym' data-sym='D_KL'>D<sub>KL</sub></span>( B(<span class='sym fe-formula-sym' data-sym='π'>π</span>) ‖ B(<span class='sym fe-formula-sym' data-sym='p'>p</span>) ) = <span class='sym fe-formula-sym' data-sym='π'>π</span>·log(<span class='sym fe-formula-sym' data-sym='π'>π</span>/<span class='sym fe-formula-sym' data-sym='p'>p</span>) + (1−<span class='sym fe-formula-sym' data-sym='π'>π</span>)·log((1−<span class='sym fe-formula-sym' data-sym='π'>π</span>)/(1−<span class='sym fe-formula-sym' data-sym='p'>p</span>))</div><div>组内取前 <span class='sym fe-formula-sym' data-sym='k_j'>k<sub>j</sub></span> 块</div>",
         "symbols": [
           {
             "sym": "s_i",
+            "label": "s<sub>i</sub>",
             "desc": "第 i 块被选中的概率，由「片块特征 + 问题特征」经两层线性层加 sigmoid 给出"
           },
           {
+            "sym": "x_i",
+            "label": "x<sub>i</sub>",
+            "desc": "第 i 个片块的特征向量"
+          },
+          {
+            "sym": "q",
+            "desc": "问题的文本特征；与片块特征拼接后送进片块选择器"
+          },
+          {
+            "sym": "D_KL",
+            "label": "D<sub>KL</sub>",
+            "desc": "两个伯努利分布之间的 KL 距离：压缩项就是用它衡量「学到的概率」与「先验」差多远"
+          },
+          {
+            "sym": "F_patch",
+            "label": "F<sub>片块</sub>",
+            "desc": "片块选择器：两层线性层，输出经 sigmoid 变成每块被选中的概率"
+          },
+          {
             "sym": "π",
-            "desc": "学习到的选择概率（组级是 r_j，片块级是 s_i）"
+            "desc": "学习到的选择概率（组级是 r<sub>j</sub>，片块级是 s<sub>i</sub>）"
           },
           {
             "sym": "p",
@@ -246,6 +283,7 @@ export const tutorial: TutorialData = {
           },
           {
             "sym": "k_j",
+            "label": "k<sub>j</sub>",
             "desc": "组内保留的块数；排序只在组内进行"
           }
         ]
@@ -259,7 +297,7 @@ export const tutorial: TutorialData = {
         {
           "icon": "🔧",
           "title": "β 是拉锯",
-          "desc": "β 为 0 时压缩失效，β_g=0.2 或 β_p=0.10 最好，再加大就压过头。"
+          "desc": "β 为 0 时压缩失效；组级 β 取 0.2、片块级 β 取 0.10 时最好，再加大就压过头。"
         },
         {
           "icon": "✨",
@@ -293,26 +331,36 @@ export const tutorial: TutorialData = {
       "insight": "选择器是学出来的策略：<b>先验是相似度</b>，正则化让「留下」和「丢掉」都有依据。",
       "formula": {
         "lead": "总损失由回答的似然与两级压缩项组成，两个 β 分开调节。",
-        "unicode": "L_final = L_VQA + β_g · L_group + β_p · L_patch",
+        "unicode": "<div><span class='sym fe-formula-sym' data-sym='L_final'>L<sub>final</sub></span> = <span class='sym fe-formula-sym' data-sym='L_VQA'>L<sub>VQA</sub></span> + <span class='sym fe-formula-sym' data-sym='β_g'>β<sub>g</sub></span> · <span class='sym fe-formula-sym' data-sym='L_group'>L<sub>group</sub></span> + <span class='sym fe-formula-sym' data-sym='β_p'>β<sub>p</sub></span> · <span class='sym fe-formula-sym' data-sym='L_patch'>L<sub>patch</sub></span></div>",
         "symbols": [
           {
+            "sym": "L_final",
+            "label": "L<sub>final</sub>",
+            "desc": "最终一起优化的总损失：回答好不好，与「选得够不够精」同时被约束"
+          },
+          {
             "sym": "L_VQA",
+            "label": "L<sub>VQA</sub>",
             "desc": "答案序列的负对数似然：回答得越准，这一项越小"
           },
           {
             "sym": "L_group",
+            "label": "L<sub>group</sub>",
             "desc": "组级压缩项：让组采样率贴近「组原型与问题的相似度」这个先验"
           },
           {
             "sym": "L_patch",
+            "label": "L<sub>patch</sub>",
             "desc": "片块级压缩项：让片块选择概率贴近「片块与问题的相似度」这个先验"
           },
           {
             "sym": "β_g",
+            "label": "β<sub>g</sub>",
             "desc": "组级压缩权重，训练时从 0 线性升到 0.1"
           },
           {
             "sym": "β_p",
+            "label": "β<sub>p</sub>",
             "desc": "片块级压缩权重，训练时从 0 线性升到 0.2"
           }
         ]

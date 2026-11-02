@@ -41,7 +41,12 @@ export function Formula({ formula }: { formula: FormulaDef }) {
   const [active, setActive] = useState<string | null>(null);
 
   const formulaHtml = useMemo(
-    () => makeClickableFormula(formula.unicode, formula.symbols),
+    () =>
+      // A formula that already marks its symbols with data-sym is fully authored:
+      // wrapping it again would nest clickable spans inside <sub>/<sup> markup.
+      /data-sym=/.test(formula.unicode)
+        ? formula.unicode
+        : makeClickableFormula(formula.unicode, formula.symbols),
     [formula.unicode, formula.symbols]
   );
 
@@ -65,7 +70,10 @@ export function Formula({ formula }: { formula: FormulaDef }) {
       <div className="fe-formula" dangerouslySetInnerHTML={{ __html: formulaHtml }} />
       {activeSym ? (
         <div className="fe-explain" key={activeSym.sym}>
-          <span className="fe-explain-sym">{activeSym.sym}</span>
+          <span
+            className="fe-explain-sym"
+            dangerouslySetInnerHTML={{ __html: activeSym.label ?? activeSym.sym }}
+          />
           <span
             className="fe-explain-desc"
             dangerouslySetInnerHTML={{ __html: activeSym.desc }}
