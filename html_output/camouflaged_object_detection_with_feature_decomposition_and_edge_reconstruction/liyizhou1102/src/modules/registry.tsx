@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Rubbing1 } from './analogy-1';
+import { Rubbing10 } from './analogy-10';
+import { Rubbing2 } from './analogy-2';
+import { Rubbing3 } from './analogy-3';
+import { Rubbing4 } from './analogy-4';
+import { Rubbing5 } from './analogy-5';
+import { Rubbing6 } from './analogy-6';
+import { Rubbing7 } from './analogy-7';
+import { Rubbing8 } from './analogy-8';
+import { Rubbing9 } from './analogy-9';
+import { Feder10 } from './feder-10';
+import { Feder04 } from './feder-4';
+import { Feder05 } from './feder-5';
+import { Feder06 } from './feder-6';
+import { Feder7 } from './feder-7';
+import { Feder8 } from './feder-8';
+import { Feder9 } from './feder-9';
+import { Feder1A } from './feder-ch1-is-ed';
+import { Feder2A } from './feder-ch2-path';
+import { Feder3B } from './feder-ch3-attention';
+import { Feder3A } from './feder-ch3-haar';
+import { Rubbing11 } from './hero-new';
+import { Rubbing0 } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Rubbing1;
+widgetRegistry['analogy-10'] = Rubbing10;
+widgetRegistry['analogy-2'] = Rubbing2;
+widgetRegistry['analogy-3'] = Rubbing3;
+widgetRegistry['analogy-4'] = Rubbing4;
+widgetRegistry['analogy-5'] = Rubbing5;
+widgetRegistry['analogy-6'] = Rubbing6;
+widgetRegistry['analogy-7'] = Rubbing7;
+widgetRegistry['analogy-8'] = Rubbing8;
+widgetRegistry['analogy-9'] = Rubbing9;
+widgetRegistry['feder-10'] = Feder10;
+widgetRegistry['feder-4'] = Feder04;
+widgetRegistry['feder-5'] = Feder05;
+widgetRegistry['feder-6'] = Feder06;
+widgetRegistry['feder-7'] = Feder7;
+widgetRegistry['feder-8'] = Feder8;
+widgetRegistry['feder-9'] = Feder9;
+widgetRegistry['feder-ch1-is-ed'] = Feder1A;
+widgetRegistry['feder-ch2-path'] = Feder2A;
+widgetRegistry['feder-ch3-attention'] = Feder3B;
+widgetRegistry['feder-ch3-haar'] = Feder3A;
+widgetRegistry['hero-new'] = Rubbing11;
+widgetRegistry['hero-old'] = Rubbing0;
