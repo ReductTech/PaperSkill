@@ -1,0 +1,359 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  "meta": {
+    "titleEn": "Learning Transferable Visual Models From Natural Language Supervision",
+    "titleZh": "CLIP：从自然语言监督学习可迁移视觉模型",
+    "venue": "ICML 2021 · CLIP",
+    "authors": "Alec Radford、Jong Wook Kim 等",
+    "affiliation": "OpenAI",
+    "domain": "视觉与语言 · 表示学习",
+    "coreProblem": "固定类别之外，能否用一句话告诉模型要识别什么？",
+    "coreInsight": "CLIP 用图文配对学习共同表示，再用类别描述构造零样本分类器。",
+    "keywords": [
+      "对比学习",
+      "双编码器",
+      "零样本迁移",
+      "提示词"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "固定类别的监督分类",
+      "desc": "输出头只包含预先训练的类别。",
+      "componentId": "clip-cover"
+    },
+    "newMethod": {
+      "title": "CLIP 零样本分类",
+      "desc": "用自然语言指定候选类别。",
+      "componentId": "clip-cover"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "自然语言作为监督",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "1.1",
+          "title": "自然语言监督：突破固定类别",
+          "desc": "点击帆船展签，比较候选集扩展前后的相似度与输出。",
+          "componentId": "labels-scene"
+        },
+        {
+          "kind": "module",
+          "id": "1.2",
+          "title": "图文对提供什么监督",
+          "desc": "先点照片，再点相应展签，交换后正确配对计数同步变化。",
+          "componentId": "pairs-scene"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "closed-labels",
+          "title": "自然语言监督：突破固定类别",
+          "goal": "新增视觉概念时，能否直接使用语言来定义任务？",
+          "summary": "CLIP从自然语言学习视觉表示，能通过类别文本构建新分类器。",
+          "interaction": "点击帆船展签，比较候选集扩展前后的相似度与输出。",
+          "next": "这些跨模态联系是从什么监督信号学来的？",
+          "notes": "来源：PDF pages1–3，§2.1–2.2与Figure1；零样本接口见page6 §3.1.2。固定输出只含猫狗的分类器无法输出帆船。本例使用人工构造并归一化的3维向量，不是运行真实CLIP，也不保证任意新概念都能识别。",
+          "componentId": "labels-scene",
+          "moduleId": "1.1",
+          "thumbnail": "./thumbnails/closed-labels.jpg"
+        },
+        {
+          "id": "paired-data",
+          "title": "图文对提供什么监督",
+          "goal": "自然语言描述如何变成可学习的图文关系？",
+          "summary": "图像与配文的共同出现构成监督，也可能包含噪声。",
+          "interaction": "先点照片，再点相应展签，交换后正确配对计数同步变化。",
+          "next": "图像和文字形式不同，如何让它们可以比较？",
+          "notes": "来源：PDF page3 §2.1–2.2，page4 §2.3。WIT有4亿互联网图文对；描述可提供类别外信息，也可能含噪声。本例只整理已知配对，正确数不是训练损失；不意味着人工把全部WIT清洗为无误标签。初始[1,2,0]正确0/3；[0,1,2]正确3/3。",
+          "componentId": "pairs-scene",
+          "moduleId": "1.2",
+          "thumbnail": "./thumbnails/paired-data.jpg"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "共享的图文表示",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "2.1",
+          "title": "双编码器：分别理解，再对齐",
+          "desc": "分别点选图片和描述，观察对应向量与中间点积变化。",
+          "componentId": "encoder-scene"
+        },
+        {
+          "kind": "module",
+          "id": "2.2",
+          "title": "归一化后，比方向而不是长度",
+          "desc": "拖猫咪图卡或调角度，再单独改变原始长度。",
+          "componentId": "cosine-scene"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "encoders",
+          "title": "双编码器：分别理解，再对齐",
+          "goal": "两个不同编码器为什么能在同一空间里比较？",
+          "summary": "图文独立编码、线性投影到同维空间并归一化，再做点积。",
+          "interaction": "分别点选图片和描述，观察对应向量与中间点积变化。",
+          "next": "为什么比较前要去掉向量长度？",
+          "notes": "来源：PDF pages4–5 §2.3–2.4，Figure3。图像用改进ResNet或ViT，文本用Transformer；线性投影同维后分别L2归一化。真实表示不是3维，本例分量无命名语义。改变图片不必改变可缓存文本向量。同类方向完全相同只是构造，不是真实网络必得1。",
+          "componentId": "encoder-scene",
+          "moduleId": "2.1",
+          "thumbnail": "./thumbnails/encoders.jpg"
+        },
+        {
+          "id": "cosine",
+          "title": "归一化后，比方向而不是长度",
+          "goal": "区分向量方向和长度对相似度的作用。",
+          "summary": "归一化向量的点积等于两向量夹角余弦。",
+          "interaction": "拖猫咪图卡或调角度，再单独改变原始长度。",
+          "next": "单对相似度如何扩展成批内竞争？",
+          "notes": "来源：PDF page5 Figure3。u、v是投影后L2归一化向量，点积范围[-1,1]。二维只是示意；theta为0/90/180度对应1/0/-1，rawLength在0.5到3内变化不影响结果。照片位置代表向量方向，非真实物理距离。单指拖动，第二指取消控件拖动并交给stage缩放。",
+          "componentId": "cosine-scene",
+          "moduleId": "2.2",
+          "thumbnail": "./thumbnails/cosine.jpg"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "03 · 对比学习",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "batch-experiment",
+          "title": "批内对比：正确配对与竞争组合",
+          "desc": "改变批大小，点击照片或矩阵行。",
+          "componentId": "batch-scene"
+        },
+        {
+          "kind": "module",
+          "id": "symmetric-experiment",
+          "title": "对称交叉熵：两个方向都要会找",
+          "desc": "调节第三条描述的泛化程度，切换图找文和文找图。",
+          "componentId": "symmetric-scene"
+        },
+        {
+          "kind": "module",
+          "id": "temperature-experiment",
+          "title": "温度：放大差异，不修正排序",
+          "desc": "调节聚光灯温度，试试错误描述排第一。",
+          "componentId": "temperature-scene"
+        },
+        {
+          "kind": "module",
+          "id": "gradient-experiment",
+          "title": "训练：同时调整两个编码器",
+          "desc": "按校准印章执行一次小向量梯度下降。",
+          "componentId": "gradient-scene"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "batch",
+          "title": "批内对比：正确配对与竞争组合",
+          "goal": "观察同一批里的所有图文组合，理解分母中的竞争。",
+          "summary": "观察同一批里的所有图文组合，理解分母中的竞争。",
+          "interaction": "改变批大小，点击照片或矩阵行。",
+          "next": "有了配对矩阵，为什么还要从两个方向检索？",
+          "notes": "PDF pages 4–5, §2.3。n=3；z=4cos(a_i-b_j)；N2=2正2竞争，N4=4正12竞争。这是教学构造向量，非真实CLIP权重、预测或训练轨迹。对称交叉熵按行图找文、按列文找图定义；真实训练参数与演示参数分离。",
+          "componentId": "batch-scene",
+          "thumbnail": "./thumbnails/batch.jpg",
+          "moduleId": "batch-experiment"
+        },
+        {
+          "id": "symmetric",
+          "title": "对称交叉熵：两个方向都要会找",
+          "goal": "同一张配对表，按行与按列归一化，答案会不同。",
+          "summary": "同一张配对表，按行与按列归一化，答案会不同。",
+          "interaction": "调节第三条描述的泛化程度，切换图找文和文找图。",
+          "next": "分数不变时，温度能改变什么？",
+          "notes": "PDF page 5, Figure 3。generic=.8范围0..1；第三文本混向图片均值，算行列交叉熵平均。这是教学构造向量，非真实CLIP权重、预测或训练轨迹。对称交叉熵按行图找文、按列文找图定义；真实训练参数与演示参数分离。",
+          "componentId": "symmetric-scene",
+          "thumbnail": "./thumbnails/symmetric.jpg",
+          "moduleId": "symmetric-experiment"
+        },
+        {
+          "id": "temperature",
+          "title": "温度：放大差异，不修正排序",
+          "goal": "调温度前，先判断排第一的描述是否正确。",
+          "summary": "调温度前，先判断排第一的描述是否正确。",
+          "interaction": "调节聚光灯温度，试试错误描述排第一。",
+          "next": "真正纠正表示，必须通过训练更新参数。",
+          "notes": "PDF pages 4–5, §2.5。tau=.3范围.05..1；s=[.8,.5,.1]或错排[.5,.8,.1]；低温也放大错判。这是教学构造向量，非真实CLIP权重、预测或训练轨迹。对称交叉熵按行图找文、按列文找图定义；真实训练参数与演示参数分离。",
+          "componentId": "temperature-scene",
+          "thumbnail": "./thumbnails/temperature.jpg",
+          "moduleId": "temperature-experiment"
+        },
+        {
+          "id": "gradient",
+          "title": "训练：同时调整两个编码器",
+          "goal": "一次更新，让图像与文字的表示共同变化。",
+          "summary": "一次更新，让图像与文字的表示共同变化。",
+          "interaction": "按校准印章执行一次小向量梯度下降。",
+          "next": "训练后的两个编码器，如何用于新类别？",
+          "notes": "PDF page 5, §2.5。I角0/120/240,T角70/190/310；alpha3；有限差分梯度eta.12弧度，最多20步。这是教学构造向量，非真实CLIP权重、预测或训练轨迹。对称交叉熵按行图找文、按列文找图定义；真实训练参数与演示参数分离。 真实CLIP共32epochs，ViT-L/14@336px另一个高分辨率epoch；有限差分仅用于演示，真实训练反向传播。",
+          "componentId": "gradient-scene",
+          "thumbnail": "./thumbnails/gradient.jpg",
+          "moduleId": "gradient-experiment"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "从语言迁移到新任务",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "4.1",
+          "title": "零样本分类：用文字生成分类器",
+          "desc": "冻结编码器，通过类别描述生成权重，在当前候选集内比较。",
+          "componentId": "zero-shot-scene"
+        },
+        {
+          "kind": "module",
+          "id": "4.2",
+          "title": "提示词：上下文消解歧义",
+          "desc": "文本描述是分类器的一部分；上下文能明确词义。",
+          "componentId": "prompt-scene"
+        },
+        {
+          "kind": "module",
+          "id": "4.3",
+          "title": "提示集成：先平均表示，再分类",
+          "desc": "同类文本向量平均并归一化，得到一个可缓存的权重向量。",
+          "componentId": "ensemble-scene"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "zero-shot",
+          "componentId": "zero-shot-scene",
+          "moduleId": "4.1",
+          "title": "零样本分类：用文字生成分类器",
+          "goal": "不增加目标任务标注样本，怎样改变分类任务？",
+          "summary": "冻结编码器，通过类别描述生成权重，在当前候选集内比较。",
+          "interaction": "选择图片，点展签添加或移除候选类别。",
+          "next": "类别名有歧义时，描述该怎样写？",
+          "notes": "PDF page 6, §3.1.2；Figure 1。零样本指未使用目标任务标注样本拟合分类器，CLIP已经使用大规模图文数据预训练。浏览器使用人为构造的归一化3维向量，alpha=4；分数不是CLIP实际推理。猫狗候选初始不能识别船，加入帆船文本后argmax变为帆船。最后一个候选禁止删除，以避免未定义的空softmax。",
+          "thumbnail": "./thumbnails/zero-shot.jpg"
+        },
+        {
+          "id": "prompts",
+          "componentId": "prompt-scene",
+          "moduleId": "4.2",
+          "title": "提示词：上下文消解歧义",
+          "goal": "给 crane 加上上下文，分类权重会怎样变化？",
+          "summary": "文本描述是分类器的一部分；上下文能明确词义。",
+          "interaction": "分别选择无上下文、鸟类上下文和工程机械上下文。",
+          "next": "如果同一类别有多种合适描述，如何组合？",
+          "notes": "PDF page 7, §3.1.4。原文用crane和boxer讨论多义词；默认模板A photo of a {label}.在ImageNet提高1.3个百分点。这里图片是自绘教学插画，二维向量人为设为[1,1]、[.99,.14]、[.14,.99]后归一化；显示的是余弦相似度而非概率。不声称这三个具体提示的真实CLIP输出。",
+          "thumbnail": "./thumbnails/prompts.jpg"
+        },
+        {
+          "id": "ensemble",
+          "componentId": "ensemble-scene",
+          "moduleId": "4.3",
+          "title": "提示集成：先平均表示，再分类",
+          "goal": "多种展签怎样合成一个可复用的分类权重？",
+          "summary": "同类文本向量平均并归一化，得到一个可缓存的权重向量。",
+          "interaction": "点选或取消三张展签，观察合成方向和余弦相似度。",
+          "next": "方法能迁移到哪些任务，哪些任务仍然困难？",
+          "notes": "PDF page 8, §3.1.4。论文在嵌入空间集成，不是在概率空间。ImageNet使用80个模板，在默认单模板基础上再提高3.5个百分点；默认模板相对类名提高1.3个百分点。该数值为文献固定结果。教学文本向量角度为−20°、10°、35°；图像方向15°，选中文本单位向量逐维平均后归一化。任意多加提示并不保证效果单调提升；最后一条不能删除。",
+          "thumbnail": "./thumbnails/ensemble.jpg"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "05 · 实验与迁移",
+      "modules": [],
+      "scenes": [
+        {
+          "id": "transfer",
+          "title": "迁移结果：覆盖面广，优势不均",
+          "goal": "广泛迁移不等于每项任务都领先。",
+          "summary": "广泛迁移不等于每项任务都领先。",
+          "interaction": "读取同一基线下的五个任务差值。",
+          "next": "分数相同的模型，遇到分布变化会怎样？",
+          "notes": "PDF page 8, Figure 5。静态28.9/22.5/1.9/-18.2/-37.1；原论文任务协议。数值直接来自给定论文；不得把示意香蕉视作单张图预测。原论文基线、模型、数据集和方向已在页面注明。 Figure5各数据集使用原论文分数协议；StanfordCars/Food101/ImageNet是准确率，CLEVRCounts计数分类，EuroSAT按原评估定义。CLIP为ViT-L/14@336px。76.2为top1，不能与95%top5混用。",
+          "componentId": "transfer-scene",
+          "thumbnail": "./thumbnails/transfer.jpg"
+        },
+        {
+          "id": "robustness",
+          "title": "分布偏移：同分模型，迁移不同",
+          "goal": "模型在 ImageNet 上同分，在新分布上未必同样稳健。",
+          "summary": "模型在 ImageNet 上同分，在新分布上未必同样稳健。",
+          "interaction": "比较同一条横轴上的两组准确率。",
+          "next": "更广泛的迁移仍需要认识候选集和表示的边界。",
+          "notes": "PDF page 15, Figure 13。静态ImageNet76.2/76.2,V2 64.3/70.1,R37.7/88.9,Sketch25.2/60.2。数值直接来自给定论文；不得把示意香蕉视作单张图预测。原论文基线、模型、数据集和方向已在页面注明。",
+          "componentId": "robustness-scene",
+          "thumbnail": "./thumbnails/robustness.jpg"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-6",
+      "title": "零样本能力的边界",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "6.1",
+          "title": "候选集边界：高概率也可能答非所问",
+          "desc": "softmax只在给定候选内归一化，不自动提供未知类别拒识。",
+          "componentId": "candidate-scene"
+        },
+        {
+          "kind": "module",
+          "id": "6.2",
+          "title": "表示边界：换文案不一定补回信息",
+          "desc": "如果表示丢失数量，仅更换文字无法保证补回信息。",
+          "componentId": "counting-scene"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "candidate-limit",
+          "componentId": "candidate-scene",
+          "moduleId": "6.1",
+          "title": "候选集边界：高概率也可能答非所问",
+          "goal": "候选里没有正确答案，最大概率还可信吗？",
+          "summary": "softmax只在给定候选内归一化，不自动提供未知类别拒识。",
+          "interaction": "加入或移除正确自行车展签，再尝试增减无关帆船展签。",
+          "next": "即使有正确展签，表示本身仍可能缺少关键信息。",
+          "notes": "PDF pages 19–20, §6–7。CLIP零样本分类仍受候选概念集合限制。此页自行车图与类向量为构造3维示例，alpha=6；图片和向量不变，只改变候选集合。显示概率不是实测CLIP输出，也不代表校准可信度。加入正确候选修复本例缺类，不等于所有实际样本都会被正确分类。",
+          "thumbnail": "./thumbnails/candidate-limit.jpg"
+        },
+        {
+          "id": "count-limit",
+          "componentId": "counting-scene",
+          "moduleId": "6.2",
+          "title": "表示边界：换文案不一定补回信息",
+          "goal": "图片数量改变时，表示是否保留了这个区别？",
+          "summary": "如果表示丢失数量，仅更换文字无法保证补回信息。",
+          "interaction": "调整苹果数量；切换假设计数维度，对比相似度是否区分数量。",
+          "next": "对照论文核验：灵活的语言接口，仍需要针对任务评估。",
+          "notes": "PDF pages 19–20, §6–7。论文报告CLIP在计数、部分抽象任务和真正分布外数据上的局限，同时讨论社会偏见与使用验证集指导开发的评估限制。本页不是CLIP真实计数预测：语义平均假设把所有苹果图归为[1,0]；四个计数文本也映为[1,0]，故余弦全为1。假设计数信息开关把图像表示设为normalize([1,count])，文本设为normalize([1,n])。该对照仅说明“信息是否存在于表示”，不是论文提出的改进。",
+          "thumbnail": "./thumbnails/count-limit.jpg"
+        }
+      ]
+    }
+  ],
+  "thumbnails": {
+    "cover": "./thumbnails/cover.jpg"
+  }
+};
