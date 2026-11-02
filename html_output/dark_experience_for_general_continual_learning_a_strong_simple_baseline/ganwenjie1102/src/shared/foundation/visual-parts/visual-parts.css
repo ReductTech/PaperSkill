@@ -1,0 +1,45 @@
+/* Complete visual defaults. The caller owns composition and data semantics. */
+.rk-sample-token, .rk-feature-blocks, .rk-feature-aggregation, .rk-representation-vector { box-sizing: border-box; display: grid; justify-items: center; gap: 10px; min-width: 0; margin: 0; color: var(--rk-ink); font: 400 var(--rk-type-diagram-label)/1.5 var(--rk-font-body); }
+.rk-sample-token figcaption, .rk-feature-blocks figcaption, .rk-feature-aggregation figcaption, .rk-representation-vector figcaption { max-width: 100%; text-align: center; overflow-wrap: anywhere; }
+.rk-sample-token__image { box-sizing: border-box; display: grid; place-items: center; width: 76px; min-height: 76px; padding: 8px; background: var(--rk-surface); border: 1px solid var(--rk-line-strong); border-radius: 8px; }
+.rk-sample-token__image > :not(.rk-sample-token__pixels) { max-width: 100%; }
+.rk-sample-token__pixels { display: grid; gap: 3px; width: 100%; }
+.rk-sample-token__pixels i { display: block; aspect-ratio: 1; border-radius: 1px; background: var(--rk-accent); }
+.rk-feature-blocks, .rk-feature-aggregation { width: 112px; max-width: 100%; }
+.rk-feature-blocks svg, .rk-feature-aggregation svg { display: block; width: 100%; height: auto; fill: var(--rk-data-positive-fill); stroke: var(--rk-data-positive-line); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.rk-feature-blocks path { fill: none; stroke: var(--rk-line-strong); }
+.rk-feature-aggregation .rk-feature-aggregation__baseline { fill: none; stroke: var(--rk-line-strong); stroke-width: 1; }
+.rk-feature-aggregation .rk-feature-aggregation__bar { fill: var(--rk-data-positive-fill); stroke: var(--rk-data-positive-line); stroke-width: 1; }
+.rk-feature-blocks[data-active="true"] rect { stroke-width: 2.5; stroke: var(--rk-accent-strong); }
+.rk-feature-aggregation[data-active="true"] .rk-feature-aggregation__baseline { stroke-width: 2; stroke: var(--rk-data-positive-line); }
+.rk-representation-vector__coordinates { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; }
+.rk-vector-coordinate { display: grid; grid-template-rows: 44px 44px auto; min-width: 34px; text-align: center; font: 12px/1.6 var(--rk-font-mono); }
+.rk-vector-coordinate__positive, .rk-vector-coordinate__negative { display: flex; justify-content: center; }
+.rk-vector-coordinate__positive { align-items: end; border-bottom: 1px solid var(--rk-line-strong); }
+.rk-vector-coordinate__negative { align-items: start; }
+.rk-vector-coordinate i { box-sizing: border-box; width: 13px; background: var(--rk-data-positive-fill); border: 1px solid var(--rk-data-positive-line); border-radius: 2px; }
+.rk-vector-coordinate__negative i { background: var(--rk-data-negative-fill); border-color: var(--rk-data-negative-line); }
+.rk-response-meter { position: relative; display: grid; grid-template-columns: minmax(30px, auto) minmax(48px, 1fr) auto; align-items: center; gap: 4px 10px; min-width: 0; color: var(--rk-ink); font: 13px/1.5 var(--rk-font-body); }
+.rk-response-meter label { overflow-wrap: anywhere; }
+.rk-response-meter meter { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.rk-response-meter__track { position: relative; display: block; height: 8px; border-radius: 3px; background: var(--rk-surface-soft); }
+.rk-response-meter__fill { position: absolute; inset-block: 0; border-radius: 3px; background: var(--rk-data-positive-fill); box-shadow: inset 0 0 0 1px var(--rk-data-positive-line); }
+.rk-response-meter__fill[data-negative="true"] { background: var(--rk-data-negative-fill); box-shadow: inset 0 0 0 1px var(--rk-data-negative-line); }
+.rk-response-meter__zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--rk-line-strong); }
+.rk-response-meter output { font: 12px/1.5 var(--rk-font-mono); font-variant-numeric: tabular-nums; }
+.rk-response-meter small { grid-column: 1 / -1; color: var(--rk-muted); font-size: 12px; }
+.rk-flow-connector { display: inline-grid; justify-items: center; align-content: center; gap: 6px; min-width: 40px; color: var(--rk-muted); font: 400 var(--rk-type-diagram-label)/1.5 var(--rk-font-body); }
+.rk-flow-connector__label { color: var(--rk-ink); }
+.rk-flow-connector svg { display: block; width: 44px; height: 16px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.rk-flow-connector[data-kind="control"] .rk-flow-connector__shaft { stroke-dasharray: 1 4; }
+.rk-flow-connector[data-kind="gradient"] { color: var(--rk-warn); }
+.rk-flow-connector[data-kind="gradient"] .rk-flow-connector__shaft { stroke-dasharray: 5 3; }
+.rk-flow-connector[data-kind="reference"] .rk-flow-connector__shaft { stroke-dasharray: 8 3 1 3; }
+.rk-flow-connector[data-direction="left"] svg { transform: rotate(180deg); }
+.rk-flow-connector[data-direction="down"] { gap: 8px; }
+.rk-flow-connector[data-direction="down"] svg { width: 16px; height: 40px; }
+.rk-semantic-mark { display: inline-flex; align-items: center; gap: 7px; color: var(--rk-accent-strong); font: 600 12px/1.5 var(--rk-font-body); }
+.rk-semantic-mark::before { content: ''; width: 9px; height: 9px; border: 1.5px solid currentColor; }
+.rk-semantic-mark[data-state="frozen"]::before { border-style: dashed; }
+.rk-semantic-mark[data-state="trainable"]::before { background: var(--rk-accent-soft); }
+.rk-semantic-mark[data-state="reference"]::before { border-radius: 50%; }
