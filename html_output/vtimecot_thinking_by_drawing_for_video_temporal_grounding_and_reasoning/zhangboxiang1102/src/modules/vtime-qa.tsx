@@ -1,0 +1,10 @@
+/* Codex initial draft, 2026-10-21. Non-rendered handoff marker; see sibling MODEL_HANDOFF.md. */
+import React,{useState} from 'react';
+import type { WidgetProps } from './registry';
+const vr:any={Qwen2VL:[[59.87,35.95],[62.50,41.45]],'GPT-4o':[[70.39,61.18],[83.55,68.42]]};
+export const VtimeQA: React.FC<WidgetProps> = () => {
+ const [bench,setBench]=useState<'Vript-RR'|'VideoMME'>('Vript-RR');const [model,setModel]=useState<'Qwen2VL'|'GPT-4o'>('Qwen2VL');
+ return <div className="vt-widget"><div className="vt-chiprow"><button className="vt-chip" aria-pressed={bench==='Vript-RR'} onClick={()=>setBench('Vript-RR')}>Vript-RR</button><button className="vt-chip" aria-pressed={bench==='VideoMME'} onClick={()=>setBench('VideoMME')}>VideoMME</button>{bench==='Vript-RR'&&<>{['Qwen2VL','GPT-4o'].map(x=><button key={x} className="vt-chip" aria-pressed={model===x} onClick={()=>setModel(x as 'Qwen2VL'|'GPT-4o')}>{x}</button>)}</>}</div>
+ {bench==='Vript-RR'?<div className="vt-card"><div className="vt-card-head"><span>Vript-RR · {model}</span><span className="vt-pill">Table 3 · 准确率 (%)</span></div><table className="vt-table"><thead><tr><th>配置</th><th>多选</th><th>开放式</th></tr></thead><tbody><tr><td>{model} 基线</td><td>{vr[model][0][0].toFixed(2)}</td><td>{vr[model][0][1].toFixed(2)}</td></tr><tr><td>+ VTimeCoT</td><td>{vr[model][1][0].toFixed(2)}</td><td>{vr[model][1][1].toFixed(2)}</td></tr></tbody></table><p className="vt-small">原文§4：152个问题，视频平均622秒；每题提供场景提示，需要先检索场景再回答。开放式答案由GPT-4评估，不与多选准确率混为同一判分规则。</p></div>:<div className="vt-card"><div className="vt-card-head"><span>VideoMME · GPT-4o（32 帧）</span><span className="vt-pill">Table 4 · 准确率 (%)</span></div><table className="vt-table"><thead><tr><th>配置</th><th>无字幕</th><th>有字幕</th></tr></thead><tbody><tr><td>GPT-4o</td><td>61.6</td><td>65.1</td></tr><tr><td>+ VTimeCoT</td><td>64.2</td><td>73.6</td></tr></tbody></table><p className="vt-small">该基准包含900个视频、2700组问答。Table 4原列顺序为无字幕 / 有字幕；对应提升为2.6 / 8.5个百分点。两行均按32帧重测。</p></div>}
+ <div className="vt-feedback">只在各自基准内部比较对应的设置。VideoMME 的其他模型帧数不同，不直接拿来做相同输入成本下的比较。</div></div>;
+};
