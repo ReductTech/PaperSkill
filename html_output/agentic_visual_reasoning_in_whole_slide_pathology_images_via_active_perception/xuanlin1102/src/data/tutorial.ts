@@ -1,0 +1,310 @@
+import type { TutorialData } from '../types';
+
+export const tutorial: TutorialData = {
+  "meta": {
+    "titleEn": "Agentic Visual Reasoning in Whole-Slide Pathology Images via Active Perception",
+    "titleZh": "以主动感知实现全切片病理图像中的智能体视觉推理",
+    "venue": "arXiv 2608.08648 · 2026",
+    "authors": "Jingyun Chen, Fengchun Liu, Linghan Cai, Songhan Jiang, Shenjin Huang, Hongpeng Wang, Lequan Yu, Yongbing Zhang",
+    "affiliation": "哈尔滨工业大学（深圳）· 香港大学",
+    "domain": "计算病理 · 全切片图像 · 视觉问答",
+    "coreProblem": "诊断证据稀疏又分散在不同尺度，必须先决定看哪里、看多大。",
+    "coreInsight": "用病理医生复核的异常标签训练导航策略，按倍率逐层获取稀疏观察，再对每个候选答案逐条审查证据后裁决。",
+    "keywords": [
+      "主动感知",
+      "顺序焦点观测",
+      "异常分数",
+      "多倍率",
+      "证据裁决"
+    ]
+  },
+  "hero": {
+    "oldMethod": {
+      "title": "缩略图整体判断",
+      "desc": "把整张玻片缩成一张小图，凭整体印象直接定论。",
+      "componentId": "adaptivepath-cover"
+    },
+    "newMethod": {
+      "title": "主动感知导航（AdaptivePath）",
+      "desc": "显微镜视野框按可疑处推进，逐条记下证据再定论。",
+      "componentId": "adaptivepath-cover"
+    }
+  },
+  "chapters": [
+    {
+      "kind": "chapter",
+      "id": "chap-1",
+      "title": "01 · 巨幅全切片与有限的观察预算",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p1-thumb",
+          "title": "缩略图为何给不出证据",
+          "desc": "点缩略图上的三枚图钉，看视野框里能看清什么、又证明了什么。",
+          "componentId": "ch1-thumbnail-limit"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch1-thumbnail-limit",
+          "title": "缩略图看不出可核查的证据",
+          "goal": "在缩略图上点三处试着找证据，体会缩略图为什么给不出可核查的证据。",
+          "summary": "把整张玻片缩成一张缩略图，再点三处试图找到细胞形态或结构：缩略图上只剩大片色块，放大到局部才看得清组织结构，但看得清并不等于看得有依据。",
+          "interaction": "点击缩略图上的红、蓝、橙三枚图钉，右侧视野框移向该处并放大；三处都点过之后，再比较哪一处真正给出了可核查的证据。",
+          "next": "下一步要决定看哪里、看多大",
+          "notes": "论文定位 Table 1（Qwen3-VL 缩略图输入 30.70% / AdaptivePath 60.81%）；本页为类比演示，两个数值的协议是 SlideBench-VQA (BCNB) 总体准确率，越高越好。",
+          "componentId": "ch1-thumbnail-limit",
+          "moduleId": "p1-thumb"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-2",
+      "title": "02 · 顺序焦点观测：位置、范围与预算",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p1-focus",
+          "title": "位置与尺度共同决定看到什么",
+          "desc": "拖动视野框、调整视野框大小，每按一次“下一次观察”就往笔记上添一条形态描述。",
+          "componentId": "ch2-focus-loop"
+        },
+        {
+          "kind": "module",
+          "id": "p1-budget",
+          "title": "Top-K 观察预算",
+          "desc": "把保留数从 1 调到 10，看哪些候选区域被留下、哪些被淡出，并读对应的实测曲线。",
+          "componentId": "ch2-budget-topk"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch2-focus-loop",
+          "title": "顺序焦点观测：看哪里、看多大",
+          "goal": "亲手做出一连串“看哪里、看多大”的决策，并把每次观察变成笔记上的一条形态描述。",
+          "summary": "视野框的位置决定看哪里，视野框的大小决定看多大范围；每按一次“下一次观察”，当前位置就被记成一条笔记，最多记四次。",
+          "interaction": "拖动视野框或拖动横向、纵向位置滑块换位置，再调视野框大小滑块决定看多大范围，按“下一次观察”记下一条笔记；把视野框放得过大时会看到细节被摊薄。",
+          "next": "下一步：每个倍率该保留几个候选区域",
+          "notes": "论文定位 §3.2.1 式(1)(2)、§4.2（T=4，P=512，P_f=112）。类比边界：本页只演示位置与尺度如何决定看到什么，不模拟 FocusNet 的真实推理。",
+          "componentId": "ch2-focus-loop",
+          "moduleId": "p1-focus"
+        },
+        {
+          "id": "ch2-budget-topk",
+          "title": "保留几个候选区域最划算",
+          "goal": "用两条实测曲线判断每个倍率该保留几个候选区域，并理解为什么更大的预算反而变差。",
+          "summary": "同一幅卷面上有十个候选区域，按异常分数只保留最靠前的若干个；保留数从 1 变到 10，两条实测曲线上的对应点随之高亮。",
+          "interaction": "选择保留数 1 / 3 / 5 / 8 / 10，或直接点选左侧想保留的候选区域，观察哪些被保留、哪些被淡出，并读取当前保留数在两条实测曲线上的位置。",
+          "next": "下一步：训练如何让观察变得有收获",
+          "notes": "论文定位 §3.3.1 式(7)(8)、Table 3-C 的 K 消融实测值（BCNB：58.77/59.03/60.81/59.27/58.84；WSI-VQA：51.26/52.71/54.92/52.53/50.26，准确率%，越高越好）。左侧候选框与异常分数为示意，不代表真实模型输出。",
+          "componentId": "ch2-budget-topk",
+          "moduleId": "p1-budget"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-3",
+      "title": "03 · 两阶段训练：有收获的观察与稳定的判断",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p2-reward",
+          "title": "观察奖励来自分类损失下降",
+          "desc": "点一条形态笔记，读出这次观察让分类损失降了多少，以及它换来的是正奖励还是抑制。",
+          "componentId": "ch3-phase1-reward"
+        },
+        {
+          "kind": "module",
+          "id": "p2-consist",
+          "title": "一致性微调把注意力钉住",
+          "desc": "把扰动强度推上去，看三组焦点框在一致性约束打开与关闭时，是收敛在同一处接缝还是各自漂走。",
+          "componentId": "ch3-phase2-consistency"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch3-phase1-reward",
+          "title": "一次观察什么时候算有收获",
+          "goal": "判断一次焦点观察到底值不值得一次奖励。",
+          "summary": "奖励来自分类损失下降：观察到证据时 CE(z_t) 低于 CE(z_{t-1})，即时奖励 g_t 为正，这一步会被强化；观察落在正常组织上时损失不降反升，g_t 为负，这一步会被抑制。",
+          "interaction": "点选四条形态笔记中的一条，右侧三行读数（CE(z_{t-1})、CE(z_t)、g_t）与绿／红／蓝反馈随之更新，视野框同时移到这次观察的焦点处。",
+          "next": "下一步：换个光线、转个角度还认不认得同一处",
+          "notes": "论文定位 §3.2.2 式(3)(4)、§4.2（α=1、PPO 裁剪 0.2、β_stab=β_ent=0.01）。页内 CE 变化与 g_t 数值为演示示意，不是论文报告值。",
+          "componentId": "ch3-phase1-reward",
+          "moduleId": "p2-reward"
+        },
+        {
+          "id": "ch3-phase2-consistency",
+          "title": "扰动下焦点仍然聚在同一处",
+          "goal": "理解同一处可疑形态为什么必须在几何扰动与外观扰动下仍指向同一位置。",
+          "summary": "第二阶段用证据热图的一致性目标把轨迹钉住：约束打开时三组焦点框始终收敛在同一处接缝，去掉这一阶段后框随扰动漂走，同一处证据被指到两个地方。",
+          "interaction": "拖动扰动强度滑块，切换一致性约束的开与关，观察三个版本上的焦点框相对位置与右侧 0–100 的一致性读数如何变化。",
+          "next": "下一步：三个倍率怎么配合",
+          "notes": "论文定位 §3.2.3 式(6)、Figure 4 消融（去掉一致性微调 p<0.01 显著更差）。一致性读数由演示公式给出，标注为示意；不给出图 4 未列出的百分点。",
+          "componentId": "ch3-phase2-consistency",
+          "moduleId": "p2-consist"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-4",
+      "title": "04 · 分层多倍率导航",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p2-multiscale",
+          "title": "多倍率证据的互补",
+          "desc": "分别只看 2.5×、5×、10× 或者三段合看，比较观察到的证据条目与病理医生盲测的平均准确率。",
+          "componentId": "ch4-multiscale"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch4-multiscale",
+          "title": "三个倍率各看到什么",
+          "goal": "理解分层多倍率导航为什么必须把三个尺度合起来看。",
+          "summary": "同一处可疑区域，2.5× 看到腺体排列与间质比例，5× 看到上皮层边界，10× 看到细胞核细节与组织结构纹理；单一倍率拿到的证据都不完整，三段互补后的完整序列在病理医生盲测里平均准确率达到 82.9%。",
+          "interaction": "点选参与本次观察的倍率（可多选，至少保留一个），观察到的证据条目随之增减，条形图中与之对应的条件被加粗标出。",
+          "next": "下一步：把观察变成可审查的证据",
+          "notes": "论文定位 §4.2（M={2.5×,5×,10×}，K=5，T=4）、Figure 3 右panel 的病理医生盲测平均准确率（仅 2.5× 69.7%、仅 5× 62.9%、仅 10× 62.3%、完整多倍率 82.9%，SlideBench-VQA (BCNB) 子集，同 ROI 预算）。证据条目为演示。",
+          "componentId": "ch4-multiscale",
+          "moduleId": "p2-multiscale"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-5",
+      "title": "05 · 形态解读与证据裁决",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p3-audit",
+          "title": "观察如何变成可审查的证据",
+          "desc": "把每条观察改写成一句形态描述，再逐候选诊断列出支持与冲突，没看到的特征一律记为中性，最后用证据充分性判断这个候选的证据够不够。",
+          "componentId": "ch5-option-audit"
+        },
+        {
+          "kind": "module",
+          "id": "p3-arbiter",
+          "title": "跨倍率的证据级裁决",
+          "desc": "两个倍率各给出一个答案时，不按倍率投票，而是把各倍率的选项级证据放在一起比较，选出一条最直接的证据来定论，并把独立答案留作追溯。",
+          "componentId": "ch5-arbiter"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch5-option-audit",
+          "moduleId": "p3-audit",
+          "title": "观察如何变成可审查的证据",
+          "goal": "把一条观察归到某个候选诊断，或者明确记为中性。",
+          "summary": "同一处区域上的四条观察，可以支持一个候选诊断、与另一个候选相抵，也可能什么都不说明。把它们逐条归位后，每个候选都留下可核对的支持数、冲突数与证据充分性。",
+          "interaction": "先点一条形态笔记，再点右侧的候选诊断卡或中性区；笔记会落到该处，计数与证据充分性条同时更新。",
+          "next": "每条观察都归好之后，下一页看当两个倍率给出不同答案时该如何裁决。",
+          "notes": "§3.3.2 式(9)(10)(12)：只依据直接观察到的形态，未观察到的特征按中性处理；本页笔记、观察与候选诊断卡均为演示（论文的实际选项来自各数据集的问题，不是这三张卡）。",
+          "componentId": "ch5-option-audit"
+        },
+        {
+          "id": "ch5-arbiter",
+          "moduleId": "p3-arbiter",
+          "title": "跨倍率的证据级裁决",
+          "goal": "比较“按倍率投票”和“按证据裁决”会得到什么结论。",
+          "summary": "2.5× 判良性增生、10× 判浸润性癌，两个答案彼此相反。投票只能得到 1 比 1，无法定论；按证据裁决则逐选项比较支持与冲突，由更直接的冲突证据定出最终诊断，同时保留两个倍率各自的独立答案。",
+          "interaction": "在右侧两个按钮中选择合并方式，观察最终结论章、理由句与追溯区里保留下来的独立答案。",
+          "next": "方法链讲完，下一页进入实测成绩：零样本问答到底赢在哪里。",
+          "notes": "§3.3.2 式(11)(13)：最终答案是证据级裁决而不是对各倍率答案投票；各倍率独立答案保留用于追溯。页面上的“按倍率投票”一栏是对照演示，论文并未报告投票基线的实验结果。",
+          "componentId": "ch5-arbiter"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-6",
+      "title": "06 · 实测证据",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p3-results",
+          "title": "零样本成绩对比",
+          "desc": "按数据集切换条形图，读取论文报告的真实准确率，分清同一数据集内的比较与不同数据集之间的协议差别。",
+          "componentId": "ch6-results-chart"
+        },
+        {
+          "kind": "module",
+          "id": "p3-reader",
+          "title": "病理医生的盲测与轨迹对齐",
+          "desc": "看病理医生在盲测里只凭观察序列作答的平均准确率，并对照图 5 中自适应轨迹与医生检查区域是否重叠。",
+          "componentId": "ch6-reader-figure"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch6-results-chart",
+          "moduleId": "p3-results",
+          "title": "零样本成绩对比",
+          "goal": "读出每个数据集里各方法的真实准确率与差距大小。",
+          "summary": "在 SlideBench-VQA（BCNB）、WSI-VQA、PathVQA（是/否子集）与癌型分类六队列总体上，自适应方法都排第一；同组最强基线分别落后 1.39、2.71、1.79 与 14.85 个百分点。",
+          "interaction": "切换数据集看条形按真实数值生长，点基线组图例隐藏或显示同类方法，点任意条形读出它的准确率与归属。",
+          "next": "下一页换一个角度：把观察序列直接交给病理医生，看他们能不能据此做出诊断。",
+          "notes": "Table 1/Table 2 实测准确率（%），越高越好；不同数据集协议不同不可跨轴比较；不生成论文未报告的外推值。",
+          "componentId": "ch6-results-chart"
+        },
+        {
+          "id": "ch6-reader-figure",
+          "moduleId": "p3-reader",
+          "title": "病理医生的盲测与轨迹对齐",
+          "goal": "判断观察序列本身是否足以支撑病理医生的诊断。",
+          "summary": "在 BCNB 子集的盲测里，病理医生只看自适应观察序列时平均准确率 82.9%，最接近他们自己检查轨迹的 89.7%；单条随机采样只有 34.3%，完整多倍率也高于任何单一倍率。",
+          "interaction": "切换“按序列来源”和“按倍率条件”两组条形，读出每种条件下的平均准确率与结论句。",
+          "next": "既然实测有效，最后要问的还是边界：只看形态到底能走到哪里。",
+          "notes": "§4.6.1、Figure 3/Figure 5；盲测、同一 ROI 预算、BCNB 子集；读者研究不含置信区间，不能当作通用诊断性能；图 5 为定性示例，定量对齐率在补充材料。",
+          "componentId": "ch6-reader-figure"
+        }
+      ]
+    },
+    {
+      "kind": "chapter",
+      "id": "chap-7",
+      "title": "07 · 可见证据的边界",
+      "modules": [
+        {
+          "kind": "module",
+          "id": "p3-boundary",
+          "title": "只有 H&E 形态能走到哪里",
+          "desc": "把三类临床问题分别放到“可直接从形态判断”或“超出可观察证据”，说清哪些结论必须另有免疫组化或分子检测才能确认。",
+          "componentId": "ch7-evidence-boundary"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "ch7-evidence-boundary",
+          "moduleId": "p3-boundary",
+          "title": "只有 H&E 形态能走到哪里",
+          "goal": "分清哪些结论来自可见形态，哪些必须依赖形态之外的检测。",
+          "summary": "组织学分级看的是细胞形态与排列，属于切片上可以直接观察到的证据；HER2 表达状态与分子分型需要免疫组化或分子检测，超出只看 H&E 能给出的范围。说明牌上写的“只能看 H&E 形态”，正对应这条终点。",
+          "interaction": "先点一张问题卡，再点右侧两个落位区之一，卡片落位后给出判断依据与报告结论章。",
+          "next": "到这里，从选择看哪里到看清边界，整条证据链就走完了一遍。",
+          "notes": "§4.3（仅 H&E，不提供 IHC 或分子检测结果）、§5 局限；这三类问题的落位依据是论文的输入条件，不是本页新结论。",
+          "componentId": "ch7-evidence-boundary"
+        }
+      ]
+    }
+  ],
+  "thumbnails": {
+    "cover": "./thumbnails/cover.jpg",
+    "ch1-thumbnail-limit": "./thumbnails/ch1-thumbnail-limit.jpg",
+    "ch2-focus-loop": "./thumbnails/ch2-focus-loop.jpg",
+    "ch2-budget-topk": "./thumbnails/ch2-budget-topk.jpg",
+    "ch3-phase1-reward": "./thumbnails/ch3-phase1-reward.jpg",
+    "ch3-phase2-consistency": "./thumbnails/ch3-phase2-consistency.jpg",
+    "ch4-multiscale": "./thumbnails/ch4-multiscale.jpg",
+    "ch5-option-audit": "./thumbnails/ch5-option-audit.jpg",
+    "ch5-arbiter": "./thumbnails/ch5-arbiter.jpg",
+    "ch6-results-chart": "./thumbnails/ch6-results-chart.jpg",
+    "ch6-reader-figure": "./thumbnails/ch6-reader-figure.jpg",
+    "ch7-evidence-boundary": "./thumbnails/ch7-evidence-boundary.jpg"
+  }
+};
