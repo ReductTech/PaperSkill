@@ -1,0 +1,125 @@
+{
+  "title": "Earth-Agent：以智能体拓展地球观测的完整任务版图",
+  "pages": [
+    {
+      "id": "earth-01",
+      "chapterId": "chap-1",
+      "title": "RGB之外：数据决定能回答什么",
+      "goal": "同一河岸，不同数据能支持哪些回答？",
+      "summary": "照片仅外观不能算NDVI；光谱含NIR/Red可算指数；产品包含逐期数值可分析趋势。",
+      "interaction": "切换河岸照片册、光谱采样和温度记录；切换改变可用数据、支持的计算及河岸呈现。",
+      "next": "有了数据，还需要能操作这些数据的工具。",
+      "snippet": "来源：§1、§4.1；Earth-Bench 248题与14类任务。 教学边界：照片仅外观不能算NDVI；光谱含NIR/Red可算指数；产品包含逐期数值可分析趋势。 生活主题为社区河岸巡查，SVG为原创教学，不是论文定性输出。"
+    },
+    {
+      "id": "earth-02",
+      "chapterId": "chap-2",
+      "title": "五类工具对应不同科学操作",
+      "goal": "按任务选择可执行操作，再核对输入和返回值。",
+      "summary": "Index用于指数；Inversion用于温度反演；Perception识别；Analysis趋势；Statistics均值。植被任务+相机失败、取样仪成功。",
+      "interaction": "点巡查工具箱里的实体工具，相机、取样仪、温度计、记录本、计算器分别体现感知/指数/反演/分析/统计；再选择任务验证输入输出匹配。",
+      "next": "工具集合准备好后，控制器怎样连续使用它们？",
+      "snippet": "来源：§3.2、Appendix E，104工具与5类工具包。 教学边界：Index用于指数；Inversion用于温度反演；Perception识别；Analysis趋势；Statistics均值。植被任务+相机失败、取样仪成功。 生活主题为社区河岸巡查，SVG为原创教学，不是论文定性输出。"
+    },
+    {
+      "id": "earth-03",
+      "chapterId": "chap-3",
+      "title": "观测改变下一次可执行的调用",
+      "goal": "亲手调用工具，观察历史怎样约束后续动作。",
+      "summary": "目录→得到文件名；指数→[.5,.25,.75]；均值→.5。未计算就求均值失败。合成状态机解释完整历史，不替代真正LLM。",
+      "interaction": "巡查记录桌：点目录查找、计算指数、区域均值，允许错次序。历史记录驱动可用文件、数组、结果；笔与文件出现产生有因果的动画。",
+      "next": "下一页检查工具输入与科学参数的绑定。",
+      "snippet": "来源：§3.1、Figure3，ReAct式POMDP，完整历史包含所有动作与观测。 教学边界：目录→得到文件名；指数→[.5,.25,.75]；均值→.5。未计算就求均值失败。合成状态机解释完整历史，不替代真正LLM。 生活主题为社区河岸巡查，SVG为原创教学，不是论文定性输出。"
+    },
+    {
+      "id": "earth-04",
+      "chapterId": "chap-3",
+      "title": "工具名正确，参数仍可能出错",
+      "goal": "工具能返回数值时，还要检查什么？",
+      "summary": "虚构文件拒绝执行；正确文件+交换波段→-.5；正确文件与波段→.5。未校验不能把调用当成功。",
+      "interaction": "在测量单选存在或虚构的文件、正确或交换的Red/NIR配对；提交测量，印章及返回值由同一状态产生。",
+      "next": "接下来进入可直接计算的定量工具实验。",
+      "snippet": "来源：Appendix D，文件幻觉和无效参数；NDVI计算为教学合成。 教学边界：虚构文件拒绝执行；正确文件+交换波段→-.5；正确文件与波段→.5。未校验不能把调用当成功。 生活主题为社区河岸巡查，SVG为原创教学，不是论文定性输出。"
+    },
+    {
+      "id": "scene-05",
+      "chapterId": "chap-4",
+      "title": "NDVI：波段次序改变指数符号",
+      "goal": "调节两种反射率，检查指数为什么翻转符号。",
+      "summary": "NDVI=(NIR-Red)/(NIR+Red)；.2,.6→.5；.6,.2→-.5；合成反射率不等于真实地理诊断。每一符号SymbolHint。",
+      "interaction": "调巡查取样仪Red/NIR两个读数，液柱、样地指数与公式同步计算；允许对照正负指数。",
+      "next": "将当前操作与下一页的执行约束连接起来。",
+      "snippet": "Appendix E Tables 9–13。NDVI=(NIR-Red)/(NIR+Red)；.2,.6→.5；.6,.2→-.5；合成反射率不等于真实地理诊断。每一符号SymbolHint。 全部小样本数值为合成教学，不是论文基准结果。"
+    },
+    {
+      "id": "scene-06",
+      "chapterId": "chap-4",
+      "title": "云掩膜会改变时间趋势的输入",
+      "goal": "排除污染样本，比较同一序列的拟合趋势。",
+      "summary": "不屏蔽时斜率.8℃/期；屏蔽第三期2℃/期。OLS只是教学中的明确计算，不声称是论文所有趋势工具实现。",
+      "interaction": "点记录本上的第三期云污染样本，选择保留/剔除；用保留时刻对合成温度[20,22,12,26]拟合OLS斜率，云片移走、点与拟合线同步变化。",
+      "next": "将当前操作与下一页的执行约束连接起来。",
+      "snippet": "Appendix E Tables 9–13。不屏蔽时斜率.8℃/期；屏蔽第三期2℃/期。OLS只是教学中的明确计算，不声称是论文所有趋势工具实现。 全部小样本数值为合成教学，不是论文基准结果。"
+    },
+    {
+      "id": "scene-07",
+      "chapterId": "chap-5",
+      "title": "步骤指导改变提示，不代替执行",
+      "goal": "同一目标，不同提示；执行约束始终存在。",
+      "summary": "IF是step-explicit，AP是step-implicit；IF指引不自动保证答案更好。区别查询信息与实际执行。",
+      "interaction": "同一巡查任务切AP或IF便签；AP只有目标、IF展示步骤；实际选择目录、指数、均值，错误次序仍不能成功。",
+      "next": "将当前操作与下一页的执行约束连接起来。",
+      "snippet": "§4.2; Appendix A.2。IF是step-explicit，AP是step-implicit；IF指引不自动保证答案更好。区别查询信息与实际执行。 全部小样本数值为合成教学，不是论文基准结果。"
+    },
+    {
+      "id": "scene-08",
+      "chapterId": "chap-6",
+      "title": "工具集合相同，轨迹得分也会不同",
+      "goal": "重排调用，区分集合覆盖、次序与严格前缀。",
+      "summary": "AXBC:TAO1,TIO1,TEM1/3,Eff4/3；BAC:TAO1,TIO1/3,TEM0。TIO按专家前缀作预测子序列，不是任意LCS；参数错配影响参数前缀。",
+      "interaction": "用记录卡左右移动或拖动重排A目录/B指数/C统计；可增减额外X；即时计算TAO/TIO/TEM、参数前缀和Eff。",
+      "next": "将当前操作与下一页的执行约束连接起来。",
+      "snippet": "§3.3; Appendix B.2 Eqs 1–6。AXBC:TAO1,TIO1,TEM1/3,Eff4/3；BAC:TAO1,TIO1/3,TEM0。TIO按专家前缀作预测子序列，不是任意LCS；参数错配影响参数前缀。 全部小样本数值为合成教学，不是论文基准结果。"
+    },
+    {
+      "id": "scene-09",
+      "chapterId": "chap-7",
+      "title": "步骤指导并不总提高最终准确率",
+      "goal": "核对数据集、协议和指标，再解释比较结果。",
+      "summary": "GPT5 Acc65.99/62.35 TAO68.74/71.41；DeepSeek51.42/52.23 TAO78.31/78.66；Kimik2 Acc50.61/56.68 TAO71.03/78.86。Table1完整Earth-Bench，百分比高优。",
+      "interaction": "APIF配对点图，3模型；选Accuracy或TAO时固定0–100轴；用巡查评分册关联轨迹与答案。",
+      "next": "继续比较不同评测协议下的证据。",
+      "snippet": "Table 1。GPT5 Acc65.99/62.35 TAO68.74/71.41；DeepSeek51.42/52.23 TAO78.31/78.66；Kimik2 Acc50.61/56.68 TAO71.03/78.86。Table1完整Earth-Bench，百分比高优。"
+    },
+    {
+      "id": "scene-10",
+      "chapterId": "chap-7",
+      "title": "专用工具的收益：Earth-Bench-Lite",
+      "goal": "核对数据集、协议和指标，再解释比较结果。",
+      "summary": "Table2 Avg: GPT-Agent40.42,Manus26.14,Earth-Agent GPT5 55.83,Earth-Agent DeepSeek47.84。仅Lite，同一协议；不是单工具因果消融。",
+      "interaction": "静态0–100准确率横向柱图；工具箱小插图留在右上方，结论与比较条件醒目。",
+      "next": "继续比较不同评测协议下的证据。",
+      "snippet": "Table 2。Table2 Avg: GPT-Agent40.42,Manus26.14,Earth-Agent GPT5 55.83,Earth-Agent DeepSeek47.84。仅Lite，同一协议；不是单工具因果消融。"
+    },
+    {
+      "id": "scene-11",
+      "chapterId": "chap-7",
+      "title": "RGB分类与专家模型的能力边界",
+      "goal": "核对数据集、协议和指标，再解释比较结果。",
+      "summary": "Table3 Earth-Agent93.42/96.12，VHM91.70/95.80。不同于Earth-Bench总体；正确调用也可能受感知专家模型泛化限制，不能将Grounding误称分割。",
+      "interaction": "AID/WHU-RS19切换分类对比柱，0–100轴；现场相机作为主题物件。",
+      "next": "把轨迹评测用于最后一次失败诊断。",
+      "snippet": "Table 3。Table3 Earth-Agent93.42/96.12，VHM91.70/95.80。不同于Earth-Bench总体；正确调用也可能受感知专家模型泛化限制，不能将Grounding误称分割。"
+    },
+    {
+      "id": "scene-12",
+      "chapterId": "chap-8",
+      "title": "目标达成后，继续调用只会增加轨迹",
+      "goal": "让巡查报告在正确时刻结束。",
+      "summary": "3调用Eff1；6调用Eff2，均值不变。正确性须与效率结合，文件错先修复；不声称玩具工具能保证真实系统的答案。",
+      "interaction": "巡查收工：3步均值.5已完成；再测添加记录纸且Eff升高，交报告则盖章停止；错误文件可修复。",
+      "next": "回到工具、参数和终止条件，复核一次完整调用。",
+      "snippet": "Appendix C; D。3调用Eff1；6调用Eff2，均值不变。正确性须与效率结合，文件错先修复；不声称玩具工具能保证真实系统的答案。"
+    }
+  ]
+}
