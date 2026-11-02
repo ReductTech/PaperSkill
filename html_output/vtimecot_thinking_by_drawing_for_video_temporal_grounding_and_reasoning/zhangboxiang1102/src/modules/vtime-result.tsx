@@ -1,0 +1,8 @@
+/* Codex initial draft, 2026-10-21. Non-rendered handoff marker; see sibling MODEL_HANDOFF.md. */
+import React,{useState} from 'react';
+import type { WidgetProps } from './registry';
+export const VtimeResult: React.FC<WidgetProps> = () => {
+ const [started,setStarted]=useState(false);
+ const row=(label:string,base:number,full:number)=><div className="vt-card" key={label}><div className="vt-card-head"><span>{label}</span><span className="vt-pill">Table 5</span></div><div className="vt-race-row"><span>GPT-4o 基线</span><span className="vt-bar"><span className="vt-bar-fill old" style={{display:'block',width:`${started?base:0}%`}}/></span><strong className="vt-num">{started?base.toFixed(2):'—'}</strong></div><div className="vt-race-row"><span>完整 VTimeCoT</span><span className="vt-bar"><span className="vt-bar-fill paper" style={{display:'block',width:`${started?full:0}%`}}/></span><strong className="vt-num">{started?full.toFixed(2):'—'}</strong></div></div>;
+ return <div className="vt-widget"><div className="vt-card-head"><span>先预测，再核对论文结果</span><button className="vt-button" onClick={()=>setStarted(true)}>{started?'已显示原表结果':'查看结果'}</button></div>{started?<div className="vt-grid2">{row('QVHighlights · mIoU',37.66,54.49)}{row('Vript-RR · M-Acc',70.39,83.55)}</div>:<div className="vt-stage"><p>点击后显示 Table 5 的两组数值。动画只改变呈现顺序，不是新的模型运行。</p></div>}<div className="vt-feedback">两组数值分别属于不同评测任务，不能把柱长当作同一指标。论文未报告通用延迟或成本最优曲线；是否值得多轮调用，应在目标系统中实测。</div></div>;
+};

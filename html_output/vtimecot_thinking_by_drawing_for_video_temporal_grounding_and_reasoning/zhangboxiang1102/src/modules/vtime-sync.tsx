@@ -1,0 +1,10 @@
+/* Codex initial draft, 2026-10-21. Non-rendered handoff marker; see sibling MODEL_HANDOFF.md. */
+import React,{useRef,useState} from 'react';
+import type { WidgetProps } from './registry';
+import { VtimeFrame,eventAt } from './vtime-scene';
+export const VtimeSync: React.FC<WidgetProps> = () => {
+ const [pos,setPos]=useState(50); const drag=useRef(false); const clamp=(v:number)=>Math.max(4,Math.min(96,v));
+ const point=(e:React.PointerEvent<HTMLDivElement>)=>{const r=e.currentTarget.getBoundingClientRect();setPos(clamp((e.clientX-r.left)/r.width*100));};
+ const seconds=pos*.6; const inTarget=seconds>=20&&seconds<=38;
+ return <div className="vt-widget"><div className="vt-card"><div className="vt-card-head"><span>把候选片段放回整段视频检查</span><span className="vt-pill">60 秒教学片</span></div><VtimeFrame seconds={seconds} annotated highlighted/><div className="vt-timeline" role="slider" aria-label="拖动选择帧在视频中的相对位置" aria-valuemin={4} aria-valuemax={96} aria-valuenow={Math.round(pos)} aria-valuetext={`${seconds.toFixed(1)}秒，${eventAt(seconds)}`} tabIndex={0} onPointerDown={e=>{drag.current=true;e.currentTarget.setPointerCapture(e.pointerId);point(e);}} onPointerMove={e=>{if(drag.current)point(e);}} onPointerUp={()=>{drag.current=false;}} onPointerCancel={()=>{drag.current=false;}} onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();setPos(v=>clamp(v+(e.key==='ArrowRight'?4:-4)));}}}><div className="vt-timeline-fill" style={{width:`${pos}%`}}/><span className="vt-target" style={{left:'33.333%',width:'30%'}}/><span className="vt-cursor" style={{left:`${pos}%`}}/></div><div className="vt-track-labels"><span>0s</span><span>{seconds.toFixed(1)}s · {Math.round(pos)}%</span><span>60s</span></div></div><div className={'vt-feedback '+(inTarget?'good':'warn')} aria-live="polite"><strong>当前看到：{eventAt(seconds)}。</strong>{inTarget?'游标位于目标动作 20—38 秒内，画面和高亮共同支持这一候选。':'游标已离开 20—38 秒目标区间。对照画面，可以区分动作前的准备和动作后的结果。'} 拖动时间轴或使用左右方向键；区间与事件均为教学设计。</div></div>;
+};

@@ -1,0 +1,7 @@
+/* Codex initial draft, 2026-10-21. Non-rendered handoff marker; see sibling MODEL_HANDOFF.md. */
+import React,{useState} from 'react';
+import type { WidgetProps } from './registry';
+const nodes=[['时间进度条','输入：原始帧和真实时间。操作：OpenCV在帧下拼接进度条。输出：画面+秒数，帮助模型判断“这是什么时候”。'],['片段高亮','输入：视频和文本查询。操作：VideoCLIP-XL编码视频片段/查询，按余弦相似度取top-k，合并相邻片段。输出：候选时间区间，再画到进度条上。'],['动态视频记忆','输入：工具改绘的视频帧和历史推理。操作：MLLM再次观察与推理。输出：继续调用工具，或给出最终答案。它不是新增的一种检索工具。']];
+export const VtimeFlow: React.FC<WidgetProps> = () => {
+ const [active,setActive]=useState(0);return <div className="vt-widget"><div className="vt-process vt-flow">{nodes.map((n,i)=><button key={n[0]} className={'vt-process-step vt-hotspot '+(i===active?'active':'')} aria-pressed={active===i} onClick={()=>setActive(i)}><strong>{n[0]}</strong></button>)}</div><div className="vt-card"><div className="vt-card-head"><span>谁负责什么？</span><span className="vt-pill">Figure 2 / §3</span></div><p className="vt-reasoning">{nodes[active][1]}</p><div className="vt-budget-grid"><div className={active===1?'selected':''}><span className="vt-kicker">外部检索分支</span><strong>1 FPS → 每8帧一clip → top-8</strong><span>VideoCLIP-XL处理片段与查询的相似度。</span></div><div className={active===2?'selected':''}><span className="vt-kicker">MLLM观察分支</span><strong>默认32帧 · 最多3步推理</strong><span>Qwen2VL-7B / GPT-4o负责理解、调用与回答。</span></div></div><div className="vt-feedback">{active===0?'时间条由工具生成。本文无需为VTimeCoT再训练骨干，但仍使用预训练模型。':active===1?'外部编码器可处理与MLLM不同的采样分辨率；“32帧”不代表整个系统总共只处理32帧。':'视频记忆是当前可供模型观察的帧上下文，历史同时保留文本输出；不是把模型重新训练一遍。'} 条件均据§4实现设置，不作为普遍最优参数。</div></div></div>;
+};
