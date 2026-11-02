@@ -1,0 +1,230 @@
+/* Paper-specific overrides for the DER tutorial.
+   Semantic roles from tokens.css stay untouched: blue = guidance/current,
+   green = paper method/success, red = old method/failure, orange = user input,
+   purple = auxiliary. Only the apothecary-cabinet scene palette is added here. */
+
+:root {
+  --paper-scene-bg: #f7f3ec;
+  --drawer-wood: #b57c52;
+  --drawer-wood-dark: #8a5636;
+  --drawer-handle: #e0b34e;
+  --label-paper: #fbf6e9;
+  --seal-wax: #c43f52;
+  --herb-green: #5c7f4e;
+  --der-line: #e3d8c6;
+  --der-ink-soft: #6b5a49;
+}
+
+.der-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #fdfbf6 0%, var(--paper-scene-bg) 62%, #efe7d8 100%);
+  color: #21324a;
+}
+.der-page::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #d9c3a4, #b98a5f 45%, #d9c3a4);
+  opacity: .55;
+}
+.der-grid { display: grid; width: 100%; height: 100%; gap: 28px; padding: 26px 30px; box-sizing: border-box; }
+.der-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: 16px; }
+.der-row { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.der-spread { justify-content: space-between; }
+
+.der-h { font-size: 34px; font-weight: 750; line-height: 1.3; margin: 0; letter-spacing: .2px; }
+.der-p { font-size: 28px; font-weight: 500; line-height: 1.5; margin: 0; }
+.der-num { font-size: 44px; font-weight: 800; line-height: 1.1; margin: 0; font-variant-numeric: tabular-nums; }
+.der-muted { color: #68778f; }
+.der-soft { color: var(--der-ink-soft); }
+.der-em { color: #b3572b; font-weight: 700; }
+.der-good { color: #228d5c; font-weight: 700; }
+.der-bad { color: #c43f52; font-weight: 700; }
+
+.der-panel {
+  position: relative;
+  background: #fffdf9;
+  border: 1px solid var(--der-line);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 24px rgba(120, 92, 60, .07);
+  min-width: 0;
+  min-height: 0;
+}
+
+.der-cabinet {
+  position: relative;
+  background: linear-gradient(180deg, #a06a45, #7d4f31);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: inset 0 2px 0 #c99a70, inset 0 -6px 14px rgba(0, 0, 0, .22), 0 14px 26px rgba(90, 60, 35, .18);
+}
+.der-drawer {
+  position: relative;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #c48c60, #a9704a 62%, #965f3d);
+  border: 1px solid rgba(72, 44, 26, .5);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 210, .55), inset 0 -5px 10px rgba(74, 44, 24, .28);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform .28s ease, filter .28s ease;
+}
+.der-drawer.is-sealed { filter: saturate(.55) brightness(.94); }
+.der-drawer.is-open { transform: translateY(6px); }
+.der-handle {
+  width: 46%;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f3d183, #c99a35);
+  box-shadow: 0 2px 0 rgba(90, 60, 20, .45), inset 0 -2px 3px rgba(0, 0, 0, .25);
+}
+.der-drawer-label {
+  font-size: 22px;
+  font-weight: 700;
+  color: #3c2a1c;
+  background: var(--label-paper);
+  border-radius: 5px;
+  padding: 1px 10px;
+  box-shadow: 0 1px 0 rgba(90, 60, 30, .25);
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+.der-seal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  padding: 4px 14px;
+  border: 2px solid var(--seal-wax);
+  color: var(--seal-wax);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  border-radius: 4px;
+  background: rgba(196, 63, 82, .06);
+  white-space: nowrap;
+}
+.der-tag {
+  background: var(--label-paper);
+  border: 1px solid #ddd0b6;
+  border-radius: 4px;
+  color: #4a3a29;
+  font-size: 20px;
+  font-weight: 650;
+  padding: 2px 8px;
+  box-shadow: 0 2px 4px rgba(90, 60, 30, .12);
+  white-space: nowrap;
+}
+
+.der-slot {
+  width: 46px;
+  height: 46px;
+  border-radius: 7px;
+  border: 1px solid #b9906a;
+  background: linear-gradient(180deg, #f2e2c8, #e2cba6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+  padding: 0;
+}
+.der-slot:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(120, 80, 40, .2); }
+.der-slot .der-herb { width: 22px; height: 22px; border-radius: 50% 40% 55% 45%; background: var(--herb-green); opacity: .9; }
+.der-slot.is-off { background: #cfc4b0; border-style: dashed; border-color: #a89b85; }
+.der-slot.is-off .der-herb { opacity: .12; transform: scale(.6); }
+
+.der-chip {
+  border: 1px solid #d8cdb9;
+  background: #fffdf9;
+  color: #4a3a29;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 26px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all .18s ease;
+  font-family: inherit;
+}
+.der-chip:hover { border-color: #b98a5f; }
+.der-chip.is-on { background: #27446e; border-color: #27446e; color: #fff; box-shadow: 0 6px 14px rgba(39, 68, 110, .25); }
+.der-chip.is-accent.is-on { background: #f07e47; border-color: #f07e47; box-shadow: 0 6px 14px rgba(240, 126, 71, .28); }
+
+.der-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 34px;
+  background: transparent;
+  cursor: pointer;
+}
+.der-slider::-webkit-slider-runnable-track {
+  height: 10px; border-radius: 999px;
+  background: linear-gradient(90deg, #e8ddc9, #cbb28d);
+}
+.der-slider::-moz-range-track { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #e8ddc9, #cbb28d); }
+.der-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 30px; height: 30px; border-radius: 50%;
+  margin-top: -10px;
+  background: radial-gradient(circle at 35% 30%, #ffd9a3, #f07e47 62%, #c85f2c);
+  border: 2px solid #fff;
+  box-shadow: 0 3px 8px rgba(160, 80, 30, .4);
+}
+.der-slider::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff;
+  background: radial-gradient(circle at 35% 30%, #ffd9a3, #f07e47 62%, #c85f2c);
+}
+.der-slider:focus-visible::-webkit-slider-thumb { outline: 3px solid #2f6bff; outline-offset: 3px; }
+
+.der-meter { height: 16px; border-radius: 999px; background: #e9e1d2; overflow: hidden; }
+.der-meter > span { display: block; height: 100%; border-radius: 999px; transition: width .3s ease; }
+.der-meter.is-good > span { background: linear-gradient(90deg, #4fae82, #228d5c); }
+.der-meter.is-bad > span { background: linear-gradient(90deg, #e07587, #c43f52); }
+.der-meter.is-blue > span { background: linear-gradient(90deg, #5a7fae, #27446e); }
+.der-meter.is-orange > span { background: linear-gradient(90deg, #f7b083, #f07e47); }
+
+.der-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 24px; color: #5b6b80; }
+.der-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; vertical-align: -1px; }
+
+.der-eq {
+  font-family: "Cambria Math", "Segoe UI Symbol", Georgia, serif;
+  font-size: 34px;
+  line-height: 1.35;
+  color: #1d2c44;
+  letter-spacing: .4px;
+}
+.der-eq-block {
+  background: #fff;
+  border-left: 4px solid #27446e;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 28px;
+  line-height: 1.45;
+}
+.der-formula-sym { color: #27446e; font-weight: 700; }
+
+.der-axis text { font-size: 22px; fill: #68778f; }
+.der-tick { stroke: #d7deea; stroke-width: 1; }
+.der-note-sm { font-size: 24px; line-height: 1.45; color: #68778f; margin: 0; }
+
+.der-step { display: flex; align-items: center; gap: 10px; font-size: 24px; color: #5b6b80; }
+.der-dots { display: flex; gap: 8px; }
+.der-dots i { width: 14px; height: 14px; border-radius: 50%; background: #ddd2bf; display: block; }
+.der-dots i.on { background: #27446e; }
+
+/* Keep the page-rail label opaque so scrolled thumbnails cannot show through it. */
+.ppt-directory-label {
+  position: relative;
+  z-index: 2;
+  background: #f8f9fc;
+}
