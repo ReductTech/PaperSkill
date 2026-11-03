@@ -1,0 +1,120 @@
+{
+  "baseUrl": "http://127.0.0.1:4198/",
+  "server": {
+    "command": "node",
+    "args": [
+      "node_modules/vite/bin/vite.js",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "4198",
+      "--strictPort"
+    ],
+    "cwd": ".",
+    "readyPath": "/p1-review.html?scene=reservoir",
+    "startupTimeoutMs": 30000
+  },
+  "viewports": [
+    { "id": "desktop-window", "width": 1440, "height": 900 },
+    { "id": "fullscreen-layout", "width": 1920, "height": 1080 }
+  ],
+  "pages": [
+    {
+      "id": "reservoir-prototype",
+      "path": "./p1-review.html?scene=reservoir",
+      "states": [
+        {
+          "id": "replacement-mid-motion",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-reservoir select.motion-stage-value", "value": "2" },
+            { "type": "click", "selector": ".p1-reservoir [data-play]" },
+            { "type": "wait", "milliseconds": 1050 }
+          ]
+        },
+        {
+          "id": "replacement-settled",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-reservoir select.motion-stage-value", "value": "2" },
+            { "type": "click", "selector": ".p1-reservoir [data-play]" },
+            { "type": "wait", "milliseconds": 1850 }
+          ]
+        },
+        {
+          "id": "reject-and-count",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-reservoir select.motion-stage-value", "value": "3" },
+            { "type": "click", "selector": ".p1-reservoir [data-play]" },
+            { "type": "wait", "milliseconds": 1900 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "augmentation-prototype",
+      "path": "./p1-review.html?scene=augmentation",
+      "states": [
+        {
+          "id": "frozen-target",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-augmentation select.motion-stage-value", "value": "1" },
+            { "type": "click", "selector": ".p1-augmentation [data-play]" },
+            { "type": "wait", "milliseconds": 1100 }
+          ]
+        },
+        {
+          "id": "replay-center-crop",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-augmentation select.motion-stage-value", "value": "2" },
+            { "type": "click", "selector": ".p1-augmentation [data-play]" },
+            { "type": "wait", "milliseconds": 1250 }
+          ]
+        },
+        {
+          "id": "replay-horizontal-flip",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-augmentation select.motion-stage-value", "value": "2" },
+            { "type": "click", "selector": ".p1-augmentation [data-view-choice='flip']" },
+            { "type": "click", "selector": ".p1-augmentation [data-play]" },
+            { "type": "wait", "milliseconds": 1250 }
+          ]
+        },
+        {
+          "id": "same-frozen-target",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-augmentation select.motion-stage-value", "value": "3" },
+            { "type": "click", "selector": ".p1-augmentation [data-play]" },
+            { "type": "wait", "milliseconds": 1450 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "der-plus-prototype",
+      "path": "./p1-review.html?scene=der-plus",
+      "states": [
+        { "id": "wrong-old-response" },
+        {
+          "id": "two-independent-reads",
+          "actions": [
+            { "type": "click", "selector": ".p1-der-plus [data-overlap-choice='different']" },
+            { "type": "click", "selector": ".p1-der-plus [data-play]" },
+            { "type": "wait", "milliseconds": 1150 }
+          ]
+        },
+        {
+          "id": "one-joint-update",
+          "actions": [
+            { "type": "selectOption", "selector": ".p1-der-plus select.motion-stage-value", "value": "2" },
+            { "type": "click", "selector": ".p1-der-plus [data-play]" },
+            { "type": "wait", "milliseconds": 1650 }
+          ]
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "checkPageHorizontalOverflow": true,
+    "minSemanticFontSizePx": 12,
+    "clippingSelectors": []
+  }
+}

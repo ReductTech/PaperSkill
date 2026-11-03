@@ -1,0 +1,17 @@
+import ChapterFlourish from "./modules/ChapterFlourish";
+import ChapterHandoff from "./modules/ChapterHandoff";
+import { tutorial } from "./data/tutorial";
+import { widgetRegistry } from "./modules/registry";
+import { ReferenceButton, ReferenceProvider } from "./modules/Reference";
+import Reservoir from "./modules/Reservoir";
+import ReviewPrototypes from "./modules/review/ReviewPrototypes";
+
+export default function App() {
+  const focus = new URLSearchParams(window.location.search).get("focus");
+  const focusIds: Record<string,string> = { "der-step":"der-training-step", augmentation:"der-augmentation", "der-plus":"der-plus", workbench:"der-workbench", evidence:"der-evidence" };
+  const FocusScene = focus ? widgetRegistry[focusIds[focus]] : undefined;
+  if (FocusScene) return <ReferenceProvider><main className="reading-layout workbench-review"><a href="./#U6-complete-system">← 回到 DER 阅读主线</a><FocusScene chapterId="focused" moduleId={focus!}/></main></ReferenceProvider>;
+  if (focus === "reservoir") return <ReferenceProvider><main className="reading-layout reservoir-review"><a href="./#U4-reservoir-and-step">← 回到 DER 阅读主线</a><Reservoir focused /></main></ReferenceProvider>;
+  if (new URLSearchParams(window.location.search).get("review") === "1") return <ReviewPrototypes />;
+  return <ReferenceProvider><a className="skip-link" href="#reading">跳到正文</a><header className="site-header"><div className="site-header-inner"><a href="#U1-replay-entry" className="site-brand" aria-label="DER 教程开头"><span className="brand-mark">DER</span><span>持续学习笔记<small>NEURIPS 2020</small></span></a><nav aria-label="阅读单元">{tutorial.chapters.map((chapter, index) => <a key={chapter.id} href={`#${chapter.id}`}><span>0{index + 1}</span>{String(chapter.navTitle)}</a>)}</nav><ReferenceButton>参考资料</ReferenceButton></div></header><main id="reading" className="reading-layout"><div className="paper-line"><span>DARK EXPERIENCE REPLAY</span><span>用有限记忆，保留历史预测</span></div>{tutorial.chapters.map((chapter, index) => <article key={chapter.id} id={chapter.id} className={`lesson-section lesson-${index + 1}`} aria-labelledby={`${chapter.id}-title`}><header className="lesson-heading"><p className="eyebrow"><span className="unit-number">0{index + 1}</span>{index === 0 ? "从问题开始" : index === 1 ? "两种表示的比较" : index === 2 ? "历史监督与执行时序" : index === 3 ? "有限空间中的选留" : index === 4 ? "视图与监督" : index === 5 ? "完整执行" : "证据与边界"}</p>{index === 0 ? <h1 id={`${chapter.id}-title`}>{chapter.title}</h1> : <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>}<p className="chapter-summary">{chapter.summary}</p><ChapterFlourish variant={index} /></header>{chapter.modules.map((module) => { const Widget = module.componentId ? widgetRegistry[module.componentId] : undefined; return Widget ? <section key={module.id} id={module.id} aria-label={module.title} className="teaching-module"><Widget chapterId={chapter.id} moduleId={module.id} /></section> : null; })}<ChapterFlourish end variant={index + 1} />{index < tutorial.chapters.length-1 && <ChapterHandoff index={index} nextId={tutorial.chapters[index+1].id} nextTitle={String(tutorial.chapters[index+1].navTitle)} />}</article>)}</main><footer className="site-footer"><div><span className="brand-mark">DER</span><p>保持历史行为，不意味着历史行为一定正确。<br /><span>从空池学习到只读预测，带着条件阅读实验结果。</span></p></div><a href={String(tutorial.meta?.paperUrl)} target="_blank" rel="noreferrer">阅读原论文 · arXiv v2 ↗</a></footer></ReferenceProvider>;
+}
