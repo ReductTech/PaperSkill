@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Stitch1 } from './analogy-1';
+import { Stitch10 } from './analogy-10';
+import { Stitch2 } from './analogy-2';
+import { Stitch3 } from './analogy-3';
+import { Stitch4 } from './analogy-4';
+import { Stitch5 } from './analogy-5';
+import { Stitch6 } from './analogy-6';
+import { Stitch7 } from './analogy-7';
+import { Stitch8 } from './analogy-8';
+import { Stitch9 } from './analogy-9';
+import { Fsp10 } from './fsp-10';
+import { Fsp4 } from './fsp-4';
+import { Fsp5 } from './fsp-5';
+import { Fsp5b } from './fsp-5b';
+import { Fsp6 } from './fsp-6';
+import { Fsp7 } from './fsp-7';
+import { Fsp8 } from './fsp-8';
+import { Fsp9 } from './fsp-9';
+import { FspFront1 } from './fsp-front-1';
+import { FspFront2 } from './fsp-front-2';
+import { FspFront3 } from './fsp-front-3';
+import { Stitch11 } from './quilt-new';
+import { Stitch0 } from './quilt-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Stitch1;
+widgetRegistry['analogy-10'] = Stitch10;
+widgetRegistry['analogy-2'] = Stitch2;
+widgetRegistry['analogy-3'] = Stitch3;
+widgetRegistry['analogy-4'] = Stitch4;
+widgetRegistry['analogy-5'] = Stitch5;
+widgetRegistry['analogy-6'] = Stitch6;
+widgetRegistry['analogy-7'] = Stitch7;
+widgetRegistry['analogy-8'] = Stitch8;
+widgetRegistry['analogy-9'] = Stitch9;
+widgetRegistry['fsp-10'] = Fsp10;
+widgetRegistry['fsp-4'] = Fsp4;
+widgetRegistry['fsp-5'] = Fsp5;
+widgetRegistry['fsp-5b'] = Fsp5b;
+widgetRegistry['fsp-6'] = Fsp6;
+widgetRegistry['fsp-7'] = Fsp7;
+widgetRegistry['fsp-8'] = Fsp8;
+widgetRegistry['fsp-9'] = Fsp9;
+widgetRegistry['fsp-front-1'] = FspFront1;
+widgetRegistry['fsp-front-2'] = FspFront2;
+widgetRegistry['fsp-front-3'] = FspFront3;
+widgetRegistry['quilt-new'] = Stitch11;
+widgetRegistry['quilt-old'] = Stitch0;
