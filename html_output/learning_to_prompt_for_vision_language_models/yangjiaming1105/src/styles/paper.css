@@ -1,0 +1,313 @@
+:root {
+  --scene-bg: #f5f8f0;
+  --scene-ink: #21324a;
+  --reading-paper: #f7f5ee;
+  --reading-ink: #172f43;
+  --reading-secondary: #43565e;
+  --reading-rule: #cfcfc2;
+  --reading-accent: #a45330;
+  --reading-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "Microsoft YaHei", serif;
+}
+
+body:has(.slide-layout) {
+  background: var(--reading-paper);
+  font-family: "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--reading-ink);
+}
+
+/* A light index with the cover and the further-reading page at either end. */
+.slide-layout .chapter-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 2.2vw, 36px);
+  padding: 9px clamp(22px, 5.6vw, 88px);
+  background: rgb(247 245 238 / 96%);
+  border: 0;
+  box-shadow: 0 1px 0 rgb(41 54 49 / 9%);
+}
+.slide-layout .chapter-nav::before,
+.slide-layout .chapter-nav::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  max-width: 334px;
+  background: var(--reading-rule);
+}
+.slide-layout .chapter-nav-inner {
+  flex: none;
+  grid-template-columns: repeat(12, 42px);
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+.slide-layout .chapter-nav-button {
+  position: relative;
+  width: 42px;
+  min-height: 42px;
+  border-radius: 50%;
+  color: #58616a;
+  font: 600 16px/1 "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.slide-layout .chapter-nav-button:hover { background: #e9e8df; color: var(--reading-ink); }
+.slide-layout .chapter-nav-button.active {
+  background: var(--reading-ink);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px #182f43;
+}
+.slide-layout .chapter-nav-button:focus-visible { outline: 2px solid var(--reading-accent); outline-offset: 2px; }
+
+/* A chapter opens like a two-column spread. On a phone the question comes first. */
+.slide-content section.slide-chap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  padding: 4px 0 10px;
+}
+.slide-chap > * { min-width: 0; }
+.slide-chap .chap-title {
+  position: relative;
+  display: block;
+  align-self: center;
+  margin: 0;
+  padding-top: 37px;
+  color: var(--reading-ink);
+  font-family: var(--reading-serif);
+  font-size: clamp(33px, 3.5vw, 54px);
+  line-height: 1.27;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  white-space: pre-line;
+}
+.slide-chap .chap-title .num,
+.slide-chap .chap-title .badge-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+}
+.slide-chap .chap-title .num {
+  color: var(--reading-accent);
+  font: italic 600 23px/1 Georgia, serif;
+}
+.slide-chap .chap-title .badge-tag {
+  left: 3.5rem;
+  padding: 0 0 0 13px;
+  margin: 0;
+  border-radius: 0;
+  border-left: 1px solid #beb5a6;
+  background: transparent;
+  color: #54676b;
+  font: 600 15px/1 "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: .045em;
+}
+.slide-chap .chap-bridge { align-self: center; margin: 0; border: 0; overflow: visible; }
+.slide-chap .cb-body { padding: 0; }
+.slide-chap .cb-title { display: none; }
+.slide-chap .cb-text { color: var(--reading-secondary); font-size: 19px; line-height: 1.85; }
+.slide-chap .analogy-card {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.slide-chap .analogy-body {
+  display: grid;
+  grid-template-columns: minmax(140px, .68fr) 2fr;
+  align-items: baseline;
+  gap: 24px;
+  padding: 19px 6px 21px;
+  border: 0;
+  border-bottom: 1px solid var(--reading-rule);
+  background: transparent;
+}
+.slide-chap .analogy-title { font-size: 22px; letter-spacing: -.015em; color: var(--reading-ink); }
+.slide-chap .analogy-text { color: var(--reading-secondary); font-size: 18px; line-height: 1.75; }
+
+/* The workbench supplies its own surfaces. Keep the section around it quiet. */
+.slide-chap .module {
+  margin: 15px 0 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.slide-chap .module-head {
+  padding: 0;
+  gap: 16px;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  background: transparent;
+  border: 0;
+}
+.slide-chap .module-head .num {
+  display: inline-block;
+  align-self: baseline;
+  padding: 0 14px 0 0;
+  min-width: 0;
+  min-height: 0;
+  background: none;
+  border-right: 1px solid #bdb6a8;
+  border-radius: 0;
+  color: var(--reading-accent);
+  font: italic 600 24px/1 Georgia, serif;
+  font-variant-numeric: lining-nums;
+}
+.slide-chap .module-head h4 {
+  min-width: 0;
+  font-family: var(--reading-serif);
+  color: var(--reading-ink);
+  font-size: clamp(27px, 2.5vw, 37px);
+  line-height: 1.45;
+  font-weight: 780;
+  letter-spacing: -.035em;
+}
+.slide-chap .module-body { padding: 0; }
+.slide-chap .module-body .module-desc {
+  max-width: 56em;
+  margin: 12px 0 24px;
+  color: var(--reading-secondary);
+  line-height: 1.8;
+}
+.slide-chap .insight-bar {
+  position: relative;
+  margin: 0;
+  padding: 24px 32px 24px 46px;
+  background: var(--reading-ink);
+  border-radius: 12px;
+  color: #fbf8ef;
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 550;
+  line-height: 1.75;
+}
+.slide-chap .insight-bar::before {
+  position: absolute;
+  content: "";
+  left: 22px;
+  top: 26px;
+  bottom: 26px;
+  width: 3px;
+  border-radius: 2px;
+  background: #e9a271;
+}
+.slide-chap .formula-explain {
+  padding: clamp(18px, 3vw, 34px);
+  border: 1px solid #d7dbd2;
+  border-radius: 14px;
+  background: #fffef9;
+}
+.slide-chap .fe-formula {
+  background: #f1f3ed;
+  color: #193d4d;
+  border: 0;
+  border-radius: 9px;
+}
+.slide-chap .embed-takeaway {
+  padding-top: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.slide-chap .et-item { padding: 6px 27px; gap: 10px; }
+.slide-chap .et-item:first-child { padding-left: 0; }
+.slide-chap .et-item:last-child { padding-right: 0; }
+.slide-chap .et-arrow { width: 1px; margin: 6px 0; background: var(--reading-rule); }
+.slide-chap .et-icon { display: none; }
+.slide-chap .et-title { font-size: 22px; color: var(--reading-ink); font-family: var(--reading-serif); }
+.slide-chap .et-desc { color: var(--reading-secondary); font-size: 18px; line-height: 1.8; }
+
+.slide-layout .slide-nav-counter { font-variant-numeric: tabular-nums; color: var(--reading-secondary); }
+.slide-layout .slide-nav .slide-nav-btn { background: transparent; color: var(--reading-ink); border: 1px solid #c6c9c1; }
+.slide-layout .slide-nav .slide-nav-btn-primary { background: var(--reading-ink); border-color: var(--reading-ink); color: white; }
+.slide-layout .slide-nav-btn:disabled { opacity: .42; }
+.slide-layout .slide-nav-btn:enabled:hover { box-shadow: 0 3px 10px #1d3a431c; }
+
+/* A local illustrated backdrop keeps the reading list legible while a video
+   thumbnail loads or when the hosting service cannot supply one. */
+.slide-content .dl-related-section {
+  padding: 24px 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+.slide-content .dl-related-section h3 {
+  color: var(--reading-ink);
+  font-family: var(--reading-serif);
+  font-size: clamp(30px, 3.4vw, 48px);
+}
+.slide-content .dl-related-section > p { margin: 14px 0 32px; color: var(--reading-secondary); font-size: 19px; }
+.slide-content .dl-video-strip {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(16px, 2.5vw, 36px);
+  padding: 6px 4px 20px;
+}
+.dl-video-strip a.dl-video-card { gap: 14px; }
+.dl-video-strip .dl-video-link-cover {
+  background: #214554 url('./reading-plates.svg') left / 300% 100% no-repeat;
+  border-radius: 9px;
+  box-shadow: none;
+}
+.dl-video-strip .dl-video-card:nth-child(2) .dl-video-link-cover { background-position: center; }
+.dl-video-strip .dl-video-card:nth-child(3) .dl-video-link-cover { background-position: right; }
+.dl-video-strip .dl-video-play {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #153442eb;
+  font-size: 15px;
+  box-shadow: none;
+}
+.dl-video-strip .dl-video-duration { bottom: auto; top: 8px; }
+.dl-video-strip .dl-video-card strong { font-size: clamp(19px, 1.9vw, 25px); color: var(--reading-ink); font-weight: 650; }
+
+@media (min-width: 1050px) {
+  .slide-content section.slide-chap {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(40px, 5vw, 80px);
+    row-gap: 34px;
+  }
+  .slide-chap > :nth-child(n+3) { grid-column: 1 / -1; }
+  .slide-chap > .chap-bridge { padding: 7px 0 7px 26px; border-left: 1px solid var(--reading-rule); }
+}
+@media (max-width: 780px) {
+  .slide-layout .chapter-nav { gap: 14px; padding: 7px 16px; }
+  .slide-layout .chapter-nav-inner { grid-template-columns: repeat(12, 38px); gap: 2px; }
+  .slide-layout .chapter-nav-button { width: 38px; min-height: 38px; }
+  .slide-chap .analogy-body { grid-template-columns: 1fr; gap: 6px; padding: 16px 2px 20px; }
+  .slide-chap .et-item, .slide-chap .et-item:first-child, .slide-chap .et-item:last-child { padding: 12px 0; }
+  .slide-chap .et-arrow { width: 100%; height: 1px; margin: 2px 0; }
+  .slide-chap .embed-takeaway { flex-direction: column; }
+}
+@media (max-width: 560px) {
+  .slide-layout .chapter-nav { padding: 5px 12px; }
+  .slide-layout .chapter-nav-inner { grid-template-columns: repeat(6, 38px); gap: 1px 4px; }
+  .slide-layout .chapter-nav-button { min-height: 34px; width: 38px; border-radius: 10px; }
+  .slide-content section.slide-chap { gap: 19px; padding-top: 0; }
+  .slide-chap .chap-title { padding-top: 32px; font-size: clamp(31px, 7.8vw, 39px); line-height: 1.34; }
+  .slide-chap .chap-title .num { font-size: 21px; }
+  .slide-chap .chap-title .badge-tag { font-size: 14px; }
+  .slide-chap .cb-text { font-size: 17px; line-height: 1.78; }
+  .slide-chap .module { margin: 10px 0; }
+  .slide-chap .module-head { gap: 10px; }
+  .slide-chap .module-head .num { padding-right: 8px; font-size: 19px; }
+  .slide-chap .module-head h4 { font-size: 26px; }
+  .slide-chap .module-body .module-desc { margin: 10px 0 17px; }
+  .slide-chap .insight-bar { padding: 20px 18px 20px 30px; }
+  .slide-chap .insight-bar::before { left: 14px; top: 22px; bottom: 22px; }
+  .slide-content .dl-video-strip { grid-template-columns: minmax(0, 1fr); gap: 25px; }
+}
