@@ -1,0 +1,97 @@
+.formula-explain.coop-equations { text-align: left; }
+.coop-equations .coop-equation-lead {
+  max-width: 52em;
+  color: #263f4a;
+  font-size: clamp(18px, 1.5vw, 21px);
+  line-height: 1.8;
+}
+
+.coop-equations .coop-equation-lead p { margin: 0; }
+.coop-equations .coop-equation-help {
+  margin: 6px 0 19px;
+  color: #54696b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.coop-help-touch { display: none; }
+.coop-equation-list {
+  border-block: 1px solid #d3dcd5;
+  background: #f3f5ef;
+  padding-inline: clamp(14px, 2vw, 28px);
+}
+.coop-equation-row {
+  display: grid;
+  grid-template-columns: minmax(9em, .62fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 12px;
+  padding-block: 15px;
+}
+.coop-equation-row + .coop-equation-row { border-top: 1px solid #dde3dc; }
+.coop-equation-label {
+  color: #455e63;
+  font-size: 16px;
+  font-weight: 600;
+}
+.coop-equation-expression {
+  min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  color: #193846;
+  font-size: clamp(21px, 2vw, 26px);
+  line-height: 1.4;
+  border-radius: 3px;
+}
+.coop-equation-expression:focus-visible { outline: 2px solid #447b80; outline-offset: 3px; }
+.coop-tex-display { display: block; }
+.coop-tex-display > .katex-display { margin: 0; }
+.coop-equation-expression .katex-display,
+.coop-equation-expression .katex-display > .katex { text-align: left; }
+.coop-equation-expression .katex-html { pointer-events: none; }
+.coop-equation-expression [data-symbol] {
+  pointer-events: auto;
+  color: #24525b;
+  cursor: help;
+  border-radius: 2px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.coop-equation-expression :is(.pstrut, .katex-strut, .vlist-s) { pointer-events: none; }
+.coop-equation-expression .coop-symbol-active {
+  color: #123f44;
+  background-color: #d3e9de;
+  box-shadow: 0 0 0 2px #d3e9de;
+}
+.coop-symbol-hint {
+  position: fixed;
+  z-index: 200;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 20px));
+  padding: 13px 16px;
+  border: 1px solid #c9d5cd;
+  border-top: 3px solid #42736f;
+  border-radius: 7px;
+  box-shadow: 0 7px 24px #1d393528;
+  background: #fffef8;
+  color: #253c45;
+  text-align: left;
+}
+.coop-symbol-hint strong {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+.coop-symbol-hint strong .coop-tex-inline { color: #1e605b; }
+.coop-symbol-hint p { margin: 6px 0 0; color: #40555a; font-size: 16px; line-height: 1.65; }
+@media (hover: none), (pointer: coarse) {
+  .coop-help-pointer { display: none; }
+  .coop-help-touch { display: inline; }
+}
+@media (max-width: 700px) {
+  .coop-equation-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding-block: 13px; }
+  .coop-equation-expression { font-size: clamp(19px, 4.8vw, 23px); }
+  .coop-equation-label { font-size: 15px; }
+}
