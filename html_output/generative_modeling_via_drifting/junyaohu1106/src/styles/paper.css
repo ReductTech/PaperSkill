@@ -1,0 +1,64 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f6efe2;
+}
+
+/* Drifting tutorial page styles. Body text stays within the three type roles of contract §2.5. */
+.dk-split { display: grid; grid-template-columns: minmax(0,1fr) 540px; gap: 24px; width: 100%; height: 100%; }
+.dk-stage { position: relative; min-width: 0; min-height: 0; border-radius: 20px; overflow: hidden; background: #f6efe2; border: 1px solid #e3d8c3; box-sizing: border-box; }
+.dk-stage > svg, .dk-stage > canvas { display: block; width: 100%; height: 100%; }
+.dk-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; color: #21324a; font-size: var(--ppt-body-text); line-height: 1.36; }
+.dk-panel p { margin: 0; }
+.dk-h { font-size: var(--ppt-body-heading); font-weight: 780; line-height: 1.25; color: #21324a; }
+.dk-formula { font-size: var(--ppt-body-heading); font-weight: 720; line-height: 1.4; color: #27446e; white-space: nowrap; font-family: Georgia, 'Times New Roman', serif; }
+.dk-formula .formula-symbol { font-family: inherit; }
+.dk-big { font-size: var(--ppt-body-emphasis); font-weight: 800; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.dk-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-variant-numeric: tabular-nums; }
+.dk-row b { font-weight: 780; }
+.dk-blue { color: #27446e; } .dk-orange { color: #c85d29; } .dk-green { color: #228d5c; } .dk-red { color: #c43f52; } .dk-muted { color: #68778f; } .dk-purple { color: #7c3aed; }
+.dk-feedback { padding: 10px 16px; border-radius: 12px; font-size: var(--ppt-body-text); line-height: 1.34; font-weight: 650; }
+.dk-feedback.is-good { background: #e6f4ec; color: #1c7a4e; }
+.dk-feedback.is-mid { background: #eef3fb; color: #27446e; }
+.dk-feedback.is-bad { background: #fbe9ec; color: #ad3345; }
+.dk-slider { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dk-slider-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 700; }
+.dk-slider-head b { color: #c85d29; font-variant-numeric: tabular-nums; }
+.dk-slider input[type=range] { width: 100%; height: 34px; margin: 0; accent-color: #f07e47; cursor: pointer; touch-action: none; }
+.dk-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.dk-chips button, .dk-btn { font: inherit; font-size: var(--ppt-body-text); line-height: 1.2; font-weight: 700; padding: 7px 14px; border-radius: 10px; border: 2px solid #d7deea; background: #fff; color: #27446e; cursor: pointer; }
+.dk-chips button.is-on { background: #27446e; border-color: #27446e; color: #fff; }
+.dk-btn.is-primary { background: #f07e47; border-color: #f07e47; color: #fff; }
+.dk-chips button:focus-visible, .dk-btn:focus-visible { outline: 3px solid #2f6bff; outline-offset: 2px; }
+.dk-handle { cursor: grab; touch-action: none; }
+.dk-handle:active { cursor: grabbing; }
+.dk-handle:focus-visible { outline: none; }
+.dk-handle:focus-visible .dk-ring { stroke: #2f6bff; stroke-width: 4; }
+.dk-theme { display: block; border-radius: 12px; flex: none; }
+.dk-hint { position: absolute; left: 60px; right: 60px; bottom: 14px; padding: 5px 14px; text-align: center; border-radius: 10px; background: #fffdf6e8; color: #21324a; font-size: var(--ppt-body-text); line-height: 1.3; font-weight: 700; pointer-events: none; }
+.dk-code { margin: 0; padding: 10px 16px; border-radius: 12px; background: #f3f6fb; color: #21324a; font: 600 var(--ppt-body-text)/1.28 Consolas, 'Courier New', monospace; white-space: pre; }
+.dk-bars { display: flex; flex-direction: column; gap: 4px; }
+.dk-bar-row { display: grid; align-items: center; gap: 12px; padding: 3px 8px; border: 0; border-radius: 8px; background: transparent; font: inherit; color: inherit; text-align: left; width: 100%; box-sizing: border-box; font-variant-numeric: tabular-nums; }
+button.dk-bar-row { cursor: pointer; }
+button.dk-bar-row:hover { background: #eef3fb; }
+button.dk-bar-row.is-on { background: #fff2ea; box-shadow: inset 0 0 0 2px #f07e47; }
+.dk-bar-track { height: 24px; background: #eef1f6; border-radius: 6px; overflow: hidden; }
+.dk-bar-fill { height: 100%; border-radius: 6px; }
+.dk-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; height: 100%; }
+.dk-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.dk-flex { flex: 1 1 0; min-height: 0; }
+.dk-figure { margin: 0; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.dk-figure img { display: block; height: 404px; width: auto; max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; }
+.dk-cover { position: relative; width: 100%; height: 100%; border-radius: 14px; overflow: hidden; background: #f6efe2; }
+.dk-cover svg { display: block; width: 100%; height: 100%; }
+.dk-cover-tag { position: absolute; left: 58px; top: 22px; padding: 2px 12px; border-radius: 8px; background: #fffdf6e8; color: #21324a; font-size: var(--ppt-body-text); font-weight: 750; }
+.dk-cover-status { position: absolute; left: 58px; right: 58px; bottom: 8px; padding: 2px 10px; border-radius: 8px; text-align: center; background: #fffdf6e8; color: #27446e; font-size: var(--ppt-body-text); font-weight: 750; }
+.dk-cover-status.is-good { color: #1c7a4e; }
+.dk-table-grid { display: grid; column-gap: 12px; align-items: center; font-variant-numeric: tabular-nums; line-height: 39px; }
+.dk-table-grid > div { white-space: nowrap; min-width: 0; }
+.ppt-body sub, .ppt-body sup { font-size: var(--ppt-body-text); line-height: 0; }
+.dk-table-grid svg { display: block; }
