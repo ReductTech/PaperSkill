@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { Lab1 } from './lab-1';
+import { Lab10 } from './lab-10';
+import { Lab2 } from './lab-2';
+import { Lab3 } from './lab-3';
+import { Lab4 } from './lab-4';
+import { Lab5 } from './lab-5';
+import { Lab6 } from './lab-6';
+import { Lab7 } from './lab-7';
+import { Lab8 } from './lab-8';
+import { Lab9 } from './lab-9';
+import { Purpose } from './lab-purpose';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['lab-1'] = Lab1;
+widgetRegistry['lab-10'] = Lab10;
+widgetRegistry['lab-2'] = Lab2;
+widgetRegistry['lab-3'] = Lab3;
+widgetRegistry['lab-4'] = Lab4;
+widgetRegistry['lab-5'] = Lab5;
+widgetRegistry['lab-6'] = Lab6;
+widgetRegistry['lab-7'] = Lab7;
+widgetRegistry['lab-8'] = Lab8;
+widgetRegistry['lab-9'] = Lab9;
+widgetRegistry['lab-purpose'] = Purpose;

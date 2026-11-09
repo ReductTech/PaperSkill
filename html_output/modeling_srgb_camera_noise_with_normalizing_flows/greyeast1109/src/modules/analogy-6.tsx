@@ -1,0 +1,1 @@
+import React from 'react';import {StampScene} from './stamp-kit';export function Analogy6(){return <StampScene action="stamp"/>;}
