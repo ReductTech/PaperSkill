@@ -1,0 +1,88 @@
+/* Paper-specific styles: "mixing console" theme for Elastic Weight Consolidation.
+   Semantic colors follow contract.md §5 (blue = guidance/current, green = paper method,
+   red = failure/old method, orange = learner emphasis, purple = auxiliary). */
+
+:root {
+  --ewc-scene-bg: #f5f8f0;
+  --ewc-light: #b8c9a7;
+  --ewc-dark: #76906a;
+  --ewc-support: #92400e;
+  --ewc-panel: #ffffff;
+}
+
+.ewc-page { display: flex; gap: 28px; width: 100%; height: 100%; min-width: 0; min-height: 0; }
+.ewc-page.is-col { flex-direction: column; }
+.ewc-scene { position: relative; flex: none; background: var(--ewc-scene-bg); border: 0; box-shadow: 0 0 0 2px #d9e3cf; border-radius: 24px; overflow: hidden; }
+.ewc-scene svg { display: block; }
+.ewc-side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; justify-content: flex-start; color: #21324a; }
+.ewc-side p { margin: 0; font-size: var(--ppt-body-text); line-height: 1.4; }
+.ewc-head { margin: 0; font-size: var(--ppt-body-heading); line-height: 1.25; font-weight: 800; color: #21324a; }
+.ewc-big { font-size: var(--ppt-body-emphasis); line-height: 1.2; font-weight: 800; }
+.ewc-muted { color: #68778f; }
+.ewc-blue { color: var(--blue); }
+.ewc-green { color: var(--green); }
+.ewc-red { color: var(--red); }
+.ewc-orange { color: var(--orange); }
+
+.ewc-formula { background: #fff; border: 2px solid #d7deea; border-left: 8px solid var(--blue); border-radius: 14px; padding: 12px 20px; font-size: var(--ppt-body-heading); line-height: 1.35; font-weight: 700; color: #21324a; }
+.ewc-formula i { font-family: "Times New Roman", "Cambria Math", serif; font-style: italic; font-weight: 600; }
+.ewc-formula sub, .ewc-formula sup, .ewc-side sub, .ewc-side sup { font-size: .62em; line-height: 0; }
+.ewc-formula .formula-symbol { border-bottom: 3px dotted var(--orange); cursor: help; }
+.ewc-formula-sub { font-size: var(--ppt-body-text); font-weight: 600; color: #68778f; }
+
+.ewc-kpis { display: grid; gap: 10px; }
+.ewc-kpi { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; background: #fff; border: 2px solid #d7deea; border-radius: 14px; padding: 8px 18px; font-size: var(--ppt-body-text); font-weight: 700; }
+.ewc-kpi b { font-size: var(--ppt-body-heading); font-variant-numeric: tabular-nums; }
+.ewc-kpi.is-red { border-color: #e7b4bc; background: #fdf1f3; }
+.ewc-kpi.is-red b { color: var(--red); }
+.ewc-kpi.is-green { border-color: #b5dec9; background: #effaf4; }
+.ewc-kpi.is-green b { color: var(--green); }
+.ewc-kpi.is-blue b { color: var(--blue); }
+
+.ewc-slider { display: block; }
+.ewc-slider > span { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--ppt-body-text); }
+.ewc-slider b { font-size: var(--ppt-body-heading); font-variant-numeric: tabular-nums; color: var(--orange); }
+.ewc-slider input[type="range"] { width: 100%; height: 44px; margin: 4px 0 0; accent-color: var(--orange); }
+
+.ewc-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.ewc-btn { border: 3px solid #d7deea; background: #fff; color: #21324a; border-radius: 999px; padding: 6px 22px; min-height: 52px; font-size: var(--ppt-body-text); font-weight: 700; cursor: pointer; }
+.ewc-btn:hover { border-color: var(--blue); }
+.ewc-btn.is-on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ewc-btn.is-red.is-on { background: var(--red); border-color: var(--red); }
+.ewc-btn.is-green.is-on { background: var(--green); border-color: var(--green); }
+.ewc-btn.is-orange.is-on { background: var(--orange); border-color: var(--orange); }
+.ewc-btn.is-primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+.ewc-btn:disabled { opacity: .35; cursor: default; }
+
+.ewc-verdict { border-radius: 16px; padding: 12px 20px; font-size: var(--ppt-body-text); line-height: 1.38; font-weight: 700; border: 3px solid transparent; }
+.ewc-verdict.is-good { background: #effaf4; border-color: #b5dec9; color: #17673f; }
+.ewc-verdict.is-bad { background: #fdf1f3; border-color: #e7b4bc; color: #9f2f41; }
+.ewc-verdict.is-info { background: #eef3fb; border-color: #c9d6ee; color: #27446e; }
+
+.ewc-fig { margin: 0; background: #fff; border: 2px solid #d7deea; border-radius: 16px; padding: 10px; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.ewc-fig img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.ewc-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.ewc-list li { font-size: var(--ppt-body-text); line-height: 1.38; padding-left: 26px; position: relative; }
+.ewc-list li::before { content: ""; position: absolute; left: 0; top: .55em; width: 12px; height: 12px; border-radius: 3px; background: var(--orange); }
+.ewc-card { background: #fff; border: 2px solid #d7deea; border-radius: 18px; padding: 16px 22px; }
+.ewc-card.is-blue { border-left: 8px solid var(--blue); }
+.ewc-card.is-green { border-left: 8px solid var(--green); }
+.ewc-card.is-red { border-left: 8px solid var(--red); }
+.ewc-tabs { display: flex; gap: 12px; }
+.ewc-thumbs { display: flex; gap: 14px; }
+.ewc-thumb { flex: 1; border: 3px solid #d7deea; background: #fff; border-radius: 14px; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 0; }
+.ewc-thumb img { width: 100%; height: 120px; object-fit: contain; }
+.ewc-thumb.is-on { border-color: var(--orange); box-shadow: 0 0 0 3px #f07e4733; }
+.ewc-note { font-size: var(--ppt-body-text); color: #68778f; }
+.ewc-gameitems { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.ewc-game { border: 3px solid #d7deea; border-radius: 14px; background: #fff; padding: 6px 4px; font-size: 22px; font-weight: 700; color: #21324a; cursor: pointer; text-align: center; line-height: 1.2; }
+.ewc-game.is-on { border-color: var(--orange); background: #fff4ec; }
+.ewc-game.is-guard { border-color: var(--green); background: #effaf4; }
+
+/* Mouse-focusing a draggable SVG handle should not paint Chrome's black UA box;
+   keyboard users still get a visible orange ring. */
+.ewc-scene [role="slider"]:focus { outline: none; }
+.ewc-scene [role="slider"]:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; border-radius: 8px; }
+
+.ewc-cover { position: relative; width: 100%; height: 100%; }
+.ewc-cover svg { width: 100%; height: 100%; display: block; }
