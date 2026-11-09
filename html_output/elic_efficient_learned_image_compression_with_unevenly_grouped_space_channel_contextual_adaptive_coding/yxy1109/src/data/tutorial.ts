@@ -125,7 +125,7 @@ export const tutorial: TutorialData = {
           desc:
             '逐步前进，观察按能量排序后的通道组：第一组能量最高，越靠后的组能量越低。前面几组几乎已经决定了图像的主要语义。',
           componentId: 'elic-module',
-          figure: '/images/energy.png',
+          figure: './images/energy.png',
         },
         {
           kind: 'module',
@@ -134,7 +134,7 @@ export const tutorial: TutorialData = {
           desc:
             '切换两种分组方案，比较并行步骤数、参数估计延迟和 BD-Rate。BD-Rate 是相对基准编码器的平均码率节省，负值表示更省比特；参数延迟越低越好。不均匀分组用少量率失真代价换来了近一半的参数延迟。',
           componentId: 'elic-module',
-          figure: '/images/uneven-grouping.png',
+          figure: './images/uneven-grouping.png',
         },
       ],
       insight:
@@ -326,7 +326,7 @@ export const tutorial: TutorialData = {
           desc:
             '点击结构图中的节点，查看它做什么、输入输出形状如何变化。红色路径是编码，蓝色路径是解码，橙色路径两者共用。主变换里的 GDN 已被可堆叠的残差瓶颈块替代。',
           componentId: 'elic-module',
-          figure: '/images/architecture.png',
+          figure: './images/architecture.png',
         },
       ],
       insight:
@@ -359,7 +359,7 @@ export const tutorial: TutorialData = {
           desc:
             '点开始，观察两侧从同一状态出发：缩略图合成器几乎瞬间完成低分辨率预览，全解码则要重跑完整合成网络。',
           componentId: 'elic-module',
-          figure: '/images/thumbnail.png',
+          figure: './images/thumbnail.png',
         },
       ],
       insight:
@@ -392,7 +392,7 @@ export const tutorial: TutorialData = {
           desc:
             '点击开始，基于论文 Table 2 的 Kodak 数据让各模型的 BD-Rate 与解码延迟动画展开。BD-Rate 越低越好，延迟越短越好；这里以 VVC 的 YUV 4:4:4 色彩空间为锚点。',
           componentId: 'elic-module',
-          figure: '/images/rd-curves.png',
+          figure: './images/rd-curves.png',
         },
       ],
       insight:
