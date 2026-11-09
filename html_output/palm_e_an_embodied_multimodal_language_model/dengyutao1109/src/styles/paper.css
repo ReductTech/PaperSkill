@@ -1,0 +1,369 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Semantic color roles stay stable: --blue guidance/current, --green success/paper
+   method, --red failure/old, --orange emphasis, --purple auxiliary. Only warm kitchen
+   surface colors are added here; tokens.css / components.css are not rewritten. */
+
+:root {
+  --theme-panel: #fff7ec;
+  --theme-wood: #92400e;
+  --theme-ink: #21324a;
+}
+
+/* §4 编码器漫画热点底图：图片铺满容器，透明按钮按百分比 bbox 覆盖四格。 */
+.encoder-hotspot {
+  position: relative;
+  display: block;
+  margin: 0 0 12px;
+}
+.encoder-hotspot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border, #d7deea);
+  border-radius: 12px;
+}
+.encoder-hotspot-btn {
+  position: absolute;
+  background: transparent;
+  border: 2px dashed transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+.encoder-hotspot-btn:hover {
+  border-color: rgba(39, 68, 110, 0.5);
+}
+.encoder-hotspot-btn.active {
+  border-color: var(--blue, #27446e);
+  background: rgba(39, 68, 110, 0.1);
+}
+
+/* §7 通用模型静态对照表 */
+.generalist-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.generalist-table th,
+.generalist-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border, #d7deea);
+  text-align: left;
+}
+.generalist-table th {
+  color: var(--ink, #21324a);
+  font-weight: 600;
+}
+.generalist-table tbody tr {
+  transition: background-color var(--t-fast, 160ms) ease-out;
+}
+.generalist-table tbody tr:hover {
+  background: var(--blue-soft, rgba(39, 68, 110, 0.08));
+}
+.generalist-table tbody tr.selected {
+  background: var(--blue-soft, rgba(39, 68, 110, 0.12));
+}
+
+/* §8 双栏复盘板 */
+.recap-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.recap-col h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.recap-col ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+@media (max-width: 720px) {
+  .recap-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 通用卡片 / 图表（生成方可写，仅作用于 widget 内层） ---- */
+.widget-grid {
+  display: grid;
+  gap: 12px;
+}
+.widget-grid.two { grid-template-columns: 1fr 1fr; }
+.widget-grid.three { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 720px) {
+  .widget-grid.two, .widget-grid.three { grid-template-columns: 1fr; }
+}
+
+.tap-card {
+  display: block;
+  text-align: left;
+  padding: 14px 16px;
+  background: var(--paper, #fff);
+  border: 1.5px solid var(--line, #d7deea);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 160ms ease-out, background 160ms ease-out, transform 160ms ease-out;
+  font: inherit;
+}
+.tap-card:hover { border-color: var(--blue, #27446e); }
+.tap-card.active {
+  border-color: var(--blue, #27446e);
+  background: var(--blue-soft, rgba(39, 68, 110, 0.08));
+  transform: translateY(-2px);
+}
+.tap-card .card-title {
+  font-weight: 600;
+  color: var(--ink, #21324a);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.tap-card .card-sub {
+  color: var(--ink-2, #68778f);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 横条对比图（DOM 实现，真实数值标签） */
+.bar-chart { display: grid; gap: 14px; margin: 8px 0; }
+.bar-row { display: grid; grid-template-columns: 130px 1fr 64px; align-items: center; gap: 10px; }
+.bar-row .bar-label { color: var(--ink, #21324a); font-size: 13px; }
+.bar-track { height: 26px; background: var(--paper-2, #f1f4ee); border-radius: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 8px; transition: width 420ms ease-out; }
+.bar-row .bar-value { color: var(--ink, #21324a); font-size: 13px; font-weight: 600; text-align: right; }
+
+/* 步进时间线 */
+.step-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0;
+}
+.step-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--line, #d7deea);
+  background: var(--paper, #fff);
+  color: var(--ink-2, #68778f);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.step-dot.reached { border-color: var(--green, #228d5c); color: var(--green, #228d5c); }
+.step-dot.current { border-color: var(--blue, #27446e); background: var(--blue, #27446e); color: #fff; }
+.step-dot.recover { border-color: var(--orange, #f07e47); color: var(--orange, #f07e47); }
+
+/* 双面板联动 */
+.dual-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 10px 0;
+}
+@media (max-width: 720px) { .dual-panel { grid-template-columns: 1fr; } }
+.panel-box {
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--paper, #fff);
+}
+.panel-box h5 { margin: 0 0 8px; font-size: 14px; color: var(--ink, #21324a); }
+.panel-box .panel-body { color: var(--ink-2, #68778f); font-size: 13px; line-height: 1.6; }
+
+.token-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.token-chip {
+  padding: 5px 10px;
+  border-radius: 9px;
+  font-size: 12px;
+  background: var(--paper-2, #f1f4ee);
+  color: var(--ink, #21324a);
+}
+.token-chip.obs { background: rgba(39, 68, 110, 0.12); color: var(--blue, #27446e); }
+.token-chip.obs-purple { background: rgba(124, 58, 237, 0.12); color: var(--purple, #7c3aed); }
+.token-chip.pred { background: var(--green-soft, rgba(34, 141, 92, 0.14)); color: var(--green, #228d5c); }
+
+.obj-tray { display: flex; gap: 16px; justify-content: center; margin: 12px 0; }
+.obj-block {
+  width: 74px;
+  height: 74px;
+  border-radius: 12px;
+  border: 2px solid var(--line, #d7deea);
+  background: var(--env, #b8c9a7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+}
+.obj-block.sel { border-color: var(--blue, #27446e); box-shadow: 0 0 0 3px rgba(39, 68, 110, 0.18); }
+.obj-block.hit { border-color: var(--green, #228d5c); }
+
+.chip:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.scope-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0; color: var(--ink-2, #68778f); font-size: 12px; }
+.scope-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 5px; vertical-align: -1px; }
+
+/* ---- 图片占位：懒加载未解码前避免塌陷成 1px，给出稳定比例框与浅底 ---- */
+.paper-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  background: #f1f4ee;
+}
+/* 类比漫画为 3:2 横版 */
+.analogy-visual .paper-figure img {
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+}
+/* 模块内论文原图：宽扁为主，给 16:9 占位框，加载后按固有比例撑开 */
+.module-body .paper-figure img {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+/* ---- 封面关键词词云 ---- */
+.hero-meta {
+  gap: 10px 16px;
+  padding: 18px 22px;
+  background: var(--paper-2, #f1f4ee);
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 14px;
+}
+.hero-meta .tag {
+  border: 1px solid var(--line, #d7deea);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  line-height: 1.4;
+  color: var(--slate, #68778f);
+  box-shadow: 0 1px 2px rgba(33, 50, 74, 0.06);
+  transition: background-color var(--t-fast, 160ms) ease-out, color var(--t-fast, 160ms) ease-out, border-color var(--t-fast, 160ms) ease-out;
+}
+.hero-meta .tag:hover {
+  background: var(--blue-soft, #eef2f8);
+  border-color: var(--blue, #27446e);
+  color: var(--blue, #27446e);
+}
+.hero-meta .tag:nth-child(1),
+.hero-meta .tag:nth-child(2),
+.hero-meta .tag:nth-child(3) {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue, #27446e);
+}
+.hero-meta .tag:nth-child(4),
+.hero-meta .tag:nth-child(5),
+.hero-meta .tag:nth-child(6) {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--purple, #7c3aed);
+}
+.hero-meta .tag:nth-child(7),
+.hero-meta .tag:nth-child(8),
+.hero-meta .tag:nth-child(9),
+.hero-meta .tag:nth-child(10) {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue, #27446e);
+}
+.hero-meta .tag:nth-child(11) { font-size: 14px; font-weight: 600; color: var(--orange, #f07e47); }
+.hero-meta .tag:nth-child(12),
+.hero-meta .tag:nth-child(17),
+.hero-meta .tag:nth-child(18),
+.hero-meta .tag:nth-child(22) { color: var(--green, #228d5c); }
+.hero-meta .tag:nth-child(19) { color: var(--orange, #f07e47); }
+.hero-meta .tag:nth-child(23) { color: var(--purple, #7c3aed); }
+.hero-meta .tag:nth-child(13),
+.hero-meta .tag:nth-child(14),
+.hero-meta .tag:nth-child(15),
+.hero-meta .tag:nth-child(16),
+.hero-meta .tag:nth-child(20),
+.hero-meta .tag:nth-child(21),
+.hero-meta .tag:nth-child(24) { font-size: 12.5px; }
+
+/* §1 关键英文名称速览 */
+.glossary-section-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink, #21324a);
+  margin: 4px 0 12px;
+}
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+.glossary-card {
+  background: #fff;
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 12px;
+  padding: 13px 15px;
+  box-shadow: 0 1px 2px rgba(33, 50, 74, 0.06);
+}
+.glossary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-bottom: 6px;
+}
+.glossary-term {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.glossary-full {
+  font-size: 12px;
+  color: var(--slate, #68778f);
+}
+.glossary-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2, #68778f);
+}
+
+/* §1 全文脉络路线 */
+.roadmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.roadmap-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--paper-2, #f1f4ee);
+  border: 1px solid var(--line, #d7deea);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.roadmap-no {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue, #27446e);
+  background: var(--blue-soft, #eef2f8);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+.roadmap-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink, #21324a);
+}
+.roadmap-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--slate, #68778f);
+  margin-top: 2px;
+}
