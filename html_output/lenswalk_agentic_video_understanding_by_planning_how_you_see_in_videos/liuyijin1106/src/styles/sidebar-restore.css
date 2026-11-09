@@ -1,0 +1,32 @@
+/* LensWalk chapter labels in the InSpatio PptBars sidebar geometry. */
+.sidebar{padding:0;box-shadow:10px 0 32px rgba(25,42,70,.075)}
+.sidebar-brand{display:flex;align-items:flex-start;min-height:0;padding:20px 18px 14px;border-bottom:1px solid var(--ui-border)}
+.sidebar-brand>div{display:block}
+.sidebar-brand .sidebar-venue{display:block;margin:0 0 4px;color:var(--ui-text-light);font:500 16px/1.7 var(--ui-font-sans)}
+.sidebar-brand .sidebar-title{display:block;color:var(--ui-text-main);font:800 24px/1.35 var(--ui-font-sans);letter-spacing:0}
+.sidebar nav{margin:0;padding:8px;display:flex;flex-direction:column;gap:2px}
+.sidebar nav button{display:flex;align-items:center;gap:10px;min-height:0;margin:0;padding:10px 12px;border-radius:var(--ui-radius-sm)}
+.sidebar nav button>span{flex:0 0 34px;min-width:34px;color:inherit;font:800 16px Georgia,serif}
+.sidebar nav button b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:inherit;font-size:16px;font-weight:500;line-height:1.7}
+.sidebar nav button small{font-size:11px;line-height:1.4}
+.sidebar nav button.active{background:var(--ui-accent);color:#fff;box-shadow:none}
+.sidebar nav button.active>span,.sidebar nav button.active small{color:rgba(255,255,255,.82)}
+.sidebar nav button:disabled{opacity:.45}
+.sidebar-tools{margin:0 8px 8px;padding-top:10px}
+.sidebar-collapse{position:fixed;z-index:71;top:14px;left:288px;display:flex;align-items:center;justify-content:center;width:24px;height:48px;border:1px solid var(--ui-border);border-left:0;border-radius:0 var(--ui-radius-sm) var(--ui-radius-sm) 0;background:var(--ui-bg-card);color:var(--ui-text-muted);font-size:14px}
+.sidebar-collapse:hover{background:var(--ui-bg-soft);color:var(--ui-accent)}
+@media(min-width:769px){
+  .sidebar{width:288px;visibility:visible;pointer-events:auto;transform:none;transition:width var(--t-med) var(--ease-out)}
+  .sidebar-close,.mobile-menu,.nav-backdrop{display:none}
+  .tutorial-main{width:calc(100% - 344px);max-width:1120px;margin-left:max(288px,calc((100vw - 1120px + 288px)/2))}
+  .sidebar-collapsed .sidebar{width:0;overflow:hidden;border:0;box-shadow:none}
+  .sidebar-collapsed .sidebar-collapse{left:8px;border:1px solid var(--ui-border);border-radius:var(--ui-radius-sm)}
+  .sidebar-collapsed .tutorial-main{width:calc(100% - 48px);margin-left:auto;margin-right:auto}
+}
+@media(max-width:768px){
+  .sidebar{width:280px;visibility:hidden;pointer-events:none;transform:translateX(-100%)}
+  .sidebar.open{visibility:visible;pointer-events:auto;transform:translateX(0)}
+  .sidebar-collapse{display:none}
+  .mobile-menu{display:grid}
+  .sidebar-close{display:grid}
+}
