@@ -5,22 +5,16 @@ name: Notify Auto Merge
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
-  workflow_run:
-    workflows: [Validate paper tutorials]
-    types: [completed]
 
 permissions:
   contents: read
 
 concurrency:
-  group: notify-auto-merge-${{ github.event.pull_request.number || github.event.workflow_run.id || github.run_id }}
+  group: notify-auto-merge-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   notify:
-    if: >-
-      github.event_name == 'pull_request_target' ||
-      github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Generate token for the new merge controller
@@ -36,7 +30,7 @@ jobs:
       - name: Notify Auto_Merge
         env:
           DISPATCH_TOKEN: ${{ steps.dispatch-token.outputs.token }}
-          EVENT_TYPE: ${{ github.event_name == 'workflow_run' && 'paperskill-check-complete' || 'paperskill-pr-change' }}
+          EVENT_TYPE: paperskill-pr-change
           SOURCE_REPOSITORY: ${{ github.repository }}
         shell: bash
         run: |
