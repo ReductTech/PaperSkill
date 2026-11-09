@@ -1,0 +1,98 @@
+/* Directly adapted from InSpatio-World's Formula block and [data-tip] rules. */
+.formula-interactive.formula-explain {
+  position: relative;
+  overflow: visible;
+  margin: 14px 0;
+  padding: 12px 20px 14px;
+  background: linear-gradient(135deg, var(--blue-soft) 0%, var(--green-soft) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.formula-interactive .fe-hint {
+  position: static;
+  display: block;
+  margin: 0 0 8px;
+  color: var(--slate-2);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+}
+.formula-interactive .fe-formula {
+  display: block;
+  overflow: visible;
+  max-width: none;
+  margin: 0;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--blue);
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 2.15;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+.formula-interactive .fx-line { display: block; }
+.formula-interactive .fx-line + .fx-line { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.formula-interactive .fx-tag { margin-right: 10px; color: var(--slate-2); font-family: "Segoe UI", sans-serif; font-size: 15px; font-weight: 600; }
+.formula-interactive .fx-group { display: inline-block; white-space: nowrap; }
+.formula-interactive .fe-formula-sym,
+.formula-interactive-inline .fe-formula-sym {
+  cursor: pointer;
+  border-bottom: 1px dotted rgba(39,68,110,.5);
+  border-radius: 4px;
+  padding: 0 1px;
+  white-space: nowrap;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.formula-interactive .fe-formula-sym:hover,
+.formula-interactive-inline .fe-formula-sym:hover,
+.formula-interactive .fe-formula-sym:focus-visible,
+.formula-interactive-inline .fe-formula-sym:focus-visible { background: var(--blue-soft); outline: 2px solid var(--blue); outline-offset: 2px; }
+.formula-interactive .fe-formula-sym.active,
+.formula-interactive-inline .fe-formula-sym.active { background: var(--blue); color: #fff; border-bottom-color: #fff; }
+.fe-tooltip {
+  position: fixed;
+  z-index: 2000;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 16px));
+  padding: 7px 11px;
+  background: var(--ink);
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  color: #fff;
+  font-family: var(--ui-font-sans);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.45;
+  pointer-events: none;
+  white-space: normal;
+  animation: fe-tip-fade var(--t-fast) var(--ease-out) both;
+}
+@keyframes fe-tip-fade { from { opacity: 0; } to { opacity: 1; } }
+.formula-interactive-inline { display: inline; white-space: nowrap; }
+.formula-interactive-inline .fe-formula {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: "Cambria Math", Georgia, serif;
+  font-size: 1em;
+  font-weight: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+.policy-core > .formula-interactive-inline { display: block; margin: 0 0 8px; color: #27446e; font-size: 19px; font-weight: 700; }
+.policy-result > .formula-interactive-inline { display: inline-block; color: #27446e; font-size: 11px; }
+@media (max-width: 760px) {
+  .formula-interactive .fe-formula { padding: 12px 10px; font-size: 18px; line-height: 2; overflow-x: auto; }
+  .formula-interactive.formula-explain { padding: 12px 10px 10px; }
+}
