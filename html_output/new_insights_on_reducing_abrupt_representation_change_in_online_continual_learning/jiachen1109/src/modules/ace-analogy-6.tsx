@@ -1,0 +1,40 @@
+import React, {useEffect,useRef} from 'react';
+import {setupCanvas,observeCanvas} from '../lib/canvasKit';
+export const palette={bg:'#f5f8f0',blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#f07e47',purple:'#7c3aed',ink:'#21324a',muted:'#68778f',border:'#d7deea',light:'#b8c9a7',brown:'#92400e'};
+type Draw=(ctx:CanvasRenderingContext2D,w:number,h:number)=>void;
+type SceneProps={draw:Draw;label:string;onPointerDown?:React.PointerEventHandler<HTMLCanvasElement>;onPointerMove?:React.PointerEventHandler<HTMLCanvasElement>;onPointerUp?:React.PointerEventHandler<HTMLCanvasElement>;onKeyDown?:React.KeyboardEventHandler<HTMLCanvasElement>;tabIndex?:number};
+export function Scene({draw,label,...events}:SceneProps){const ref=useRef<HTMLCanvasElement>(null);useEffect(()=>{const canvas=ref.current;if(!canvas)return;const ctx=setupCanvas(canvas,1080,280);canvas.style.width='100%';canvas.style.height='auto';const redraw=()=>{ctx.clearRect(0,0,1080,280);ctx.fillStyle=palette.bg;ctx.fillRect(0,0,1080,280);draw(ctx,1080,280);canvas.classList.add('is-ready');};redraw();return observeCanvas(canvas,redraw,()=>{});},[draw]);return <canvas ref={ref} className="ace-canvas" aria-label={label} role="img" {...events}/>;}
+export function Feedback({tone='blue',children}:{tone?:'blue'|'green'|'red'|'purple';children:React.ReactNode}){return <div className={`ace-feedback ace-feedback-${tone}`} aria-live="polite">{children}</div>;}
+export function Prose({children}:{children:React.ReactNode}){return <div className="ace-prose">{children}</div>;}
+export function MathBox({children}:{children:React.ReactNode}){return <div className="ace-math">{children}</div>;}
+export function Controls({children}:{children:React.ReactNode}){return <div className="ace-controls">{children}</div>;}
+export function Chips({options,value,onChange,label}:{options:string[];value:number;onChange:(n:number)=>void;label?:string}){return <div className="ace-controls" role="group" aria-label={label||'选择配置'}>{options.map((x,i)=><button type="button" className="chip" key={x} aria-pressed={i===value} onClick={()=>onChange(i)}>{x}</button>)}</div>;}
+export function Source({locator,children}:{locator:string;children?:React.ReactNode}){return <p className="ace-source">依据：<a href="https://arxiv.org/abs/2104.05025" target="_blank" rel="noreferrer">论文 {locator}</a>{children&&<> · {children}</>}</p>;}
+export function dot(c:CanvasRenderingContext2D,x:number,y:number,r:number,color:string){c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fillStyle=color;c.fill();}
+export function bar(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string){c.fillStyle=color;c.fillRect(x,y,Math.max(0,w),h);}
+export function arrow(c:CanvasRenderingContext2D,x1:number,y1:number,x2:number,y2:number,color:string){c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();const a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-12*Math.cos(a-.45),y2-12*Math.sin(a-.45));c.lineTo(x2-12*Math.cos(a+.45),y2-12*Math.sin(a+.45));c.closePath();c.fillStyle=color;c.fill();}
+export function axes(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number){c.strokeStyle=palette.border;c.lineWidth=2;c.beginPath();c.moveTo(x,y);c.lineTo(x+w,y);c.moveTo(x,y);c.lineTo(x,y-h);c.stroke();}
+export function paintPaper(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number){c.fillStyle=palette.light;c.fillRect(x+5,y+5,w,h);c.fillStyle='#fff';c.fillRect(x,y,w,h);c.strokeStyle=palette.border;c.lineWidth=2;c.strokeRect(x,y,w,h);}
+export function paintStencil(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number){c.save();c.fillStyle='#b8c9a755';c.fillRect(x,y,w,h);c.clearRect(x+w*.26,y+h*.22,w*.48,h*.56);c.strokeStyle=palette.blue;c.lineWidth=2;c.setLineDash([6,5]);c.strokeRect(x+w*.26,y+h*.22,w*.48,h*.56);c.restore();}
+export function paintBrush(c:CanvasRenderingContext2D,x:number,y:number,a:number,color:string){c.save();c.translate(x,y);c.rotate(a);c.fillStyle=palette.brown;c.fillRect(-4,-65,8,47);c.fillStyle=palette.light;c.fillRect(-6,-22,12,12);c.beginPath();c.moveTo(-7,-11);c.quadraticCurveTo(-9,1,0,10);c.quadraticCurveTo(9,1,7,-11);c.fillStyle=color;c.fill();c.restore();}
+
+function bloom(c:CanvasRenderingContext2D,x:number,y:number,color:string){c.strokeStyle=color;c.lineWidth=3;for(let i=0;i<5;i++){const a=i*Math.PI*2/5;c.beginPath();c.ellipse(x+15*Math.cos(a),y+15*Math.sin(a),13,7,a,0,Math.PI*2);c.stroke();}dot(c,x,y,5,color);}
+function painting(c:CanvasRenderingContext2D,w:number,h:number,index:number,t:number,isNew=true){
+ c.fillStyle=palette.bg;c.fillRect(0,0,w,h);const k=w/560;c.save();c.scale(k,h/140);paintPaper(c,62,23,426,99);
+ const phase=(t/3000)%1;const wave=Math.sin(phase*Math.PI*2);const oldX=150+(isNew?0:18*wave);bloom(c,oldX,73,isNew?palette.green:palette.red);
+ c.strokeStyle=palette.blue;c.lineWidth=4;c.beginPath();c.moveTo(280,91);c.quadraticCurveTo(320,35,381,77);c.stroke();
+ let bx=320,by=60,ang=.4;
+ if(index===1){bx=250+phase*110;by=100-phase*40;ang=-.3;}
+ if(index===2){bx=260+wave*26;by=42;ang=.8;c.strokeStyle=palette.brown;c.strokeRect(244,34,160,75);}
+ if(index===3){bx=371+Math.cos(phase*Math.PI*2)*24;by=79+wave*14;dot(c,373,82,24,palette.light);ang=wave*.25;}
+ if(index===4){bx=300+wave*32;by=76;c.fillStyle='#b8c9a755';c.fillRect(225,40,55,67);c.fillRect(375,40,55,67);c.strokeStyle=palette.blue;c.setLineDash([5,4]);c.strokeRect(280,40,95,67);c.setLineDash([]);}
+ if(index===5){bx=327;by=72+wave*9;ang=.15;c.lineWidth=5+wave*3;c.beginPath();c.moveTo(293,96);c.lineTo(360,96);c.stroke();}
+ if(index===6){bx=280+phase*96;by=89-25*Math.sin(phase*Math.PI);ang=-.3;}
+ if(index===7){bx=295+wave*9;by=98;ang=1.1;c.strokeStyle=palette.brown;c.beginPath();c.moveTo(98,122);c.lineTo(460,122);c.stroke();}
+ if(index===8){bx=330+phase*45;by=64;ang=.7;c.strokeStyle=palette.border;c.beginPath();c.moveTo(263,28);c.lineTo(263,115);c.stroke();}
+ if(index===9){bx=348+wave*5;by=58;ang=-.55;c.strokeStyle=palette.orange;c.lineWidth=3;c.beginPath();c.arc(342,73,27,0,Math.PI*2);c.stroke();}
+ if(index===10){bx=310+phase*49;by=76+Math.sin(phase*Math.PI)*13;ang=.2;c.strokeStyle=palette.green;c.lineWidth=3;c.beginPath();c.moveTo(300,90);c.lineTo(320,105);c.lineTo(363,57);c.stroke();}
+ paintBrush(c,bx,by,ang,isNew?palette.blue:palette.red);c.restore();
+}
+function AnimatedPainting({index,isNew=true}:{index:number;isNew?:boolean}){const ref=useRef<HTMLCanvasElement>(null);useEffect(()=>{const el=ref.current;if(!el)return;const w=560,h=140;const ctx=setupCanvas(el,w,h);el.style.width='100%';el.style.height='auto';let frame=0,active=false;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;const render=(time:number)=>{painting(ctx,w,h,index,reduce?1200:time,isNew);el.classList.add('is-ready');if(active&&!reduce)frame=requestAnimationFrame(render);};render(1200);const start=()=>{if(active)return;active=true;frame=requestAnimationFrame(render);};const stop=()=>{active=false;cancelAnimationFrame(frame);};const disconnect=observeCanvas(el,start,stop);return()=>{stop();disconnect();};},[index,isNew]);return <canvas ref={ref} className="ace-canvas ace-analogy" role="img" aria-label={`绘画类比：第${index}种局部笔触`}/>;}
+export function AceAnalogy1(){return <AnimatedPainting index={1}/>;}export function AceAnalogy2(){return <AnimatedPainting index={2}/>;}export function AceAnalogy3(){return <AnimatedPainting index={3}/>;}export function AceAnalogy4(){return <AnimatedPainting index={4}/>;}export function AceAnalogy5(){return <AnimatedPainting index={5}/>;}export function AceAnalogy6(){return <AnimatedPainting index={6}/>;}export function AceAnalogy7(){return <AnimatedPainting index={7}/>;}export function AceAnalogy8(){return <AnimatedPainting index={8}/>;}export function AceAnalogy9(){return <AnimatedPainting index={9}/>;}export function AceAnalogy10(){return <AnimatedPainting index={10}/>;}export function AceHeroOld(){return <AnimatedPainting index={1} isNew={false}/>;}export function AceHeroNew(){return <AnimatedPainting index={4}/>;}
