@@ -1,0 +1,279 @@
+/* Foundation adapted from Inspatio components.css; no teaching state lives here. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  background: var(--ui-bg-page);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--ui-text-main);
+  font: var(--ui-body)/1.7 var(--ui-font-sans);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(39, 68, 110, 0.06),
+      transparent 30%
+    ),
+    linear-gradient(180deg, var(--ui-bg-page-top), var(--ui-bg-page));
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  color: var(--ui-text-muted);
+  background: var(--ui-bg-muted);
+  box-shadow: none;
+}
+
+a {
+  color: var(--ui-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+strong {
+  font-weight: 700;
+}
+
+code {
+  font: 0.9em/1.7 var(--ui-font-mono);
+  color: var(--ui-accent);
+  background: var(--ui-bg-soft);
+  padding: 2px 5px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+
+:focus-visible {
+  outline: var(--ui-focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--ui-bg-soft);
+  color: var(--ui-accent);
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: rgba(39, 68, 110, 0.12);
+}
+
+button,
+.button-primary,
+.button-outline,
+.button-ghost {
+  transition:
+    transform var(--t-fast) var(--ease-out),
+    box-shadow var(--t-fast) var(--ease-out),
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out);
+}
+
+button:active:not(:disabled),
+a.button-primary:active,
+a.button-outline:active {
+  transform: scale(0.97);
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.tutorial-main {
+  max-width: var(--ui-page-width);
+  margin: 0 auto;
+  padding: 0 28px 80px;
+}
+
+.chapter {
+  scroll-margin-top: 20px;
+  margin-top: var(--ui-space-8);
+  padding: var(--ui-space-8);
+  background: var(--ui-bg-card);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.section-heading {
+  margin-bottom: 24px;
+}
+
+.section-number {
+  font:
+    italic 700 26px/1.3 Georgia,
+    serif;
+  color: var(--ui-accent);
+  flex-shrink: 0;
+}
+
+.section-heading h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 4px 0 0;
+  font-size: var(--ui-title-chapter);
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.section-kicker,
+.eyebrow {
+  color: var(--ui-accent);
+  font-size: var(--ui-badge);
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.section-body > p {
+  color: var(--ui-text-muted);
+}
+
+.section-body .lead {
+  color: var(--ui-text-main);
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.small-prose {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.subtle {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-caption);
+  line-height: 1.7;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 6px;
+  color: var(--ui-text-muted);
+  font-size: 14px;
+}
+
+.footer strong {
+  color: var(--ui-accent);
+}
+
+.footer p {
+  margin: 4px 0;
+}
+
+.footer > div:last-child {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+@media (min-width: 1380px) {
+  .tutorial-main {
+    margin-left: max(240px, calc((100vw - 1120px) / 2));
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 17px;
+  }
+
+  .tutorial-main {
+    padding: 0 12px 56px;
+  }
+
+  .chapter {
+    padding: 20px 16px;
+    border-radius: var(--ui-radius-md);
+  }
+
+  .section-heading h2 {
+    font-size: 26px;
+  }
+
+  .section-heading h2 {
+    gap: 10px;
+  }
+
+  .section-number {
+    font-size: 24px;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:active:not(:disabled),
+  a.button-primary:active,
+  a.button-outline:active {
+    transform: none;
+  }
+}
