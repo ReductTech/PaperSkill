@@ -1,0 +1,99 @@
+/* SparseVLM 长滚动版的论文专属样式。外壳尺寸与视觉沿用 v9.css（参照页原样）；这里只加本教程用到的
+   证据芯片、术语、公式、收束、视频与封面容器。颜色取 --sv-*（sv-palette.ts 写入）或 tokens.css 的语义色。
+   小屏规则在文件末尾。 */
+
+/* 证据芯片 */
+.sv-ev { display: inline-block; margin: 0 2px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--line); background: #f6f8fc; color: var(--blue); font-size: 12px; font-weight: 700; line-height: 1.7; text-decoration: none; white-space: nowrap; vertical-align: 1px; }
+@media (hover: hover) { .sv-ev:hover { border-color: var(--blue); } }
+.sv-ev.is-code { font-family: Consolas, "SFMono-Regular", Menlo, monospace; }
+.sv-ev.is-arxiv { color: #7a5b16; }
+.sv-ev.is-ext { color: var(--ink-2); }
+.sv-term.formula-symbol { border-bottom: 1px dashed var(--blue); color: inherit; }
+.sv-muted { color: var(--ink-2); }
+.v9-check code, .cb-text code, .insight-bar code, .v9-pits code { font-family: Consolas, "SFMono-Regular", Menlo, monospace; font-size: 0.9em; padding: 0 4px; border-radius: 4px; background: rgba(39, 68, 110, 0.07); overflow-wrap: anywhere; }
+
+/* 开场段与“符号与推导” */
+.cb-text.sv-intro { color: var(--ink); font-size: 16px; }
+.sv-derive { display: flex; flex-direction: column; gap: 4px; margin: 12px 0; padding: 10px 14px; border-left: 4px solid var(--line-2); border-radius: 0 8px 8px 0; background: #f6f8fc; font-size: 14px; }
+.sv-derive b { font-size: 13px; color: var(--ink-2); }
+.sv-deep-list { margin: 4px 0; padding-left: 1.3em; }
+.v9-facts span .sv-tag { margin-left: 2px; }
+
+/* 公式：公式片段整体不断开，放不下时公式框自身可滑动 */
+.fe-formula { max-width: 100%; }
+.sv-formula { display: inline-block; white-space: normal; }
+.sv-formula .fx-seg { display: inline-block; white-space: nowrap; margin: 0 0.4em; }
+.sv-formula i { font-style: italic; }
+.sv-formula sub, .sv-formula sup { font-size: 0.65em; line-height: 0; }
+.sv-formula .frac { white-space: nowrap; }
+
+/* 还没展开到收束时，最后一章可能比视口短：留出底部空间，跳章后章标题仍能对齐到视口顶部 */
+.v9-main.is-partial { padding-bottom: max(120px, 75vh); }
+
+/* 封面对比画布 */
+.sv-hero-duel { text-align: left; }
+
+/* 收束 */
+.sv-verdict-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+.sv-verdict-col { padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; border-top-width: 4px; min-width: 0; }
+.sv-verdict-col.is-ok { border-top-color: var(--sv-green); }
+.sv-verdict-col.is-warn { border-top-color: var(--sv-amber); }
+.sv-verdict-col.is-unknown { border-top-color: var(--ink-2); }
+.sv-verdict-col h3 { font-size: 16px; margin-bottom: 4px; }
+.sv-verdict-col > p { font-size: 13px; }
+.sv-verdict-col ul { margin: 8px 0 0; padding-left: 1.1em; font-size: 14px; }
+.sv-verdict-col li { margin: 8px 0; }
+.sv-verdict-col li b { display: block; font-weight: 700; }
+.sv-verdict-col li span { display: block; font-size: 13px; color: var(--ink-2); }
+.sv-retell { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--line); }
+.sv-retell summary { cursor: pointer; font-weight: 700; }
+.sv-retell p { margin-top: 6px; }
+.sv-gloss { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; }
+.sv-gloss > div { padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.sv-gloss dt { font-weight: 800; }
+.sv-gloss dt span { margin-left: 8px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.sv-gloss dd { font-size: 14px; }
+.sv-gloss-k { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 4px; background: #f1f4f9; color: var(--ink-2); font-size: 12px; font-weight: 700; }
+.sv-sources { list-style: none; display: grid; gap: 8px; margin-bottom: 12px; }
+.sv-sources li { display: flex; flex-direction: column; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.sv-sources li span { font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+.sv-legend-block { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; }
+.sv-legend-block h3 { font-size: 16px; }
+.sv-legend-block > p { font-size: 13px; margin-bottom: 8px; }
+.sv-legend-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 8px 16px; font-size: 14px; }
+.sv-legend-list li { display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 6px; align-items: baseline; }
+.sv-legend-list li span { grid-column: 2; font-size: 12.5px; color: var(--ink-2); }
+.sv-legend-list.is-status { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+
+/* 视频区沿用 DivPrune / VTW 的卡片，补充标题对齐与说明 */
+.sv-videos .dl-video-card strong { min-height: 3em; }
+.sv-videos .dl-video-meta { flex-wrap: wrap; justify-content: space-between; }
+.sv-videos > .sv-video-note { margin: 18px 0 0; font-size: 12px; line-height: 1.7; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .sv-videos .dl-video-link-cover { transition: none; } }
+
+/* ---------- 中间宽度（≤ 1279）：定位时让出顶栏 ---------- */
+@media (max-width: 1279px) {
+  .chap, .sv-videos, .hero { scroll-margin-top: 54px; }
+}
+/* ---------- ≤ 960 ---------- */
+@media (max-width: 960px) {
+  .sv-verdict-cols { grid-template-columns: 1fr; }
+  /* 参照页在 960 以下让模块正文横向滚动（为整体缩放的旧模块准备）；本教程模块都是容器适配，不需要 */
+  .module-body { overflow-x: visible; }
+}
+/* ---------- 手机竖屏（≤ 720）：上下排列（放在文件末尾，保证覆盖前面的桌面规则） ---------- */
+@media (max-width: 720px) {
+  .sv-gloss { grid-template-columns: 1fr; }
+  .module-body { padding: 14px 14px 16px; }
+  .module-head { padding: 10px 14px; }
+  .hero-stats b { font-size: 20px; }
+  .hero-stats > div { padding: 12px 8px; }
+  .v9-facts { grid-template-columns: 1fr; }
+  .formula-explain { padding: 12px 10px; }
+  .fe-formula { padding: 8px 6px; font-size: 18px; }
+  .sv-formula .fx-seg { margin: 0 0.2em; }
+}
+@media (max-width: 560px) {
+  .sv-videos { padding: 22px 16px; }
+}
+.sv-formula .up { font-style: normal; font-family: "Times New Roman", serif; }
