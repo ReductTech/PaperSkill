@@ -1,0 +1,204 @@
+/* 容器适配的交互模块：不经整体 zoom，按卡片实际宽度布局（取自 VTW v7.3 live.css，配色改读 --sv-*）。
+   字号与控件用网页真实尺寸；模块内容宽度不足 700px 时图在上、控件与即时反馈在下（容器查询）。 */
+
+.sv-live {
+  container-type: inline-size;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.lv-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 310px);
+  gap: 20px;
+  align-items: start;
+}
+.lv-split.is-wide-side {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+.lv-side {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+}
+@container (max-width: 700px) {
+  .lv-split,
+  .lv-split.is-wide-side {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+.lv-stage {
+  width: 100%;
+  min-width: 0;
+}
+.lv-stage canvas {
+  display: block;
+  border-radius: 14px;
+  background: var(--sv-stage);
+  border: 1px solid var(--sv-stageLine);
+  touch-action: pan-y;
+}
+.lv-note {
+  font-size: 13px;
+  color: var(--sv-muted);
+  line-height: 1.55;
+}
+
+/* 时间轴控制条 */
+.lv-tbar {
+  display: grid;
+  gap: 8px;
+}
+.lv-tbar-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lv-tbar-btn {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--sv-line2);
+  background: #fff;
+  color: var(--sv-blue);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .lv-tbar-btn:hover {
+    border-color: var(--sv-blue);
+  }
+}
+.lv-tbar-btn:active {
+  transform: scale(0.97);
+}
+.lv-tbar-btn:focus-visible,
+.lv-ph:focus-visible,
+.lv-tbar-range:focus-visible {
+  outline: 3px solid rgba(47, 107, 255, 0.55);
+  outline-offset: 2px;
+}
+.lv-ic.is-play {
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-style: solid;
+  border-width: 7px 0 7px 12px;
+  border-color: transparent transparent transparent var(--sv-blue);
+}
+.lv-ic.is-pause {
+  width: 11px;
+  height: 14px;
+  border-left: 4px solid var(--sv-blue);
+  border-right: 4px solid var(--sv-blue);
+}
+.lv-tbar-range {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1 1 160px;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.lv-tbar-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sv-blue) 0 var(--p), #e3e8f0 var(--p));
+}
+.lv-tbar-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--sv-blue);
+  box-shadow: 0 1px 4px rgba(25, 42, 70, 0.2);
+}
+.lv-tbar-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #e3e8f0;
+}
+.lv-tbar-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sv-blue);
+}
+.lv-tbar-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--sv-blue);
+}
+.lv-tbar-phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lv-ph {
+  font-size: 13px;
+  line-height: 1.3;
+  min-height: 32px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1.5px solid var(--sv-line);
+  background: #fff;
+  color: var(--sv-ink);
+  cursor: pointer;
+  transition: background-color 0.24s, border-color 0.24s, color 0.24s, transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .lv-ph:hover {
+    border-color: var(--sv-line2);
+  }
+}
+.lv-ph:active {
+  transform: scale(0.97);
+}
+.lv-ph.is-cur {
+  background: var(--sv-blue);
+  border-color: var(--sv-blue);
+  color: #fff;
+}
+@media (pointer: coarse) {
+  .lv-ph {
+    min-height: 40px;
+    padding: 6px 14px;
+  }
+  .lv-tbar-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .lv-tbar-range::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lv-tbar-btn,
+  .lv-ph {
+    transition: none;
+  }
+}
+
+/* 减少动态效果（系统设置或 ?motion=reduce）：全站关闭 CSS 过渡与入场动画 */
+.is-reduced-motion *,
+.is-reduced-motion *::before,
+.is-reduced-motion *::after {
+  transition: none !important;
+  animation: none !important;
+}

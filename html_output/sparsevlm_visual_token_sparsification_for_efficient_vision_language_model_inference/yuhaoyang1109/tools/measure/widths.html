@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>宽度检查</title>
+<!-- 把教程放进同源 iframe，逐个设置 iframe 宽度；记录的是教程页面自身的 window.innerWidth。不进正式构建。 -->
+<style>body{margin:0;font:13px system-ui} iframe{border:0;display:block}</style>
+<iframe id="f"></iframe>
+<script>
+window.__runWidths = async (widths, states = false, query = 'motion=reduce&all=1') => {
+  const f = document.getElementById('f');
+  const out = [];
+  for (const w of widths) {
+    f.style.width = w + 'px';
+    f.style.height = ({ 360: 800, 390: 844, 430: 932 }[w] || (w <= 1024 ? 768 : 900)) + 'px';
+    await new Promise((r) => { f.onload = r; f.src = './index.html?' + query + '&_=' + w + '_' + Date.now(); });
+    await new Promise((r) => setTimeout(r, 1200));
+    const win = f.contentWindow;
+    await new Promise((r) => { const s = win.document.createElement('script'); s.src = './layout.js?' + Date.now(); s.onload = r; win.document.body.appendChild(s); });
+    out.push(await win.__layoutCheck(states));
+  }
+  return out;
+};
+</script>
