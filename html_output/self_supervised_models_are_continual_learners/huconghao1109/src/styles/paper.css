@@ -1,0 +1,266 @@
+/* CaSSLe 交互教程 · 乐队换琴 / 移调合奏
+   语义色沿用 tokens.css：蓝=当前/引导，绿=本文方法/成功，红=失败/旧方法，
+   橙=用户控制的强调，紫=辅助。此处只加场景色与连续滚动布局。 */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-wood: #92400e;
+  --paper-fork: #27446e;
+  --scroll-nav-w: 272px;
+}
+
+/* ---------- 顶部阅读进度 ---------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 90;
+  pointer-events: none;
+}
+.scroll-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  transition: width 120ms linear;
+}
+
+/* ---------- 外壳：左侧目录 + 右侧连续滚动 ---------- */
+.scroll-shell {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.scroll-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 100vh;
+  width: var(--scroll-nav-w);
+  flex: 0 0 var(--scroll-nav-w);
+  padding: 28px 14px 22px;
+  overflow-y: auto;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+}
+.scroll-nav-head {
+  margin-bottom: 12px;
+  padding: 0 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.scroll-nav-venue {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.scroll-nav-title {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.scroll-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.scroll-nav-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.42;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.scroll-nav-item:hover {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.scroll-nav-item.active {
+  background: var(--blue);
+  color: #fff;
+}
+.scroll-nav-num {
+  flex: 0 0 34px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  opacity: 0.8;
+}
+.scroll-nav-text {
+  flex: 1;
+}
+.scroll-nav-item.active .scroll-nav-num {
+  opacity: 1;
+}
+.scroll-nav-foot {
+  margin-top: 18px;
+  padding: 14px 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--slate-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scroll-nav-toggle {
+  display: none;
+}
+.scroll-nav-mask {
+  display: none;
+}
+
+/* ---------- 主列 ---------- */
+.scroll-main {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 34px 64px;
+}
+.scroll-main > #top .hero {
+  margin: 0 0 26px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.scroll-chap {
+  margin: 26px 0 0;
+}
+.scroll-chap .chap-title {
+  margin-bottom: 6px;
+}
+.scroll-chap .module-desc {
+  max-width: 78ch;
+}
+.scroll-chap .module + .module {
+  margin-top: 16px;
+}
+.scroll-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--slate-2);
+  font-size: 13px;
+}
+.scroll-fallback {
+  max-width: 720px;
+  margin: 80px auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink-2);
+}
+
+/* ---------- Canvas 等比自适应 ---------- */
+.module canvas,
+.analogy-visual canvas,
+.bg-side-canvas canvas {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  border-radius: 10px;
+}
+.analogy-visual {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+.module .chip-row {
+  flex-wrap: wrap;
+}
+
+/* ---------- 小屏 ---------- */
+@media (max-width: 900px) {
+  .scroll-shell {
+    display: block;
+  }
+  .scroll-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    max-height: 72vh;
+    padding: 22px 12px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-102%);
+    transition: transform 240ms var(--ease-out);
+    box-shadow: var(--ui-shadow-hover);
+  }
+  .scroll-nav.open {
+    transform: translateY(0);
+  }
+  .scroll-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 70;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+  }
+  .scroll-nav-mask {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(24, 36, 56, 0.22);
+  }
+  .scroll-main {
+    padding: 58px 12px 48px;
+  }
+  section.chap {
+    padding: 20px 16px;
+  }
+  .analogy-card {
+    flex-direction: column;
+  }
+  .analogy-visual {
+    width: 100%;
+  }
+  .scroll-chap .module-desc {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  section.chap {
+    padding: 16px 12px;
+  }
+  .chap-title {
+    font-size: 1.4rem;
+  }
+  .hero-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
