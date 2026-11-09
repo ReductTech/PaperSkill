@@ -1,0 +1,1 @@
+export { HeroNew } from './scenes';
