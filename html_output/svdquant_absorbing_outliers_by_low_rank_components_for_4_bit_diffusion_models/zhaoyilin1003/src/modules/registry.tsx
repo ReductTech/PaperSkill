@@ -8,6 +8,8 @@ import { TransformToggle } from './transformToggle';
 import { LayerStep } from './layerStep';
 import { QuantRace } from './quantRace';
 import { GridAnalog } from './gridAnalog';
+import { ProtectToggle } from './protectToggle';
+import { RankSlider } from './rankSlider';
 
 export interface WidgetProps {
   chapterId: string;
@@ -25,3 +27,5 @@ widgetRegistry['transform-toggle'] = TransformToggle;
 widgetRegistry['layer-step'] = LayerStep;
 widgetRegistry['quant-race'] = QuantRace;
 widgetRegistry['grid-analog'] = GridAnalog;
+widgetRegistry['protect-toggle'] = ProtectToggle;
+widgetRegistry['rank-slider'] = RankSlider;
