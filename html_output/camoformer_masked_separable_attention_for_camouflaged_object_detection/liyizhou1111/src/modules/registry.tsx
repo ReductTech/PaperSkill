@@ -1,0 +1,58 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { CamoProblem } from './camo-1';
+import { Camo10 } from './camo-10';
+import { CamoFeatures } from './camo-2';
+import { CamoBranches } from './camo-3';
+import { CamoMaskMath } from './camo-4';
+import { CamoShapeSteps } from './camo-4b';
+import { CamoSoftMask } from './camo-5';
+import { CamoRefinement } from './camo-6';
+import { Camo7 } from './camo-7';
+import { Camo8 } from './camo-8';
+import { Camo9 } from './camo-9';
+import { KitPreview } from './camo-kit';
+import { CamoNew } from './camo-new';
+import { CamoOld } from './camo-old';
+import { CamoScene1 } from './camo-scene-1';
+import { CamoScene10 } from './camo-scene-10';
+import { CamoScene2 } from './camo-scene-2';
+import { CamoScene3 } from './camo-scene-3';
+import { CamoScene4 } from './camo-scene-4';
+import { CamoScene5 } from './camo-scene-5';
+import { CamoScene6 } from './camo-scene-6';
+import { CamoScene7 } from './camo-scene-7';
+import { CamoScene8 } from './camo-scene-8';
+import { CamoScene9 } from './camo-scene-9';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['camo-1'] = CamoProblem;
+widgetRegistry['camo-10'] = Camo10;
+widgetRegistry['camo-2'] = CamoFeatures;
+widgetRegistry['camo-3'] = CamoBranches;
+widgetRegistry['camo-4'] = CamoMaskMath;
+widgetRegistry['camo-4b'] = CamoShapeSteps;
+widgetRegistry['camo-5'] = CamoSoftMask;
+widgetRegistry['camo-6'] = CamoRefinement;
+widgetRegistry['camo-7'] = Camo7;
+widgetRegistry['camo-8'] = Camo8;
+widgetRegistry['camo-9'] = Camo9;
+widgetRegistry['camo-kit'] = KitPreview;
+widgetRegistry['camo-new'] = CamoNew;
+widgetRegistry['camo-old'] = CamoOld;
+widgetRegistry['camo-scene-1'] = CamoScene1;
+widgetRegistry['camo-scene-10'] = CamoScene10;
+widgetRegistry['camo-scene-2'] = CamoScene2;
+widgetRegistry['camo-scene-3'] = CamoScene3;
+widgetRegistry['camo-scene-4'] = CamoScene4;
+widgetRegistry['camo-scene-5'] = CamoScene5;
+widgetRegistry['camo-scene-6'] = CamoScene6;
+widgetRegistry['camo-scene-7'] = CamoScene7;
+widgetRegistry['camo-scene-8'] = CamoScene8;
+widgetRegistry['camo-scene-9'] = CamoScene9;
