@@ -1,0 +1,55 @@
+/* A single moving marker shows where each discrete control is headed.
+   Its buttons retain independent hit areas and focus rings. */
+.vz-segment { position: relative; isolation: isolate; }
+.vz-segment > button { position: relative; z-index: 1; }
+.vz-segment > .vz-segment-marker {
+  position: absolute; z-index: 0; margin: 0; padding: 0; border: 0;
+  border-radius: var(--segment-radius,999px); pointer-events: none; transform-origin: top left;
+  background: var(--segment-fill,#e6e9fc); box-shadow: inset 0 0 0 1px var(--segment-line,#bdc4ee);
+}
+.vz-segment .vz-segment-marker[hidden] { display: none; }
+.vzlab-switch, .vz-choice-line {
+  --segment-radius: 7px; --segment-fill: #fff; --segment-line: #c3cadf;
+}
+.vzlab-steps { --segment-radius: 7px; --segment-fill: #e9eaff; --segment-line: transparent; }
+.budget-kinds { --segment-radius: 8px; }
+.vz-segment.vz-segment > button[aria-pressed='true'],
+.reader .vzs-panel .vz-segment > button[aria-pressed='true'] {
+  background: transparent; border-color: transparent; color: #343a91; box-shadow: none;
+}
+.vz-segment.vz-segment > button:not([aria-pressed='true']):not(:hover) { background: transparent; }
+.budget-kinds.vz-segment > button[aria-pressed='true'] { outline: none; }
+.budget-kinds.vz-segment > button:focus-visible { outline: 3px solid #e58d45; }
+.vz-question-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.vz-question-options button { margin: 0; }
+.reader :is(button, summary, .vzs-next a, .vz-cover-routes a, .vz-cover-start a, .vzs-side-item, .vzs-progress a):not(:disabled):not(.vzlab-patch):not(.budget-cell):not(.vz-hint-inline) {
+  transition: scale 140ms cubic-bezier(.2,.8,.2,1), color 140ms ease-out, border-color 140ms ease-out;
+}
+.reader :is(button,summary,.vzs-next a,.vz-cover-routes a,.vz-cover-start a,.vzs-side-item,.vzs-progress a):not(:disabled):not(.vzlab-patch):not(.budget-cell):not(.vz-hint-inline):active { scale: .97; }
+.reader :is(button,summary):focus-visible { outline: 2px solid #5550b2; outline-offset: 3px; }
+.vz-average-rail i { transform-origin: left; transition: transform 360ms cubic-bezier(.22,1,.36,1); }
+
+/* Budget changes animate the output as a single surface, keeping large grids light. */
+.vz-token-grid > i.vz-cell-cls, .vz-token-grid > i.vz-cell-dom, .vz-token-grid > i.vz-cell-ctx { animation: none; }
+.vz-duel-panes:not(.is-playing) .vz-coast-grid { animation: none; }
+.vz-duel-panes.is-playing .vz-token-grid { animation: vz-cover-grid 420ms cubic-bezier(.22,1,.36,1) both; }
+html:is(.is-reduced-motion,.vz-ui-hidden) .reader *, html:is(.is-reduced-motion,.vz-ui-hidden) .reader *::before,
+html:is(.is-reduced-motion,.vz-ui-hidden) .reader *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition-duration: 0s !important; }
+html:is(.is-reduced-motion,.vz-ui-hidden) .reader :active { scale: none !important; }
+html.is-reduced-motion .vz-cover-replay { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reader *, .reader *::before, .reader *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition-duration: 0s !important; }
+  .reader :active { scale: none !important; }
+}
+
+
+.vzlab-grid .vzlab-patch.is-pinned::after { content: none; }
+.vzlab-pin-layer {
+  position: absolute; z-index: 2; pointer-events: none; top: 0; left: 0;
+  transition: transform 330ms cubic-bezier(.22,1,.36,1);
+}
+.vzlab-pin-layer::after {
+  content: ''; position: absolute; bottom: 7px; left: 7px; width: 9px; height: 9px;
+  border: 1.5px solid white; border-radius: 1px; background: #26324d;
+  box-shadow: 0 0 0 1px #46506b; transform: rotate(45deg);
+}
