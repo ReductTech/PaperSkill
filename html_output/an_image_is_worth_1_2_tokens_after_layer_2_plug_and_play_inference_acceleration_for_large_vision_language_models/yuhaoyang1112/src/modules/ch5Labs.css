@@ -1,0 +1,178 @@
+#chap-5 .module-head .num {
+  color: white;
+  background: #514a91;
+}
+
+#chap-5 .prune-strategies,
+#chap-5 .prune-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#chap-5 .prune-strategies {
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+#chap-5 .prune-strategies .chip-group,
+#chap-5 .prune-strategies .lab-context {
+  margin: 0;
+}
+
+#chap-5 .prune-strategies .chip-row {
+  justify-content: flex-start;
+}
+
+#chap-5 .prune-strategies .chip.is-on {
+  background: #514a91;
+  border-color: #514a91;
+}
+
+#chap-5 .prune-origin {
+  color: #5f5678;
+  font-size: 13px;
+}
+
+#chap-5 .prune-legend {
+  gap: 2px 16px;
+  font-size: 13px;
+  color: var(--slate);
+}
+
+#chap-5 .prune-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#chap-5 .prune-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+#chap-5 .prune-legend .kept {
+  background: #23856c;
+}
+
+#chap-5 .prune-legend .dropped {
+  background: #d398a2;
+}
+
+#chap-5 .prune-legend .curve {
+  width: 16px;
+  height: 3px;
+  background: #996410;
+}
+
+#chap-5 .prune-gate-reading {
+  margin: 8px 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+#chap-5 .prune-gate-reading strong {
+  color: var(--ink);
+}
+
+#chap-5 .prune-flops {
+  display: block;
+  margin: 12px 0 0;
+  padding-inline-start: 13px;
+  border-inline-start: 2px solid #c7bddc;
+  font-size: 14px;
+}
+
+#chap-5 .prune-flops p {
+  margin: 0;
+}
+
+#chap-5 .prune-flops p + p {
+  color: var(--slate);
+  font-size: 13px;
+}
+
+#chap-5 .prune-flops.warn {
+  border-color: #b55632;
+}
+
+#chap-5 .prune-notes {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--slate);
+  font-size: 14px;
+}
+
+#chap-5 .prune-notes summary {
+  width: fit-content;
+  max-width: 100%;
+  color: #514a79;
+  font-weight: 650;
+}
+
+#chap-5 .prune-notes p {
+  margin: 7px 0 0;
+}
+
+@media (max-width: 680px) {
+  #chap-5 .prune-origin,
+  #chap-5 .prune-legend {
+    font-size: 12px;
+  }
+  #chap-5 .prune-budget {
+    flex-basis: 100%;
+  }
+}
+/* Put the adjustable budget and its live readings in view together. The chart
+   keeps its full drawing width and its drag target at every window size. */
+#chap-5 .module-body { container: pruning-module / inline-size; }
+.prune-config-band {
+  display: grid;
+  gap: 8px 20px;
+  margin-block: 12px;
+  align-items: stretch;
+}
+.prune-config-band .ctrl-pair, .prune-config-band .prune-path { margin: 0; }
+.prune-config-band .prune-path {
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.prune-config-band .prune-path > span {
+  padding: 6px 10px;
+  background: #faf9fd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.prune-config-band .prune-path small { color: var(--ink-2); }
+.prune-config-band .prune-path strong { color: var(--blue); }
+@container pruning-module (min-width: 740px) {
+  .prune-config-band { grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr); }
+  .prune-config-band .ctrl-pair { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .prune-config-band .prune-path > span { align-content: center; }
+  .prune-config-band .prune-path strong { font-size: 18px; line-height: 1.35; }
+}
+@media (max-width: 680px) {
+  .prune-config-band .prune-path { gap: 0; padding: 3px 9px; border: 1px solid var(--line); border-radius: 8px; background: #faf9fd; }
+  .prune-config-band .prune-path > span { padding: 2px 0; border: 0; background: none; }
+}
+
+#chap-5 .prune-config-band .ctrl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+#chap-5 .prune-config-band .ctrl label { width: 100%; }
+#chap-5 .prune-config-band .ctrl input { width: 100%; }
+@media (min-width: 681px) {
+  #chap-5 .prune-config-band .prune-path > span { border: 1px solid var(--line); }
+}
+#chap-5 .prune-strategies .chip { border-radius: 20px; padding-inline: 14px; }

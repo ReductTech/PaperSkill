@@ -1,0 +1,25 @@
+html { scroll-behavior: auto; }
+html.reader-travelling { overflow-anchor: none; }
+@media (min-width: 1280px) { .reader-scrim { display: none; } }
+@media (max-width: 1279px) {
+  .reader-scrim, .reader .reader-scrim {
+    position: fixed; inset: 0; display: block; z-index: 26;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    background: rgb(22 32 52 / 30%);
+    transition: opacity 160ms ease-out, visibility 0s linear 160ms;
+  }
+  .reader-scrim.is-shown, .reader .reader-scrim.is-shown {
+    opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s;
+  }
+  .slide-sidebar, .vzs-sidebar {
+    transition: transform 210ms cubic-bezier(.22,.68,.2,1);
+  }
+}
+html.is-reduced-motion { scroll-behavior: auto !important; }
+html.is-reduced-motion *, html.is-reduced-motion *::before, html.is-reduced-motion *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
