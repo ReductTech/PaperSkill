@@ -1,0 +1,163 @@
+/* The cover layout comes from the shared series shell. Only FastV's figure and
+   evidence labels are styled here. */
+section.fastv-series-hero {
+  margin-block: 0 28px;
+  padding: 44px 32px 32px;
+  border-radius: 24px;
+}
+.hero.fastv-series-hero h1 {
+  background-image: var(--dp-deco-gradient, linear-gradient(95deg, #ba6446, #805cb5 52%, #49427b));
+}
+.fastv-series-hero .hero-sub {
+  margin-bottom: 0;
+  font-weight: 400;
+}
+.fastv-series-hero .hero-authors a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.fastv-series-hero .hero-abstract {
+  text-wrap: pretty;
+}
+.fv-cover-duel {
+  min-width: 0;
+  margin: 0;
+}
+.fv-duel-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  background: #f6f8fb;
+  border: 1px solid var(--line, #dce0e8);
+  border-radius: 14px;
+}
+.fv-duel-board {
+  --panel-accent: #9c523c;
+  min-width: 0;
+  padding: 14px 18px;
+}
+.fv-duel-board + .fv-duel-board {
+  border-inline-start: 1px solid var(--line, #dce0e8);
+}
+.fv-duel-board.is-pruned {
+  --panel-accent: #63538e;
+}
+.fv-duel-name {
+  margin: 0 0 12px;
+  color: var(--panel-accent);
+  font-size: 14px;
+  font-weight: 750;
+  text-align: left;
+}
+.fv-duel-image {
+  position: relative;
+  width: clamp(150px, 16vw, 215px);
+  max-width: 100%;
+  aspect-ratio: 1;
+  margin: auto;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d0cbdc;
+  border-radius: 6px;
+}
+.fv-duel-image canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+.fv-duel-image .fv-duel-mask {
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.is-pruned .fv-duel-image .fv-duel-mask {
+  opacity: 1;
+}
+.fv-duel-reading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 12px;
+  color: var(--ink-2, #556076);
+  font-size: 13px;
+}
+.fv-duel-reading strong {
+  color: var(--panel-accent);
+  font-variant-numeric: tabular-nums;
+}
+.fv-length-track {
+  width: clamp(38px, 6vw, 80px);
+  height: 7px;
+  overflow: hidden;
+  border-radius: 3px;
+  margin-right: 3px;
+  background: #e1dfe9;
+}
+.fv-length-track i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--panel-accent);
+  transition: width 320ms ease;
+}
+.is-pruned .fv-length-track i { width: 50%; }
+.fv-duel-switch {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 9px;
+}
+.fv-duel-switch button {
+  min-height: 36px;
+  padding: 4px 12px;
+  background: white;
+  border: 1px solid var(--line, #dce0e8);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2, #556076);
+}
+.fv-duel-switch button[aria-pressed='true'] {
+  background: #594c80;
+  border-color: #594c80;
+  color: white;
+}
+.fastv-series-hero .fv-stat-origin {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  color: #645480;
+  font-size: 12px;
+  font-weight: 600;
+}
+.fastv-series-hero .fv-stat-origin .ev {
+  color: #65537e;
+  font-size: 11px;
+}
+@media (max-width: 1279px) {
+  section.fastv-series-hero { padding: 28px 24px; }
+}
+@media (max-width: 960px) {
+  section.fastv-series-hero { padding: 22px 16px; }
+}
+@media (max-width: 720px) {
+  .fv-duel-charts { grid-template-columns: 1fr; }
+  .fv-duel-image { width: min(80%, 235px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fv-duel-image .fv-duel-mask, .fv-length-track i { transition: none; }
+  .fv-replay { display: none; }
+}

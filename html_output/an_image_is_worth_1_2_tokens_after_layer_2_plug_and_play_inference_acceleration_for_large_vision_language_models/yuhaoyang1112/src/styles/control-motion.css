@@ -1,0 +1,30 @@
+/* Press feedback uses the independent scale property so component transforms
+   (including the moving selection background) retain their own coordinate space. */
+:where(button, .side-item, .source-links a, .dl-video-card) {
+  -webkit-tap-highlight-color: transparent;
+}
+#root :is(button, .side-item, .dl-video-card):not(:disabled) {
+  transition: scale 140ms cubic-bezier(.22,1,.36,1), color 140ms ease, border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+#root :is(button, .side-item, .dl-video-card):not(:disabled):active {
+  scale: .97;
+}
+#root :is(button, a, summary):focus-visible { outline: 3px solid #796acd; outline-offset: 3px; }
+.fv-segments { position: relative; isolation: isolate; --fv-pill: #235db5; }
+.fv-segments > .fv-selection-marker { position: absolute; z-index: -1; pointer-events: none; transform-origin: 0 0; background: var(--fv-pill); }
+.fv-segments > button { position: relative; }
+#root .fv-segments > button { background: transparent; }
+#root .fv-segments > button.chip.is-on, #root .fv-segments > button:is([aria-checked="true"], [aria-pressed="true"]) { background: transparent; color: #fff; border-color: transparent; }
+#chap-5 .fv-segments { --fv-pill: #514a91; }
+.fv-close-tabs.fv-segments { --fv-pill: var(--blue); }
+.fv-duel-switch.fv-segments { --fv-pill: #594c80; }
+@media (hover:hover) {
+  #root .fv-segments > button:not([aria-checked="true"]):not([aria-pressed="true"]):hover { background: rgba(96,94,173,.08); }
+}
+@media(pointer:coarse) {
+  #root .fv-segments > button { min-height: 40px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #root :is(button, .side-item, .dl-video-card):not(:disabled):active { scale: 1; }
+}
+html.is-reduced-motion #root :is(button, .side-item, .dl-video-card):not(:disabled), html.is-reduced-motion #root :is(button, .side-item, .dl-video-card):not(:disabled):active { scale: 1; transition: none; }
