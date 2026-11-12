@@ -1,0 +1,43 @@
+.vzhr-views {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 22px);
+  margin: 18px 0;
+  padding: clamp(12px, 2vw, 20px);
+  background: #f4f8f8;
+  border: 1px solid #d9e4e3;
+  border-radius: 12px;
+}
+.vzhr-view { min-width: 0; flex: 1; margin: 0; }
+.vzhr-scene { aspect-ratio: 3 / 2; overflow: hidden; border-radius: 6px; position: relative; }
+.vzhr-scene svg { display: block; }
+.vzhr-crops::before, .vzhr-crops::after {
+  position: absolute;
+  content: '';
+  background: white;
+  box-shadow: 0 0 0 1px #33475565;
+}
+.vzhr-crops::before { top: 0; bottom: 0; left: calc(50% - 2px); width: 4px; }
+.vzhr-crops::after { left: 0; right: 0; top: calc(50% - 2px); height: 4px; }
+.vzhr-view figcaption { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; margin: 7px 0 0; }
+.vzhr-view figcaption span, .vzhr-view figcaption strong { line-height: 1.5; }
+.vzhr-view figcaption span, .vzhr-allocation span { color: var(--result-muted); font-size: 13px; }
+.vzhr-view figcaption strong { font-size: 15px; }
+.vzhr-plus { color: #65718b; font-size: 18px; }
+.vzhr-allocation { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border: 1px solid #dce1ec; border-radius: 12px; overflow: hidden; }
+.vzhr-allocation > div { display: grid; align-content: start; gap: 3px; padding: 14px 16px; }
+.vzhr-allocation > div + div { border-left: 1px solid #dce1ec; background: #f6f6fc; }
+.vzhr-allocation b { color: #45468b; font-size: clamp(16px, 2vw, 23px); font-variant-numeric: tabular-nums; line-height: 1.55; }
+.vzhr-allocation small { font-weight: 600; font-size: 13px; }
+.vzhr-scores { border: 1px solid var(--result-line); border-radius: 12px; overflow: hidden; }
+.vzhr-scores table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 15px; line-height: 1.5; }
+.vzhr-scores :is(th,td) { padding: 9px clamp(6px, 2vw, 18px); text-align: right; }
+.vzhr-scores th:first-child { text-align: left; }
+.vzhr-scores thead th, .vzhr-scores small { font-size: 12px; color: var(--result-muted); }
+.vzhr-scores tbody tr { border-top: 1px solid var(--result-line); }
+.vzhr-selected { color: #45468b; font-weight: 700; background: #eef0fb; }
+@media (max-width: 600px) {
+  .vzhr-allocation { grid-template-columns: 1fr; }
+  .vzhr-allocation > div + div { border-left: none; border-top: 1px solid #dce1ec; }
+  .vzhr-view figcaption { display: grid; }
+}
