@@ -1,0 +1,507 @@
+/* Paper-specific implementation. Hidden handoff notes live in source comments only. */
+:root {
+  --paper-scene-bg: #f2f6f5;
+  --paper-accent-2: #d36f46;
+  --ora-teal: #176c68;
+  --ora-teal-soft: #e7f3f1;
+  --ora-ink: #203247;
+  --ora-warm: #fff7ef;
+  --ora-line: #d8e2e1;
+}
+
+body {
+  background:
+    radial-gradient(circle at 82% 2%, rgba(23, 108, 104, .09), transparent 28rem),
+    linear-gradient(180deg, #f8fbfa 0%, #eef3f2 100%);
+}
+.slide-sidebar { background: #173e50; }
+.slide-sidebar-venue { color: #b9d9d4; }
+.slide-sidebar-item.active { background: rgba(255,255,255,.14); border-left-color: #e7a06f; }
+.slide-sidebar-item:hover { background: rgba(255,255,255,.09); }
+.slide-sidebar-toggle, .slide-sidebar-collapse { background: #176c68; color: #fff; }
+.slide-nav-btn-primary { background: #176c68; border-color: #176c68; }
+.slide-nav-btn-primary:hover { background: #105652; }
+.hero-venue { font-size: 0; color: transparent; }
+.hero-venue::after { content: '交互式论文导读'; color: var(--ora-teal); font-size: var(--ui-type-body-small-size); }
+.bg-side.new .bg-side-head { font-size: 0; color: transparent; }
+.bg-side.new .bg-side-head::after { content: '本文方法'; color: var(--ora-teal); font-size: var(--ui-type-body-small-size); }
+section.hero { border-top: 4px solid var(--ora-teal); }
+.hero h1 { color: #183d51; }
+.hero-sub { color: var(--ora-teal); }
+.hero-abs { max-width: 740px; margin-left: auto; margin-right: auto; }
+.bg-side.new { border-top-color: var(--ora-teal); }
+.bg-side.new .bg-side-head { background: var(--ora-teal-soft); }
+section.chap { border-top: 3px solid rgba(23,108,104,.55); }
+.chap-title .num { color: var(--ora-teal); }
+.chap-bridge { background: linear-gradient(125deg, #edf5f5, #f2f7ee); }
+.chap-bridge::before { background: linear-gradient(180deg, var(--ora-teal), #d38b55); }
+.cb-title { color: var(--ora-teal); }
+.analogy-card { background: var(--ora-warm); border-color: #ead9c8; }
+.analogy-visual { width: min(48%, 580px); background: #f8eee3; }
+.analogy-body { min-width: 0; }
+.analogy-title { color: #9a5a30; }
+.analogy-title::before { background: #d36f46; }
+.module-head { background: linear-gradient(90deg, #f0f6f5, #f8f9f7); }
+.module-head .num { background: var(--ora-teal-soft); color: var(--ora-teal); }
+.module { border-color: #d8e2e1; box-shadow: 0 10px 28px rgba(22,57,73,.055); }
+.takeaway { border-color: #dfe8e5; }
+.takeaway h3 { color: var(--ora-teal); }
+
+/* The same editor and time ruler recur in each analogy card. */
+.ora-story {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 14px;
+  width: 100%;
+  max-width: 560px;
+  min-height: 132px;
+  padding: 15px 17px 12px;
+  color: var(--ora-ink);
+  background: #fffdfa;
+  border: 1px solid #ead9c8;
+  border-radius: 13px;
+}
+.ora-story-editor { display: grid; justify-items: center; gap: 5px; color: #8a5739; font-size: .83rem; font-weight: 700; }
+.ora-editor-mark { display: grid; place-items: center; width: 38px; height: 38px; color: white; background: #c4774e; border-radius: 12px; font-size: 1rem; }
+.ora-story-timeline { min-width: 0; }
+.ora-time-ruler { position: relative; display: flex; justify-content: space-between; height: 13px; margin: 0 4px 8px; border-bottom: 1px solid #bdc9c8; }
+.ora-time-ruler i { width: 1px; height: 5px; background: #aab8b7; }
+.ora-time-ruler::after { content: ''; position: absolute; left: 0; bottom: -5px; width: 2px; height: 13px; background: #d36f46; border-radius: 2px; animation: ora-scrub 5s ease-in-out infinite alternate; }
+.ora-time-row { display: grid; grid-template-columns: 78px minmax(0,1fr); align-items: center; gap: 7px; margin: 7px 0; font-size: .75rem; font-weight: 650; }
+.ora-time-track { position: relative; height: 12px; overflow: hidden; background: #edf1ef; border-radius: 99px; }
+.ora-time-track i { position: absolute; top: 2px; height: 8px; background: #5a91b4; border-radius: 99px; }
+.ora-time-track.ora-reference i { background: #3c9678; }
+.ora-story-caption { grid-column: 1 / -1; color: #697a80; font-size: .72rem; text-align: center; }
+@keyframes ora-scrub { from { left: 0; } to { left: calc(100% - 2px); } }
+
+/* Reusable controls and evidence panels for the 13 active modules. */
+.ora-widget { display: grid; gap: 13px; min-width: 0; padding: 16px; background: #fbfdfc; border: 1px solid #e0e9e7; border-radius: 14px; }
+.ora-picks, .ora-actions, .ora-step-picks { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+.ora-pick, .ora-actions button, .ora-toggle {
+  min-height: 42px; padding: 8px 13px; color: #365367; background: white; border: 1px solid #cfdcda; border-radius: 10px; cursor: pointer; font-size: .92rem; line-height: 1.4;
+}
+.ora-pick:hover, .ora-actions button:hover, .ora-toggle:hover { border-color: var(--ora-teal); background: #f1f8f7; }
+.ora-pick.active, .ora-toggle[aria-pressed="true"] { color: white; background: var(--ora-teal); border-color: var(--ora-teal); }
+.ora-pick small { display: block; margin-top: 3px; color: inherit; opacity: .82; font-size: .78rem; }
+.ora-picks:has(small) { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.ora-picks:has(small) .ora-pick { text-align: left; }
+.ora-feedback { padding: 11px 13px; color: #38515b; background: #eef5f4; border-left: 4px solid #5a91b4; border-radius: 0 10px 10px 0; font-size: .92rem; line-height: 1.55; }
+.ora-citation { margin: 0; color: #697b80; font-size: .78rem; line-height: 1.5; }
+.ora-toy-tag { width: fit-content; padding: 5px 9px; color: #915222; background: #fff3e4; border: 1px solid #efd5b7; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+.ora-step-card { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 13px; align-items: start; padding: 16px; background: white; border: 1px solid #dae5e3; border-radius: 12px; }
+.ora-step-card > b { color: var(--ora-teal); font-family: var(--ui-font-mono); font-size: 1.4rem; }
+.ora-step-card strong { color: #203b4c; }
+.ora-step-card p { margin: 4px 0 0; font-size: .93rem; }
+.ora-step-picks { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); }
+.ora-step-picks .ora-pick { padding: 7px 8px; font-size: .81rem; }
+.ora-actions { justify-content: space-between; }
+.ora-actions button { min-width: 110px; color: #176c68; font-weight: 700; }
+.ora-reference-tray { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #405c67; font-size: .87rem; }
+.ora-reference-tray span { padding: 8px 12px; color: #176c68; background: #e7f3f1; border: 1px dashed #5d9a8c; border-radius: 9px; cursor: grab; }
+.ora-reference-tray small { color: #708186; }
+.ora-drop-track { padding: 13px; background: white; border: 1px dashed #a9c1bb; border-radius: 12px; }
+.ora-drop-track > strong, .ora-group > span { display: block; margin-bottom: 9px; color: #526973; font-size: .83rem; }
+.ora-candidates { display: flex; gap: 8px; flex-wrap: wrap; }
+.ora-candidates i, .ora-oracle-row i { padding: 6px 10px; color: #35566a; background: #edf4f7; border: 1px solid #d2e1e8; border-radius: 99px; font-size: .81rem; font-style: normal; }
+.ora-oracle-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 11px; padding-top: 11px; border-top: 1px solid #e6efed; }
+.ora-oracle-row b { color: #258063; font-size: .82rem; }
+.ora-oracle-row i { color: #24775d; background: #e9f5ef; border-color: #cde5d8; }
+.ora-math { display: flex; gap: 8px; flex-wrap: wrap; }
+.ora-math span, .ora-math b { padding: 8px 11px; background: white; border: 1px solid #dfe8e6; border-radius: 9px; font-family: var(--ui-font-mono); font-size: .84rem; }
+.ora-math b { color: var(--ora-teal); }
+.ora-bars { display: grid; gap: 9px; }
+.ora-bar-row { display: grid; grid-template-columns: 150px minmax(80px,1fr) 58px; align-items: center; gap: 10px; font-size: .81rem; }
+.ora-bar-row > div { position: relative; height: 13px; background: #edf1ef; border-radius: 99px; }
+.ora-bar-row > div i { display: block; height: 100%; background: #75a9c4; border-radius: inherit; }
+.ora-bar-row > div b { position: absolute; top: -3px; width: 2px; height: 19px; background: #d36f46; }
+.ora-bar-row em { font-family: var(--ui-font-mono); font-size: .8rem; font-style: normal; text-align: right; }
+.ora-bar-row em.pos, .ora-positive { color: #258063; }
+.ora-bar-row em.neg, .ora-negative { color: #bd4c52; }
+.ora-range { display: grid; gap: 7px; color: #405966; font-size: .9rem; }
+.ora-range b { color: var(--ora-teal); font-family: var(--ui-font-mono); }
+.ora-two-col { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.ora-two-col section { min-width: 0; padding: 14px; background: white; border: 1px solid #dce7e4; border-radius: 12px; }
+.ora-two-col section:first-child { border-top: 3px solid #c76668; }
+.ora-two-col section:last-child { border-top: 3px solid #258063; }
+.ora-two-col small { display: block; color: #6a7d81; font-size: .78rem; }
+.ora-two-col strong { display: block; margin: 4px 0 8px; color: #203b4c; }
+.ora-two-col p { font-size: .87rem; }
+.ora-flow { padding: 9px; color: #536d77; background: #f3f7f6; border-radius: 8px; font-size: .82rem; }
+.ora-eq { display: grid; gap: 4px; padding: 11px 13px; background: white; border: 1px solid #dce7e4; border-radius: 10px; }
+.ora-eq b { color: var(--ora-teal); font-size: .84rem; }
+.ora-eq code { overflow-wrap: anywhere; color: #304b61; font-family: var(--ui-font-mono); font-size: .86rem; line-height: 1.55; }
+.ora-eq small { color: #6b7d81; font-size: .78rem; }
+.ora-widget details { padding: 10px 12px; background: #f1f5f4; border-radius: 9px; font-size: .85rem; }
+.ora-widget summary { color: #176c68; cursor: pointer; font-weight: 700; }
+.ora-widget details p { margin-bottom: 0; font-size: .85rem; overflow-wrap: anywhere; }
+.ora-retain { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 11px 13px; background: #edf6f3; border-radius: 10px; }
+.ora-retain span { color: #55706e; font-size: .83rem; }
+.ora-retain strong { color: #176c68; font-size: 1.8rem; }
+.ora-retain code { color: #426268; font-size: .8rem; }
+.ora-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.ora-stats div { display: grid; gap: 3px; padding: 10px; background: white; border: 1px solid #e0e8e6; border-radius: 9px; }
+.ora-stats small { color: #6b7d81; font-size: .74rem; }
+.ora-stats b { color: #254b5a; font-size: 1rem; }
+.ora-balance { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.ora-balance span { display: grid; gap: 7px; padding: 12px; background: white; border: 1px solid #dce7e4; border-radius: 9px; color: #657b80; font-size: .8rem; }
+.ora-balance strong { color: var(--ora-teal); font-size: .95rem; }
+.ora-picks:has(+ .ora-result), .ora-widget > .ora-picks:first-child { align-items: center; }
+.ora-result { display: grid; gap: 3px; padding: 15px; background: #eef6f4; border-radius: 12px; }
+.ora-result span { color: #55716e; font-size: .83rem; }
+.ora-result strong { color: #176c68; font-size: 2rem; line-height: 1.2; }
+.ora-rate-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.ora-rate-grid div { display: grid; gap: 4px; padding: 11px; background: white; border: 1px solid #e0e8e6; border-radius: 9px; }
+.ora-rate-grid b { color: #295967; font-size: 1.1rem; }
+.ora-rate-grid small { color: #536a71; font-size: .76rem; }
+.ora-selected-set { margin: 0; color: #176c68; font-weight: 700; }
+.ora-result-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 11px 14px; background: #eaf4f1; border-radius: 9px; color: #295568; }
+.ora-result-row b { font-size: 1.2rem; }
+.ora-result-row.muted { background: #f2f4f4; color: #66777d; }
+.ora-task-picks { display: flex; flex-wrap: wrap; gap: 7px; }
+.ora-task-detail { padding: 14px; background: white; border: 1px solid #dce7e4; border-radius: 11px; }
+.ora-task-detail small { display: block; color: #75868a; font-size: .77rem; }
+.ora-task-detail strong { display: block; margin-top: 4px; color: #176c68; font-size: 1.15rem; }
+.ora-task-detail p { margin: 3px 0; }
+.ora-task-detail span { color: #526d77; font-size: .86rem; }
+.ora-final { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+.ora-final > div { display: grid; gap: 3px; padding: 13px; background: white; border: 1px solid #dce7e4; border-radius: 11px; }
+.ora-final small, .ora-final span { color: #718185; font-size: .77rem; }
+.ora-final b { color: #4b6975; font-size: 1.8rem; }
+.ora-final .winner { background: #edf7f2; border-color: #c5e0d1; }
+.ora-final .winner b { color: #258063; }
+
+@media (max-width: 760px) {
+  section.hero { margin: 14px auto; padding: 30px 18px 24px; }
+  section.chap { padding: 20px 16px; }
+  .analogy-card { flex-direction: column; }
+  .analogy-visual { width: 100%; min-height: 150px; padding: 10px; }
+  .analogy-body { padding: 13px 16px 16px; }
+  .ora-story { grid-template-columns: 65px minmax(0,1fr); gap: 7px; padding: 12px 9px; }
+  .ora-time-row { grid-template-columns: 68px minmax(0,1fr); font-size: .68rem; }
+  .ora-step-picks { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ora-picks:has(small) { grid-template-columns: 1fr; }
+  .ora-two-col { grid-template-columns: 1fr; }
+  .ora-bars { gap: 12px; }
+  .ora-bar-row { grid-template-columns: 118px minmax(45px,1fr) 50px; gap: 7px; font-size: .73rem; }
+  .ora-stats, .ora-balance, .ora-rate-grid { grid-template-columns: 1fr; }
+  .ora-final { grid-template-columns: 1fr; }
+  .ora-final > i { transform: rotate(90deg); text-align: center; }
+  .ora-widget { padding: 12px; }
+  .ora-pick { flex: 1 1 auto; }
+}
+@media (max-width: 420px) {
+  .ora-math { display: grid; }
+  .ora-bar-row { grid-template-columns: 1fr 48px; }
+  .ora-bar-row > div { grid-column: 1 / -1; grid-row: 2; }
+  .ora-bar-row em { grid-column: 2; grid-row: 1; }
+  .ora-actions button { min-width: 0; flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ora-time-ruler::after { animation: none; left: 50%; }
+}
+/* Improve navigation readability against the deep teal sidebar. */
+.slide-sidebar-title { color: #f4faf8; }
+.slide-sidebar-item { color: #d4e6e7; }
+.slide-sidebar-num { color: #a8d2d0; }
+.slide-sidebar-item:hover { color: #ffffff; }
+.slide-sidebar-item.active { color: #ffffff; }
+
+/* Typography refinement; keep paper-specific overrides in this file. */
+.slide-main {
+  --ui-type-h1-size: clamp(1.7rem, 2.45vw, 2.05rem);
+  --ui-type-h1-line-height: 1.2;
+  --ui-type-h2-size: clamp(1.25rem, 1.75vw, 1.5rem);
+  --ui-type-h2-line-height: 1.3;
+  --ui-type-h3-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  --ui-type-h3-line-height: 1.4;
+  --ui-type-subtitle-size: clamp(1rem, 1.2vw, 1.125rem);
+  --ui-type-subtitle-line-height: 1.65;
+  --ui-type-body-size: clamp(1rem, 1.15vw, 1.125rem);
+  --ui-type-body-line-height: 1.72;
+  --ui-type-body-small-size: .9rem;
+  --ui-type-body-small-line-height: 1.6;
+  --ui-type-formula-size: clamp(1rem, 1.35vw, 1.2rem);
+  --ui-type-formula-line-height: 1.45;
+  padding-bottom: 104px;
+}
+.slide-main .chap-title { text-wrap: balance; }
+.slide-main .chap-intro,
+.slide-main .module-desc { max-width: 78ch; }
+.slide-main .cb-text,
+.slide-main .analogy-text { max-width: 72ch; }
+.slide-main .note { line-height: 1.65; }
+
+@media (max-width: 640px) {
+  .slide-main {
+    --ui-type-h1-size: clamp(1.55rem, 7vw, 1.75rem);
+    --ui-type-h2-size: 1.2rem;
+    --ui-type-h3-size: 1.05rem;
+    --ui-type-body-size: 1rem;
+    --ui-type-body-small-size: .875rem;
+    padding-bottom: 104px;
+  }
+  .slide-main .chap-bridge { margin-block: 18px; }
+  .slide-main .cb-body { padding: 12px 14px; }
+  .slide-main .module-body { padding: 15px; }
+}
+
+/* Visual polish: carry the OraRL teal/copper identity through the shared shell. */
+:root {
+  --ui-bg-page: #edf3f2;
+  --ui-bg-page-top: #f8fbfa;
+  --ui-bg-soft: #e5f1ef;
+  --ui-bg-muted: #f4f8f7;
+  --ui-text-main: #203b43;
+  --ui-text-muted: #5c7379;
+  --ui-text-light: #819397;
+  --ui-border: #d7e3e1;
+  --ui-border-strong: #9eb9b2;
+  --ui-accent: #176c68;
+  --ui-accent-alt: #d36f46;
+  --ui-success: #35866c;
+  --blue: var(--ui-accent);
+  --blue-soft: var(--ui-bg-soft);
+  --green: var(--ui-success);
+  --green-soft: rgba(53, 134, 108, .12);
+  --orange: var(--ui-accent-alt);
+  --orange-soft: rgba(211, 111, 70, .12);
+  --ink: var(--ui-text-main);
+  --ink-2: var(--ui-text-muted);
+  --slate: var(--ui-text-muted);
+  --slate-2: var(--ui-text-light);
+  --line: var(--ui-border);
+  --line-2: var(--ui-border-strong);
+}
+.slide-main .slide-chap {
+  border: 1px solid #d8e4e1;
+  border-top: 3px solid #3e8b7e;
+  border-radius: 22px;
+  background: linear-gradient(155deg, #fff 0%, #fcfdfc 100%);
+  box-shadow: 0 18px 48px rgba(22, 57, 73, .075);
+}
+.slide-main .chap-title {
+  position: relative;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e2ece9;
+}
+.slide-main .chap-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 58px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #278077, #d36f46);
+}
+.slide-main .module {
+  border-color: #d8e4e1;
+  border-radius: 16px;
+  box-shadow: 0 9px 26px rgba(22, 57, 73, .055);
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.slide-main .module:hover {
+  border-color: #abc9c1;
+  box-shadow: 0 13px 32px rgba(22, 57, 73, .085);
+}
+.slide-main .module-head { background: linear-gradient(100deg, #edf6f3, #fbfaf7); }
+.slide-main .module-head .num { border: 1px solid #d4e7df; }
+.slide-main .chap-bridge { box-shadow: 0 6px 18px rgba(22, 57, 73, .04); }
+.slide-main .analogy-card { box-shadow: 0 8px 24px rgba(142, 91, 47, .07); }
+.ora-widget { box-shadow: 0 8px 22px rgba(22, 57, 73, .045); }
+.ora-step-card, .ora-final > div { box-shadow: 0 5px 16px rgba(22, 57, 73, .035); }
+.ora-feedback { background: #edf6f4; border-left-color: var(--ora-teal); }
+.slide-nav {
+  background: rgba(249, 252, 251, .94);
+  border-top-color: #d7e3e1;
+  box-shadow: 0 -8px 28px rgba(22, 57, 73, .07);
+  backdrop-filter: blur(12px);
+}
+
+/* Evidence-linked controls and technical scenes, refined 2026-10-22. */
+.ora-widget { background: #fcfdfd; box-shadow: none; }
+.ora-widget > * { min-width: 0; }
+.ora-widget p { line-height: 1.75; }
+.ora-question { font-size: 1.05rem; line-height: 1.65; font-weight: 700; color: #203d4c; }
+.ora-role-explain { padding: 15px 17px; border: 1px solid #d5e4e0; border-radius: 10px; background: #fff; }
+.ora-role-explain > b { color: #176c68; }
+.ora-role-explain p { margin: 8px 0 0; }
+.ora-widget .ora-feedback { font-size: .96rem; line-height: 1.75; }
+.ora-feedback.warning { background: #fff6eb; border-left-color: #bc7133; color: #754a24; }
+.ora-widget .ora-citation { font-size: .84rem; line-height: 1.65; overflow-wrap: anywhere; }
+.ora-widget .ora-citation a { color: #176c68; text-decoration: underline; text-underline-offset: 3px; }
+.ora-chart-key { color: #63767b; font-size: .83rem; margin: 0; }
+.ora-pick:focus-visible, .ora-toggle:focus-visible, .ora-actions button:focus-visible { outline: 3px solid #e8ad79; outline-offset: 3px; }
+.ora-actions button:disabled { opacity: .45; cursor: default; }
+.ora-range { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ora-range input { display: block; flex-basis: 100%; width: 100%; accent-color: #176c68; height: 28px; }
+.ora-range b { font-variant-numeric: tabular-nums; color: #176c68; }
+.ora-table-wrap { width: 100%; overflow-x: auto; border: 1px solid #d8e5e2; border-radius: 10px; }
+.ora-table { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.ora-table caption { text-align: left; color: #526b72; background: #f4f8f7; padding: 11px 13px; font-size: .82rem; line-height: 1.6; }
+.ora-table th, .ora-table td { padding: 12px 10px; border-top: 1px solid #e1eae7; text-align: right; white-space: nowrap; }
+.ora-table th:first-child { text-align: left; }
+.ora-table thead th { color: #49616b; font-weight: 600; font-size: .82rem; }
+.ora-table tbody th { font-weight: 600; color: #244951; }
+.ora-table tr.selected { background: #e8f4f0; }
+.ora-table .selected th:first-child { box-shadow: inset 3px 0 #176c68; }
+.ora-paired-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ora-paired-metrics section { display: grid; align-content: start; gap: 9px; padding: 17px; border: 1px solid #d9e5e2; border-radius: 10px; background: #fff; }
+.ora-paired-metrics small { color: #5e747b; font-size: .84rem; line-height: 1.6; }
+.ora-paired-metrics b, .ora-paired-metrics strong { font-size: 1.65rem; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.ora-paired-metrics span { color: #6a7c82; font-size: .84rem; }
+.ora-intervals { border: 1px solid #d7e4e1; border-radius: 10px; background: #fff; padding: 14px; display: grid; gap: 14px; }
+.ora-interval-axis { display: flex; justify-content: space-between; margin-left: 82px; margin-right: 96px; color: #6b8085; font-size: .75rem; }
+.ora-interval-row { display: grid; grid-template-columns: 72px minmax(40px,1fr) 86px; gap: 10px; align-items: center; }
+.ora-interval-row > span { color: #405c6c; font-size: .85rem; }
+.ora-interval-row > b { text-align: right; color: #405c6c; font-size: .8rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.ora-interval-row > div { position: relative; height: 23px; background: repeating-linear-gradient(90deg, #ecf1f3 0, #ecf1f3 calc(25% - 1px), #d8e1e5 calc(25% - 1px), #d8e1e5 25%); border-radius: 4px; }
+.ora-interval-row i { position: absolute; top: 4px; height: 15px; border: 1px solid #3976a5; border-radius: 4px; background: #78a5c5; }
+.ora-interval-row.oracle i { background: #68a38b; border-color: #287b60; }
+.ora-interval-row.oracle > span { color: #26765b; font-weight: 700; }
+.ora-interval-row.added { border-top: 1px dashed #abc8ba; padding-top: 13px; }
+.ora-prune-heading { color: #214a55; font-weight: 700; line-height: 1.7; }
+.ora-prune-heading span { display: block; color: #6d7f84; font-size: .84rem; font-weight: 400; }
+.ora-sample-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.ora-sample-grid.compact { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.ora-sample { display: grid; gap: 7px; text-align: center; align-content: center; border: 1px solid #d4deda; border-radius: 9px; padding: 12px 6px; background: #fff; font-variant-numeric: tabular-nums; }
+.ora-sample small { color: #51676e; font-size: .8rem; }
+.ora-sample > b { font-size: 1.05rem; }
+.ora-sample span { font-size: .73rem; color: #637a79; }
+.ora-sample.kept { border: 2px solid #6e9d92; background: #f2f8f5; padding: 11px 5px; }
+.ora-sample.oracle { background: #fff4e9; border-color: #cf9566; }
+.ora-sample.oracle > b { color: #925c2c; }
+.ora-sample.discarded { background: #f3f5f4; opacity: .65; border-style: dashed; }
+.ora-stats span { color: #61767e; font-size: .79rem; line-height: 1.5; }
+.ora-widget details { padding: 14px; font-size: .93rem; line-height: 1.75; }
+.ora-widget details p { font-size: .93rem; }
+.ora-eq code { white-space: normal; overflow-wrap: anywhere; line-height: 1.9; }
+.ora-eq small { line-height: 1.7; font-size: .86rem; }
+.ora-benchmark-bar > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: #28565f; margin-bottom: 8px; font-size: .92rem; }
+.ora-benchmark-bar b { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.ora-score-track { height: 15px; background: #eef2f1; border-radius: 4px; }
+.ora-score-track i { display: block; height: 100%; background: #338779; border-radius: 4px; transition: width .2s ease; }
+.ora-benchmark-bar.muted .ora-score-track i { background: #8799a6; }
+.ora-cover-scene { width: 100%; display: grid; gap: 12px; padding: 12px 4px; color: #294854; }
+.ora-cover-caption { font-size: .78rem; color: #617b82; }
+.ora-cover-candidates { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.ora-cover-candidates span { border: 1px solid #bdcfd8; color: #42657a; background: #edf4f7; border-radius: 7px; padding: 8px 10px; font-size: .84rem; }
+.ora-cover-anchor { border: 1px solid #c3d9ce; border-radius: 8px; padding: 10px; background: #edf6f0; color: #26795d; font-weight: 700; }
+.ora-cover-scene p { margin: 0; font-size: .94rem; line-height: 1.7; }
+.ora-cover-scene small { font-size: .82rem; color: #61777d; }
+.bg-side-canvas .ora-widget { width: 100%; border: 0; padding: 10px; background: transparent; }
+.formula-explain .fe-hint { position: static; margin: 0 0 10px; line-height: 1.6; font-size: .82rem; }
+.formula-explain .fe-lead { margin: 0 0 12px; line-height: 1.75; }
+.formula-explain .fe-formula { line-height: 2; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .ora-picks:has(small) { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ora-paired-metrics { grid-template-columns: 1fr; }
+  .ora-table { table-layout: fixed; }
+  .ora-table th, .ora-table td { padding: 10px 4px; font-size: .72rem; white-space: normal; overflow-wrap: anywhere; }
+  .ora-table th:first-child { width: 25%; }
+  .ora-table caption { font-size: .79rem; }
+  .ora-intervals { padding: 10px 8px; }
+  .ora-interval-row { grid-template-columns: 54px minmax(24px,1fr) 66px; gap: 5px; }
+  .ora-interval-row > span, .ora-interval-row > b { font-size: .72rem; }
+  .ora-interval-axis { margin-left: 59px; margin-right: 71px; font-size: .63rem; }
+  .ora-sample-grid.compact { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ora-sample-grid { gap: 6px; }
+  .ora-sample > b { font-size: .9rem; }
+  .ora-sample small { font-size: .75rem; }
+  .ora-toy-tag { border-radius: 7px; font-size: .73rem; }
+  .ora-widget .ora-feedback { font-size: .94rem; }
+  .ora-range { font-size: .94rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ora-score-track i { transition: none; }
+}
+
+/* Cover-card text alignment for the new method. */
+.bg-side.new .ora-cover-scene {
+  gap: 10px;
+  padding: 15px 12px 8px;
+  text-align: center;
+}
+.bg-side.new .ora-cover-caption {
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.bg-side.new .ora-cover-candidates {
+  gap: 8px;
+}
+.bg-side.new .ora-cover-candidates span {
+  padding: 7px 12px;
+  line-height: 1.45;
+}
+.bg-side.new .ora-cover-anchor {
+  padding: 10px 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.bg-side.new .ora-cover-scene p {
+  font-size: .94rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.bg-side.new .ora-cover-scene small {
+  display: block;
+  font-size: .82rem;
+  line-height: 1.6;
+}
+.bg-side.new .bg-side-tag {
+  margin: 2px 20px 16px;
+  padding: 10px 12px;
+  color: #536f72;
+  background: #f5f9f7;
+  border: 1px solid #e1ece6;
+  border-radius: 8px;
+  line-height: 1.65;
+}
+/* Match the traditional-method card to the adjacent card. */
+.bg-side.old {
+  display: flex;
+  flex-direction: column;
+}
+.bg-side.old .bg-side-canvas {
+  flex: 1 0 auto;
+}
+.bg-side.old .ora-cover-scene {
+  gap: 10px;
+  padding: 15px 12px 8px;
+  text-align: center;
+}
+.bg-side.old .ora-cover-caption {
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.bg-side.old .ora-cover-candidates {
+  gap: 8px;
+}
+.bg-side.old .ora-cover-candidates span {
+  padding: 7px 12px;
+  line-height: 1.45;
+}
+.bg-side.old .ora-cover-anchor {
+  padding: 10px 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.bg-side.old .ora-cover-scene p {
+  font-size: .94rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.bg-side.old .bg-side-tag {
+  margin: 2px 20px 16px;
+  padding: 10px 12px;
+  color: #536f72;
+  background: #f5f9f7;
+  border: 1px solid #e1ece6;
+  border-radius: 8px;
+  line-height: 1.65;
+}
