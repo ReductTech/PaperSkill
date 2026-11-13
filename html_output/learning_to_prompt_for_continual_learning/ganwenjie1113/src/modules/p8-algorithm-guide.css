@@ -1,0 +1,34 @@
+.p8-algorithm { margin: 24px 0 28px; }
+.p8-algorithm__frame { border: 1px solid #cbd6cc; border-radius: 16px; overflow: hidden; background: #fbfcf8; }
+.p8-algorithm__head, .p8-algorithm li, .p8-algorithm__inference { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 5fr); }
+.p8-algorithm__head { color: #31543f; background: #e8efe4; font-weight: 650; }
+.p8-algorithm__head span { padding: 12px 20px; }
+.p8-algorithm__head span + span { border-inline-start: 1px solid #cbd6cc; }
+.p8-algorithm ol { list-style: none; margin: 0; padding: 0; }
+.p8-algorithm li { --inset: 0px; border-top: 1px solid #d8e2d7; }
+.p8-algorithm li[data-depth="1"] { --inset: 24px; }
+.p8-algorithm li[data-depth="2"] { --inset: 48px; }
+.p8-algorithm li[data-depth="3"] { --inset: 72px; }
+.p8-algorithm li[data-depth="4"] { --inset: 96px; border-top-color: #e3eae0; }
+.p8-algorithm [data-depth="4"] .p8-algorithm__label { grid-template-columns: max-content 1fr; gap: 10px; align-items: baseline; }
+.p8-algorithm__label { position: relative; display: grid; align-content: start; gap: 4px; padding: 9px 16px 9px calc(20px + var(--inset, 0px)); line-height: 1.6; font-size: 15px; color: #3f584b; }
+.p8-algorithm__label strong { font-size: 16px; color: #204731; }
+.p8-algorithm [data-depth]:not([data-depth="0"]) .p8-algorithm__label::before { content: ""; position: absolute; inset: 0 auto 0 var(--inset); border-inline-start: 1px solid #9fb7a5; }
+.p8-algorithm pre { min-width: 0; margin: 0; padding: 9px 20px; border-inline-start: 1px solid #cbd6cc; overflow: auto; background: #f0f4ed; color: #274738; font: 15px/1.72 var(--rk-font-mono); tab-size: 2; }
+.p8-algorithm pre code { font: inherit; }
+.p8-algorithm [data-step="write"], .p8-algorithm [data-step="write"] pre { background: #e4efdb; }
+.p8-algorithm [data-step="write"] pre { font-weight: 650; }
+.p8-algorithm__inference { border-top: 1px solid #aabfbe; background: #e9f0f2; }
+.p8-algorithm__inference :is(.p8-algorithm__label, strong, pre) { color: #315663; }
+.p8-algorithm__inference pre { background: #f0f5f6; border-color: #bfced1; }
+.p8-algorithm figcaption { margin-top: 12px; color: var(--rk-muted); font-size: 15px; line-height: 1.7; }
+@media (max-width: 760px) {
+  .p8-algorithm li, .p8-algorithm__inference { grid-template-columns: minmax(0, 1fr); }
+  .p8-algorithm__head { grid-template-columns: minmax(0, 1fr); }
+  .p8-algorithm__head span:first-child { display: none; }
+  .p8-algorithm pre { border-inline-start: 0; font-size: 13px; }
+  .p8-algorithm li[data-depth="1"] { --inset: 10px; }
+  .p8-algorithm li[data-depth="2"] { --inset: 20px; }
+  .p8-algorithm li[data-depth="3"] { --inset: 30px; }
+  .p8-algorithm li[data-depth="4"] { --inset: 40px; }
+}

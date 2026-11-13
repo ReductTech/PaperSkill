@@ -1,0 +1,117 @@
+
+.lesson-copy:has(> .guided-motion) {
+  --motion-font: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+}
+.guided-motion .motion-parameter { font-family: var(--rk-font-math); font-style: italic; font-weight: 400; }
+.guided-motion .motion-parameter-index { font-size: .74em; font-style: normal; }
+
+/* Match the warm paper surface and the blue, leaf and ochre accents in P2/P3. */
+.lesson-figure.guided-motion {
+  --motion-paper: #f2f5ed;
+  --motion-line: #a8b9a8;
+  --motion-ink: #254335;
+  --motion-muted: #506759;
+  --motion-leaf: #396746;
+  --motion-leaf-wash: #dce8d5;
+  --motion-blue: #315d73;
+  --motion-blue-wash: #dce9ed;
+  --motion-ochre: #775023;
+  --motion-ochre-wash: #f0e2c9;
+  /* SVG labels use viewBox units, so reduce their size as the canvas scales up. */
+  --motion-svg-label: clamp(11px, calc(20px - .66cqw), 16px);
+  --motion-svg-detail: calc(var(--motion-svg-label) - 1px);
+  width: 100%;
+  font-family: var(--motion-font);
+  font-variant-numeric: tabular-nums;
+  margin: 24px auto 34px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+}
+.guided-motion .motion-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 0 0 18px;
+}
+.motion-dock .playback-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(10px, 2vw, 26px);
+  padding: 0;
+}
+.motion-dock .playback-controls > .lesson-choice {
+  min-inline-size: 6em;
+  min-height: 40px;
+}
+.motion-dock .playback-controls > label {
+  min-width: 0;
+  gap: clamp(6px, 1.2vw, 16px);
+}
+.motion-dock .playback-controls > label > span { white-space: nowrap; }
+.motion-dock input[type="range"] { width: 100%; min-width: 0; }
+.guided-motion .motion-dock .lesson-choice,
+.guided-motion .motion-dock .text-button { font-size: 14px; font-weight: 400; }
+.guided-motion .motion-dock .lesson-choice[aria-pressed="true"] { font-weight: 400; }
+.motion-dock input[type="range"]:focus-visible {
+  outline: 2px solid var(--rk-focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.guided-motion .motion-stops {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(8px, 1.4vw, 20px);
+  margin: 0;
+}
+.guided-motion .motion-stops button { min-height: 40px; }
+.guided-motion .motion-window {
+  container-type: inline-size;
+  overflow-x: auto;
+  border: 1px solid var(--rk-line);
+  border-radius: 10px;
+  background: var(--motion-paper);
+}
+.guided-motion figcaption {
+  border: 0;
+  padding: 12px 12px 0;
+  min-height: 48px;
+  text-align: center;
+  color: var(--motion-ink);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.guided-motion .motion-pan-hint { display: none; }
+
+.guided-equations {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 9px 34px;
+  margin: 15px auto 25px;
+  padding: 5px 0;
+  font-size: clamp(18px, 2vw, 23px);
+}
+.guided-equations > math { max-width: 100%; margin: 0; }
+
+@media (max-width: 760px) {
+  .guided-motion .motion-pan-hint {
+    display: block;
+    text-align: center;
+    color: var(--rk-muted);
+    font-size: 13px;
+  }
+}
+@media (max-width: 540px) {
+  .guided-motion .motion-stops { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .guided-motion .motion-stops button { grid-column: span 2; padding-inline: 5px; }
+  .guided-motion .motion-stops button:nth-last-child(-n + 2) { grid-column: span 3; }
+  .motion-dock .playback-controls > button { white-space: nowrap; }
+  .motion-dock .playback-controls > label {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
