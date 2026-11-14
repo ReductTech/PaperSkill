@@ -1,0 +1,168 @@
+:root {
+  --td-deep: #102b2e;
+  --td-muted: #a4c0be;
+  --td-mint: #63e8b6;
+  --td-line: #416366;
+  --paper-scene-bg: #f1f6f5;
+}
+
+.td-frame {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 980px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  color: #e8f7f1;
+  font-size: var(--ppt-body-text);
+  line-height: 1.38;
+}
+
+.td-visual { min-width: 0; }
+.td-road { width: 100%; display: block; border-radius: 28px; }
+.ppt-cover-panel:has(.td-road) { min-height: 0; }
+.ppt-cover-animation .td-road { width: 100%; height: 100%; }
+.td-pick { cursor: grab; touch-action: none; }
+.td-pick:active { cursor: grabbing; }
+.td-pick:focus-visible circle { stroke: white; stroke-width: 6; }
+
+.td-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 19px;
+  align-self: stretch;
+  padding: 30px;
+  background: #173e41;
+  border-radius: 28px;
+}
+
+.td-panel h2, .td-panel p, .td-bars h3, .td-rank p { margin: 0; }
+.td-panel h2 { font-size: var(--ppt-body-heading); line-height: 1.34; }
+.td-panel .td-number { font-size: var(--ppt-body-emphasis); font-weight: 800; color: var(--td-mint); }
+.td-quiet { color: var(--td-muted); }
+.td-good { color: var(--td-mint); }
+.td-range { display: grid; gap: 9px; }
+.td-range span { display: flex; justify-content: space-between; gap: 8px; }
+.td-range strong { color: var(--td-mint); }
+.td-range input { display: block; width: 100%; min-height: 22px; margin: 0; accent-color: var(--td-mint); cursor: pointer; }
+
+.td-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.td-buttons button {
+  font: inherit;
+  font-weight: 650;
+  color: #effaf6;
+  border: 1px solid #709492;
+  padding: 7px 13px;
+  border-radius: 10px;
+  background: #244d4f;
+  cursor: pointer;
+}
+.td-buttons button:hover { border-color: var(--td-mint); }
+.td-buttons button[aria-pressed='true'] { color: var(--td-deep); background: var(--td-mint); border-color: var(--td-mint); }
+.td-buttons button:focus-visible { outline: 3px solid #ffc875; outline-offset: 2px; }
+
+.td-training, .td-rank, .td-bars { background: var(--td-deep); border-radius: 28px; }
+.td-training { height: 600px; display: grid; grid-template-rows: minmax(0, 1fr) 135px; }
+.td-training .td-road { width: 100%; height: 100%; }
+.td-probabilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 20px 40px 28px; }
+.td-probabilities div { display: grid; grid-template-columns: 1fr auto; align-content: center; gap: 8px; }
+.td-probabilities i { grid-column: 1 / -1; display: block; height: 9px; border-radius: 8px; }
+
+.td-rank, .td-bars { min-height: 580px; display: flex; flex-direction: column; justify-content: center; padding: 34px 42px; }
+.td-rank { gap: 14px; }
+.td-rank-head, .td-rank-row { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; }
+.td-rank-head { color: var(--td-muted); padding: 0 16px; }
+.td-rank-row { padding: 13px 16px; border-radius: 12px; background: #204348; }
+.td-rank p { margin-top: 12px; }
+.td-bars { gap: 23px; }
+.td-bars header { display: flex; justify-content: space-between; gap: 20px; color: var(--td-muted); }
+.td-bars h3 { font-size: var(--ppt-body-heading); margin-bottom: 7px; }
+.td-bar { display: grid; grid-template-columns: minmax(0, 1fr) 115px; align-items: center; margin-top: 6px; gap: 16px; }
+.td-bar i { display: block; height: 23px; border-radius: 8px; }
+.td-bar strong { text-align: right; }
+
+/* Narrative pages share the road vocabulary while changing the composition
+   to match comparison, learning, calculation and evidence. */
+.td-density { display: block; width: 100%; border-radius: 28px; }
+.td-equation { font-size: var(--ppt-body-heading); line-height: 1.4; color: #c8f8e4; }
+.td-equation .formula-symbol { color: inherit; }
+.td-conflict, .td-temporal, .td-proof, .td-horizons {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #eaf8f0;
+  background: #102b2e;
+  border-radius: 28px;
+  padding: 24px 30px;
+  font-size: var(--ppt-body-text);
+  line-height: 1.4;
+}
+.td-wide-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 22px; }
+.td-wide-toolbar p, .td-wide-conclusion, .td-bridge p, .td-confidence p { margin: 0; }
+.td-wide-conclusion { color: #c3d9d1; padding-top: 5px; }
+.td-conflict-main { display: grid; grid-template-columns: 830px minmax(0, 1fr); gap: 24px; min-height: 0; flex: 1; }
+.td-conflict-main .td-road { height: 100%; }
+.td-conflict-metrics { display: grid; grid-template-rows: 1fr 1fr; gap: 12px; }
+.td-conflict-metrics section { padding: 12px 24px; background: #204348; border-radius: 16px; }
+.td-conflict-metrics h2, .td-conflict-metrics p, .td-temporal h2,
+.td-temporal p, .td-proof h2, .td-horizons h2, .td-horizons p { margin: 0; }
+.td-conflict-metrics h2, .td-temporal h2, .td-proof h2,
+.td-horizons h2, .td-bridge h2, .td-confidence h2 { font-size: var(--ppt-body-heading); line-height: 1.4; }
+.td-conflict-metrics strong, .td-temporal .td-number { font-size: var(--ppt-body-emphasis); color: var(--td-mint); }
+.td-bridge { height: 100%; display: grid; grid-template-columns: 720px 1fr; gap: 30px; color: #eaf8f0;
+  border-radius: 28px; background: #102b2e; padding: 30px; font-size: var(--ppt-body-text); line-height: 1.4; }
+.td-bridge-text { display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+.td-bridge h2 { margin: 0; }
+.td-bridge-road { display: flex; align-items: center; }
+.td-stage-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.td-stage-row b { padding: 12px 18px; border: 2px solid #507575; border-radius: 12px; }
+.td-stage-row .td-active { border-color: #63e8b6; color: #63e8b6; background: #24493e; }
+.td-temporal-columns { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 22px; }
+.td-temporal-columns section { display: flex; flex-direction: column; justify-content: center; gap: 27px;
+  padding: 24px; border-radius: 18px; background: #204348; min-width: 0; }
+.td-weight-cars { display: grid; gap: 24px; }
+.td-weight-cars > div { display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 10px; }
+.td-car { width: 62px; height: 32px; border-radius: 10px; display: inline-block; background: #ffc875;
+  border-left: 16px solid #d39f57; border-right: 12px solid #d39f57; }
+.td-car-1 { background: #81c6ff; border-color: #497eaa; }
+.td-confidence { height: 100%; display: grid; grid-template-columns: 670px 1fr; gap: 30px; color: #eaf8f0;
+  background: #102b2e; border-radius: 28px; padding: 26px; font-size: var(--ppt-body-text); line-height: 1.4; }
+.td-confidence-road { display: flex; align-items: center; }
+.td-confidence-math { display: flex; flex-direction: column; justify-content: center; gap: 19px; }
+.td-confidence h2 { margin: 0; }
+.td-ledger { display: grid; gap: 7px; }
+.td-ledger header, .td-ledger > div { display: grid; grid-template-columns: 100px 130px 1fr; align-items: center; }
+.td-ledger header { color: #a4c0be; }
+.td-ledger > div { padding: 5px 0; border-bottom: 1px solid #3e6261; }
+.td-ledger strong { color: #63e8b6; }
+.td-proof-body { flex: 1; display: grid; grid-template-columns: 720px 1fr; gap: 28px; align-items: center; }
+.td-proof-charts { display: grid; gap: 35px; }
+.td-proof-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: #b8cbc7; }
+.td-proof-row > span { width: 65px; flex-shrink: 0; }
+.td-proof-row i { display: block; height: 24px; border-radius: 6px; }
+.td-proof-row strong { font-variant-numeric: tabular-nums; }
+.td-proof-row.is-selected { color: #f5fff9; }
+.td-horizons svg { width: 100%; height: 310px; display: block; flex-shrink: 0; }
+.td-horizon-notes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+.td-horizon-notes h2 { color: #63e8b6; margin-bottom: 10px; }
+.td-axis-label { color: #63e8b6; font-size: 28px; line-height: 44px; }
+.td-horizon-label { color: #eaf8f0; font-size: 28px; line-height: 54px; text-align: center; }
+
+.td-integer-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.td-integer-choice .td-buttons { flex-wrap: nowrap; }
+.td-cover-explained { display: block; width: 100%; height: 100%; }
+.ppt-cover-panel:has(.td-cover-explained) { min-height: 0; }
+.td-score-explained { height: 100%; display: flex; flex-direction: column; gap: 20px;
+  padding: 24px 30px; border-radius: 28px; color: #eaf8f0; background: #102b2e;
+  font-size: var(--ppt-body-text); line-height: 1.4; }
+.td-score-explained p, .td-score-explained h2 { margin: 0; }
+.td-score-columns { display: grid; grid-template-columns: 900px 1fr; gap: 24px; flex: 1; min-height: 0; align-items: center; }
+.td-score-columns svg { display: block; width: 100%; height: 100%; min-height: 0; }
+.td-score-readouts { display: grid; gap: 18px; }
+.td-score-readouts section { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
+  background: #204348; padding: 16px 20px; border-radius: 18px; }
+.td-score-readouts p { grid-column: 1 / -1; }
+.td-score-readouts h2 { font-size: var(--ppt-body-heading); }
+.td-score-readouts strong { display: block; color: #63e8b6; font-size: var(--ppt-body-emphasis); }
+.td-bridge-explained .td-bridge-text { gap: 20px; }
