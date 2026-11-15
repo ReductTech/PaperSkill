@@ -1,0 +1,89 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css.
+   Studio scene neutrals below mirror src/modules/studio-kit.tsx. */
+
+:root {
+  --studio-wall: #f5f3ec;
+  --studio-counter: #e3ddcf;
+  --studio-shade: #b8b2a0;
+  --studio-handle: #92400e;
+  --studio-paper: #fffdf7;
+  --paper-scene-bg: #f5f3ec;
+}
+
+/* ---- 公式卡片重排：去花哨底色、导语与提示不再重叠、每条公式独立成行 ---- */
+.formula-explain {
+  text-align: left;
+  padding: 14px 20px 12px;
+  background: #fbfcf8;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+}
+
+.fe-hint {
+  position: static;
+  display: block;
+  margin: 0 0 8px;
+  color: var(--slate-2);
+  font-size: 12px;
+}
+
+.fe-lead {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.fe-formula {
+  display: block;
+  text-align: left;
+  padding: 4px 16px;
+  line-height: 2.2;
+}
+
+.fe-formula sub,
+.fe-formula sup {
+  line-height: 0;
+  font-size: 0.72em;
+}
+
+.fe-formula sub { margin-left: 1px; }
+.fe-formula sup { margin-left: 2px; }
+
+/* 每条公式独立一行；行间以虚线分隔；超宽时横向滚动而非在词中间折行 */
+.fe-eq {
+  display: block;
+  padding: 9px 0;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.fe-eq + .fe-eq {
+  border-top: 1px dashed var(--line);
+}
+
+/* 式号标签（式2 · 理解 等） */
+.fe-eq-tag {
+  display: inline-block;
+  margin-right: 16px;
+  padding: 3px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--slate-2);
+  font-family: var(--ui-font-sans, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: middle;
+  white-space: nowrap;
+  transform: translateY(-2px);
+}
+
+.fe-explain {
+  margin-top: 10px;
+}
