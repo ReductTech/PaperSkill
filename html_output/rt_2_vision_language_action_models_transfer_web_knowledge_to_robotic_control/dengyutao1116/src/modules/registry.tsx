@@ -1,0 +1,54 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { ABTesting } from './ab-testing';
+import { AblationRecap } from './ablation-recap';
+import { ActionTokenize } from './action-tokenize';
+import { ApproachCompare } from './approach-compare';
+import { BaselineLineup } from './baseline-lineup';
+import { CotRollout } from './cot-rollout';
+import { DataProvenance } from './data-provenance';
+import { EmergenceEvidence } from './emergence-evidence';
+import { EvalProtocol } from './eval-protocol';
+import { GeneralizationEvidence } from './generalization-evidence';
+import { InterpreterStrip } from './interpreter-strip';
+import { LangtableTable } from './langtable-table';
+import { LatencyBudget } from './latency-budget';
+import { LimitationRecap } from './limitation-recap';
+import { ModelRealtime } from './model-realtime';
+import { OutputConstraint } from './output-constraint';
+import { ProblemBaseline } from './problem-baseline';
+import { QuantizationLab } from './quantization-lab';
+import { Rt2ArchOverview } from './rt2-arch-overview';
+import { CoverWidget } from './rt2-cover';
+import { SharedVocab } from './shared-vocab';
+import { TrainingRecipe } from './training-recipe';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['ab-testing'] = ABTesting;
+widgetRegistry['ablation-recap'] = AblationRecap;
+widgetRegistry['action-tokenize'] = ActionTokenize;
+widgetRegistry['approach-compare'] = ApproachCompare;
+widgetRegistry['baseline-lineup'] = BaselineLineup;
+widgetRegistry['cot-rollout'] = CotRollout;
+widgetRegistry['data-provenance'] = DataProvenance;
+widgetRegistry['emergence-evidence'] = EmergenceEvidence;
+widgetRegistry['eval-protocol'] = EvalProtocol;
+widgetRegistry['generalization-evidence'] = GeneralizationEvidence;
+widgetRegistry['interpreter-strip'] = InterpreterStrip;
+widgetRegistry['langtable-table'] = LangtableTable;
+widgetRegistry['latency-budget'] = LatencyBudget;
+widgetRegistry['limitation-recap'] = LimitationRecap;
+widgetRegistry['model-realtime'] = ModelRealtime;
+widgetRegistry['output-constraint'] = OutputConstraint;
+widgetRegistry['problem-baseline'] = ProblemBaseline;
+widgetRegistry['quantization-lab'] = QuantizationLab;
+widgetRegistry['rt2-arch-overview'] = Rt2ArchOverview;
+widgetRegistry['rt2-cover'] = CoverWidget;
+widgetRegistry['shared-vocab'] = SharedVocab;
+widgetRegistry['training-recipe'] = TrainingRecipe;
