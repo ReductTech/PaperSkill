@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { Architecture } from './architecture';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+import { Inputs } from './inputs';
+import { Matching } from './matching';
+import { PaperResults } from './paper-results';
+import { PhotoLab } from './photo-lab';
+import { PhraseMask } from './phrase-mask';
+import { Ranking } from './ranking';
+import { Refinement } from './refinement';
+import { Scene1 } from './scene-1';
+import { Scene10 } from './scene-10';
+import { Scene2 } from './scene-2';
+import { Scene3 } from './scene-3';
+import { Scene4 } from './scene-4';
+import { Scene5 } from './scene-5';
+import { Scene6 } from './scene-6';
+import { Scene7 } from './scene-7';
+import { Scene8 } from './scene-8';
+import { Scene9 } from './scene-9';
+import { Tasks } from './tasks';
+import { Thresholds } from './thresholds';
+import { TokenLoss } from './token-loss';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['architecture'] = Architecture;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
+widgetRegistry['inputs'] = Inputs;
+widgetRegistry['matching'] = Matching;
+widgetRegistry['paper-results'] = PaperResults;
+widgetRegistry['photo-lab'] = PhotoLab;
+widgetRegistry['phrase-mask'] = PhraseMask;
+widgetRegistry['ranking'] = Ranking;
+widgetRegistry['refinement'] = Refinement;
+widgetRegistry['scene-1'] = Scene1;
+widgetRegistry['scene-10'] = Scene10;
+widgetRegistry['scene-2'] = Scene2;
+widgetRegistry['scene-3'] = Scene3;
+widgetRegistry['scene-4'] = Scene4;
+widgetRegistry['scene-5'] = Scene5;
+widgetRegistry['scene-6'] = Scene6;
+widgetRegistry['scene-7'] = Scene7;
+widgetRegistry['scene-8'] = Scene8;
+widgetRegistry['scene-9'] = Scene9;
+widgetRegistry['tasks'] = Tasks;
+widgetRegistry['thresholds'] = Thresholds;
+widgetRegistry['token-loss'] = TokenLoss;
