@@ -1,0 +1,125 @@
+{
+  "title": "OmniTaskonomy：视觉生成何时提升视觉理解？",
+  "pages": [
+    {
+      "id": "s1-paired-task",
+      "chapterId": "chap-1",
+      "title": "配对任务：同一输入，两种输出模态",
+      "goal": "在打乱的木料上亲手完成“拼回去”和“报出顺序”两件事，理解 I2I 与 I2T 只是同一视觉问题的两种输出。",
+      "summary": "Jigsaw 与 Zoom-In 把输入与视觉问题固定，只改变答案是图像还是文本。",
+      "interaction": "点一片木料再点另一片交换位置，右侧文本排列随之更新。",
+      "next": "看六种训练配方如何处理共享参数",
+      "snippet": "出处：p.4 §3 Controlled paired tasks；p.4 Figure 2(a)。论文的 Jigsaw 把图像 patch 打乱，要求 I2I 还原成图、I2T 输出文本排列如 ('reorder',[4,2,3,1])；1k I2T 训练样本、15 epochs、3 个种子。本页把 patch 级重排简化为 2×2 木料示意，只保留“同一输入、两种输出模态”的结构，不对应论文的任何模型内部表示。"
+    },
+    {
+      "id": "s2-recipes",
+      "chapterId": "chap-1",
+      "title": "六种训练配方与共享参数更新",
+      "goal": "区分六种配方，并从“共享参数是否被更新”解释为什么只有先做一段 I2I 的两条配方随数据稳定提升。",
+      "summary": "I2I→I2T 与 I2I→Mixed 稳定 scaling；冻结共享参数或一开始就混合收益更弱或不稳定。",
+      "interaction": "在六张配方卡中选择一个，观察工序条、共享参数状态与结论卡。",
+      "next": "量化生成数据能替代多少讲解数据",
+      "snippet": "出处：p.4 §3 Which training recipe transfers best?；Figure 2(b)；FINDING 1。→ 表示先后两阶段，Mixed 表示同一 batch 混合 I2I 与 I2T，Frozen I2I 表示冻结与 I2T 共享的参数、只更新生成专有参数。论文只报告相对趋势（稳定上升 / 更弱或不稳定），本页不给出曲线数值；“师傅手感”只是共享参数的类比，真实共享参数是 LM、理解组件与 ViT 权重（VAE 在 I2I 阶段冻结）。"
+    },
+    {
+      "id": "s3-substitute",
+      "chapterId": "chap-1",
+      "title": "I2I 数据替代 I2T 数据",
+      "goal": "说出在给定任务上，多少生成数据加多少理解数据可以达到“只用理解数据”的可比水平。",
+      "summary": "100k I2I + 1k/3k I2T 达到只用 10k I2T 的可比水平；I2T 预算越小，增益越大。",
+      "interaction": "选任务，再选 I2T 预算（1k/3k/10k/30k），比较两条路径的条形长度与结论。",
+      "next": "把对应关系落到单个样本上",
+      "snippet": "出处：p.4-5 §3；Figure 2(c)。I2I 预算固定 100k；论文对 1k/3k/10k/30k 四个预算都报告了提升，并指出预算越小增益越大。等价点是“可比（comparable）”而非严格相等：Zoom-In 为 1k、Jigsaw 为 3k 对标 10k I2T。条形长度按对数刻度绘制，仅为可读性，不改变数值含义。"
+    },
+    {
+      "id": "s4-instance",
+      "chapterId": "chap-1",
+      "title": "逐样本对应：拼对了，也说对了",
+      "goal": "用同一批样本上的条件正确率，判断 I2I 与 I2T 的对应是否只发生在总体均值上。",
+      "summary": "同一输入上 I2I 预测正确时，I2T 正确率明显更高。",
+      "interaction": "切换任务与条件（I2I 正确 / 错误），比较两组条件正确率条形。",
+      "next": "进入 OmniTaskonomy 的统一分类",
+      "snippet": "出处：p.5 Table 1。30k I2I + 1k I2T、三次种子、1k 配对评估输入；Jigsaw：I2I 70.9、I2T 81.3、P(I2T✓|I2I✓)=88.2、P(I2T✓|I2I×)=64.3；Zoom-In：91.8、90.6、90.9、86.7。两个任务是不同难度，因此不要把 88.2 与 90.9 直接比大小，只在同一任务内比较两个条件。"
+    },
+    {
+      "id": "s5-taxonomy",
+      "chapterId": "chap-2",
+      "title": "三 R 层级与分离的叶子",
+      "goal": "把一项能力放回 3R 中的位置，并区分“理解能力叶子”和“I2I 任务叶子”。",
+      "summary": "19 个 I2I 任务与 25 个理解能力共享同一 3R 层级，但仍是分离的叶子。",
+      "interaction": "点任一个能力或任务叶子，挂板高亮并给出归属与同族对照。",
+      "next": "看这张表是怎么建出来的",
+      "snippet": "出处：p.5-6 §4；Figure 3（本页用自绘的三块挂板复述其层级关系，未改画原图；原图 3 的叶子标签在原尺寸已很密，缩到幻灯片尺寸会不可读，故按契约 §11 不嵌入）。3R 取自 Malik et al. 2016；细粒度能力自下而上从 7 个基准问题归纳。形状区分：圆=理解能力，方=I2I 任务。25 个能力里有 6 个评估样本少于 100，不出现在主文迁移图中。"
+    },
+    {
+      "id": "s6-build",
+      "chapterId": "chap-2",
+      "title": "分类树怎么建出来，校验到什么程度",
+      "goal": "说清四步构建流程与该阶段的真实规模，并知道人工校验只覆盖抽样。",
+      "summary": "7 个基准 → 固定属性 schema → 10 批局部树 → 合并并归入 3R；三评审 ≥2/3 一致保留 9,444 例。",
+      "interaction": "点四个阶段节点推进，树状示意生长，右侧只显示该阶段的真实数字。",
+      "next": "读迁移地图",
+      "snippet": "出处：p.6 §4；p.19 Figure 7；p.21-22 Table 6。真实数字：7 个基准（BLINK、MM-Star、MMT-Bench、CV-Bench、RealWorldQA、MMVP、VStarBench）、属性描述用 gemini-3-flash-preview、10 个基准分层批次、三评审 ≥2/3 一致保留 9,444 例；人工校验 250 例 / 400 次评审，确定判断中 97.4% 与 VLM 一致，Cohen's κ 0.956–0.989（均值 0.972），四人共同复核 50 例 Krippendorff's α = 0.943。树节点数只是示意，真实叶子为 25 个能力。"
+    },
+    {
+      "id": "s7-transfer",
+      "chapterId": "chap-2",
+      "title": "19×25 的迁移地图：谁帮了谁",
+      "goal": "读出迁移的选择性：只有少数能力被显著提升，且每个源任务帮助的对象不同。",
+      "summary": "Metric 3D 与 Counting 受益源最多（各 12 个），2D Ordering 11 个；OCR 与外观理解没有显著提升。",
+      "interaction": "点一个源任务列，列高亮并列该源的显著增益清单。",
+      "next": "转而问：为什么会迁移",
+      "snippet": "出处：p.7 §5.2；Figure 4；p.8 §5.2 正文数值。本页只画正文报告了具体 pp 的单元：Localization→Counting +2.5、Object pointing→Counting +2.0、Inpainting→Counting +1.5、Jigsaw→2D Ordering +6.8、Inpainting→2D Ordering +7.2、Z-depth→Metric 3D +3.6、Euclidean depth→Metric 3D +3.8、Surface normals→Metric 3D +3.4、2.5D segmentation→Category recognition +1.2、Z-depth→Localization +2.3（图 4 标注值）。空白表示论文未报告该组合的显著增益，不等于零增益或有害。"
+    },
+    {
+      "id": "s8-alignment",
+      "chapterId": "chap-3",
+      "title": "对齐分数：s = √d_eff · cos(θ)",
+      "goal": "亲手改变两个梯度方向的夹角与有效维度，理解分数为正/负的条件，以及为什么不同参数块可以比较。",
+      "summary": "对齐分数＝归一化梯度在共享 PCA 子空间内的余弦，再乘有效维度的平方根。",
+      "interaction": "拖动橙色箭头或用滑块改变 θ，并调整 d_eff，观察 cos、s 与判定文字。",
+      "next": "看这种对齐落在哪些模块与层",
+      "snippet": "出处：p.9 §6.1（公式）。论文做法：梯度在预训练 checkpoint θ0 处计算，逐参数块 L2 归一化，拟合共享无中心 PCA（保留累计 99% 方差的最少主成分），在子空间内算余弦并乘 √d_eff。本页把高维方向压成二维夹角：θ、d_eff 的取值域都是示意，真正的 s 是逐参数块、逐样本计算后再平均；符号说明用 SymbolHint，不要让学习者以为 d_eff 可随意设定。"
+    },
+    {
+      "id": "s9-where",
+      "chapterId": "chap-3",
+      "title": "对齐集中在注意力前的归一化层",
+      "goal": "指出对齐最强的参数块与层区间，并说明图的读法与它的定性性质。",
+      "summary": "受控配对里，理解分支 pre-attention RMSNorm 的对齐最强，且较早层更强。",
+      "interaction": "点参数块、点层条，观察结论卡与层区间着色。",
+      "next": "看对齐与下游增益的相关",
+      "snippet": "出处：p.8-9 §6.2；Figure 5(a,b)；p.10 FINDING 3。Jigsaw 与 Zoom-In 各采样 500 个配对样本，在预训练 checkpoint 处计算。本页柱高与配色是定性示意（论文正文未给逐层数值），只表达“pre-attn 最强、较早层更强、部分块为负”。Q-norm / K-norm / Out 的负值依据图 5(a)。"
+    },
+    {
+      "id": "s10-correlation",
+      "chapterId": "chap-3",
+      "title": "对齐与增益的两种粒度相关",
+      "goal": "比较两种聚合粒度下的相关强度，并守住“相关不是因果”的边界。",
+      "summary": "平均对齐越高的能力，平均迁移增益越大；单对层面方向一致但更松。",
+      "interaction": "在“能力级”和“任务对级”之间切换，读对应的 r 与解释。",
+      "next": "把增益换算成具体准确率并看条件",
+      "snippet": "出处：p.9 §6.3；Figure 5(c,d)。能力级为 7 个能力（评估样本 > 500）对 19 个源平均；任务对级为 19×7=133 对。r 为 Pearson 相关系数，论文用“associated with”，本页明确写“相关不是因果”。本页只截取原图 5 的 (c)(d) 两联（./images/fig5-cd.png），(a)(b) 已在上一页讨论。"
+    },
+    {
+      "id": "s11-gain",
+      "chapterId": "chap-4",
+      "title": "把百分点增益换算成准确率",
+      "goal": "用 Δ 的定义算出训练后的绝对准确率，并知道这个差值来自哪种检验与多少个种子。",
+      "summary": "Δ 是相对 I2T-only 基线的百分点变化；训练后准确率 = 基线 + Δ。",
+      "interaction": "选能力、再选该能力下有正文数值的源任务，刻度尺上出现基线与训练后两个点。",
+      "next": "把方法用起来并说明适用条件",
+      "snippet": "出处：Δ 定义见 p.7 §5.1；基线见 p.32 Table 12；Δ 数值见 p.7-8 §5.2 与图 4。只列正文报告过显著增益的组合；Localization 的源 Z-depth 为图 4 标注值（+2.3）。显著性为逐样本精确配对置换检验 p<0.05，三次种子平均。跨能力不应比较绝对准确率（各能力难度不同）。"
+    },
+    {
+      "id": "s12-recipe-card",
+      "chapterId": "chap-4",
+      "title": "按目标能力挑生成任务与配方",
+      "goal": "把论文的路线图用一次：给定想提升的能力，选生成任务、定配方，并说清适用范围。",
+      "summary": "先 I2I 后 I2T，并按目标能力挑选有显著增益的源任务。",
+      "interaction": "选一个目标能力，右侧生成对应的源任务清单与配方卡。",
+      "next": "",
+      "snippet": "出处：结论与路线图见 p.3 与 p.10 §7；增益数值见 p.7-8 §5.2。适用范围来自实验设置（单一底座 BAGEL-7B-MoT、50k/50k 预算、4 GPU、三次种子，见 p.7 §5.1 与 p.32 Table 11），是本教程按论文条件写出的解读，不是论文的独立 Limitations 章节。不要把“按能力挑任务”写成已被验证的通用做法。"
+    }
+  ]
+}
