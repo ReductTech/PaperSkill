@@ -1,0 +1,409 @@
+/* ============================================================
+   PPT 模式叠加层（最左侧目录栏 + 底部上一页/下一页）
+   ------------------------------------------------------------
+   仅新增：不修改本论文原有的 tokens.css / components.css / paper.css。
+   目录栏 / 底栏的规则原样取自 paper-skill/assets/react-template
+   的 .slide-* 样式（asset 示例的 PPT 模式），末尾只追加
+   「固定浮层定位」覆盖，使其叠在原有正文之上。
+
+   本论文的 tokens.css 已含 --ui-* 颜色、--t-fast/--t-med、--ease-out、
+   --shadow/--shadow-soft、--ui-radius-sm/pill、--ui-font-mono，
+   只缺示例 slide 样式用到的两个字号组，这里补上。
+   ============================================================ */
+
+:root {
+  --ui-type-h3-size: 1.5rem;
+  --ui-type-h3-weight: 800;
+  --ui-type-h3-line-height: 1.35;
+  --ui-type-body-small-size: 1rem;
+  --ui-type-body-small-weight: 500;
+  --ui-type-body-small-line-height: 1.7;
+}
+
+
+/* ---------- Slide layout (PPT-style: sidebar + one slide at a time) ---------- */
+.slide-layout {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Sidebar */
+.slide-sidebar {
+  width: 288px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--ui-bg-card);
+  border-right: 1px solid var(--ui-border);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--t-med) var(--ease-out);
+}
+.slide-layout.sidebar-collapsed .slide-sidebar {
+  width: 0;
+  overflow: hidden;
+  border-right: 0;
+}
+.slide-sidebar-header {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.slide-sidebar-venue {
+  color: var(--ui-text-light);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  margin-bottom: 4px;
+}
+.slide-sidebar-title {
+  color: var(--ui-text-main);
+  font-size: var(--ui-type-h3-size);
+  font-weight: var(--ui-type-h3-weight);
+  line-height: var(--ui-type-h3-line-height);
+  overflow-wrap: anywhere;
+}
+.slide-sidebar-nav {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.slide-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  background: transparent;
+  color: var(--ui-text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out),
+    transform var(--t-fast) var(--ease-out);
+}
+.slide-sidebar-item:hover {
+  background: var(--ui-bg-soft);
+  color: var(--ui-accent);
+}
+.slide-sidebar-item:active { transform: scale(0.98); }
+.slide-sidebar-item.active {
+  background: var(--ui-accent);
+  color: #fff;
+}
+.slide-sidebar-num {
+  flex-shrink: 0;
+  font-family: Georgia, serif;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-h3-weight);
+  min-width: 34px;
+}
+.slide-sidebar-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  line-height: var(--ui-type-body-small-line-height);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Main content area */
+.slide-main {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 56px;
+  clear: none;
+}
+.slide-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px clamp(24px, 5vw, 80px);
+  animation: slide-in var(--t-med) var(--ease-out) both;
+}
+.slide-content > section,
+.slide-content > .dl-related-section {
+  margin: 0;
+  max-width: none;
+}
+.slide-chap {
+  margin: 0;
+  scroll-margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.slide-chap .module + .module { margin-top: 0; }
+/* Takeaway row fills width */
+.slide-chap .embed-takeaway,
+.slide-chap .reversibility-takeaway { margin: 0; }
+/* Hero */
+.slide-content > section.hero {
+  max-width: none;
+  margin: 0;
+}
+.slide-content > section.hero .hero-inner { max-width: 960px; }
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Bottom navigation bar: full-width bar pinned to the viewport bottom.
+   padding-left = sidebar 288px + collapse toggle 24px, so the centered button
+   group aligns with the content card for both sidebar states. */
+.slide-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px 10px 312px;
+  border-top: 1px solid var(--ui-border);
+  background: var(--ui-bg-card);
+  flex-shrink: 0;
+  transition: padding-left var(--t-med) var(--ease-out);
+}
+.slide-layout.sidebar-collapsed .slide-nav { padding-left: 24px; }
+.slide-nav-btn {
+  padding: 9px 22px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-bg-card);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out),
+    transform var(--t-fast) var(--ease-out);
+}
+.slide-nav-btn:hover:not(:disabled) {
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
+  transform: translateY(-1px);
+}
+.slide-nav-btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+.slide-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.slide-nav-btn-primary {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: #fff;
+}
+.slide-nav-btn-primary:hover:not(:disabled) {
+  background: #1f385d;
+  border-color: #1f385d;
+  color: #fff;
+}
+.slide-nav-counter {
+  color: var(--ui-text-light);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  min-width: 64px;
+  text-align: center;
+}
+
+/* Mobile sidebar toggle (hidden on desktop) */
+.slide-sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 300;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-bg-card);
+  color: var(--ui-accent);
+  font-size: var(--ui-type-body-small-size);
+  font-weight: var(--ui-type-body-small-weight);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+.slide-sidebar-toggle-icon { font-size: 16px; line-height: 1; }
+.slide-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(25, 42, 70, 0.4);
+}
+
+/* Desktop sidebar collapse toggle */
+.slide-sidebar-collapse {
+  position: sticky;
+  top: 14px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 1px solid var(--ui-border);
+  border-left: 0;
+  border-radius: 0 var(--ui-radius-sm) var(--ui-radius-sm) 0;
+  background: var(--ui-bg-card);
+  color: var(--ui-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+  margin-top: 14px;
+}
+.slide-sidebar-collapse:hover {
+  background: var(--ui-bg-soft);
+  color: var(--ui-accent);
+}
+.slide-layout.sidebar-collapsed .slide-sidebar-collapse {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+}
+
+/* Responsive: sidebar becomes a drawer on mobile */
+@media (max-width: 768px) {
+  .slide-sidebar-toggle { display: flex; }
+  .slide-sidebar-collapse { display: none; }
+  .slide-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 250;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform var(--t-med) var(--ease-out);
+    box-shadow: var(--shadow);
+  }
+  .slide-layout.sidebar-open .slide-sidebar { transform: translateX(0); }
+  .slide-layout.sidebar-open .slide-sidebar-overlay { display: block; }
+  .slide-content { padding: 48px 16px 16px; }
+  .slide-nav { padding: 8px 12px; gap: 8px; }
+  .slide-nav-btn { padding: 8px 14px; }
+  .slide-nav-counter { min-width: 48px; }
+}
+
+/* ============================================================
+   叠加定位覆盖：目录栏 / 底栏以固定浮层呈现，正文只让出空间
+   （这类论文没有固定顶部导航，所以 --ppt-top 为 0）
+   ============================================================ */
+.slide-layout.ppt-overlay {
+  display: block;
+  --ppt-top: 0px;
+}
+
+/* 还没开始学习（只有封面）时，整组导航隐藏，且不占正文空间 */
+.slide-layout.ppt-overlay.ppt-hidden {
+  display: none;
+}
+
+/* 目录栏：固定在最左侧，占满整屏高度 */
+.slide-layout.ppt-overlay .slide-sidebar {
+  position: fixed;
+  top: var(--ppt-top);
+  left: 0;
+  bottom: 0;
+  height: auto;
+  z-index: 70;
+  box-shadow: var(--shadow);
+}
+.slide-layout.ppt-overlay .slide-sidebar-collapse {
+  position: fixed;
+  top: calc(var(--ppt-top) + 14px);
+  left: 288px;
+  margin-top: 0;
+  z-index: 71;
+}
+.slide-layout.ppt-overlay.sidebar-collapsed .slide-sidebar-collapse {
+  left: 8px;
+}
+
+/* 底部翻页条 */
+.slide-layout.ppt-overlay .slide-nav {
+  z-index: 60;
+}
+
+/* 尚未揭示的章节：条目暗一些，表示还没到 */
+.slide-layout.ppt-overlay .slide-sidebar-item.is-locked {
+  opacity: 0.45;
+}
+
+/* 正文让位（桌面）：body 左侧留出目录栏宽度，内部内容会自动重新居中 */
+@media (min-width: 769px) {
+  html.ppt-bars-on body {
+    padding-left: 288px;
+  }
+  html.ppt-bars-on.ppt-sidebar-collapsed body {
+    padding-left: 0;
+  }
+  html.ppt-bars-on main {
+    padding-bottom: 120px;
+  }
+}
+
+/* 窄屏：目录栏改为抽屉（与示例移动端行为一致），正文不再左移 */
+@media (max-width: 768px) {
+  .slide-layout.ppt-overlay .slide-sidebar-toggle {
+    display: flex;
+    top: calc(var(--ppt-top) + 12px);
+  }
+  .slide-layout.ppt-overlay .slide-sidebar {
+    top: var(--ppt-top);
+    bottom: 0;
+    height: auto;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform var(--t-med) var(--ease-out);
+    z-index: 250;
+  }
+  .slide-layout.ppt-overlay.sidebar-open .slide-sidebar {
+    transform: translateX(0);
+  }
+  .slide-layout.ppt-overlay.sidebar-open .slide-sidebar-overlay {
+    display: block;
+  }
+  .slide-layout.ppt-overlay .slide-sidebar-collapse {
+    display: none;
+  }
+  html.ppt-bars-on main {
+    padding-bottom: 110px;
+  }
+}
+
+/* ============================================================
+   底栏微调（用户要求：上一章/下一章整体往上一些、大一些）
+   只覆盖竖向 padding 与字号；横向 padding 仍沿用上面各断点的设置，
+   所以窄屏抽屉布局不受影响。正文底部让位同步加大，避免被加高的底栏压住。
+   ============================================================ */
+.slide-layout.ppt-overlay .slide-nav {
+  padding-top: 12px;
+  padding-bottom: 24px;   /* 按钮整体上移，离开屏幕底边 */
+}
+.slide-layout.ppt-overlay .slide-nav-btn {
+  padding: 13px 30px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.slide-layout.ppt-overlay .slide-nav-counter {
+  min-width: 84px;
+  font-size: 18px;
+}
+html.ppt-bars-on main {
+  padding-bottom: 156px;
+}
