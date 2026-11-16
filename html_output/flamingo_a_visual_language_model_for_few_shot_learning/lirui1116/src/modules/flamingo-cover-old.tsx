@@ -1,0 +1,32 @@
+import React,{useState,useEffect,useRef} from 'react';
+import {SymbolHint} from '../components/SymbolHint';
+import {useCoverPlayback} from '../components/CoverPlayback';
+import './flamingo-thumbnail-sync';
+export const C={blue:'#27446e',green:'#228d5c',red:'#c43f52',orange:'#f07e47',ink:'#21324a'};
+export function Bird({x=0,y=0,scale=1,wing=0,color='#d99887'}:{x?:number;y?:number;scale?:number;wing?:number;color?:string}){return <g transform={'translate('+x+' '+y+') scale('+scale+')'}><path d="M-65 18 Q-85 -5 -106 17 L-71 30" fill={color}/><ellipse rx="70" ry="43" fill={color}/><circle cx="49" cy="-38" r="33" fill={color}/><path d={'M-28 2 Q-5 '+(-65-wing*55)+' 38 -4 Q14 36 -28 2'} fill="#ad6f63"/><path d="M77 -42 L110 -28 L78 -21" fill="#e4a34c"/><circle cx="59" cy="-44" r="5" fill="#21324a"/><path d="M-15 36 L-21 80 M23 36 L22 80 M-35 81 H-7 M8 81 H36" stroke="#92400e" strokeWidth="7" strokeLinecap="round"/></g>}
+export function Notebook({children,wide=false}:{children?:React.ReactNode;wide?:boolean}){return <svg viewBox={wide?'0 0 1400 390':'0 0 850 420'} className="field-art" role="img" aria-label="自然观察手账示意"><rect x="8" y="8" width={wide?1384:834} height={wide?374:404} rx="30" fill="#f3eedf"/><path d={wide?'M700 20 V370':'M425 20 V400'} stroke="#cbb99c" strokeWidth="6"/><path d="M45 355 Q150 260 280 350" fill="none" stroke="#bbc7a5" strokeWidth="12"/><path d="M90 330 Q110 250 145 225 Q135 310 90 330" fill="#bbc7a5"/>{children}</svg>}
+export function Feedback({children,bad=false}:{children:React.ReactNode;bad?:boolean}){return <div className={'field-feedback '+(bad?'bad':'')} aria-live="polite">{children}</div>}
+export function Hint({sym,meaning}:{sym:string;meaning:string}){return <SymbolHint meaning={meaning}>{sym}</SymbolHint>}
+export function Slider({label,value,min,max,step=1,onChange}:{label:string;value:number;min:number;max:number;step?:number;onChange:(v:number)=>void}){return <label className="field-slider"><span>{label}<b>{value.toFixed(step<1?1:0)}</b></span><input aria-label={label} type="range" min={min} max={max} step={step} value={value} onChange={e=>onChange(Number(e.target.value))}/></label>}
+export function useEase(value:number){const [v,setV]=useState(value);const ref=useRef(value);useEffect(()=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches){ref.current=value;setV(value);return;}const from=ref.current,start=performance.now();let id=0;const tick=(now:number)=>{const t=Math.min(1,(now-start)/500);ref.current=from+(value-from)*(1-(1-t)**3);setV(ref.current);if(t<1)id=requestAnimationFrame(tick)};id=requestAnimationFrame(tick);return()=>cancelAnimationFrame(id)},[value]);return v}
+export function softmax(x:number[]){const e=x.map(v=>Math.exp(v-Math.max(...x))),sum=e.reduce((a,b)=>a+b,0);return e.map(v=>v/sum)}
+export function FieldCover({moduleId}:{moduleId:string}){
+ const {progress}=useCoverPlayback();const modern=moduleId==='newMethod';const stage=Math.min(3,Math.floor(progress*4));
+ return <svg className="mechanism-cover" viewBox="0 0 664 324" width="100%" height="100%" role="img" aria-label={modern?'冻结骨干，通过可训练连接读取图文示例并逐词续写':'图像与候选文字分别编码，比较相似度，选择已有描述'}>
+ <rect width="664" height="324" rx="20" fill="#f6f2e7"/>
+ {modern?<><text x="22" y="47" fill={C.blue}>视觉骨干</text><path d="M155 26 H248 M418 26 H509" stroke={C.green} strokeWidth="5"/><rect x="251" y="8" width="164" height="38" rx="8" fill="#def0e4"/><text x="264" y="47" fill={C.green}>可训练连接</text><text x="520" y="47" fill={C.blue}>语言骨干</text>
+ <rect x="18" y="64" width="628" height="93" rx="12" fill="#fff"/><Bird x={80} y={108} scale={.36} color="#899bb0"/><text x="164" y="102" fill={C.ink}>示例：什么颜色？</text><text x="164" y="139" fill={C.blue}>回答：蓝色</text><path d="M565 95 l15 15 30 -32" fill="none" stroke={stage>=1?C.green:'#d7deea'} strokeWidth="7"/>
+ <rect x="18" y="171" width="628" height="105" rx="12" fill="#fff" stroke={stage>=2?C.green:'#ded9cc'} strokeWidth="3"/><Bird x={80} y={215} scale={.36} wing={Math.sin(progress*10)*.15}/><text x="164" y="209" fill={C.ink}>查询：这张呢？</text><text x="164" y="251" fill={C.green}>{stage>=2?'回答：'+(stage>=3?'粉色':'粉'):'读取新图，沿用示例格式'}</text><rect x={stage>=3?305:278} y="228" width="4" height="29" fill={stage>=2?C.orange:'transparent'}/>
+ <text x="24" y="311" fill={C.green}>{['两端骨干冻结，只学习连接','从图文示例理解当前任务','新图提供内容，文字逐词生成','能生成回答，而非只选标签'][stage]}</text></>:<>
+ <text x="24" y="47" fill={C.blue}>图像编码</text><text x="209" y="47" fill={C.blue}>候选文字分别编码</text><text x="511" y="47" fill={C.blue}>相似度</text>
+ <rect x="18" y="60" width="153" height="196" rx="14" fill="#eee7d5"/><Bird x={87} y={144} scale={.53}/><rect x="37" y="222" width={stage>=1?115:0} height="12" rx="6" fill={C.blue}/>
+ {['粉色鸟在水中','猫躺在地上','森林中的树'].map((t,i)=><g key={t}><rect x="191" y={58+i*69} width="287" height="58" rx="10" fill={i===0&&stage>=3?'#f9e8eb':'white'} stroke={i===0&&stage>=3?C.red:'#ded9cc'} strokeWidth="3"/><text x="208" y={96+i*69} fill={C.ink}>{t}</text><rect x="501" y={77+i*69} width="136" height="17" rx="8" fill="#e0e4e9"/><rect x="501" y={77+i*69} width={stage>=2?[117,18,8][i]:0} height="17" rx="8" fill={i===0?C.red:C.blue}/></g>)}
+ <text x="24" y="292" fill={C.red}>{stage>=3?'最高匹配：粉色鸟在水中':'相似度教学示意：逐项匹配'}</text>
+ </>}</svg>
+}
+
+export function FieldCoverOld(){return <FieldCover moduleId="oldMethod"/>}; export function FieldCoverNew(){return <FieldCover moduleId="newMethod"/>};
+export function Lesson({children,className=''}:{children:React.ReactNode;className?:string}){return <div className={'learn-page '+className}>{children}</div>}
+export function Lead({children}:{children:React.ReactNode}){return <p className="learn-lead">{children}</p>}
+export function Photo({blue=false,wing=0,label='',selected=false}:{blue?:boolean;wing?:number;label?:string;selected?:boolean}){return <figure className="learn-photo"><svg viewBox="0 0 400 280" role="img" aria-label={label||'自然观察图'}><rect x="5" y="5" width="390" height="270" rx="20" fill="#f3eedf" stroke={selected?C.orange:'none'} strokeWidth="6"/><path d="M25 229 Q90 210 180 230 T375 230 M45 251 H350" stroke="#b6d0d6" strokeWidth="10" fill="none"/><Bird x={190} y={128} scale={1.1} color={blue?'#899bb0':'#d99887'} wing={wing}/></svg>{label&&<figcaption>{label}</figcaption>}</figure>}
+export function Choice({active,children,onClick,label}:{active:boolean;children:React.ReactNode;onClick:()=>void;label?:string}){return <button className="learn-choice" aria-pressed={active} aria-label={label} onClick={onClick}>{children}</button>}
