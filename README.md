@@ -1,84 +1,33 @@
-# Paper Skill：交互式论文教程生成工具
+# 从像素准确到视觉真实：读懂 SRGAN 交互式教程
 
-PaperSkill 用于把 AI 与机器学习论文制作成中文交互式教学网页。使用者可以在 Agent 协助下完成环境准备、论文解析、网页生成、人工准确性核验、本地预览、仓库导入和 Pull Request 提交。
+基于论文 *Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network*，由 **paper-skill** 生成的完整 React + TypeScript + Vite 网页项目。
 
-生成结果是完整的 React + TypeScript（Vite）项目，不是单独的 HTML 文件。本仓库不提供仅在本地生成或使用的流程；开始使用本仓库即表示使用者同意：教程通过人工内容核验和提交前网页预览后，由 Agent 导入公共仓库、推送个人分支并创建公开 Pull Request。Pull Request 是否合并及教程是否正式发布，仍由仓库维护者审核决定。
+## 本地运行
 
-**在线教程集合：** https://reducttech.github.io/PaperSkill/#start
-
-## News
-
-- **2026-10-20**：`paper-skill` 已推出新版本，采用 PPT 模式生成交互式论文教学网页。
-
-<video src="https://github.com/user-attachments/assets/0848d35b-22f6-4ec0-838c-77fd6e096de0" width="480" controls preload="metadata">
-  <a href="https://github.com/user-attachments/assets/0848d35b-22f6-4ec0-838c-77fd6e096de0">查看展示视频</a>
-</video>
-
-## 参考案例
-
-[查看参考案例](docs/reference-cases/README.md)
-
-## 快速开始
-
-准备一篇机器学习或人工智能论文的 PDF、LaTeX、正文或公开链接，然后把下面的指令发送给支持 Skill 的 Agent：
-
-```text
-请访问仓库 https://github.com/ReductTech/PaperSkill，首先读取 docs/AGENT_WORKFLOW.md（菜单模式），不必读取项目中的其他源码，先向我展示功能菜单，由我选择要执行的功能。
+```bash
+npm install
+npm run dev       # 开发预览 http://localhost:5173
+npm run build     # 产出 dist/ 静态站点
+npm run preview   # 预览构建结果
 ```
 
-Agent 应展示以下菜单：
+最终提交应保留整个项目目录，不要只复制 `index.html` 或 `dist/`。
 
-1. 自动准备环境
-2. 调用 `paper-skill` 生成网页
-3. 人工校验网页准确性，本步骤确认后会自动返回你的预期发布地址
-4. 导入主仓库
-5. 准备提交 PR，(PR经审核通过与构建后，“预计发布地址”即可正常访问)
-6. 修改已有的网页，自动复制版本目录并写入版本溯源信息
+## 目录结构
 
-选择功能 1 后，Agent 会检查 GitHub 登录、Node.js、npm、Git 和 Paper Skill；选择功能 2 后，Agent 会读取论文、生成网页并完成基础工程检查；选择功能 6 后，Agent 会复制你要修改的已有网页、生成包含源作者信息的 `paper.json`，然后你可以开始修改。每项功能结束后，Agent 都会重新显示菜单并等待下一次选择。
+| 路径 | 说明 | 是否生成器（Agent）修改 |
+| ---- | ---- | ---- |
+| `src/data/tutorial.ts` | 论文专属内容（章节、模块、公式、B 站、元信息） | ✅ 唯一数据文件 |
+| `src/styles/paper.css` | 论文专属 `:root` 配色覆盖 | ✅ 仅此 CSS |
+| `src/modules/*.tsx` + `registry.tsx` | 论文专属 Canvas 交互组件 | ✅ 在 registry 注册 |
+| `public/images/*` | 论文原图（可选） | ✅ 仅放图 |
+| `src/components/*` | 静态展示组件（Hero/Chapter/Module…） | ❌ 模板框架默认 |
+| `src/lib/*` | 静态工具（canvasKit / B 站） | ❌ 模板框架默认 |
+| `src/styles/{tokens,components}.css` | 静态设计令牌与组件样式 | ❌ 模板框架默认 |
 
-收集公开署名信息时，Agent 会一起询问 GitHub 用户名和可选的减论 ID。减论 ID 请在「编辑资料 → 账号 ID」右侧复制完整值；它会保存到对应版本的 `paper.json`，集合站通过“查看 →”小窗口显示完整值，未填写时显示「暂无」。
+## 配色语义（contract.md §5，保持稳定）
 
-也可以自行下载仓库并按 [贡献指南](docs/PARTICIPATING.md) 操作，但建议让 Agent 按菜单逐步执行，以免遗漏校验和预览环节。
+- `--blue` 指导/当前状态，`--green` 成功/本文方法，`--red` 失败/传统方法
+- `--orange` 用户强调，`--purple` 辅助机制
 
-## 生成后需要确认什么
-
-功能 2 完成后，Agent 会提供本地预览地址和项目文件夹，并提示选择下一项功能。选择功能 3，按照原论文检查：
-
-- 研究问题、方法结构、公式、实验数字和结论是否准确；
-- 中文讲解和章节顺序是否足够清楚；
-- 交互是否真正表达论文概念，并且操作反馈正确；
-- 桌面端和手机端是否存在溢出、遮挡、空白或资源丢失；
-- 论文链接与图片等外部素材是否可追溯且允许公开使用。
-
-完成后按照 Agent 的提示明确确认核验结果，然后继续选择功能 4 和功能 5，完成仓库导入和公开 Pull Request 提交。
-
-详细核验要求由 Agent 在功能 3 中展示并引导完成。
-
-## 系统支持
-
-环境配置会根据操作系统自动选择入口：
-
-- Windows 使用 `scripts/setup-participant.ps1` 和 PowerShell/winget；
-- macOS、Linux 使用 `scripts/setup-participant.sh`，脚本会识别 Homebrew 或当前 Linux 发行版的包管理器。
-
-两种入口都会检查 Node.js 20+、npm、Git、GitHub 连接和 Paper Skill 完整性。需要账号登录、系统授权或管理员权限时，Agent 会暂停并等待使用者处理。
-
-## 仓库结构
-
-```text
-PaperSkill/
-|-- docs/               # 使用流程、人工核验和贡献说明
-|-- paper-skill/        # 共享生成 Skill，由核心维护者维护
-|-- html_output/        # 已导入的完整教程项目（论文目录 / 版本目录两级）
-|-- catalog/            # 自动生成的论文索引
-|-- portal/             # GitHub Pages 教程集合入口
-|-- scripts/            # 环境配置、导入、验证、索引和构建工具
-`-- .github/            # PR 模板、自动检查和部署流程
-```
-
-贡献到本仓库的教程统一放入 `html_output/<paper-name>/<version>/`。`paper-name` 是论文标题全称的小写下划线形式，例如 `attention_is_all_you_need`；`version` 是「姓名拼音小写 + 修改日期 MMDD」，例如 `liming0903`，同一人同一天再次提交会自动变成 `liming0903_2`。同一篇论文的每个版本都独立保留，不会互相覆盖。
-
-集合站会按论文聚合展示：一张卡片列出该论文的全部版本（作者、修改日期、状态），每个版本都有独立的打开链接。存量扁平目录可用 `npm run migrate:versions`（先预演，确认后加 `--apply`）迁移为版本结构。不要把教程直接放在仓库根目录，也不要提交 `node_modules/`、`dist/`、论文 PDF、密钥、个人隐私、本地绝对路径或未获授权的素材。
-
-`main` 只通过 Pull Request 合并。创建 Pull Request 前，Agent 必须完成提交格式、目录范围和构建检查，并提供最终网页预览；论文事实与教学质量仍须由使用者人工确认。详细流程见 [文档索引](docs/README.md)。
+切勿把 `--accent` 重新定义成别的语义角色。
