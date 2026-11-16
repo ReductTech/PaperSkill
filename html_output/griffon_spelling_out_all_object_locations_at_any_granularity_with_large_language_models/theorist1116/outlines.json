@@ -1,0 +1,135 @@
+{
+  "title": "Griffon：用大语言模型在任意粒度标出全部目标位置",
+  "pages": [
+    {
+      "id": "c1-limit",
+      "chapterId": "chap-1",
+      "title": "单目标模式的代价",
+      "goal": "体验只允许一个框时，同场其他人如何被漏检。",
+      "summary": "旧 LVLM 常被锁在「只框一个已存在目标」。",
+      "interaction": "点击画面中的人物尝试框选；再点「需要全场景定位」看洞察。",
+      "next": "认识四种语言提示定位场景",
+      "snippet": "出处：Abstract 与 Fig.1。类比边界：棚拍漏检示意不等于具体模型在某一张图上的实测输出。"
+    },
+    {
+      "id": "c1-four",
+      "chapterId": "chap-1",
+      "title": "四种语言提示场景",
+      "goal": "按标签与目标数量理解 1vs1、1vsn、None、nvsn。",
+      "summary": "真实使用可按四种场景划分定位任务。",
+      "interaction": "点选四种拍摄简报，观察逐段拼写输出。",
+      "next": "了解 Language-prompted Localization Dataset",
+      "snippet": "出处：§3.1；Fig.1、Fig.3。None 输出 None。1vs1 示例可无 label；§3.2 统一为 label-first。"
+    },
+    {
+      "id": "c2-dataset",
+      "chapterId": "chap-2",
+      "title": "Language-prompted Localization Dataset",
+      "goal": "弄清约 6M 预训练与约 900K 指令数据各自解决什么。",
+      "summary": "数据覆盖四种场景与逾 76K 类别。",
+      "interaction": "拖滑块在 REC / 检测 / 6M / 900K 等离散点之间跳转。",
+      "next": "用简报练习场景判断",
+      "snippet": "出处：§3.1；贡献 1。预训练约 4M REC + 2M 检测；指令含 Flickr30K Entities 与 LVIS 负类。滑块不插值。"
+    },
+    {
+      "id": "c2-brief",
+      "chapterId": "chap-2",
+      "title": "从拍摄简报到输出行为",
+      "goal": "根据简报判断应输出单框、多框、None 还是多类拼接。",
+      "summary": "指令样本把四场景写成贴近日常的表达。",
+      "interaction": "抽一张简报并选择正确输出类型，查看即时对错反馈。",
+      "next": "学习统一坐标拼写格式",
+      "snippet": "出处：Fig.3 样本。玩具问答，不代表模型准确率。"
+    },
+    {
+      "id": "c3-format",
+      "chapterId": "chap-3",
+      "title": "拼写出全部目标位置",
+      "goal": "用统一格式把多个框写成一条自然语言坐标串。",
+      "summary": "label-[x1,y1,x2,y2]，多目标用 & 连接。",
+      "interaction": "拖动两个框的角点，观察输出字符串按 0.001 精度更新。",
+      "next": "比较数值坐标与特殊 token",
+      "snippet": "出处：§3.2。玩具交互；真实推理由 LLM 自回归生成，不是拖拽导出。"
+    },
+    {
+      "id": "c3-tokens",
+      "chapterId": "chap-3",
+      "title": "数值字符坐标，而非特殊 token",
+      "goal": "理解为何采用自然语言数字坐标、精度 0.001。",
+      "summary": "特殊坐标 token 需从零训练，收敛更慢。",
+      "interaction": "切换「数值字符 / 特殊 token」表示，阅读论文取舍。",
+      "next": "查看与 LLaVA 一致的结构",
+      "snippet": "出处：§3.2；引用 Shikra 在 REC 上的比较结论。本页为教学示意，不重训模型。"
+    },
+    {
+      "id": "c3-arch",
+      "chapterId": "chap-3",
+      "title": "保持与流行 LVLM 一致的结构",
+      "goal": "确认 Griffon 不引入检测头、专家模型或特殊 token。",
+      "summary": "Visual Encoder + Projection + LLM，一次前向可输出多目标。",
+      "interaction": "点击三个模块查看职责；对照「无额外检测头」。",
+      "next": "进入两阶段训练流程",
+      "snippet": "出处：§3.2；Fig.2。实现：CLIP ViT-L/14 + LLaMA2-13B。"
+    },
+    {
+      "id": "c4-stages",
+      "chapterId": "chap-4",
+      "title": "渐进两阶段训练流水线",
+      "goal": "区分 Stage I 基础多目标预训练与 Stage II 全场景指令微调。",
+      "summary": "Stage I 训练全网；Stage II 微调 LLM 与投影层。",
+      "interaction": "切换 Stage I / II，观察火焰（可训）与雪花（冻结）标记。",
+      "next": "理解训练无关打分",
+      "snippet": "出处：Fig.2；§3.3。Stage I 用约 6M；Stage II 用约 900K。初始化自 LLaVA。"
+    },
+    {
+      "id": "c4-score",
+      "chapterId": "chap-4",
+      "title": "训练无关的置信打分",
+      "goal": "用标签与坐标条件概率的几何平均给多目标排序。",
+      "summary": "score = p(R)^q × p_loc^(1-q)，论文取 q=0.5。",
+      "interaction": "拖动 p_label 与 p_loc，观察 score 与排序提示变化。",
+      "next": "查看 RefCOCO / Flickr 结果",
+      "snippet": "出处：§3.4 式 (1)–(4)；消融见表 5。高/中/低分档为教学示意阈值，非论文阈值。"
+    },
+    {
+      "id": "c5-rec",
+      "chapterId": "chap-5",
+      "title": "RefCOCO 系列与 Flickr30K Entities",
+      "goal": "阅读 Griffon 在指称与短语定位上的已报告结果。",
+      "summary": "主比通用 LVLM；Griffon-13B* 为仅 REC 公平设置。",
+      "interaction": "切换 RefCOCO / Flickr 视图，阅读柱状对比与成绩印章。",
+      "next": "对照 MSCOCO 检测结果",
+      "snippet": "出处：Table 1–2。仅 val：Griffon-13B 89.4 与 Qwen 并列，* 为 90.1。Flickr ANY 领先；MERGED test 低于 Ferret 84.8。"
+    },
+    {
+      "id": "c5-coco",
+      "chapterId": "chap-5",
+      "title": "接近 Faster R-CNN 的检测能力",
+      "goal": "在 MSCOCO val2017 上对照 Griffon 与同分辨率 Faster R-CNN。",
+      "summary": "mAP 接近，APS 更高；先前 LVLM 几乎无法一次多类检测。",
+      "interaction": "查看 mAP / APS 对比柱与曝光印章，阅读协议说明。",
+      "next": "看 Fig.4 风格的四场景定性对照",
+      "snippet": "出处：Table 3；§4.4。Griffon-13B mAP 24.8 vs FRCNN-R50 26.3 @448；APS 5.9 vs 4.6。"
+    },
+    {
+      "id": "c5-qual",
+      "chapterId": "chap-5",
+      "title": "四场景定性对照",
+      "goal": "对照专家模型与通用 LVLM，Griffon 如何覆盖四场景？",
+      "summary": "定性示意：单目标之外，拒识与多类多目标是关键差异。",
+      "interaction": "点选四种场景，比较 Qwen-VL / Grounding DINO / Griffon 的行为标签。",
+      "next": "用消融修复并看局限",
+      "snippet": "出处：§4.6、Fig.4。机制示意，不复现原图像素，不是新 AP 表。"
+    },
+    {
+      "id": "c5-bound",
+      "chapterId": "chap-5",
+      "title": "消融修复与适用边界",
+      "goal": "分别体验 Label-first 与置信打分，并记住局限。",
+      "summary": "两表独立读数；工作仍主要聚焦定位。",
+      "interaction": "分别开关 Label-first 与打分，对照表 4 / 表 5；阅读局限条。",
+      "next": "",
+      "snippet": "出处：Table 4–5；§5。Coord-first 17.8 → Label-first 22.2；打分 20.9→23.2。禁止把两消融平均。局限：主要聚焦定位。"
+    }
+  ]
+}
