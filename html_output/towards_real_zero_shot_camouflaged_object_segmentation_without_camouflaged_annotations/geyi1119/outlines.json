@@ -1,0 +1,95 @@
+{
+  "title": "无伪装标注的零样本伪装目标分割",
+  "pages": [
+    {
+      "id": "protocol",
+      "chapterId": "chap-1",
+      "title": "零样本的边界是训练数据",
+      "goal": "核对标注从哪里来，而不是只看零样本这个名字。",
+      "summary": "用DUTS显著性监督迁移，不使用COS标注。",
+      "interaction": "切换训练来源，判断是否符合论文协议。",
+      "next": "冻结主干，学习并联修正",
+      "snippet": "Fig.3；IV-A。DUTS训练20 epochs，预训练模型并未消失。"
+    },
+    {
+      "id": "adapter",
+      "chapterId": "chap-2",
+      "title": "冻结主干，学习并联修正",
+      "goal": "改变修正强度，观察冻结输出与可训练分支。",
+      "summary": "并联低秩分支修改特征，不替换冻结主干。",
+      "interaction": "调节分支缩放，计算向量相加。",
+      "next": "多尺度改变空间粒度",
+      "snippet": "III-B Eq.3-4；Fig.4。合成二维向量不等于真实网络推理；Adapter无额外LN、带偏置。"
+    },
+    {
+      "id": "scales",
+      "chapterId": "chap-3",
+      "title": "多尺度改变空间粒度",
+      "goal": "同一幅图像，如何产生不同尺度的视觉token？",
+      "summary": "不同空间粒度进入共享投影器。",
+      "interaction": "选择下采样尺度，核对位置数与共享投影。",
+      "next": "训练描述扩大语义提示",
+      "snippet": "III-B Multi-scale Transform；III-D Eq.6-9。最后特征经SFP生成四尺度。图示网格简化。"
+    },
+    {
+      "id": "captions",
+      "chapterId": "chap-4",
+      "title": "训练描述扩大语义提示",
+      "goal": "区分训练提示消融与推理时问答。",
+      "summary": "描述在训练期提供语义，推理时不需要prompt。",
+      "interaction": "选择训练提示，比较固定的实测分数。",
+      "next": "置零分数，不等于删除概率",
+      "snippet": "Table IV SOS部分，DUTS零样本，CAMO/COD10K Fw越大越好；BLIP2-opt离线。"
+    },
+    {
+      "id": "token-match",
+      "chapterId": "chap-5",
+      "title": "置零分数，不等于删除概率",
+      "goal": "从原始分数走到权重，检查每一步。",
+      "summary": "稀疏化分数之后，零值仍贡献exp(0)。",
+      "interaction": "改变一项分数和视觉位置数，重算softmax。",
+      "next": "码本学习方向，推理移除 M-LLM",
+      "snippet": "III-D Eq.10-12。按行min-max，低于1/Lv置零，之后softmax。非负无穷硬mask。"
+    },
+    {
+      "id": "codebook",
+      "chapterId": "chap-6",
+      "title": "码本学习方向，推理移除 M-LLM",
+      "goal": "把描述方向与query对齐，观察余弦损失。",
+      "summary": "训练对齐I与Q，推理使用学习到的query。",
+      "interaction": "改变查询角度，切换训练与推理路径。",
+      "next": "同主干比较：完整方法的增益",
+      "snippet": "III-F；III-G Eq.17-19。论文四尺度平均。零样本不含UAL。图为非零单位向量单尺度示意。"
+    },
+    {
+      "id": "results",
+      "chapterId": "chap-7",
+      "title": "同主干比较：完整方法的增益",
+      "goal": "控制backbone与训练协议，再解释指标差值。",
+      "summary": "同主干DUTS协议下有增益，不外推所有指标全面领先。",
+      "interaction": "选择指标和数据集，计算绝对与相对变化。",
+      "next": "更大不一定更好",
+      "snippet": "Table II；IV-B。EVP-EVA02-L与CaMF同主干及相同超参数。Fw↑，MAE↓。无显著性结论。"
+    },
+    {
+      "id": "ablations",
+      "chapterId": "chap-8",
+      "title": "更大不一定更好",
+      "goal": "检查MFA通道、码本与推理开销的真实条件。",
+      "summary": "更大通道并不保证更好，速度依赖设备和测量协议。",
+      "interaction": "选择通道数和推理语义来源。",
+      "next": "迁移结论必须带上模型来源",
+      "snippet": "Table III零样本CAMO Fw；Table I 4060Ti .055s。IV-E18.1FPS、332M与监督CAMO .887不混入零样本比较。"
+    },
+    {
+      "id": "boundaries",
+      "chapterId": "chap-9",
+      "title": "迁移结论必须带上模型来源",
+      "goal": "修正错配的训练来源，再回看码本对齐。",
+      "summary": "零样本是相对于任务定义的，不是没有任何监督。",
+      "interaction": "为目标选择来源，调整独立合成query角度。",
+      "next": "回到机制，检查证据边界。",
+      "snippet": "V Tables V-VII；polyp来自COS预训练，水下来自DUTS；OVCamo仅二值mask。角度不控制benchmark。"
+    }
+  ]
+}
