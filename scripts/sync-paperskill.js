@@ -7,7 +7,9 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { ROOT, listSubmissions, metadataFor } = require('./lib/repository');
 
-const DEFAULT_BASE_URL = 'https://php-testbed-lyx.reduct.cn';
+const DEFAULT_BASE_URL = 'https://app.reduct.cn';
+const COPIED_DATABASE_ENDPOINT = 'https://php-testbed-lyx.reduct.cn/Web/V1/Paperskill/create_version';
+const PRODUCTION_ENDPOINT = 'https://app.reduct.cn/Web/V1/Paperskill/create_version';
 const STATE_FILE = 'paperskill-sync-state.json';
 const OVERRIDE_FIELDS = new Set(['arxiv_id', 'doi', 'user_display_name', 'user_github_name', 'uuid', 'remote_id', 'confirmed_missing_fingerprint']);
 
@@ -135,6 +137,12 @@ function newState(endpoint) {
 
 function validateState(state, endpoint) {
   if (state.schemaVersion !== 1 || !state.versions || typeof state.versions !== 'object' || Array.isArray(state.versions)) throw new Error('同步状态格式不支持');
+  // The API owner confirmed the test database, including IDs, was copied to production.
+  // Retain successes, fingerprints and ambiguous attempts on the same state branch.
+  if (state.endpoint === COPIED_DATABASE_ENDPOINT && endpoint === PRODUCTION_ENDPOINT) {
+    state.domainMigration = { from: state.endpoint, to: endpoint, basis: 'api_owner_confirmed_database_copy' };
+    state.endpoint = endpoint;
+  }
   if (state.endpoint !== endpoint) throw new Error('接口地址与同步状态不一致；切换数据库须使用另一状态文件/分支，避免混用测试和正式 ID');
 }
 
@@ -379,6 +387,8 @@ async function main(args = process.argv.slice(2), env = process.env) {
         : localStore(path.resolve(ROOT, options.state), endpoint);
       const state = await store.load();
       validateState(state, endpoint);
+      // Persist the host migration before any new API call; Git history retains the original.
+      await store.save(state);
       await synchronize({ plan, state, save: (value) => store.save(value), create: (payload) => createVersion(endpoint, payload, headers), onResult: (row) => { results.push(row); console.log(`${row.status}: ${row.key}${row.id ? ` (id=${row.id})` : ''}${row.reason ? ` — ${row.reason}` : ''}`); } });
     }
   } catch (error) {

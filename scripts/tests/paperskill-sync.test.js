@@ -10,6 +10,8 @@ const {
 } = require('../sync-paperskill');
 
 const endpoint = endpointFor('https://example.com');
+const legacyEndpoint = endpointFor('https://php-testbed-lyx.reduct.cn');
+const productionEndpoint = endpointFor('https://app.reduct.cn');
 const submission = { paperName: 'test_paper', version: 'alice1027' };
 function metadata(extra = {}) {
   return {
@@ -19,6 +21,50 @@ function metadata(extra = {}) {
     topics: ['cv', 'nlp'], ...extra,
   };
 }
+
+test('copied production database preserves IDs, fingerprints and uncertain attempts without duplicate creates', async () => {
+  const plan = planFor([submission], {}, false, () => metadata());
+  for (const status of ['synced', 'pending', 'uncertain', 'not_found']) {
+    const state = newState(legacyEndpoint);
+    state.versions[plan[0].key] = { status, id: 42, fingerprint: plan[0].fingerprint };
+    const originalVersions = structuredClone(state.versions);
+    validateState(state, productionEndpoint);
+    assert.equal(state.endpoint, productionEndpoint);
+    assert.deepEqual(state.versions, originalVersions);
+    let saves = 0;
+    const results = await synchronize({ plan, state, save: async () => { saves++; },
+      create: async () => assert.fail('Historical versions must not be recreated') });
+    assert.ok(saves > 0);
+    assert.equal(results[0].status, status === 'synced' ? 'unchanged' : status === 'not_found' ? 'skipped' : 'blocked');
+    const migrated = structuredClone(state);
+    validateState(state, productionEndpoint);
+    assert.deepEqual(state, migrated);
+  }
+});
+
+test('domain migration is one-way and limited to the confirmed database copy', () => {
+  assert.throws(() => validateState(newState(productionEndpoint), legacyEndpoint), /不一致/);
+  assert.throws(() => validateState(newState(endpoint), productionEndpoint), /不一致/);
+  assert.throws(() => validateState(newState(legacyEndpoint), endpoint), /不一致/);
+});
+
+test('new versions after the host migration use production and preserve existing IDs', async () => {
+  const plan = planFor([submission], {}, false, () => metadata());
+  const state = newState(legacyEndpoint);
+  state.versions['other/existing'] = { status: 'synced', id: 19, fingerprint: 'unchanged' };
+  validateState(state, productionEndpoint);
+  let requests = 0;
+  await synchronize({ plan, state, save: async () => {}, create: async payload =>
+    createVersion(state.endpoint, payload, {}, async (url, options) => {
+      requests++;
+      assert.equal(url, productionEndpoint);
+      assert.equal(options.body.get('page_path'), plan[0].payload.page_path);
+      return Response.json({ code: 200, data: { id: 43 } });
+    }) });
+  assert.equal(requests, 1);
+  assert.equal(state.versions['other/existing'].id, 19);
+  assert.equal(state.versions[plan[0].key].id, 43);
+});
 
 test('metadata converts to the documented multipart fields without guessing UUID or sending two paper identifiers', () => {
   const payload = payloadFor(submission, metadata({ ancestors: [{ github: '@original', version: 'original1016' }] }));

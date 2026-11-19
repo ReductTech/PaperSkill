@@ -23,7 +23,7 @@ PR 合并进 `main` 后，新增的 `Sync PaperSkill database` 工作流读取�
    | 名称 | 值 |
    | --- | --- |
    | `PAPERSKILL_SYNC_ENABLED` | `true`：开启主分支更新后的自动同步 |
-   | `PAPERSKILL_API_BASE_URL` | `https://php-testbed-lyx.reduct.cn`，当前测试服务器；以后换域名在此调整 |
+   | `PAPERSKILL_API_BASE_URL` | `https://app.reduct.cn`，正式服务器 |
 
 6. 在 Actions 手动运行一次，勾选 `apply=true`。第一次可填写一个尚未入库的 `only` 版本做联调；留空则补录全部符合条件的历史版本。真正发送失败时在报告中查看结果。
 7. 此后每次 PR 合并更新 `main`，自动化会重新扫描：已同步且数据相同的跳过；新版本创建并保存返回的 `data.id`；此前因缺字段未能提交的版本，在补齐后自动处理。直接推送到 `main` 也会触发。
@@ -123,7 +123,9 @@ GitHub 状态存储遇到网络错误、HTTP 429 或 5xx 时，会有限重试�
 
 **已入库版本的作者、论文标识、标签或溯源被修改时，脚本会报告需要更新接口，不会把 create 当成 update 再插入一条。** 按现有仓库流程，修改教程应创建新版本，新版本合并后会自动创建记录；仅修改同一路径下的教程源码且元数据不变时，无需改变数据库记录。删除/改名也不会自动删除旧数据库行。若要求同步这些行为，需对方补充 upsert/update/delete 的接口合同。
 
-状态与完整接口地址绑定。测试数据库切换正式数据库时使用新的 `PAPERSKILL_STATE_BRANCH`，并重新登记正式库的已有记录；如果只是同一数据库换域名，维护者确认后可同步修改状态文件的 `endpoint`。不要将测试库 ID 当作正式库 ID。
+2026-11-19 正式接口切换为 `https://app.reduct.cn/Web/V1/Paperskill/create_version`。接口负责人确认测试环境的内容、版本 ID 和评分记录已复制到正式环境。本次沿用原 `paperskill-sync-state` 分支和完整 `versions`，自动将旧 `https://php-testbed-lyx.reduct.cn/Web/V1/Paperskill/create_version` 的状态头单向迁移到正式地址，并在发送任何新请求前先持久保存；Git 历史保留原状态。已入库 ID、元数据摘要、`pending/uncertain` 待核对项及 `not_found` 跳过项均不重置，已经成功的版本不会重新创建。
+
+本规则只适用于上述已确认复制的两个接口地址；其他地址仍严格隔离，不能将任意测试库 ID 混用。无需新建状态分支、重新登记历史版本或全量重入库。如设置了 Actions Variable `PAPERSKILL_API_BASE_URL`，同步改为 `https://app.reduct.cn`；评分端 `PS_SCORE_DATABASE_BASE_URL` 保持同一正式域名。`page_path`、作者字段及其他接口参数保持原样。`coconut-yzp/Auto_Merge` 只调用 GitHub API，无业务入库域名需要调整。
 
 ## 本地使用
 
