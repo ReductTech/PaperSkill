@@ -1,0 +1,1 @@
+import {Analogy} from './kit'; export function Analogy3(){return <Analogy n={3}/>;}

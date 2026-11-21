@@ -1,0 +1,1 @@
+import {Analogy} from './kit'; export function HeroNew(){return <Analogy n={10}/>;}

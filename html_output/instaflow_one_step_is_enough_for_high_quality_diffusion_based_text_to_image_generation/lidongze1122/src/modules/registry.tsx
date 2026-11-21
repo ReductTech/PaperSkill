@@ -1,0 +1,56 @@
+import React from 'react';
+import { ExampleSlider } from './exampleSlider';
+import { A1 } from './a1';
+import { A1b } from './a1b';
+import { A2 } from './a2';
+import { A3 } from './a3';
+import { A4 } from './a4';
+import { A5 } from './a5';
+import { Analogy1 } from './analogy-1';
+import { Analogy10 } from './analogy-10';
+import { Analogy2 } from './analogy-2';
+import { Analogy3 } from './analogy-3';
+import { Analogy4 } from './analogy-4';
+import { Analogy5 } from './analogy-5';
+import { Analogy6 } from './analogy-6';
+import { Analogy7 } from './analogy-7';
+import { Analogy8 } from './analogy-8';
+import { Analogy9 } from './analogy-9';
+import { B10 } from './b10';
+import { B6 } from './b6';
+import { B7 } from './b7';
+import { B8 } from './b8';
+import { B9 } from './b9';
+import { HeroNew } from './hero-new';
+import { HeroOld } from './hero-old';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['example-slider'] = ExampleSlider;
+widgetRegistry['a1'] = A1;
+widgetRegistry['a1b'] = A1b;
+widgetRegistry['a2'] = A2;
+widgetRegistry['a3'] = A3;
+widgetRegistry['a4'] = A4;
+widgetRegistry['a5'] = A5;
+widgetRegistry['analogy-1'] = Analogy1;
+widgetRegistry['analogy-10'] = Analogy10;
+widgetRegistry['analogy-2'] = Analogy2;
+widgetRegistry['analogy-3'] = Analogy3;
+widgetRegistry['analogy-4'] = Analogy4;
+widgetRegistry['analogy-5'] = Analogy5;
+widgetRegistry['analogy-6'] = Analogy6;
+widgetRegistry['analogy-7'] = Analogy7;
+widgetRegistry['analogy-8'] = Analogy8;
+widgetRegistry['analogy-9'] = Analogy9;
+widgetRegistry['b10'] = B10;
+widgetRegistry['b6'] = B6;
+widgetRegistry['b7'] = B7;
+widgetRegistry['b8'] = B8;
+widgetRegistry['b9'] = B9;
+widgetRegistry['hero-new'] = HeroNew;
+widgetRegistry['hero-old'] = HeroOld;
