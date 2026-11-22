@@ -1,0 +1,1606 @@
+/* Paper-specific theme: a night case room.
+   This is the ONLY stylesheet the generator edits. Semantic roles stay identical
+   (red = wrong lead, green = confirmed, blue = current work, orange = emphasis,
+   purple = secondary mechanism); only the shell becomes dark and paper-like. */
+
+:root {
+  /* Dark shell */
+  --ui-bg-page: #0e1116;
+  --ui-bg-page-top: #131820;
+  --ui-bg-card: #171b23;
+  --ui-bg-soft: #1c222c;
+  --ui-bg-muted: #141922;
+  --ui-text-main: #e9e3d5;
+  --ui-text-muted: #b6ae9d;
+  --ui-text-light: #8b8474;
+  --ui-border: #2a3140;
+  --ui-border-strong: #46536a;
+
+  /* Semantics brightened for a dark background, meanings unchanged */
+  --ui-accent: #8ab4e4;
+  --ui-accent-alt: #d9a441;
+  --ui-success: #58c99a;
+  --ui-warning: #d8b64a;
+  --ui-danger: #e5778f;
+
+  --bg: #0e1116;
+  --paper: #171b23;
+  --paper-2: #141922;
+  --ink: #e9e3d5;
+  --ink-2: #b6ae9d;
+  --slate: #b6ae9d;
+  --slate-2: #8b8474;
+  --line: #2a3140;
+  --line-2: #46536a;
+  --blue: #8ab4e4;
+  --blue-soft: rgba(138, 180, 228, 0.14);
+  --green: #58c99a;
+  --green-soft: rgba(88, 201, 154, 0.14);
+  --orange: #d9a441;
+  --orange-soft: rgba(217, 164, 65, 0.14);
+  --purple: #b79bf2;
+  --purple-soft: rgba(183, 155, 242, 0.14);
+  --red: #e5778f;
+  --red-soft: rgba(229, 119, 143, 0.14);
+  --yellow: #d8b64a;
+  --yellow-soft: rgba(216, 182, 74, 0.14);
+  --accent: #8ab4e4;
+  --bad: #e5778f;
+
+  --shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 26px 54px rgba(0, 0, 0, 0.58);
+
+  /* Case-room accents */
+  --case-brass: #c9a45c;
+  --case-paper: #f6f1e4;
+  --case-paper-line: #cbb994;
+  --case-red: #a33b2b;
+}
+
+/* ---------- Page shell: a dim case room ---------- */
+body {
+  background:
+    radial-gradient(1200px 620px at 50% -8%, rgba(201, 164, 92, 0.09), transparent 70%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    #0e1116;
+  color: var(--ink);
+}
+
+.slide-sidebar {
+  background: linear-gradient(180deg, #12161d 0%, #0d1015 100%);
+  border-right: 1px solid #232a36;
+}
+
+.slide-sidebar-title {
+  font-family: Georgia, "Songti SC", serif;
+  letter-spacing: 0.01em;
+}
+
+.slide-sidebar-item.active {
+  background: linear-gradient(90deg, rgba(201, 164, 92, 0.22), rgba(201, 164, 92, 0.06));
+  color: #f3e6c8;
+  box-shadow: inset 2px 0 0 var(--case-brass);
+}
+
+.slide-sidebar-item:hover {
+  background: rgba(201, 164, 92, 0.1);
+  color: #f3e6c8;
+}
+
+.slide-sidebar-num {
+  color: var(--case-brass);
+}
+
+/* ---------- Hero: the case cover ---------- */
+section.hero {
+  background:
+    linear-gradient(180deg, rgba(201, 164, 92, 0.07), transparent 34%),
+    #171b23;
+  border: 1px solid #2a3140;
+  box-shadow: var(--shadow);
+}
+
+.hero h1,
+.chap-title {
+  font-family: Georgia, "Songti SC", "Times New Roman", serif;
+  letter-spacing: 0.005em;
+}
+
+.hero-venue {
+  border-color: rgba(201, 164, 92, 0.45);
+  background: rgba(201, 164, 92, 0.1);
+  color: #e7cd94;
+  letter-spacing: 0.14em;
+}
+
+.hero-meta a,
+.hero-meta span,
+.hero-meta .tag {
+  background: #141922;
+  border-color: #2a3140;
+}
+
+.bg-side {
+  background: #12161d;
+  border-color: #2a3140;
+}
+
+.bg-side.old {
+  border-top-color: #7d7666;
+}
+
+.bg-side.new {
+  border-top-color: var(--case-brass);
+}
+
+.bg-side-head {
+  background: #10141a;
+}
+
+.bg-side.new .bg-side-head {
+  color: #e7cd94;
+}
+
+/* ---------- Chapters: case sheets ---------- */
+section.chap {
+  background:
+    linear-gradient(180deg, rgba(201, 164, 92, 0.045), transparent 140px),
+    #171b23;
+  border: 1px solid #2a3140;
+  box-shadow: var(--shadow);
+}
+
+.chap-title .num {
+  color: var(--case-brass);
+  font-family: Georgia, serif;
+}
+
+.badge-tag.inf {
+  background: rgba(88, 201, 154, 0.14);
+  color: var(--green);
+}
+
+.badge-tag.trn {
+  background: rgba(217, 164, 65, 0.14);
+  color: var(--orange);
+}
+
+.badge-tag.both {
+  background: rgba(138, 180, 228, 0.14);
+  color: var(--blue);
+}
+
+/* Chapter bridge: a briefing strip */
+.chap-bridge {
+  background: linear-gradient(135deg, rgba(201, 164, 92, 0.12) 0%, rgba(138, 180, 228, 0.1) 100%);
+  border-color: #2a3140;
+}
+
+.chap-bridge::before {
+  background: linear-gradient(180deg, var(--case-brass), var(--case-red));
+}
+
+.cb-icon {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cb-title {
+  color: #e7cd94;
+  letter-spacing: 0.1em;
+}
+
+.cb-text em {
+  color: #e7cd94;
+}
+
+/* ---------- Analogy card: an evidence sheet pinned to the file ---------- */
+.analogy-card {
+  background: linear-gradient(135deg, rgba(201, 164, 92, 0.09), rgba(163, 59, 43, 0.06));
+  border-color: rgba(201, 164, 92, 0.28);
+}
+
+.analogy-title {
+  color: #e7cd94;
+}
+
+.analogy-text {
+  color: var(--ink-2);
+}
+
+.analogy-text b {
+  color: var(--ink);
+}
+
+/* ---------- Framed modules: instrument panels ---------- */
+.module {
+  background: #12161d;
+  border-color: #2a3140;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+.module-head {
+  background: linear-gradient(90deg, rgba(201, 164, 92, 0.1), rgba(255, 255, 255, 0.02));
+  border-bottom-color: #2a3140;
+}
+
+.module-head .num {
+  background: rgba(201, 164, 92, 0.16);
+  color: #e7cd94;
+}
+
+.module-body {
+  background: #12161d;
+}
+
+/* Evidence prints: every canvas sits on paper, whatever the room around it */
+canvas {
+  background: #f6f1e4;
+  border: 1px solid #8f8265;
+  border-radius: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Controls on a dark panel ---------- */
+.chip {
+  background: #1b212b;
+  border-color: #3a465a;
+  color: #cfc7b6;
+}
+
+.chip:hover {
+  border-color: var(--case-brass);
+  color: #f3e6c8;
+}
+
+.chip.selected {
+  background: linear-gradient(180deg, #d8b06a, #bf9448);
+  border-color: #bf9448;
+  color: #1b1a16;
+}
+
+.chip-row .chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ctrl label {
+  color: var(--ink-2);
+}
+
+.feedback {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--line-2);
+  color: var(--ink-2);
+}
+
+.feedback.good {
+  color: var(--green);
+  background: rgba(88, 201, 154, 0.1);
+  border-left-color: var(--green);
+  font-style: normal;
+}
+
+.feedback.bad {
+  color: var(--red);
+  background: rgba(229, 119, 143, 0.1);
+  border-left-color: var(--red);
+  font-style: normal;
+}
+
+.feedback.warn {
+  color: var(--orange);
+  background: rgba(217, 164, 65, 0.1);
+  border-left-color: var(--orange);
+  font-style: normal;
+}
+
+.note {
+  color: var(--slate-2);
+}
+
+.insight-bar {
+  background: rgba(201, 164, 92, 0.1);
+  border-left-color: var(--case-brass);
+  color: #e7cd94;
+}
+
+/* ---------- Formula block: a typed report page ---------- */
+.formula-explain {
+  position: relative;
+  margin: 18px 0;
+  padding: 22px 24px 20px;
+  background: linear-gradient(135deg, rgba(201, 164, 92, 0.1) 0%, rgba(138, 180, 228, 0.08) 100%);
+  border: 1px solid #2a3140;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+/* The template pins the hint absolutely, which makes it collide with the lead sentence. */
+.fe-hint {
+  position: static;
+  display: block;
+  margin: 0 0 14px;
+  color: #b8a887;
+  letter-spacing: 0.02em;
+}
+
+.fe-lead {
+  max-width: 42em;
+  margin: 0 0 18px;
+  color: var(--ink-2);
+  line-height: 1.9;
+  text-align: left;
+}
+
+.formula-explain .fe-formula {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 2px;
+  padding: 20px 22px;
+  background: var(--case-paper);
+  border: 1px solid var(--case-paper-line);
+  border-radius: 4px;
+  color: #26364f;
+  text-align: left;
+  font-size: clamp(16px, calc(3.6vw - 2px), 23px);
+  line-height: 1.9;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  scrollbar-width: thin;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.formula-explain .fe-explain {
+  margin: 18px 0 0;
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.formula-explain .fe-explain-sym {
+  color: #e7cd94;
+}
+
+/* Sub/superscripts stay legible; symbols are clickable but not permanently underlined. */
+.fe-formula sub,
+.fe-formula sup {
+  font-size: 0.72em;
+  line-height: 0;
+}
+
+/* Big operator with its limits stacked in one column. */
+.fe-formula .bigop {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.14em;
+  vertical-align: middle;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fe-formula .bigop .lim-top,
+.fe-formula .bigop .lim-bot {
+  display: block;
+  font-size: 0.6em;
+  line-height: 1.04;
+}
+
+.fe-formula .bigop .op {
+  display: block;
+  font-size: 1.18em;
+  line-height: 1;
+}
+
+.fe-formula .bigop .sym {
+  padding: 0;
+}
+
+.fe-formula .fe-formula-sym {
+  border-bottom: none;
+}
+
+.fe-formula .fe-formula-sym:hover,
+.fe-formula .fe-formula-sym.active {
+  border-bottom: 1px dotted currentColor;
+}
+
+/* ---------- Takeaways: parallel notes, a divider instead of arrows ---------- */
+.embed-takeaway {
+  background: #12161d;
+  border-color: #2a3140;
+}
+
+.et-title {
+  color: var(--ink);
+}
+
+.et-desc {
+  color: var(--ink-2);
+}
+
+.slide-chap .embed-takeaway .et-arrow {
+  display: none;
+}
+
+.slide-chap .embed-takeaway .et-item + .et-item {
+  border-left: 1px solid #2a3140;
+}
+
+@media (max-width: 720px) {
+  .slide-chap .embed-takeaway .et-item + .et-item {
+    border-left: none;
+    border-top: 1px solid #2a3140;
+  }
+}
+
+/* ---------- Tables and metrics ---------- */
+table {
+  background: #12161d;
+}
+
+th {
+  color: #e7cd94;
+  border-bottom-color: #3a465a;
+}
+
+td {
+  border-bottom-color: #232a36;
+  color: var(--ink-2);
+}
+
+.metric {
+  background: #12161d;
+  border-color: #2a3140;
+}
+
+.metric .v {
+  color: #e7cd94;
+}
+
+/* ---------- Bottom navigation ---------- */
+.slide-nav {
+  background: linear-gradient(180deg, rgba(14, 17, 22, 0.0), #0e1116 40%);
+  border-top-color: #232a36;
+}
+
+.slide-nav-btn {
+  background: #1b212b;
+  border-color: #3a465a;
+  color: var(--ink);
+}
+
+.slide-nav-btn:hover:not(:disabled) {
+  border-color: var(--case-brass);
+  color: #f3e6c8;
+}
+
+.slide-nav-btn-primary {
+  background: linear-gradient(180deg, #d8b06a, #bf9448);
+  border-color: #bf9448;
+  color: #1b1a16;
+}
+
+.slide-nav-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #e4bd78, #c99c4d);
+}
+
+/* Canvas sizing: setupCanvas writes inline width/height in px, so a bare max-width
+   squeezes only the width and stretches the drawing. Force the height to follow the
+   intrinsic aspect ratio instead. */
+.slide-content canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ============================================================
+   Case-file shell: the reader is the detective, chapters are
+   dossiers that must be examined, stamped and filed.
+   ============================================================ */
+
+.case-shell {
+  min-height: 100vh;
+}
+
+/* ---------- top bar ---------- */
+.case-top {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px 18px;
+  padding: 12px 22px 10px;
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.98), rgba(13, 16, 21, 0.94));
+  border-bottom: 1px solid #2d3646;
+  backdrop-filter: blur(8px);
+}
+
+.case-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.case-brand-dept {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: #9c8f74;
+  text-transform: uppercase;
+}
+
+.case-brand-name {
+  font-family: Georgia, 'Songti SC', 'Source Han Serif SC', serif;
+  font-size: 15px;
+  color: #ede5d3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.case-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.case-status-rank {
+  color: var(--case-brass);
+}
+
+.case-status-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.case-status-note {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 12px;
+  color: #a3947a;
+  cursor: pointer;
+  text-decoration: underline dotted rgba(201, 164, 92, 0.5);
+  text-underline-offset: 3px;
+}
+
+.case-status-note:hover {
+  color: var(--case-brass);
+}
+
+.case-reset {
+  background: transparent;
+  border: 1px solid #39424f;
+  color: #9d9481;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.case-reset:hover {
+  border-color: var(--case-brass);
+  color: #e8d9b4;
+}
+
+.case-board-toggle {
+  display: none;
+  background: #1b212b;
+  border: 1px solid #3a465a;
+  color: #efe7d5;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.case-meter {
+  grid-column: 1 / -1;
+  height: 3px;
+  background: #1d2430;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.case-meter span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #8a6d33, var(--case-brass));
+  transition: width 0.4s ease;
+}
+
+/* ---------- three-column desk ---------- */
+.case-body {
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px 72px;
+}
+
+/* ---------- case board (dossier index) ---------- */
+.case-board {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 74px;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.case-board-head {
+  position: relative;
+}
+
+.case-board-head-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.case-board-fold {
+  background: transparent;
+  border: 1px solid #343d4c;
+  border-radius: 2px;
+  color: #9c8f74;
+  font-size: 10.5px;
+  padding: 2px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.case-board-fold:hover {
+  border-color: var(--case-brass);
+  color: #ecd9ae;
+}
+
+/* The board is a drawer: fold it shut and a brass tab is left at the page edge. */
+.case-drawer {
+  display: none;
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  width: 44px;
+  height: 196px;
+  padding: 16px 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #f4eddb, #e3d7bd);
+  border: 1px solid #cbb994;
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 6px 0 20px rgba(0, 0, 0, 0.5);
+  color: #3b3122;
+  cursor: pointer;
+}
+
+.case-drawer::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, #a33b2b, rgba(163, 59, 43, 0.25));
+}
+
+.case-drawer-text {
+  writing-mode: vertical-rl;
+  letter-spacing: 0.18em;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 13px;
+  color: #2f2718;
+}
+
+.case-drawer-count {
+  writing-mode: vertical-rl;
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 10px;
+  color: #8a3a2c;
+  letter-spacing: 0.06em;
+}
+
+.case-drawer:hover {
+  background: linear-gradient(90deg, #fdf7e7, #ecdfc4);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.55);
+}
+
+@media (min-width: 861px) {
+  .case-body.drawer-shut {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .case-board.drawer-shut {
+    display: none;
+  }
+
+  .case-drawer {
+    display: flex;
+  }
+}
+
+.case-board-head h2 {
+  margin: 0;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 15px;
+  color: #e9dfc9;
+  letter-spacing: 0.04em;
+}
+
+.case-board-head p {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: #8f8877;
+}
+
+.case-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.case-tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'no state'
+    'title title';
+  gap: 2px 8px;
+  text-align: left;
+  padding: 9px 10px 9px 12px;
+  background: #151a22;
+  border: 1px solid #262d3a;
+  border-left: 3px solid #2f3745;
+  border-radius: 3px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.case-tab:hover:not(:disabled) {
+  border-color: #4a4232;
+  border-left-color: var(--case-brass);
+  background: #1a202a;
+}
+
+.case-tab.active {
+  background: #1e242f;
+  border-left-color: var(--case-brass);
+  box-shadow: inset 0 0 0 1px rgba(201, 164, 92, 0.22);
+}
+
+.case-tab.filed {
+  border-left-color: #3f7d5f;
+}
+
+.case-tab.sealed {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.case-tab-no {
+  grid-area: no;
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #8c8574;
+}
+
+.case-tab-title {
+  grid-area: title;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #ded7c7;
+}
+
+.case-tab-state {
+  grid-area: state;
+  justify-self: end;
+  font-size: 10px;
+  color: #8c8574;
+}
+
+.case-tab.filed .case-tab-state {
+  color: #6fbd93;
+}
+
+.case-tab-stamp {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-family: Georgia, serif;
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.2em;
+  color: rgba(191, 74, 52, 0.7);
+  border: 1px solid rgba(191, 74, 52, 0.45);
+  border-radius: 2px;
+  padding: 0 3px;
+  transform: rotate(-6deg);
+}
+
+.case-tab-brief,
+.case-tab-final {
+  grid-template-areas:
+    'no state'
+    'title title';
+}
+
+/* ---------- dossier page ---------- */
+.case-sheet {
+  min-width: 0;
+  width: 100%;
+  max-width: 1060px;
+}
+
+.case-sheet canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dossier-block,
+.dossier-head {
+  scroll-margin-top: 92px;
+}
+
+.dossier-head {
+  position: relative;
+  padding: 22px 26px 20px 30px;
+  background:
+    linear-gradient(180deg, #f7f2e5, #efe6d2),
+    var(--case-paper);
+  color: #223247;
+  border-radius: 4px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45);
+  border-left: 5px solid var(--case-red);
+  overflow: hidden;
+}
+
+.dossier-head::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(163, 59, 43, 0.18);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.dossier-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.dossier-no {
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: #a33b2b;
+}
+
+.dossier-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+  letter-spacing: 0.06em;
+}
+
+.dossier-badge.inf {
+  color: #2c5d8f;
+}
+
+.dossier-badge.trn {
+  color: #8a5a1e;
+}
+
+.dossier-badge.both {
+  color: #6b3e7c;
+}
+
+.dossier-head h1 {
+  margin: 0 0 8px;
+  font-family: Georgia, 'Songti SC', 'Source Han Serif SC', serif;
+  font-size: clamp(21px, 3.2vw, 30px);
+  line-height: 1.35;
+  color: #1c2b3f;
+  max-width: 34em;
+}
+
+.dossier-meta {
+  margin: 0;
+  font-size: 12px;
+  color: #6b6252;
+  letter-spacing: 0.02em;
+}
+
+.case-ref-note {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(201, 164, 92, 0.28);
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: rgba(201, 196, 186, 0.62);
+}
+
+/* A clipped quotation from the paper, so the story never drifts from it. */
+.dossier-paper {
+  margin-top: 14px;
+  padding: 9px 12px 10px;
+  border-left: 2px solid rgba(43, 77, 110, 0.45);
+  background: rgba(43, 62, 84, 0.06);
+  border-radius: 0 2px 2px 0;
+}
+
+.dossier-paper-tag,
+.dossier-paper-loc {
+  display: inline-block;
+  vertical-align: baseline;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.dossier-paper-tag {
+  color: #a33b2b;
+  border: 1px solid rgba(163, 59, 43, 0.45);
+  border-radius: 2px;
+  padding: 0 4px;
+  margin-right: 8px;
+}
+
+.dossier-paper-loc {
+  color: #5a6a7d;
+  font-family: 'Cascadia Code', Consolas, monospace;
+  letter-spacing: 0;
+}
+
+.dossier-paper-quote {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: #3d4d60;
+  max-width: 48em;
+}
+
+.dossier-stamp {
+  position: absolute;
+  right: 22px;
+  top: 18px;
+  padding: 6px 10px 4px;
+  border: 2px solid rgba(163, 59, 43, 0.75);
+  border-radius: 4px;
+  color: rgba(163, 59, 43, 0.85);
+  font-family: Georgia, serif;
+  text-align: center;
+  transform: rotate(-9deg);
+  line-height: 1.1;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.dossier-stamp span {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+}
+
+.dossier-stamp i {
+  display: block;
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.2em;
+  margin-top: 2px;
+}
+
+/* dossier sections */
+.dossier-block {
+  background: linear-gradient(180deg, #171c25, #151a22);
+  border: 1px solid #262e3b;
+  border-radius: 4px;
+  padding: 16px 18px 18px;
+}
+
+.dossier-block > h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #d9cfb8;
+}
+
+.dossier-block > h3 > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 164, 92, 0.5);
+  color: var(--case-brass);
+  font-family: 'Cascadia Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.dossier-task {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--case-brass);
+  background: rgba(201, 164, 92, 0.07);
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: #e0d6c2;
+}
+
+.dossier-task b {
+  color: var(--case-brass);
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.dossier-lab {
+  position: relative;
+  border-style: dashed;
+  border-color: #3b4556;
+}
+
+.dossier-lab.touched {
+  border-color: rgba(88, 201, 154, 0.4);
+  border-style: solid;
+}
+
+.dossier-lab-hint {
+  margin: -4px 0 12px;
+  font-size: 11.5px;
+  color: #8f8877;
+}
+
+.dossier-lab.touched .dossier-lab-hint {
+  color: #6fbd93;
+}
+
+.dossier-anex details {
+  border-top: 1px solid #262e3b;
+  padding-top: 10px;
+}
+
+.dossier-anex summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: #cfc6b2;
+}
+
+.dossier-anex summary::-webkit-details-marker {
+  display: none;
+}
+
+.dossier-anex summary::before {
+  content: '▸';
+  color: var(--case-brass);
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}
+
+.dossier-anex details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.dossier-anex-tag {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #a3947a;
+  border: 1px solid #3a4250;
+  border-radius: 2px;
+  padding: 1px 6px;
+}
+
+.dossier-anex-lead {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: #8f8877;
+}
+
+.dossier-archive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* The dossier column is narrow, so the three takeaways stack; the arrow that
+   sits between them becomes a thin rule instead of a 500px rotated glyph. */
+.dossier-block .embed-takeaway {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dossier-block .embed-takeaway .et-item {
+  width: 100%;
+}
+
+.dossier-block .embed-takeaway .et-arrow {
+  width: 100%;
+  height: 1px;
+  min-height: 1px;
+  transform: none;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  background: #2f3745;
+  border-radius: 0;
+}
+
+/* ---------- primary button ---------- */
+.case-cta {
+  background: linear-gradient(180deg, #d8b06a, #bf9448);
+  border: 1px solid #bf9448;
+  color: #1b1a16;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.case-cta:hover:not(:disabled) {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.case-cta:disabled {
+  background: #232934;
+  border-color: #333c4a;
+  color: #7c7666;
+  cursor: not-allowed;
+}
+
+.case-cta.ghost {
+  background: transparent;
+  border-color: #3d4657;
+  color: #ddd5c3;
+}
+
+.case-cta.ghost:hover:not(:disabled) {
+  border-color: var(--case-brass);
+  color: #f3e6c8;
+}
+
+/* ---------- briefing ---------- */
+.case-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.case-brief-head {
+  padding: 24px 26px;
+  border: 1px solid #2b3340;
+  border-left: 3px solid var(--case-brass);
+  background: linear-gradient(180deg, #171c25, #141922);
+  border-radius: 4px;
+}
+
+.case-kicker {
+  margin: 0 0 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9c8f74;
+}
+
+.case-brief-head h1 {
+  margin: 0 0 8px;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: clamp(22px, 3.4vw, 30px);
+  line-height: 1.4;
+  color: #ede4d0;
+}
+
+.case-brief-sub {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: #948c7b;
+}
+
+.case-role {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #cfc7b5;
+}
+
+.case-role b {
+  color: var(--case-brass);
+}
+
+.case-brief-ask {
+  padding: 16px 18px;
+  border: 1px dashed #3b4250;
+  border-radius: 4px;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #ded6c4;
+}
+
+.case-brief-ask p {
+  margin: 0 0 8px;
+}
+
+.case-brief-ask p:last-child {
+  margin-bottom: 0;
+}
+
+.case-brief-ask b {
+  color: #b7a37a;
+  font-weight: 500;
+}
+
+.case-brief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---------- notebook: a ledger at the bottom of the desk, never floating ---------- */
+.case-notebook {
+  margin-top: 20px;
+  background: linear-gradient(180deg, #171c25, #131820);
+  border: 1px solid #2a3240;
+  border-top: 2px solid var(--case-brass);
+  border-radius: 4px;
+  padding: 14px 16px 12px;
+}
+
+.case-notebook-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.case-notebook-head h2 {
+  margin: 0;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 15px;
+  color: #e9dfc9;
+  letter-spacing: 0.04em;
+}
+
+.case-notebook-count {
+  font-size: 11px;
+  color: var(--case-brass);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.case-notebook-hint {
+  margin: 8px 0 12px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #8c8574;
+}
+
+.case-notebook-empty {
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: #8c8574;
+  padding: 14px 10px;
+  border: 1px dashed #333b48;
+  border-radius: 3px;
+}
+
+.case-notebook-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 6px;
+}
+
+.case-notebook-list li button {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid #4a4132;
+  padding: 8px 10px 9px 10px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.case-notebook-list li button:hover {
+  background: rgba(201, 164, 92, 0.06);
+  border-left-color: var(--case-brass);
+}
+
+.case-note-no {
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: #9c8f74;
+}
+
+.case-note-title {
+  font-size: 11.5px;
+  color: #ded6c4;
+}
+
+.case-note-clue {
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: #948c7b;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.case-notebook-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #262e3b;
+  font-size: 11px;
+  color: #8c8574;
+}
+
+.case-notebook-foot b {
+  color: var(--case-brass);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- verdict ---------- */
+.verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.verdict-head {
+  padding: 26px 28px;
+  background: linear-gradient(180deg, #f7f2e5, #ece2cc);
+  color: #22324a;
+  border-radius: 4px;
+  border-left: 5px solid var(--case-red);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45);
+}
+
+.verdict-head .case-kicker {
+  color: #a33b2b;
+}
+
+.verdict-head h1 {
+  margin: 0 0 12px;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: clamp(22px, 3.4vw, 32px);
+  color: #1b2a3e;
+}
+
+.verdict-head p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 2;
+  color: #3a4a5f;
+  max-width: 46em;
+}
+
+.verdict-ledger {
+  border: 1px solid #2a3240;
+  border-radius: 4px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #171c25, #141922);
+}
+
+.verdict-ledger h3 {
+  margin: 0 0 12px;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 14px;
+  color: #d9cfb8;
+}
+
+.verdict-ledger ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.verdict-ledger li {
+  display: grid;
+  gap: 3px;
+  border-left: 2px solid rgba(201, 164, 92, 0.5);
+  padding-left: 12px;
+}
+
+.verdict-ledger b {
+  font-size: 12.5px;
+  color: #e6ddca;
+  font-weight: 500;
+}
+
+.verdict-tables {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  border: 1px solid rgba(201, 164, 92, 0.22);
+  border-radius: 3px;
+  background: rgba(201, 164, 92, 0.045);
+}
+
+.verdict-tables-cap {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: #a49a84;
+}
+
+.verdict-tables ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.verdict-tables li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.verdict-tables li span:first-child {
+  min-width: 168px;
+  color: #8b8371;
+  font-family: 'Cascadia Code', Consolas, monospace;
+}
+
+.verdict-tables li b {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  color: #e8e2d4;
+}
+
+.verdict-tables .old {
+  color: #8b8371;
+}
+
+.verdict-tables em {
+  font-style: normal;
+  font-size: 11px;
+  color: #58c99a;
+  letter-spacing: 0.04em;
+}
+
+.verdict-sign {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: #a49a84;
+}
+
+.verdict-stamp {
+  margin-left: auto;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  color: rgba(191, 74, 52, 0.85);
+  border: 2px solid rgba(191, 74, 52, 0.6);
+  border-radius: 4px;
+  padding: 4px 10px;
+  transform: rotate(-8deg);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  .case-body {
+    grid-template-columns: 218px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .case-top {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 10px 14px 8px;
+  }
+
+  .case-board-toggle {
+    display: inline-block;
+  }
+
+  .case-status {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    font-size: 11.5px;
+  }
+
+  .case-body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 14px 64px;
+    gap: 14px;
+  }
+
+  .case-board {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 60;
+    width: 280px;
+    max-height: none;
+    padding: 72px 12px 20px;
+    background: linear-gradient(180deg, #12161d, #0d1015);
+    border-right: 1px solid #2a3140;
+    transform: translateX(-102%);
+    transition: transform 0.24s ease;
+    box-shadow: 24px 0 48px rgba(0, 0, 0, 0.5);
+  }
+
+  .board-open .case-board {
+    transform: translateX(0);
+  }
+
+  .dossier-head {
+    padding: 18px 18px 16px 20px;
+  }
+
+  .dossier-stamp {
+    right: 12px;
+    top: 10px;
+  }
+
+  .dossier-block {
+    padding: 14px 14px 16px;
+  }
+
+  .case-notebook {
+    padding: 12px;
+  }
+}
