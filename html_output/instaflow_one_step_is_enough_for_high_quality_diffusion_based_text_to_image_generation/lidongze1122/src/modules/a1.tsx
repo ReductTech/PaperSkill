@@ -1,0 +1,1 @@
+import {A1 as Component} from './interactions-a'; export function A1(){return <Component/>;}
