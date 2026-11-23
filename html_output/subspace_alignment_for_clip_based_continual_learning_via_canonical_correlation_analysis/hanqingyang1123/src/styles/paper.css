@@ -1,0 +1,143 @@
+/* Paper-specific overrides for CCA-CL（双色套印主题）。
+   语义色沿用 tokens.css / contract.md §5：
+   --blue 当前/引导（画版）、--green 对齐良好（字版）、--red 错位漂移、
+   --orange 学习者调节量、--purple RFP 辅助。 */
+
+:root {
+  --paper-field: #f5f8f0;
+  --paper-sheet: #fdfdf8;
+  --ink-plate: #27446e;
+  --type-plate: #228d5c;
+  --misreg: #c43f52;
+  --knob: #f07e47;
+  --wave: #7c3aed;
+  --rule: #d7deea;
+}
+
+/* ---------- 通用场景骨架 ---------- */
+.rs { position: relative; width: 100%; height: 100%; color: var(--ink); }
+.rs-panel {
+  position: absolute;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: #fff;
+  padding: 18px 22px;
+  box-sizing: border-box;
+}
+.rs-field {
+  position: absolute;
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: var(--paper-sheet);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.rs-t { font-size: 28px; line-height: 1.42; margin: 0; }
+.rs-t.muted { color: var(--ink-2); }
+.rs-h { font-size: 34px; line-height: 1.2; font-weight: 700; margin: 0; }
+.rs-num { font-size: 44px; line-height: 1.1; font-weight: 800; font-variant-numeric: tabular-nums; margin: 0; }
+.rs-formula { font-size: 34px; line-height: 1.5; font-weight: 600; margin: 0; }
+.rs-kicker { font-size: 28px; line-height: 1.3; color: var(--ink-2); }
+
+.rs-blue { color: var(--blue); }
+.rs-green { color: var(--green); }
+.rs-red { color: var(--red); }
+.rs-orange { color: var(--orange); }
+.rs-purple { color: var(--purple); }
+
+/* ---------- 控件 ---------- */
+.rs-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), var(--orange));
+  outline: none;
+  cursor: pointer;
+}
+.rs-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  border: 4px solid var(--orange);
+  box-shadow: 0 2px 8px rgba(25, 42, 70, 0.25);
+  cursor: grab;
+}
+.rs-range:active::-webkit-slider-thumb { cursor: grabbing; }
+
+.rs-choices { display: flex; gap: 12px; flex-wrap: wrap; }
+.rs-choice {
+  font-size: 28px;
+  line-height: 1.2;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--rule);
+  background: #fff;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.rs-choice:hover { border-color: var(--blue); color: var(--blue); }
+.rs-choice.is-on {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
+}
+.rs-choice.is-off { opacity: 0.45; cursor: not-allowed; }
+.rs-choice.is-on.alt { background: var(--orange); border-color: var(--orange); }
+
+.rs-btn {
+  font-size: 28px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 2px solid var(--blue);
+  background: #fff;
+  color: var(--blue);
+  cursor: pointer;
+  font-weight: 600;
+}
+.rs-btn:hover { background: var(--blue); color: #fff; }
+.rs-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- 读数与提示 ---------- */
+.rs-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 28px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.rs-readout b { font-size: 34px; color: var(--ink); }
+
+.rs-feedback {
+  font-size: 28px;
+  line-height: 1.4;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 6px solid var(--blue);
+  background: rgba(39, 68, 110, 0.06);
+}
+.rs-feedback.good { border-color: var(--green); background: rgba(34, 141, 92, 0.1); color: #175f3d; }
+.rs-feedback.bad { border-color: var(--red); background: rgba(196, 63, 82, 0.09); color: #8c2434; }
+.rs-feedback.warn { border-color: var(--orange); background: rgba(240, 126, 71, 0.1); color: #8a4416; }
+
+.rs-legend { display: flex; gap: 22px; align-items: center; font-size: 28px; color: var(--ink-2); }
+.rs-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+/* ---------- 图表 ---------- */
+.rs-svg { display: block; }
+.rs-axis { stroke: #b9c4d4; stroke-width: 2; }
+.rs-grid { stroke: #e4e9f1; stroke-width: 1.5; }
+.rs-tick { font-size: 22px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rs-tag { font-size: 24px; fill: var(--ink-2); }
+.rs-tag.strong { font-size: 28px; fill: var(--ink); font-weight: 700; }
+
+/* 纸面纹理（套印场景） */
+.rs-sheet-lines {
+  background-image: repeating-linear-gradient(0deg, rgba(39, 68, 110, 0.05) 0 1px, transparent 1px 44px);
+}
+.rs-regmark { stroke: var(--ink-plate); stroke-width: 2.5; fill: none; }
