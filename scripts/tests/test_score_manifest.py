@@ -64,3 +64,19 @@ class ManifestTests(unittest.TestCase):
             with patch.object(module.subprocess, 'check_output', side_effect=['a' * 40, tree, blobs]):
                 with self.assertRaisesRegex(ValueError, 'differ'):
                     module.make_manifest(source, site, 'ReductTech/PaperSkill', 'a' * 40, 'https://example.com/', policy)
+
+    def test_root_vite_export_does_not_become_another_version(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source, site, policy, tree, blobs = self.fixture(Path(temp))
+            root = 'html_output/arxiv_paper/'
+            for path in ('index.html', 'assets/index-BaCpUBLM.js', 'images/figure.png'):
+                tree += f'100644 blob {"c" * 40}\t{root}{path}\0'.encode()
+            with patch.object(module.subprocess, 'check_output', side_effect=['a' * 40, tree, blobs]):
+                result = module.make_manifest(source, site, 'ReductTech/PaperSkill', 'a' * 40,
+                                              'https://example.com/', policy)
+            self.assertEqual(result['published_versions'], 2)
+            tree += f'100644 blob {"c" * 40}\t{root}bob1030/src/main.tsx\0'.encode()
+            with patch.object(module.subprocess, 'check_output', side_effect=['a' * 40, tree, blobs]):
+                with self.assertRaisesRegex(ValueError, 'Tracked version lacks paper.json'):
+                    module.make_manifest(source, site, 'ReductTech/PaperSkill', 'a' * 40,
+                                         'https://example.com/', policy)

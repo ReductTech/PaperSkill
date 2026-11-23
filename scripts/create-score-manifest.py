@@ -64,11 +64,24 @@ def make_manifest(source, site, repository, source_sha, base_url, policy, *, arx
             raise ValueError('Metadata identity differs from project path')
         metas[paper, version] = meta
     projects = {key: {} for key in metas}
+    # Older exports can leave a Vite build next to the version directories.
+    # Those assets are outside the projects enumerated in the catalog.
+    versioned_papers = {paper for paper, _ in metas}
+    tracked_paths = {path for path, _, _, _ in tracked}
+    legacy_exports = set()
+    for path in tracked_paths:
+        match = re.fullmatch(r'html_output/([^/]+)/assets/index-[^/]+\.js', path)
+        if match:
+            paper = match[1]
+            if paper in versioned_papers and f'html_output/{paper}/index.html' in tracked_paths:
+                legacy_exports.add(paper)
     for path, _, _, blob in tracked:
         parts = PurePosixPath(path).parts
         if parts[0] == 'html_output' and len(parts) >= 4:
             key = parts[1], parts[2]
             if key not in projects:
+                if parts[1] in legacy_exports and parts[2] in {'assets', 'images'}:
+                    continue
                 raise ValueError('Tracked version lacks paper.json: ' + path)
             projects[key]['/'.join(parts[3:])] = blob
     catalog = json.loads((site / 'papers.json').read_text(encoding='utf-8-sig'))
