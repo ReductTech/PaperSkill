@@ -1,0 +1,50 @@
+import React from 'react';
+import { CoverCompare } from './cover-compare';
+import { RexKitLegend } from './rex-kit';
+import { S0Write } from './s0-write';
+import { S1TwoGaps } from './s1-two-gaps';
+import { S10Behavior } from './s10-behavior';
+import { S11Precision } from './s11-precision';
+import { S12Results } from './s12-results';
+import { S13Limits } from './s13-limits';
+import { S14Recap } from './s14-recap';
+import { S2Quantize } from './s2-quantize';
+import { S3Formats } from './s3-formats';
+import { S4Decode } from './s4-decode';
+import { S5Data } from './s5-data';
+import { S6CeGeometry } from './s6-ce-geometry';
+import { S7TeacherForcing } from './s7-teacher-forcing';
+import { S8GrpoGroup } from './s8-grpo-group';
+import { S9BoxReward } from './s9-box-reward';
+import { T1BoxIou } from './t1-box-iou';
+import { T2NextToken } from './t2-next-token';
+import { T7TwoStage } from './t7-two-stage';
+import { T8Chain } from './t8-chain';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['cover-compare'] = CoverCompare;
+widgetRegistry['rex-kit'] = RexKitLegend;
+widgetRegistry['s0-write'] = S0Write;
+widgetRegistry['s1-two-gaps'] = S1TwoGaps;
+widgetRegistry['s10-behavior'] = S10Behavior;
+widgetRegistry['s11-precision'] = S11Precision;
+widgetRegistry['s12-results'] = S12Results;
+widgetRegistry['s13-limits'] = S13Limits;
+widgetRegistry['s14-recap'] = S14Recap;
+widgetRegistry['s2-quantize'] = S2Quantize;
+widgetRegistry['s3-formats'] = S3Formats;
+widgetRegistry['s4-decode'] = S4Decode;
+widgetRegistry['s5-data'] = S5Data;
+widgetRegistry['s6-ce-geometry'] = S6CeGeometry;
+widgetRegistry['s7-teacher-forcing'] = S7TeacherForcing;
+widgetRegistry['s8-grpo-group'] = S8GrpoGroup;
+widgetRegistry['s9-box-reward'] = S9BoxReward;
+widgetRegistry['t1-box-iou'] = T1BoxIou;
+widgetRegistry['t2-next-token'] = T2NextToken;
+widgetRegistry['t7-two-stage'] = T7TwoStage;
+widgetRegistry['t8-chain'] = T8Chain;
