@@ -36,8 +36,8 @@ function planPublication({ repository, sourceSha, deployment, snapshot, ledger, 
   for (const row of Object.values(ledger.versions)) {
     if (versionId(row?.id)) idCounts.set(row.id, (idCounts.get(row.id) || 0) + 1);
   }
-  const report = { dry_run: true, apply_allowed: false, repository, source_sha: sourceSha,
-    ...deployment, withdraw: [], restore: [], blocked: [], stop_reason: null };
+  const report = { ...deployment, dry_run: true, apply_allowed: false, repository, source_sha: sourceSha,
+    withdraw: [], restore: [], blocked: [], stop_reason: null };
   const synced = Object.entries(ledger.versions).filter(([, row]) => row?.status === 'synced');
   const absent = synced.filter(([key, row]) =>
     !snapshot.versions.has(key) && row.publication?.status !== 'withdrawn').length;
@@ -61,7 +61,7 @@ function planPublication({ repository, sourceSha, deployment, snapshot, ledger, 
       remaining_versions: (byPaper.get(paperName) || []).filter(version => version !== versionName).sort(),
       ownership_confirmed: Boolean(confirmed), ownership_reference: confirmed ? proof.reference : null,
       evidence: null };
-    const block = reason => report.blocked.push({ ...item, reason });
+    const block = (reason, detail) => report.blocked.push({ ...item, reason, ...(detail ? { detail } : {}) });
     if (!validKey(key) || row?.status !== 'synced' || !versionId(row.id) || !DIGEST.test(row.fingerprint || '') ||
         idCounts.get(row.id) !== 1) {
       block('unverified_or_duplicate_ledger_id');
@@ -93,7 +93,7 @@ function planPublication({ repository, sourceSha, deployment, snapshot, ledger, 
       } else {
         context = evidenceFor(key);
         if (!context) {
-          block('whole_directory_deletion_unproven');
+          block('whole_directory_deletion_unproven', '请人工核对该版本在 main 上的完整删除历史。若先删除 paper.json 再删除其他文件，需核对两次提交及远端版本归属。');
           continue;
         }
         item.evidence = context.evidence;

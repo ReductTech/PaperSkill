@@ -1,10 +1,13 @@
-"""Inspect the deployed Pages tar without extracting files from it."""
+"""Verify the original Actions ZIP, then inspect its Pages TAR."""
 import hashlib
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 import tarfile
+import tempfile
+import zipfile
 
 
 def inspect(archive):
@@ -48,6 +51,22 @@ def inspect(archive):
     return {'tar_sha256': archive_digest, 'catalog': catalog, 'indexes': indexes}
 
 
+def inspect_verified_zip(archive, expected_digest):
+    if not re.fullmatch(r'[0-9a-f]{64}', expected_digest):
+        raise ValueError('Missing or invalid trusted ZIP SHA-256')
+    with archive.open('rb') as stream:
+        if hashlib.file_digest(stream, 'sha256').hexdigest() != expected_digest:
+            raise ValueError('GitHub Pages artifact ZIP SHA-256 mismatch')
+        stream.seek(0)
+        with zipfile.ZipFile(stream) as bundle:
+            if bundle.namelist() != ['artifact.tar']:
+                raise ValueError('Pages ZIP must contain exactly artifact.tar')
+            with tempfile.TemporaryDirectory(dir=archive.parent) as directory:
+                tar = Path(directory) / 'artifact.tar'
+                with bundle.open('artifact.tar') as member, tar.open('wb') as output:
+                    shutil.copyfileobj(member, output)
+                return inspect(tar)
+
+
 if __name__ == '__main__':
-    artifact = Path(sys.argv[1])
-    print(json.dumps(inspect(artifact)))
+    print(json.dumps(inspect_verified_zip(Path(sys.argv[1]), sys.argv[2])))

@@ -1,6 +1,6 @@
 # 论文网页撤回预演
 
-Pages 的 `deploy` job 成功后，`reconcile-publication` 使用只读权限核对部署 SHA、工作流运行及尝试编号、GitHub Pages 部署状态和该次构建上传的 `github-pages` 制品 ID。脚本从实际上传的 TAR 读取站点索引和每个版本的网页入口，并与同一提交的 Git 跟踪文件逐版核对。它同时记录 TAR 和网页入口的 SHA-256。完整清单包含非 arXiv 版本，评分开关独立控制评分流程。
+Pages 的 `deploy` job 成功后，`reconcile-publication` 使用只读权限核对部署 SHA、工作流运行及尝试编号、GitHub Pages 部署状态和该次构建上传的 `github-pages` 制品 ID。脚本从 GitHub Actions API 取得该制品的可信 SHA-256，下载原始 ZIP 并在打开 ZIP 前强制校验摘要。摘要缺失、格式无效、下载失败或不一致都会停止预演。校验通过后，脚本只读取 ZIP 内的 `artifact.tar`，将站点索引和网页入口与同一提交的 Git 跟踪文件逐版核对。报告分别记录 ZIP 摘要、内部 TAR 摘要和网页入口的 SHA-256。完整清单包含非 arXiv 版本，评分开关独立控制评分流程。
 
 预演按 GitHub 上账本分支的提交 SHA 读取 `paperskill-sync-state.json`。账本分支缺失、权限不足、环境不匹配或数据异常时，报告停止原因。GitHub 的查询使用 GET，账本读取固定在一次不可变的提交上。
 
@@ -10,11 +10,11 @@ Pages 的 `deploy` job 成功后，`reconcile-publication` 使用只读权限核
 
 在对应的 Pages 工作流运行详情下载 `paperskill-publication-preview-<run_id>-<attempt>`。
 
-- `deployed-versions.json` 包含仓库、部署提交、运行及制品 ID、TAR 校验和、全部论文版本和各网页入口校验和。
+- `deployed-versions.json` 包含仓库、部署提交、运行及制品 ID、GitHub Actions ZIP 和内部 TAR 的独立校验和、全部论文版本和各网页入口校验和。
 - `reconciliation.json` 包含 `withdraw`、`restore` 和 `blocked`。每项可追溯到版本、远端数字 ID、旧网页路径、归属核对凭据及 Git 证据。撤回证据包括删除提交、其第一父提交和被删除的路径。空的 `remaining_versions` 表示同篇当前没有其他发布版本。操作的最小粒度始终为版本 ID。
 - `apply_allowed` 固定为 `false`。重复预演同一次部署会为同一候选生成相同的 `operation_key`。报告可以在后续部署发生时失效，未来执行接口须在写入前重新核验。
 - 当前 Git 树仍有版本文件、元数据不可读、部署或制品验证失败时，以停止报告为准。非 arXiv 版本仍进入完整部署清单，历史记录缺乏明确 arXiv 标识时列入阻止项。一次消失超过 10 个已同步且未撤回版本，或账本至少 10 个已同步版本且消失比例超过 20% 时停止所有候选。
-- 当前版本只有在第一父链上有从完整元数据及网页入口到整个版本前缀消失的同一次变更时，才具备自动识别所需的删除证据。分多次删除且先移除元数据的情况列入 `whole_directory_deletion_unproven`，由维护者核对。
+- 当前版本只有在第一父链上有从完整元数据及网页入口到整个版本前缀消失的同一次变更时，才具备自动识别所需的删除证据。分多次删除且先移除元数据的情况列入 `whole_directory_deletion_unproven`，报告提示维护者核对删除元数据与删除剩余文件的两个提交，以及对应的远端版本归属。
 - #535 只清理 #519 留下的扁平产物。仍在部署清单中的合法版本不进入撤回候选。
 
 ## 确认版本归属与恢复状态

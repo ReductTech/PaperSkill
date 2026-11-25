@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { createHash } = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -82,14 +83,17 @@ function fixture(t) {
   file('html_output/README.md', '# Versions');
   const initial = commit('Initial published versions');
 
-  function artifact({ omit = '', wrongTitle = false, extra = false, link = false } = {}) {
+  function artifact({ omit = '', wrongTitle = false, extra = false, link = false, changedPage = '' } = {}) {
     const site = fs.mkdtempSync(path.join(root, 'site-'));
     const papers = new Map();
     for (const [key, meta] of data) {
       const [paperName, version] = key.split('/');
       if (!papers.has(paperName)) papers.set(paperName, []);
       papers.get(paperName).push(versionRecord(meta, { paperName, version }));
-      if (key !== omit) file(path.basename(site) + '/papers/' + key + '/index.html', '<p>Published ' + key + '</p>');
+      if (key !== omit) {
+        const html = key === changedPage ? '<p>Substituted page</p>' : '<p>Published ' + key + '</p>';
+        file(path.basename(site) + '/papers/' + key + '/index.html', html);
+      }
     }
     if (extra) file(path.basename(site) + '/papers/fake/alice1124/index.html', '<p>extra</p>');
     const catalog = [...papers].map(([paperName, rows]) => {
@@ -116,7 +120,7 @@ function fixture(t) {
   return { root, git, file, json, data, add, remove, commit, artifact, initial, store, ownership };
 }
 
-function mockedGitHub(sha, state, failure) {
+function mockedGitHub(sha, state, failure, zip, expectedDigest = sha256(zip)) {
   const runId = '101';
   const attempt = '1';
   const artifactId = '401';
@@ -125,6 +129,7 @@ function mockedGitHub(sha, state, failure) {
   let mainCalls = 0;
   let statusCalls = 0;
   let ledgerCalls = 0;
+  let artifactCalls = 0;
   const calls = [];
   const ref = sha => ({ object: { sha } });
   const responses = {
@@ -140,10 +145,30 @@ function mockedGitHub(sha, state, failure) {
   };
   const fetchImpl = async (url, options) => {
     assert.equal(options.method, 'GET');
-    assert.equal(new URL(url).origin, 'https://api.github.com');
+    const host = new URL(url).origin;
+    if (host === 'https://download.example.invalid') {
+      assert.equal(options.headers, undefined);
+      assert.equal(options.redirect, 'error');
+      calls.push('signed-zip-download');
+      return failure === 'download-error' ? new Response(null, { status: 503 }) : new Response(zip);
+    }
+    assert.equal(host, 'https://api.github.com');
+    assert.equal(options.headers.Authorization, 'Bearer local-fixture');
     const route = url.split(repository)[1];
     calls.push(route);
+    if (route === '/actions/artifacts/401/zip') {
+      assert.equal(options.redirect, 'manual');
+      const location = failure === 'insecure-url' ? 'http://download.example.invalid/pages.zip'
+        : 'https://download.example.invalid/pages.zip?fixture=signed';
+      return new Response(null, { status: 302, headers: { location } });
+    }
     let body = responses[route];
+    if (route === '/actions/artifacts/401') {
+      artifactCalls++;
+      const digest = failure === 'missing-digest' ? undefined : failure === 'malformed-digest' ? 'checksum'
+        : 'sha256:' + (failure === 'digest-race' && artifactCalls > 1 ? resolved : expectedDigest);
+      body = { ...body, digest };
+    }
     if (route === '/git/ref/heads/main') {
       mainCalls++;
       body = { ref: 'refs/heads/main', ...ref(failure === 'old' || (failure === 'race' && mainCalls > 1) ? 'b'.repeat(40) : sha) };
@@ -168,12 +193,28 @@ function mockedGitHub(sha, state, failure) {
   }) };
 }
 
+function sha256(bytes) {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+function wrapTar(f, tar, member = 'artifact.tar') {
+  const name = tar + '.zip';
+  const win = process.platform === 'win32';
+  call(f.root, win ? 'py' : 'python3', [...(win ? ['-3'] : []), '-c',
+    'import zipfile,sys\nwith zipfile.ZipFile(sys.argv[1],"w",zipfile.ZIP_DEFLATED) as z:\n z.write(sys.argv[2],sys.argv[3])',
+    name, tar, member]);
+  return fs.readFileSync(name);
+}
+
 async function preview(f, sha, { failure, artifact, ledger = f.store } = {}) {
-  const mock = mockedGitHub(sha, ledger, failure);
-  const result = await reconcile({ root: f.root, archive: artifact || f.artifact(),
+  const zip = !artifact && !f.data.size ? Buffer.alloc(0) : wrapTar(f, artifact || f.artifact());
+  const mock = mockedGitHub(sha, ledger, failure, zip);
+  const result = await reconcile({ root: f.root,
     repository, context: mock.context, endpoint, github: mock.github });
   assert.equal(result.report.apply_allowed, false);
   assert.ok(mock.calls.includes('/git/ref/heads/paperskill-sync-state'));
+  assert.equal(result.manifest.artifact_zip_sha256, sha256(zip));
+  assert.notEqual(result.manifest.artifact_sha256, result.manifest.artifact_zip_sha256);
   return result;
 }
 
@@ -265,7 +306,7 @@ test('removing metadata or an entry point, corrupting metadata, and an empty tre
   fs.unlinkSync(path.join(f.root, 'html_output', first, 'index.html'));
   await assert.rejects(preview(f, f.commit('Remove only entry')), /缺少 paper.json 或 index.html/);
   for (const key of [...f.data.keys()]) f.remove(key);
-  await assert.rejects(preview(f, f.commit('Remove every version'), { artifact: 'unused.tar' }), /清单为空/);
+  await assert.rejects(preview(f, f.commit('Remove every version'), {}), /清单为空/);
 });
 
 test('disposing of one ordinary source asset or changing arXiv eligibility keeps deployed versions active', async t => {
@@ -324,6 +365,62 @@ test('failed, skipped, canceled, superseded and changing deployments cannot yiel
     'race', 'wrong-artifact', 'status-race', 'ledger-race', 'network', 'no-ledger']) {
     await assert.rejects(preview(f, sha, { failure }), undefined, failure);
   }
+});
+
+
+test('a replaced, truncated, or malformed ZIP cannot yield a withdrawal candidate', async t => {
+  const f = fixture(t);
+  f.remove(first);
+  const sha = f.commit('Remove a published version');
+  const originalTar = f.artifact();
+  const original = wrapTar(f, originalTar);
+  const substitute = wrapTar(f, f.artifact({ changedPage: second }));
+  for (const [zip, digest, error] of [
+    [substitute, sha256(original), /ZIP SHA-256 mismatch/],
+    [original.subarray(0, -32), sha256(original), /ZIP SHA-256 mismatch/],
+    [original, sha256(fs.readFileSync(originalTar)), /ZIP SHA-256 mismatch/],
+    [Buffer.from('not a zip'), sha256(Buffer.from('not a zip')), /not a zip file/],
+  ]) {
+    const mock = mockedGitHub(sha, f.store, null, zip, digest);
+    await assert.rejects(reconcile({ root: f.root, repository, context: mock.context, endpoint, github: mock.github }), error);
+    assert.ok(!mock.calls.some(route => route.includes('sync-state')));
+  }
+  const otherMember = wrapTar(f, originalTar, 'nested/artifact.tar');
+  const mock = mockedGitHub(sha, f.store, null, otherMember);
+  await assert.rejects(reconcile({ root: f.root, repository, context: mock.context, endpoint, github: mock.github }),
+    /must contain exactly artifact.tar/);
+});
+
+test('missing or changing GitHub digests stop the dry run, and download failures stop before reading the ledger', async t => {
+  const f = fixture(t);
+  const zip = wrapTar(f, f.artifact());
+  for (const [failure, error] of [
+    ['missing-digest', /未提供有效的 Pages 制品 ZIP SHA-256/],
+    ['malformed-digest', /未提供有效的 Pages 制品 ZIP SHA-256/],
+    ['digest-race', /在核对期间更新/],
+    ['download-error', /无法完整下载/],
+    ['insecure-url', /无法完整下载/],
+  ]) {
+    const mock = mockedGitHub(f.initial, f.store, failure, zip);
+    await assert.rejects(reconcile({ root: f.root, repository, context: mock.context, endpoint, github: mock.github }), error);
+    if (failure !== 'digest-race') assert.ok(!mock.calls.some(route => route.includes('sync-state')));
+    if (['missing-digest', 'malformed-digest', 'insecure-url'].includes(failure)) {
+      assert.ok(!mock.calls.includes('signed-zip-download'));
+    }
+  }
+});
+
+test('a staged directory deletion remains a manual-review case with an explicit explanation', async t => {
+  const f = fixture(t);
+  fs.unlinkSync(path.join(f.root, 'html_output', first, 'paper.json'));
+  f.commit('Remove paper.json first');
+  f.remove(first);
+  const sha = f.commit('Remove remaining files separately');
+  const result = await preview(f, sha);
+  assert.deepEqual(result.report.withdraw, []);
+  const item = result.report.blocked.find(row => row.remote_id === 101);
+  assert.equal(item.reason, 'whole_directory_deletion_unproven');
+  assert.match(item.detail, /人工核对.*paper\.json/);
 });
 
 test('unknown ownership, duplicate IDs, bad state, and an unproven removal fail safely', async t => {

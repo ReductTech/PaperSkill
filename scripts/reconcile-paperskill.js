@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { ROOT } = require('./lib/repository');
 const { endpointFor } = require('./sync-paperskill');
@@ -9,10 +10,18 @@ const { loadSnapshot, verifyArtifact, removalEvidence, restorationEvidence } = r
 const { githubPublication } = require('./lib/github-publication');
 const { planPublication } = require('./lib/publication-plan');
 
-async function reconcile({ root, archive, repository, context, endpoint, github }) {
+async function reconcile({ root, repository, context, endpoint, github }) {
   const deployment = await github.checkDeployment(context);
   const snapshot = loadSnapshot(root, context.sha);
-  const verified = verifyArtifact(root, archive, snapshot);
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'paperskill-deployed-artifact-'));
+  let verified;
+  try {
+    const archive = path.join(temporary, 'pages.zip');
+    await github.downloadArtifact(context.artifactId, archive);
+    verified = verifyArtifact(root, archive, snapshot, deployment.artifact_zip_sha256);
+  } finally {
+    fs.rmSync(temporary, { recursive: true, force: true });
+  }
   const ledger = await github.loadLedger();
   const provenance = {
     ...deployment, run_id: context.runId, run_attempt: context.attempt,
@@ -33,7 +42,8 @@ async function reconcile({ root, archive, repository, context, endpoint, github 
   ]);
   if (latestDeployment.deployment_id !== deployment.deployment_id ||
       latestDeployment.deployment_status_id !== deployment.deployment_status_id ||
-      latestDeployment.deploy_job_id !== deployment.deploy_job_id || ledgerRevision !== ledger.revision) {
+      latestDeployment.deploy_job_id !== deployment.deploy_job_id ||
+      latestDeployment.artifact_zip_sha256 !== deployment.artifact_zip_sha256 || ledgerRevision !== ledger.revision) {
     throw new Error('部署状态或账本在核对期间更新，须重新运行预演');
   }
 
@@ -45,10 +55,10 @@ async function reconcile({ root, archive, repository, context, endpoint, github 
 }
 
 async function main(args, env) {
-  if (args.length !== 2) {
-    throw new Error('用法：node scripts/reconcile-paperskill.js <github-pages/artifact.tar> <输出目录>');
+  if (args.length !== 1) {
+    throw new Error('用法：node scripts/reconcile-paperskill.js <输出目录>');
   }
-  const [archive, directory] = args.map(file => path.resolve(file));
+  const directory = path.resolve(args[0]);
   fs.mkdirSync(directory, { recursive: true });
   const write = (file, value) => fs.writeFileSync(path.join(directory, file),
     JSON.stringify(value, null, 2) + '\n');
@@ -59,7 +69,7 @@ async function main(args, env) {
     const github = githubPublication({ repository: env.GITHUB_REPOSITORY,
       token: env.GITHUB_TOKEN, branch: env.PAPERSKILL_STATE_BRANCH || 'paperskill-sync-state' });
     const result = await reconcile({
-      root: ROOT, archive, repository: env.GITHUB_REPOSITORY, context,
+      root: ROOT, repository: env.GITHUB_REPOSITORY, context,
       endpoint: endpointFor(env.PAPERSKILL_API_BASE_URL || 'https://app.reduct.cn'), github,
     });
     write('deployed-versions.json', result.manifest);

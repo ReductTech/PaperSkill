@@ -98,10 +98,10 @@ function loadSnapshot(root, revision) {
   };
 }
 
-function verifyArtifact(root, archive, snapshot) {
+function verifyArtifact(root, archive, snapshot, expectedZipSha256) {
   const py = process.platform === 'win32' ? 'py' : 'python3';
   const flags = process.platform === 'win32' ? ['-3'] : [];
-  const result = spawnSync(py, [...flags, path.join(root, 'scripts', 'read-pages-artifact.py'), archive],
+  const result = spawnSync(py, [...flags, path.join(root, 'scripts', 'read-pages-artifact.py'), archive, expectedZipSha256],
     { cwd: root, maxBuffer: 32 * 1024 * 1024, encoding: 'utf8' });
   if (result.status !== 0) throw new Error('不能验证 Pages 制品：' + (result.error?.message || result.stderr));
   const artifact = JSON.parse(result.stdout);

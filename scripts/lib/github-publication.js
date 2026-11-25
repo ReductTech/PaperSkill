@@ -1,5 +1,8 @@
 'use strict';
 
+const { createWriteStream } = require('node:fs');
+const { Readable } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
 const { SHA } = require('./deployment-snapshot');
 
 function githubPublication({ repository, token, branch, fetchImpl = fetch }) {
@@ -8,11 +11,15 @@ function githubPublication({ repository, token, branch, fetchImpl = fetch }) {
     throw new Error('缺少 GitHub 只读上下文或账本分支无效');
   }
   const root = 'https://api.github.com/repos/' + repository;
-  async function get(route, accept = 'application/vnd.github+json') {
-    const response = await fetchImpl(root + route, {
-      method: 'GET', redirect: 'error', signal: AbortSignal.timeout(30000),
+  function request(route, accept = 'application/vnd.github+json', redirect = 'error') {
+    return fetchImpl(root + route, {
+      method: 'GET', redirect, signal: AbortSignal.timeout(30000),
       headers: { Accept: accept, Authorization: 'Bearer ' + token, 'X-GitHub-Api-Version': '2022-11-28' },
     });
+  }
+
+  async function get(route, accept) {
+    const response = await request(route, accept);
     if (!response.ok) throw new Error('GitHub 只读查询失败，HTTP ' + response.status + ' (' + route.split('?')[0] + ')');
     return response.json();
   }
@@ -54,13 +61,36 @@ function githubPublication({ repository, token, branch, fetchImpl = fetch }) {
         String(artifact.workflow_run?.id) !== runId || artifact.workflow_run?.head_sha !== sha) {
       throw new Error('Pages 制品归属与当前部署不一致');
     }
+    if (typeof artifact.digest !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(artifact.digest) || artifact.digest.length !== 71) {
+      throw new Error('GitHub 未提供有效的 Pages 制品 ZIP SHA-256 摘要');
+    }
     const statuses = await get('/deployments/' + deployment.id + '/statuses?per_page=1');
     const status = statuses[0];
     const jobUrl = 'https://github.com/' + repository + '/actions/runs/' + runId + '/job/' + job.id;
     if (status?.state !== 'success' || status.log_url !== jobUrl || !Number.isSafeInteger(status.id)) {
       throw new Error('Pages 最新部署状态不属于本次成功的 deploy job');
     }
-    return { deployment_id: deployment.id, deployment_status_id: status.id, deploy_job_id: job.id };
+    return { deployment_id: deployment.id, deployment_status_id: status.id, deploy_job_id: job.id,
+      artifact_zip_sha256: artifact.digest.slice(7) };
+  }
+
+  async function downloadArtifact(artifactId, destination) {
+    if (!/^\d+$/.test(artifactId || '')) throw new Error('Pages 制品 ID 无效');
+    const redirect = await request('/actions/artifacts/' + artifactId + '/zip', undefined, 'manual');
+    if (redirect.status !== 302 || !redirect.headers.get('location')) {
+      throw new Error('GitHub 制品 ZIP 下载入口查询失败，HTTP ' + redirect.status);
+    }
+    // GitHub issues a short-lived signed URL. Keep the GitHub token on the API host.
+    try {
+      const url = new URL(redirect.headers.get('location'));
+      if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Invalid download URL');
+      const response = await fetchImpl(url, { method: 'GET', redirect: 'error',
+        signal: AbortSignal.timeout(15 * 60 * 1000) });
+      if (response.status !== 200 || !response.body) throw new Error('Missing ZIP body');
+      await pipeline(Readable.fromWeb(response.body), createWriteStream(destination, { flags: 'wx' }));
+    } catch {
+      throw new Error('无法完整下载 GitHub Pages 制品 ZIP');
+    }
   }
 
   async function loadLedger() {
@@ -70,7 +100,7 @@ function githubPublication({ repository, token, branch, fetchImpl = fetch }) {
     return { revision, state };
   }
 
-  return { checkDeployment, loadLedger, ledgerRevision: () => ref(branch) };
+  return { checkDeployment, downloadArtifact, loadLedger, ledgerRevision: () => ref(branch) };
 }
 
 module.exports = { githubPublication };
