@@ -1,0 +1,53 @@
+"""Inspect the deployed Pages tar without extracting files from it."""
+import hashlib
+import json
+from pathlib import Path
+import re
+import sys
+import tarfile
+
+
+def inspect(archive):
+    archive_size = archive.stat().st_size
+    indexes = {}
+    catalog = None
+    names = set()
+    with archive.open('rb') as stream:
+        archive_digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+        stream.seek(0)
+        # upload-pages-artifact publishes an uncompressed tar.
+        with tarfile.open(fileobj=stream, mode='r:') as tar:
+            for item in tar:
+                name = item.name.removeprefix('./').rstrip('/')
+                if name in ('', '.') and item.isdir():
+                    continue
+                if (any(part in ('', '.', '..') for part in name.split('/'))
+                        or '\\' in name or name in names or not (item.isfile() or item.isdir())):
+                    raise ValueError(f'Invalid Pages artifact entry: {name!r}')
+                names.add(name)
+                # TarFile iteration can seek past EOF without reading a member.
+                if item.offset_data + item.size > archive_size:
+                    raise ValueError(f'Truncated Pages artifact entry: {name!r}')
+                if not item.isfile():
+                    continue
+                if name == 'papers.json':
+                    if not 0 < item.size <= 16 * 1024 * 1024:
+                        raise ValueError('Invalid catalog size')
+                    catalog = json.load(tar.extractfile(item))
+                if re.fullmatch(r'papers/[^/]+/[^/]+/index\.html', name):
+                    if item.size == 0:
+                        raise ValueError(f'Empty tutorial page: {name}')
+                    indexes[name.removesuffix('/index.html')] = hashlib.file_digest(
+                        tar.extractfile(item), 'sha256').hexdigest()
+            # Require the terminating zero records as well as complete members.
+            stream.seek(tar.offset)
+            if stream.read(1024) != b'\0' * 1024:
+                raise ValueError('Pages artifact is missing its tar terminator')
+    if not isinstance(catalog, list) or not catalog or not indexes:
+        raise ValueError('Pages artifact has no catalog or version pages')
+    return {'tar_sha256': archive_digest, 'catalog': catalog, 'indexes': indexes}
+
+
+if __name__ == '__main__':
+    artifact = Path(sys.argv[1])
+    print(json.dumps(inspect(artifact)))
