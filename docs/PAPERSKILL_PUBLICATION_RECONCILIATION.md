@@ -40,13 +40,12 @@ Pages 的 `deploy` job 成功后，`reconcile-publication` 使用只读权限核
 
 ## 删除联调与启用
 
-后端提供的操作是向 [delete_version](https://app.reduct.cn/Web/V1/Paperskill/delete_version) 发送 `POST`，参数为 `id`。客户端从可核实的同步账本取值，只发送对应版本 ID。当前仓库的创建接口使用 multipart 并支持通过 `PAPERSKILL_API_HEADERS` 配置请求头。删除的编码、鉴权、成功与失败响应以及重复删除语义，以后端确认的接口合同为准。
+后端提供的操作是向 [delete_version](https://app.reduct.cn/Web/V1/Paperskill/delete_version) 发送 `POST`，以 `multipart/form-data` 传入必填整数版本 ID `id`，将该版本的网页状态更新为删除。客户端从可核实的同步账本取值，只发送对应版本 ID。当前仓库的创建接口使用 multipart 并支持通过 `PAPERSKILL_API_HEADERS` 配置请求头。删除响应须为 HTTP 200 且可解析为 JSON，业务成功码、鉴权和重复删除语义仍待独立确认。 [Apifox 项目](https://app.apifox.com/project/5867189)
 
-仓库变量 `PAPERSKILL_DELETE_ENABLED` 默认为关闭。仅当其设为 `true`，且同一次 Pages 部署成功时，才启动写入 job。该 job 独立于原有入库和评分通知流程。启用前须设置 `PAPERSKILL_DELETE_CONTRACT`，供客户端按已确认的合同编码及判定响应。
+仓库变量 `PAPERSKILL_DELETE_ENABLED` 默认为关闭。仅当其设为 `true`，且同一次 Pages 部署成功时，才启动写入 job。该 job 独立于原有入库和评分通知流程。暂定契约沿用创建接口的鉴权方式及业务成功码 `200`。可以用 `PAPERSKILL_DELETE_CONTRACT` 覆盖。正式删除须在真实接口联调成功后启用。
 
-- `encoding` 支持 `json`、`form` 或 `multipart`，其中 `form` 对应 `application/x-www-form-urlencoded`。
-- `authentication` 支持 `none`、`create-headers` 或 `delete-headers`。确认可共用后才选择 `create-headers`，对应 `PAPERSKILL_API_HEADERS`。独立鉴权使用 `PAPERSKILL_DELETE_HEADERS`。
-- `success.status` 配置确切的成功 HTTP 状态。`success.type` 支持 `empty`、`text` 或 `json`，其中 `text` 指定 `equals`，`json` 指定字段路径数组 `path` 和严格匹配的标量 `equals`。测试里的编码与状态均为模拟合同。
+- 暂定鉴权为 `create-headers`，与创建接口共用 `PAPERSKILL_API_HEADERS`，未设置时使用空鉴权头。可显式选择 `none`，也可用 `delete-headers` 和 `PAPERSKILL_DELETE_HEADERS` 配置独立鉴权。
+- `successCode` 暂定为整数 `200`。客户端核对 HTTP 200、整数 `code`、字符串 `msg`，并要求 `data.id` 与发送的整数 ID 一致。模拟测试覆盖暂定业务码及显式覆盖。重复删除仍走人工核对。
 - 启用前由后端确认删除仅影响该 ID 对应的网页版本，并保留同篇其他版本、作者与历史评分。此接口的请求范围是 ID，服务端数据保留语义需要在联调中核实。
 
 写入 job 重新核对当前部署、制品、Git 证据、版本归属和账本。发送请求前，以远端 ID 在独立的 `paperskill-delete-journal.json` 中记录操作意向。部署或账本变化时停止。确认成功后才更新 `paperskill-sync-state.json` 的该版本记录，保留原 ID、入库指纹和删除回执。

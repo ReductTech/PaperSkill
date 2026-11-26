@@ -63,7 +63,7 @@ async function main(env) {
     throw new Error('PaperSkill 版本删除须在 main 部署完成并显式启用后运行');
   }
   const deleteVersion = createDeleteVersion({ enabled: true,
-    contract: JSON.parse(env.PAPERSKILL_DELETE_CONTRACT || 'null'),
+    contract: env.PAPERSKILL_DELETE_CONTRACT ? JSON.parse(env.PAPERSKILL_DELETE_CONTRACT) : undefined,
     createHeaders: env.PAPERSKILL_API_HEADERS, deleteHeaders: env.PAPERSKILL_DELETE_HEADERS });
   const repository = env.GITHUB_REPOSITORY;
   const storage = { repository, token: env.GITHUB_TOKEN,

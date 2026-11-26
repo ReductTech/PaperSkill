@@ -525,18 +525,20 @@ test('executor deletes only a verified unpublished ledger ID and preserves histo
   };
   const base = { root: f.root, repository, context: mock.context, endpoint, github: mock.github, state: journal };
   const deleteVersion = createDeleteVersion({ enabled: true,
-    contract: { encoding: 'form', authentication: 'create-headers', success: { status: 204, type: 'empty' } },
     createHeaders: '{"Authorization":"Bearer mock"}',
     fetchImpl: async (url, options) => {
       assert.equal(url, DELETE_ENDPOINT);
       assert.equal(options.method, 'POST');
       assert.equal(options.redirect, 'error');
       assert.equal(options.headers.get('Authorization'), 'Bearer mock');
-      assert.deepEqual([...options.body], [['id', '101']]);
+      assert.equal(options.headers.get('Accept'), 'application/json');
+      const request = new Request(url, options);
+      assert.match(request.headers.get('content-type'), /^multipart\/form-data;\s*boundary=/);
+      assert.deepEqual([...(await request.formData())], [['id', '101']]);
       assert.deepEqual(state, original);
       order.push('post');
       postCount++;
-      return new Response(null, { status: 204 });
+      return Response.json({ code: 200, msg: 'mock deletion', data: { id: 101 } });
     },
   });
   await assert.rejects(applyDeletion({ ...base, deleteVersion }), /未启用/);
@@ -595,21 +597,34 @@ test('uncertain requests, ownership mismatch, and unsuccessful deployments never
 
 test('delete transport makes no assumptions about auth, JSON success, or duplicate errors', async () => {
   let requests = 0;
-  const contract = { encoding: 'json', authentication: 'delete-headers', success: { status: 200, type: 'json', path: ['ok'], equals: true } };
+  const contract = { authentication: 'delete-headers', successCode: 173 };
   const options = { contract, deleteHeaders: '{"X-Mock":"deletion-only"}', createHeaders: '{"X-Mock":"creation-only"}' };
   assert.throws(() => createDeleteVersion(options), /未启用/);
-  assert.throws(() => createDeleteVersion({ enabled: true }), /后端确认/);
+  assert.throws(() => createDeleteVersion({ enabled: true, contract: null }), /整数业务成功码/);
   assert.throws(() => createDeleteVersion({ enabled: true, contract }), /密钥显式配置/);
-  for (const [status, body] of [[200, '{}'], [200, '{"ok":false}'], [200, 'bad JSON'], [404, '{"ok":true}'], [409, '{"ok":true}']]) {
+  assert.throws(() => createDeleteVersion({ ...options, enabled: true,
+    contract: { ...contract, successCode: '173' } }), /整数业务成功码/);
+  const successfulBody = '{"code":173,"msg":"mock deletion","data":{"id":101}}';
+  const responses = [
+    [200, '{}'], [200, 'bad JSON'],
+    [200, '{"code":200,"msg":"example value","data":{"id":101}}'],
+    [200, '{"code":"173","msg":"wrong type","data":{"id":101}}'],
+    [200, '{"code":173,"data":{"id":101}}'],
+    [200, '{"code":173,"msg":"wrong id","data":{"id":102}}'],
+    [200, '{"code":173,"msg":"string id","data":{"id":"101"}}'],
+    [404, successfulBody], [409, successfulBody], [201, successfulBody],
+  ];
+  for (const [status, body] of responses) {
     const remove = createDeleteVersion({ ...options, enabled: true, fetchImpl: async (_, request) => {
       requests++;
       assert.equal(request.headers.get('X-Mock'), 'deletion-only');
-      assert.deepEqual(JSON.parse(request.body), { id: 101 });
+      assert.ok(request.body instanceof FormData);
+      assert.deepEqual([...request.body], [['id', '101']]);
       return new Response(body, { status });
     } });
     await assert.rejects(remove(101), /人工核对/);
   }
-  assert.equal(requests, 5);
+  assert.equal(requests, responses.length);
 });
 
 test('separate journal reserves a remote ID once and stores confirmed ledger with CAS', async () => {
@@ -688,4 +703,18 @@ test('success followed by a ledger conflict keeps the reservation and cannot res
   assert.deepEqual(await applyDeletion(opts), []);
   assert.equal(requests, 1);
   assert.deepEqual(f.store, original);
+});
+
+test('default deletion uses the same optional headers as version creation and rejects an unexpected business result', async () => {
+  let calls = 0;
+  const remove = createDeleteVersion({ enabled: true, fetchImpl: async (url, options) => {
+    calls++;
+    assert.equal(options.headers.has('Authorization'), false);
+    assert.equal(options.headers.get('Accept'), 'application/json');
+    const body = await new Request(url, options).formData();
+    assert.deepEqual([...body], [['id', '101']]);
+    return Response.json({ code: 409, msg: 'mock conflict', data: { id: 101 } });
+  } });
+  await assert.rejects(remove(101), /人工核对/);
+  assert.equal(calls, 1);
 });
