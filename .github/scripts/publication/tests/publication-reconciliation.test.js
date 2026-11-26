@@ -7,15 +7,18 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
-const { catalogRecord, versionRecord } = require('../lib/repository');
+const { catalogRecord, versionRecord } = require('../../../../scripts/lib/repository');
 const { githubPublication } = require('../lib/github-publication');
 const { createLifecycleClient } = require('../lib/paperskill-lifecycle');
 const { planPublication } = require('../lib/publication-plan');
 const { reconcile } = require('../reconcile-paperskill');
-const { planFor, synchronize, newState } = require('../sync-paperskill');
+const { applyDeletion } = require('../apply-deletion');
+const { createDeleteVersion, CREATE_ENDPOINT, DELETE_ENDPOINT } = require('../lib/delete-version');
+const { deletionState } = require('../lib/deletion-state');
+const { planFor, synchronize, newState } = require('../../../../scripts/sync-paperskill');
 
 const repository = 'Example/PaperSkill';
-const endpoint = 'https://database.invalid/Web/V1/Paperskill/create_version';
+const endpoint = CREATE_ENDPOINT;
 const first = 'hello_world/alice1124';
 const second = 'hello_world/bob1125';
 const unrelated = 'other_paper/charlie1124';
@@ -70,8 +73,8 @@ function fixture(t) {
   const ownership = { schema_version: 1, repository, endpoint, versions: proof };
   json('catalog/paperskill-ownership.json', ownership);
   json('catalog/paperskill-overrides.json', {});
-  fs.mkdirSync(path.join(root, 'scripts'));
-  fs.copyFileSync(path.join(__dirname, '..', 'read-pages-artifact.py'), path.join(root, 'scripts', 'read-pages-artifact.py'));
+  fs.mkdirSync(path.join(root, '.github', 'scripts', 'publication'), { recursive: true });
+  fs.copyFileSync(path.join(__dirname, '..', 'read-pages-artifact.py'), path.join(root, '.github', 'scripts', 'publication', 'read-pages-artifact.py'));
   git('init', '-q', '-b', 'main');
   git('config', 'user.name', 'Publication tests');
   git('config', 'user.email', 'testing@example.invalid');
@@ -494,4 +497,195 @@ test('future lifecycle adapter is disabled by default and stops on backend failu
   transport.lookup = async () => ({ ...identity, publication_status: 'active' });
   transport.withdraw = async () => { throw new Error('timeout after submission'); };
   await assert.rejects(client.withdraw(identity, context), /timeout after submission/);
+});
+
+test('executor deletes only a verified unpublished ledger ID and preserves history', async t => {
+  const f = fixture(t);
+  f.remove(first);
+  const sha = f.commit('Withdraw first version');
+  const original = structuredClone(f.store);
+  const mock = mockedGitHub(sha, f.store, null, wrapTar(f, f.artifact()));
+  let state = structuredClone(f.store);
+  let postCount = 0;
+  const intents = new Map();
+  const order = [];
+  const journal = {
+    loadLedger: async () => ({ sha: 'a'.repeat(40), state: structuredClone(state) }),
+    claim: async (id, intent) => {
+      if (intents.has(id)) return false;
+      intents.set(id, intent);
+      order.push('claim');
+      return true;
+    },
+    saveLedger: async (_, next) => {
+      order.push('save');
+      state = next;
+      Object.assign(f.store, next);
+    },
+  };
+  const base = { root: f.root, repository, context: mock.context, endpoint, github: mock.github, state: journal };
+  const deleteVersion = createDeleteVersion({ enabled: true,
+    contract: { encoding: 'form', authentication: 'create-headers', success: { status: 204, type: 'empty' } },
+    createHeaders: '{"Authorization":"Bearer mock"}',
+    fetchImpl: async (url, options) => {
+      assert.equal(url, DELETE_ENDPOINT);
+      assert.equal(options.method, 'POST');
+      assert.equal(options.redirect, 'error');
+      assert.equal(options.headers.get('Authorization'), 'Bearer mock');
+      assert.deepEqual([...options.body], [['id', '101']]);
+      assert.deepEqual(state, original);
+      order.push('post');
+      postCount++;
+      return new Response(null, { status: 204 });
+    },
+  });
+  await assert.rejects(applyDeletion({ ...base, deleteVersion }), /未启用/);
+  assert.deepEqual(await applyDeletion({ ...base, enabled: true, deleteVersion }), [{ key: first, id: 101 }]);
+  assert.deepEqual(order, ['claim', 'post', 'save']);
+  assert.equal(state.versions[first].id, 101);
+  assert.equal(state.versions[first].fingerprint, original.versions[first].fingerprint);
+  assert.equal(state.versions[first].publication.status, 'withdrawn');
+  assert.equal(state.versions[first].publication.operation_key, intents.get(101).operation_key);
+  assert.deepEqual(state.versions[second], original.versions[second]);
+  assert.deepEqual(state.versions[unrelated], original.versions[unrelated]);
+  assert.deepEqual(state.versions[nonArxiv], original.versions[nonArxiv]);
+  assert.deepEqual(await applyDeletion({ ...base, enabled: true, deleteVersion }), []);
+  f.add(first);
+  const restored = f.commit('Republish the first version');
+  const next = mockedGitHub(restored, f.store, null, wrapTar(f, f.artifact()));
+  assert.deepEqual(await applyDeletion({ ...base, enabled: true, deleteVersion, context: next.context, github: next.github }), []);
+  assert.equal(postCount, 1);
+});
+
+test('uncertain requests, ownership mismatch, and unsuccessful deployments never clear or resend a deletion', async t => {
+  const f = fixture(t);
+  f.remove(first);
+  const sha = f.commit('Remove one version');
+  const zip = wrapTar(f, f.artifact());
+  const original = structuredClone(f.store);
+  let postCount = 0;
+  const intents = new Set();
+  const state = {
+    loadLedger: async () => ({ sha: 'a'.repeat(40), state: structuredClone(f.store) }),
+    claim: async id => {
+      if (intents.has(id)) return false;
+      intents.add(id);
+      return true;
+    },
+    saveLedger: async () => assert.fail('must preserve ledger on uncertain or failed response'),
+  };
+  const run = async (failure, ledger = f.store) => {
+    const mock = mockedGitHub(sha, ledger, failure, zip);
+    return applyDeletion({ enabled: true, root: f.root, repository, endpoint, context: mock.context,
+      state, github: mock.github, deleteVersion: async () => { postCount++; throw new Error('connection reset'); } });
+  };
+  await assert.rejects(run('failure'), /缺少本次/);
+  await assert.rejects(run('old'), /无法证明/);
+  await assert.rejects(run('digest-race'), /更新/);
+  assert.equal(postCount, 0);
+  const duplicate = structuredClone(f.store);
+  duplicate.versions[second].id = 101;
+  assert.deepEqual(await run(null, duplicate), []);
+  assert.equal(intents.size, 0);
+  await assert.rejects(run(null), /connection reset/);
+  assert.deepEqual(await run(null), []);
+  assert.deepEqual(f.store, original);
+  assert.equal(postCount, 1);
+});
+
+test('delete transport makes no assumptions about auth, JSON success, or duplicate errors', async () => {
+  let requests = 0;
+  const contract = { encoding: 'json', authentication: 'delete-headers', success: { status: 200, type: 'json', path: ['ok'], equals: true } };
+  const options = { contract, deleteHeaders: '{"X-Mock":"deletion-only"}', createHeaders: '{"X-Mock":"creation-only"}' };
+  assert.throws(() => createDeleteVersion(options), /未启用/);
+  assert.throws(() => createDeleteVersion({ enabled: true }), /后端确认/);
+  assert.throws(() => createDeleteVersion({ enabled: true, contract }), /密钥显式配置/);
+  for (const [status, body] of [[200, '{}'], [200, '{"ok":false}'], [200, 'bad JSON'], [404, '{"ok":true}'], [409, '{"ok":true}']]) {
+    const remove = createDeleteVersion({ ...options, enabled: true, fetchImpl: async (_, request) => {
+      requests++;
+      assert.equal(request.headers.get('X-Mock'), 'deletion-only');
+      assert.deepEqual(JSON.parse(request.body), { id: 101 });
+      return new Response(body, { status });
+    } });
+    await assert.rejects(remove(101), /人工核对/);
+  }
+  assert.equal(requests, 5);
+});
+
+test('separate journal reserves a remote ID once and stores confirmed ledger with CAS', async () => {
+  const files = new Map();
+  const initial = { versions: { [first]: { id: 101 } } };
+  files.set('paperskill-sync-state.json', { sha: 'a'.repeat(40), state: initial });
+  const writes = [];
+  const store = deletionState({ repository, token: 'mock-token', branch: 'paperskill-sync-state',
+    fetchImpl: async (url, options) => {
+      const path = new URL(url).pathname.split('/').pop();
+      const previous = files.get(path);
+      if (options.method === 'GET') {
+        if (!previous) return new Response('{}', { status: 404 });
+        return Response.json({ sha: previous.sha, content: Buffer.from(JSON.stringify(previous.state)).toString('base64'), encoding: 'base64' });
+      }
+      assert.equal(options.method, 'PUT');
+      const body = JSON.parse(options.body);
+      assert.equal(body.branch, 'paperskill-sync-state');
+      if (body.sha !== previous?.sha) return new Response('{}', { status: 409 });
+      const sha = ('b' + writes.length).padEnd(40, 'b');
+      files.set(path, { sha, state: JSON.parse(Buffer.from(body.content, 'base64').toString('utf8')) });
+      writes.push(path);
+      return Response.json({ content: { sha } });
+    },
+  });
+  const before = await store.loadLedger();
+  assert.equal(await store.claim(101, { endpoint, version_key: first }), true);
+  assert.equal(await store.claim(101, { endpoint, version_key: first }), false);
+  assert.deepEqual(await store.loadLedger(), before);
+  await assert.rejects(store.saveLedger('0'.repeat(40), initial), /409/);
+  await store.saveLedger(before.sha, { versions: { [first]: { id: 101, publication: { status: 'withdrawn' } } } });
+  assert.deepEqual(writes, ['paperskill-delete-journal.json', 'paperskill-sync-state.json']);
+});
+
+test('a stale deployment after reserving an ID blocks the POST and leaves the ledger intact', async t => {
+  const f = fixture(t);
+  f.remove(first);
+  const sha = f.commit('Unpublish first version');
+  const mock = mockedGitHub(sha, f.store, null, wrapTar(f, f.artifact()));
+  const initial = structuredClone(f.store);
+  let expired = false;
+  const state = {
+    loadLedger: async () => ({ sha: 'a'.repeat(40), state: structuredClone(f.store) }),
+    claim: async () => { expired = true; return true; },
+    saveLedger: async () => assert.fail('must not update ledger before success'),
+  };
+  const github = { ...mock.github, checkDeployment: async context => {
+    const current = await mock.github.checkDeployment(context);
+    return expired ? { ...current, deployment_status_id: 1005 } : current;
+  } };
+  await assert.rejects(applyDeletion({ enabled: true, root: f.root, repository, endpoint, context: mock.context,
+    state, github, deleteVersion: async () => assert.fail('must not submit after a newer deployment') }), /部署已变化/);
+  assert.deepEqual(f.store, initial);
+});
+
+test('success followed by a ledger conflict keeps the reservation and cannot resend', async t => {
+  const f = fixture(t);
+  f.remove(first);
+  const sha = f.commit('Unpublish first version');
+  const mock = mockedGitHub(sha, f.store, null, wrapTar(f, f.artifact()));
+  const original = structuredClone(f.store);
+  let reserved = false;
+  let requests = 0;
+  const state = {
+    loadLedger: async () => ({ sha: 'a'.repeat(40), state: structuredClone(f.store) }),
+    claim: async () => {
+      if (reserved) return false;
+      reserved = true;
+      return true;
+    },
+    saveLedger: async () => { throw new Error('ledger conflict'); },
+  };
+  const opts = { enabled: true, root: f.root, repository, endpoint, context: mock.context,
+    state, github: mock.github, deleteVersion: async () => { requests++; } };
+  await assert.rejects(applyDeletion(opts), /ledger conflict/);
+  assert.deepEqual(await applyDeletion(opts), []);
+  assert.equal(requests, 1);
+  assert.deepEqual(f.store, original);
 });

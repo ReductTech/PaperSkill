@@ -4,8 +4,8 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { ROOT } = require('./lib/repository');
-const { endpointFor } = require('./sync-paperskill');
+const { ROOT } = require('../../../scripts/lib/repository');
+const { endpointFor } = require('../../../scripts/sync-paperskill');
 const { loadSnapshot, verifyArtifact, removalEvidence, restorationEvidence } = require('./lib/deployment-snapshot');
 const { githubPublication } = require('./lib/github-publication');
 const { planPublication } = require('./lib/publication-plan');

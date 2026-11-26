@@ -2,7 +2,7 @@
 
 const { createHash } = require('node:crypto');
 const { validKey, SHA } = require('./deployment-snapshot');
-const { paperIdentifier } = require('../sync-paperskill');
+const { paperIdentifier } = require('../../../../scripts/sync-paperskill');
 
 const DIGEST = /^[0-9a-f]{64}$/;
 const record = value => value && typeof value === 'object' && !Array.isArray(value);

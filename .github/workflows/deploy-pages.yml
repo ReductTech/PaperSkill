@@ -114,10 +114,41 @@ jobs:
           PAPERSKILL_STATE_BRANCH: ${{ vars.PAPERSKILL_STATE_BRANCH || 'paperskill-sync-state' }}
           PAPERSKILL_API_BASE_URL: ${{ vars.PAPERSKILL_API_BASE_URL || 'https://app.reduct.cn' }}
         run: |
-          node scripts/reconcile-paperskill.js "$RUNNER_TEMP/paperskill-publication-report"
+          node .github/scripts/publication/reconcile-paperskill.js "$RUNNER_TEMP/paperskill-publication-report"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: paperskill-publication-preview-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/paperskill-publication-report
           if-no-files-found: ignore
+
+  delete-publication-versions:
+    if: ${{ success() && github.ref == 'refs/heads/main' && needs.deploy.result == 'success' && needs.build.outputs.pages_artifact_id != '' && vars.PAPERSKILL_DELETE_ENABLED == 'true' }}
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    permissions:
+      contents: write
+      actions: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+      - name: Delete verified unpublished database versions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PAGES_ARTIFACT_ID: ${{ needs.build.outputs.pages_artifact_id }}
+          PAPERSKILL_STATE_BRANCH: ${{ vars.PAPERSKILL_STATE_BRANCH || 'paperskill-sync-state' }}
+          PAPERSKILL_API_BASE_URL: ${{ vars.PAPERSKILL_API_BASE_URL || 'https://app.reduct.cn' }}
+          PAPERSKILL_DELETE_ENABLED: ${{ vars.PAPERSKILL_DELETE_ENABLED }}
+          PAPERSKILL_DELETE_CONTRACT: ${{ vars.PAPERSKILL_DELETE_CONTRACT }}
+          PAPERSKILL_API_HEADERS: ${{ secrets.PAPERSKILL_API_HEADERS }}
+          PAPERSKILL_DELETE_HEADERS: ${{ secrets.PAPERSKILL_DELETE_HEADERS }}
+        run: node .github/scripts/publication/apply-deletion.js

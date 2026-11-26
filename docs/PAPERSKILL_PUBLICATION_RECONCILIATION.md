@@ -38,13 +38,21 @@ Pages 的 `deploy` job 成功后，`reconcile-publication` 使用只读权限核
 
 未登记、归属不一致或多个账本版本共用一个 ID 的项目进入 `blocked`。账本的 `synced` 及 ID 表示创建或认领记录，正式远端的当前归属还需要后端查询合同。已有撤回回执可随版本记录提供 `"publication": {"status": "withdrawn", "source_sha": "<成功撤回对应的提交 SHA>" }`。脚本核对该提交上的版本缺失、其后重新加入版本以及当前发布入口，生成同一远端 ID 的恢复候选。本阶段预演只读取这类回执。
 
-## 后端合同与接入点
+## 删除联调与启用
 
-`scripts/lib/paperskill-lifecycle.js` 保留三个注入操作 `lookup(identity)`、`withdraw(identity, context)` 和 `restore(identity, context)`。测试使用模拟接口，生产预演入口未装配业务传输。
+后端提供的操作是向 [delete_version](https://app.reduct.cn/Web/V1/Paperskill/delete_version) 发送 `POST`，参数为 `id`。客户端从可核实的同步账本取值，只发送对应版本 ID。当前仓库的创建接口使用 multipart 并支持通过 `PAPERSKILL_API_HEADERS` 配置请求头。删除的编码、鉴权、成功与失败响应以及重复删除语义，以后端确认的接口合同为准。
 
-- 查验要求返回远端版本 ID、来源仓库、数据库环境、版本键、网页路径及公开状态。后端应明确区分查无记录、归属冲突、已撤回和活跃状态。
-- 撤回与恢复应接收相同身份字段、部署 SHA、部署 ID、服务端认可的顺序标记、期望旧状态及幂等操作键。响应应明确最终版本 ID、发布状态、是否发生变化及对应的操作身份。同键重试应可读回已完成结果。
-- 写入前须在服务端事务内校验版本归属及顺序。软撤回保留论文、同篇其他版本、贡献者、历史评分和审计记录。超时后须能按操作键或版本 ID 查询结果，避免盲目重发。正式路由、结构、鉴权、幂等、顺序与保留语义由后端合同确定。
-- 接入正式 API 后，在调用模块中装配传输和超时处理，为生产写入设置单独开关与权限，把确认后的状态及操作回执持久化到同步账本。执行端还需复用 `scripts/lib/github-publication.js` 的部署核验和 ID 归属约束。
+仓库变量 `PAPERSKILL_DELETE_ENABLED` 默认为关闭。仅当其设为 `true`，且同一次 Pages 部署成功时，才启动写入 job。该 job 独立于原有入库和评分通知流程。启用前须设置 `PAPERSKILL_DELETE_CONTRACT`，供客户端按已确认的合同编码及判定响应。
 
-`npm run test:publication-reconciliation` 在临时 Git 仓库和模拟接口上验证上述行为。仓库侧工作流只产生审阅报告。
+- `encoding` 支持 `json`、`form` 或 `multipart`，其中 `form` 对应 `application/x-www-form-urlencoded`。
+- `authentication` 支持 `none`、`create-headers` 或 `delete-headers`。确认可共用后才选择 `create-headers`，对应 `PAPERSKILL_API_HEADERS`。独立鉴权使用 `PAPERSKILL_DELETE_HEADERS`。
+- `success.status` 配置确切的成功 HTTP 状态。`success.type` 支持 `empty`、`text` 或 `json`，其中 `text` 指定 `equals`，`json` 指定字段路径数组 `path` 和严格匹配的标量 `equals`。测试里的编码与状态均为模拟合同。
+- 启用前由后端确认删除仅影响该 ID 对应的网页版本，并保留同篇其他版本、作者与历史评分。此接口的请求范围是 ID，服务端数据保留语义需要在联调中核实。
+
+写入 job 重新核对当前部署、制品、Git 证据、版本归属和账本。发送请求前，以远端 ID 在独立的 `paperskill-delete-journal.json` 中记录操作意向。部署或账本变化时停止。确认成功后才更新 `paperskill-sync-state.json` 的该版本记录，保留原 ID、入库指纹和删除回执。
+
+接口失败、超时、响应不匹配或账本写入失败时，保留账本原记录和操作意向，交人工核对。操作日志中已有该 ID 时，重复运行会跳过该 ID。网页重新发布时也走人工核对，保留已确认的删除记录。
+
+PR CI 遇到完整删除时跳过已删除的版本。其余教程仍走现有构建入口。有关脚本和测试位于 `.github/scripts/publication/`，以避免纳入评分清单的全局脚本摘要。
+
+在本地或 CI 可运行 `node --test .github/scripts/publication/tests/*.test.js`，测试使用临时 Git 仓库、模拟 GitHub 接口和模拟删除接口。

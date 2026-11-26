@@ -23,7 +23,7 @@ jobs:
       - name: Validate repository structure
         run: npm run validate
       - name: Test publication reconciliation
-        run: npm run test:publication-reconciliation
+        run: node --test .github/scripts/publication/tests/*.test.js
       - name: Test database synchronization
         run: npm run test:paperskill-sync
       - name: Test deployment manifest
@@ -35,4 +35,4 @@ jobs:
         run: npm run validate:pr
       - name: Build changed tutorials
         if: github.event_name == 'pull_request'
-        run: npm run build:changed
+        run: node .github/scripts/publication/build-changed.js
