@@ -1,0 +1,54 @@
+import React from 'react';
+import { Ablation } from './ablation';
+import { ActiveRecovery } from './active-recovery';
+import { Backprojection } from './backprojection';
+import { Benchmarks } from './benchmarks';
+import { CoordinateSpaces } from './coordinate-spaces';
+import { DeploymentBoundary } from './deployment-boundary';
+import { DepthQuery } from './depth-query';
+import { GlobalLocal } from './global-local';
+import { GlobalQueryProposal } from './global-query-proposal';
+import { ModularSkillsProposal } from './modular-skills-proposal';
+import { MuseumCover } from './museum-cover';
+import { MuseumProblem } from './museum-problem';
+import { MuseumSkills } from './museum-skills';
+import { PixelGrounding } from './pixel-grounding';
+import { Projection } from './projection';
+import { QDMarginalCritique } from './qd-marginal-critique';
+import { ResearchProtocol } from './research-protocol';
+import { StageSwitchCritique } from './stage-switch-critique';
+import { SystemOverview } from './system-overview';
+import { TemporalContext } from './temporal-context';
+import { VisibilityRouting } from './visibility-routing';
+import { WaypointChoice } from './waypoint-choice';
+import { WaypointCritique } from './waypoint-critique';
+
+export interface WidgetProps {
+  chapterId: string;
+  moduleId: string;
+}
+
+export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
+widgetRegistry['ablation'] = Ablation;
+widgetRegistry['active-recovery'] = ActiveRecovery;
+widgetRegistry['backprojection'] = Backprojection;
+widgetRegistry['benchmarks'] = Benchmarks;
+widgetRegistry['coordinate-spaces'] = CoordinateSpaces;
+widgetRegistry['deployment-boundary'] = DeploymentBoundary;
+widgetRegistry['depth-query'] = DepthQuery;
+widgetRegistry['global-local'] = GlobalLocal;
+widgetRegistry['global-query-proposal'] = GlobalQueryProposal;
+widgetRegistry['modular-skills-proposal'] = ModularSkillsProposal;
+widgetRegistry['museum-cover'] = MuseumCover;
+widgetRegistry['museum-problem'] = MuseumProblem;
+widgetRegistry['museum-skills'] = MuseumSkills;
+widgetRegistry['pixel-grounding'] = PixelGrounding;
+widgetRegistry['projection'] = Projection;
+widgetRegistry['qd-marginal-critique'] = QDMarginalCritique;
+widgetRegistry['research-protocol'] = ResearchProtocol;
+widgetRegistry['stage-switch-critique'] = StageSwitchCritique;
+widgetRegistry['system-overview'] = SystemOverview;
+widgetRegistry['temporal-context'] = TemporalContext;
+widgetRegistry['visibility-routing'] = VisibilityRouting;
+widgetRegistry['waypoint-choice'] = WaypointChoice;
+widgetRegistry['waypoint-critique'] = WaypointCritique;
