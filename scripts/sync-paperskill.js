@@ -5,7 +5,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
-const { ROOT, listSubmissions, metadataFor } = require('./lib/repository');
+const { ROOT, listSubmissions, metadataFor, validArxivId } = require('./lib/repository');
 
 const DEFAULT_BASE_URL = 'https://app.reduct.cn';
 const COPIED_DATABASE_ENDPOINT = 'https://php-testbed-lyx.reduct.cn/Web/V1/Paperskill/create_version';
@@ -26,7 +26,7 @@ function paperIdentifier(paperUrl) {
   const pathname = decodeURIComponent(url.pathname);
   if (['arxiv.org', 'www.arxiv.org', 'export.arxiv.org'].includes(url.hostname)) {
     const id = pathname.replace(/^\/(abs|pdf|html)\//, '').replace(/\.pdf$/i, '').replace(/v\d+$/, '');
-    if (/^(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i.test(id)) return { arxiv_id: id };
+    if (validArxivId(id)) return { arxiv_id: id };
   }
   if (['doi.org', 'dx.doi.org', 'www.doi.org'].includes(url.hostname)) {
     const doi = pathname.slice(1);
@@ -62,14 +62,21 @@ function payloadFor(submission, meta, override = {}, includeUuid = false) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(payload.version_date) || !Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== payload.version_date) {
     throw new Error('version_date 必须是真实的 YYYY-MM-DD 日期');
   }
-  const identifier = override.arxiv_id !== undefined || override.doi !== undefined
-    ? { arxiv_id: override.arxiv_id, doi: override.doi }
-    : paperIdentifier(meta.paperUrl);
+  if (meta.arxivId !== undefined && !validArxivId(meta.arxivId)) {
+    throw new Error('paper.json 的 arxivId 必须是有效的裸 arXiv ID');
+  }
+  if (meta.arxivId !== undefined && override.arxiv_id !== undefined && meta.arxivId !== override.arxiv_id) {
+    throw new Error('paper.json 的 arxivId 与已有 arxiv_id 覆盖配置冲突，请核对论文身份');
+  }
+  const legacyIdentifier = override.arxiv_id !== undefined || override.doi !== undefined;
+  const identifier = meta.arxivId !== undefined
+    ? { arxiv_id: meta.arxivId }
+    : legacyIdentifier ? { arxiv_id: override.arxiv_id, doi: override.doi } : paperIdentifier(meta.paperUrl);
   const arxivId = identifier.arxiv_id;
   const doi = identifier.doi;
   if (!arxivId) throw Object.assign(new Error('没有明确的 arxiv_id，按入库策略自动跳过（仅有 DOI 也不提交）'), { skip: 'missing_arxiv_id' });
   if (doi) throw new Error('需要唯一的 arxiv_id，不能同时指定 doi');
-  if (typeof arxivId !== 'string' || !/^(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i.test(arxivId)) throw new Error('arxiv_id 格式无效');
+  if (!validArxivId(arxivId)) throw new Error('arxiv_id 格式无效');
   payload.arxiv_id = arxivId;
   const uuid = override.uuid ?? (includeUuid ? participant.jianlunId : undefined);
   if (uuid !== undefined && uuid !== '') {

@@ -9,11 +9,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE } = require('./lib/repository');
+const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE, validArxivId } = require('./lib/repository');
 const { resolveGithubLogin } = require('./lib/github-identity');
 
 const USAGE = [
-  '用法: npm run modify -- <已有网页的相对路径> --participant "展示名" --github "用户名" [--jianlun-id "减论完整账号ID"] [--pinyin "lilei"] [--date 0922] [--version lilei0922] [--force]',
+  '用法: npm run modify -- <已有网页的相对路径> --participant "展示名" --github "用户名" [--arxiv-id 2412.04467] [--jianlun-id "减论完整账号ID"] [--pinyin "lilei"] [--date 0922] [--version lilei0922] [--force]',
   '示例: npm run modify -- html_output/attention_is_all_you_need/tianaopang0913 --participant "李雷" --github "lilei" --pinyin "lilei"',
   '说明: 复制为 html_output/<论文名>/<新版本>，新版本名 = 姓名拼音小写 + 修改日期 MMDD（同一天重复执行自动追加 _2）。',
 ].join('\n');
@@ -138,6 +138,8 @@ const paperDir = path.join(OUTPUT_ROOT, paperName);
 const source = path.join(paperDir, sourceVersion);
 if (!fs.existsSync(path.join(source, 'paper.json'))) throw new Error(`找不到要修改的网页版本：${path.relative(ROOT, source)}`);
 const sourceMeta = JSON.parse(fs.readFileSync(path.join(source, 'paper.json'), 'utf8'));
+const arxivId = opts['arxiv-id']?.trim();
+if (arxivId !== undefined && !validArxivId(arxivId)) throw new Error('--arxiv-id 必须是裸 arXiv ID，未填写时请省略此参数');
 opts.github = resolveGithubLogin(opts.github);
 
 const date = resolveDate(opts);
@@ -156,6 +158,7 @@ const jianlunId = String(opts['jianlun-id'] || '').trim();
 if (jianlunId) participant.jianlunId = jianlunId;
 const ancestors = buildAncestors(sourceMeta, sourceVersion);
 const meta = { ...sourceMeta, participants: [participant], status: 'review', version, versionDate: date.iso };
+if (arxivId) meta.arxivId = arxivId;
 if (ancestors.length > 0) meta.ancestors = ancestors;
 fs.writeFileSync(path.join(target, 'paper.json'), `${JSON.stringify(meta, null, 2)}\n`, 'utf8');
 

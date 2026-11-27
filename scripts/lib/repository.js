@@ -9,6 +9,11 @@ const PAPER_NAME_RE = /^[a-z0-9]+(?:_[a-z0-9]+)*$/;
 // 版本目录名：姓名拼音小写 + 修改日期 MMDD，同一人同一天重复提交追加 _2、_3
 const VERSION_NAME_RE = /^[a-z][a-z0-9]*\d{4}(?:_\d+)?$/;
 const VERSION_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const ARXIV_ID_RE = /^(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i;
+
+function validArxivId(value) {
+  return typeof value === 'string' && ARXIV_ID_RE.test(value);
+}
 
 function readJson(file) {
   try {
@@ -82,6 +87,9 @@ function validateMetadata(meta, expectedPaperName, expectedVersion) {
   if (!PAPER_NAME_RE.test(meta.paperName || '')) errors.push('paperName 必须为小写字母、数字和下划线，且以下划线连接单词（论文全称）');
   if (meta.paperName !== expectedPaperName) errors.push(`paperName 必须与论文目录名一致（期望 ${expectedPaperName}）`);
   if (!/^https:\/\//.test(meta.paperUrl || '')) errors.push('paperUrl 必须是 https:// 链接');
+  if (meta.arxivId !== undefined && !validArxivId(meta.arxivId)) {
+    errors.push('arxivId 必须是裸 arXiv ID（例如 2412.04467），未填写时可省略');
+  }
   if (!/^\d+\.\d+\.\d+$/.test(meta.skillVersion || '')) errors.push('skillVersion 必须是 x.y.z');
   if (!['draft', 'review', 'published'].includes(meta.status)) errors.push('status 必须是 draft、review 或 published');
   if (meta.entry !== 'index.html') errors.push('entry 必须是 index.html');
@@ -188,6 +196,7 @@ module.exports = {
   findVersion,
   resolveSubmissions,
   validateMetadata,
+  validArxivId,
   metadataFor,
   versionRecord,
   catalogRecord,

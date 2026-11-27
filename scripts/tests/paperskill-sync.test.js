@@ -92,6 +92,18 @@ test('invalid metadata is blocked before any upload; manual identifiers support 
   assert.equal(payloadFor(submission, metadata({ paperUrl: 'https://conference.example/paper.pdf' }), { arxiv_id: '1706.03762' }).arxiv_id, '1706.03762');
 });
 
+test('a verified paper arxivId enables a conference URL and keeps the same delivery for existing links', () => {
+  const original = planFor([submission], {}, false, () => metadata())[0];
+  const updated = metadata({ paperUrl: 'https://conference.example/paper.html', arxivId: '1706.03762' });
+  const explicit = planFor([submission], {}, false, () => updated)[0];
+  assert.deepEqual(explicit.payload, original.payload);
+  assert.equal(explicit.fingerprint, original.fingerprint);
+  assert.equal(payloadFor(submission, metadata({ arxivId: '2412.04467' })).arxiv_id, '2412.04467');
+  assert.equal(payloadFor(submission, updated, { arxiv_id: '1706.03762' }).arxiv_id, '1706.03762');
+  assert.throws(() => payloadFor(submission, updated, { arxiv_id: '2412.04467' }), /冲突/);
+  assert.throws(() => payloadFor(submission, metadata({ arxivId: '1706.03762v2' })), /arxivId/);
+});
+
 test('real HTTP request uses POST multipart boundaries, Unicode fields, and JSON-string ancestry', async (t) => {
   let captured;
   const server = http.createServer(async (req, res) => {

@@ -28,13 +28,16 @@ test('Jianlun ID survives import and catalog; copied versions use their own iden
   const readVersion = (version) => JSON.parse(fs.readFileSync(path.join(root, 'html_output', 'test_paper', version, 'paper.json'), 'utf8'));
   const id = '00AbCd' + '1234567890abcdef'.repeat(8);
   const args = ['source', 'test_paper', '--title', 'Test paper', '--paper-url', 'https://example.com/paper', '--participant', '测试者', '--pinyin', 'tester', '--github', '@test-user', '--date', '2026-09-23'];
-  run('import-paper.js', [...args, '--jianlun-id', `  ${id}  `]);
+  run('import-paper.js', [...args, '--jianlun-id', `  ${id}  `, '--arxiv-id', '2412.04467']);
   const original = readVersion('tester0923');
   assert.equal(original.participants[0].jianlunId, id);
+  assert.equal(original.arxivId, '2412.04467');
+  assert.equal(original.paperUrl, 'https://example.com/paper');
   assert.deepEqual(repo.validateMetadata(original, 'test_paper', 'tester0923'), []);
   for (const [version, extra] of [['empty0923', []], ['blank0923', ['--jianlun-id', '   ']]]) {
     run('import-paper.js', [...args, '--version', version, ...extra]);
     assert.ok(!Object.hasOwn(readVersion(version).participants[0], 'jianlunId'));
+    assert.ok(!Object.hasOwn(readVersion(version), 'arxivId'));
   }
   for (const [version, extra, expected] of [
     ['next0923', ['--jianlun-id', '  000NewCaseID  '], '000NewCaseID'],
@@ -43,6 +46,7 @@ test('Jianlun ID survives import and catalog; copied versions use their own iden
     run('modify-version.js', ['test_paper/tester0923', '--participant', '修改者', '--github', 'next-user', '--version', version, '--date', '2026-09-23', ...extra]);
     const modified = readVersion(version);
     assert.equal(modified.participants[0].jianlunId, expected);
+    assert.equal(modified.arxivId, '2412.04467');
     assert.deepEqual(modified.ancestors, [{ github: 'test-user', version: 'tester0923' }]);
   }
   assert.deepEqual(readVersion('tester0923'), original);
@@ -52,6 +56,8 @@ test('Jianlun ID survives import and catalog; copied versions use their own iden
   assert.equal(catalog[0].versions.find((v) => v.version === 'none0923').participants[0].jianlunId, undefined);
   original.participants[0].jianlunId = 123;
   assert.ok(repo.validateMetadata(original, 'test_paper', 'tester0923').some((error) => error.includes('jianlunId')));
+  assert.ok(repo.validateMetadata({ ...original, arxivId: 2412.04467 }, 'test_paper', 'tester0923')
+    .some((error) => error.includes('arxivId')));
 });
 
 function loadPortal() {
@@ -62,6 +68,7 @@ function loadPortal() {
       value: '', innerHTML: '', textContent: '', hidden: true, style: {}, listeners: {},
       addEventListener(event, handler) { this.listeners[event] = handler; },
       insertAdjacentHTML() {}, scrollIntoView() {}, focus() { this.focused = true; },
+      setCustomValidity(message) { this.validationMessage = message; }, reportValidity() {},
     });
     return elements.get(selector);
   };
@@ -104,7 +111,7 @@ test('version modal hides long IDs behind a copyable detail dialog', async () =>
   assert.match(vm.runInContext("versionJianlunIds({participants:[{name:'A',jianlunId:'A1'},{name:'B'}]})", context), /A · 减论 ID[\s\S]*查看[\s\S]*B · 减论 ID[\s\S]*暂无/);
 });
 
-test('starter form includes an optional Jianlun ID in the import command', () => {
+test('starter form includes only supplied, valid identifiers in the import command', () => {
   const { element } = loadPortal();
   for (const [key, value] of Object.entries({ title: 'Test', url: 'https://example.com', 'paper-name': 'test', source: 'test-user', name: 'Test', pinyin: 'tester', 'jianlun-id': '  00AbCd  ' })) {
     element(`#start-${key}`).value = value;
@@ -112,7 +119,14 @@ test('starter form includes an optional Jianlun ID in the import command', () =>
   const submit = () => element('#starter-form').listeners.submit({ preventDefault() {} });
   submit();
   assert.ok(element('#import-command').textContent.endsWith("--jianlun-id '00AbCd'"));
+  assert.ok(!element('#import-command').textContent.includes('--arxiv-id'));
+  element('#start-arxiv-id').value = ' 2412.04467 ';
   element('#start-jianlun-id').value = '  ';
   submit();
   assert.ok(!element('#import-command').textContent.includes('--jianlun-id'));
+  assert.match(element('#import-command').textContent, /--paper-url "https:\/\/example.com" --arxiv-id 2412\.04467/);
+  element('#start-arxiv-id').value = 'https://arxiv.org/abs/2412.04467';
+  submit();
+  assert.ok(element('#starter-result').hidden);
+  assert.match(element('#start-arxiv-id').validationMessage, /裸编号/);
 });

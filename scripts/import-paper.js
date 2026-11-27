@@ -3,11 +3,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE, findPaper, listVersions } = require('./lib/repository');
+const { ROOT, OUTPUT_ROOT, PAPER_NAME_RE, VERSION_NAME_RE, findPaper, listVersions, validArxivId } = require('./lib/repository');
 const { resolveGithubLogin } = require('./lib/github-identity');
 
 function usage() {
-  console.error('用法: npm run import -- <生成目录> <paper-name> --title "..." --paper-url "https://..." --participant "李雷" [--pinyin "limei"] [--github "..."] [--jianlun-id "减论完整账号ID"] [--date 0903] [--version liming0903] [--force] [--year 2024] [--venue "..."] [--topics "CV,CNN"]');
+  console.error('用法: npm run import -- <生成目录> <paper-name> --title "..." --paper-url "https://..." --participant "李雷" [--arxiv-id 2412.04467] [--pinyin "limei"] [--github "..."] [--jianlun-id "减论完整账号ID"] [--date 0903] [--version liming0903] [--force] [--year 2024] [--venue "..."] [--topics "CV,CNN"]');
   process.exit(2);
 }
 
@@ -87,6 +87,8 @@ for (const key of ['title', 'paper-url', 'participant']) {
   if (!opts[key]) throw new Error(`缺少 --${key}`);
 }
 if (!/^https:\/\//.test(opts['paper-url'])) throw new Error('--paper-url 必须是 https:// 链接');
+const arxivId = opts['arxiv-id']?.trim();
+if (arxivId !== undefined && !validArxivId(arxivId)) throw new Error('--arxiv-id 必须是裸 arXiv ID，未填写时请省略此参数');
 opts.github = resolveGithubLogin(opts.github);
 
 const versionFile = path.join(ROOT, 'paper-skill', 'VERSION');
@@ -122,6 +124,7 @@ const meta = {
   year: opts.year ? Number(opts.year) : null,
   venue: opts.venue || '',
   paperUrl: opts['paper-url'],
+  ...(arxivId ? { arxivId } : {}),
   participants: [participant],
   topics: opts.topics ? opts.topics.split(',').map((item) => item.trim()).filter(Boolean) : [],
   skillVersion,

@@ -4,7 +4,7 @@
 
 > 如果本次是在已有版本上继续修改（功能 6），网页已经位于 `html_output/<论文名>/<版本>/`，跳过第 5 步的 `npm run import`，其余步骤照常执行。
 
-导入或核对已有版本时，`--paper-url` 和 `paper.json` 的 `paperUrl` 均按 `AGENT_WORKFLOW.md` §3 选择：优先使用经标题、作者核对的同一篇论文的 `https://arxiv.org/abs/<论文ID>`；没有找到可确认的 arXiv 版本时，再使用其他可核实的公开来源链接。
+导入或核对已有版本时，按 `AGENT_WORKFLOW.md` §3 确认 `paperUrl` 和可选的 `arxivId`。保留用户选择的公开论文链接，并将已核实的 arXiv 裸编号单独传给 `--arxiv-id`。无确认编号时省略此参数。
 
 1. 比较当前 `package.json` 和依赖锁文件与首次安装后的内容指纹：如果文件集合和内容均未变化且 `node_modules/` 仍可用，跳过依赖安装；如果任一文件新增、删除或改变，或者 `node_modules/` 缺失，则重新执行 `npm install`；
 2. 无论是否跳过安装，都必须重新执行 `npm run build` 和页面测试。若跳过安装后构建因依赖缺失或损坏失败，应自动执行一次 `npm install` 后重新构建；
@@ -12,7 +12,7 @@
 4. 在作品仓库中创建 `paper/<paper-name>` 分支；
 5. 按 `docs/PARTICIPATING.md` 运行 `npm run import -- ...`，中文姓名必须显式传入 `--pinyin "liming"`；已提供减论 ID 时传入 `--jianlun-id "完整ID"`，未提供则省略；
 6. 确认项目进入 `html_output/<paper-name>/<version>/`，并保持 `html_output/`、论文目录和版本目录名称不变；不要覆盖其他同学已有的版本；
-7. 检查 `paper.json`、论文链接、公开展示信息和内部追踪字段（重点核对 `paperName`、`version`、`versionDate`、`participants[].jianlunId`）；若来自功能 6、跳过了导入，身份信息有补充或更正时同步更新本版 `paper.json` 中对应贡献者的字段；
+7. 检查 `paper.json`、论文链接、可选的 `arxivId`、公开展示信息和内部追踪字段（重点核对 `paperName`、`version`、`versionDate`、`participants[].jianlunId`）；若来自功能 6、跳过了导入，补充或更正的信息同步更新到本版 `paper.json`；
 8. 在仓库根目录运行：
 
    ```powershell

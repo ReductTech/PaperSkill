@@ -18,6 +18,8 @@ function toPaperName(value) {
 
 const titleField = document.querySelector('#start-title');
 const paperNameField = document.querySelector('#start-paper-name');
+const arxivIdField = document.querySelector('#start-arxiv-id');
+arxivIdField.addEventListener('input', () => arxivIdField.setCustomValidity(''));
 function syncPaperName() {
   const derived = toPaperName(titleField.value);
   if (derived) paperNameField.value = derived;
@@ -33,6 +35,14 @@ starterForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const title = document.querySelector('#start-title').value.trim();
   const url = document.querySelector('#start-url').value.trim();
+  const arxivId = arxivIdField.value.trim();
+  if (arxivId && !/^(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i.test(arxivId)) {
+    arxivIdField.setCustomValidity('请填写 arXiv 裸编号，例如 2412.04467。');
+    arxivIdField.reportValidity();
+    starterResult.hidden = true;
+    return;
+  }
+  const arxivArg = arxivId ? ` --arxiv-id ${arxivId}` : '';
   const paperName = document.querySelector('#start-paper-name').value.trim();
   const githubUser = document.querySelector('#start-source').value.trim();
   const jianlunId = document.querySelector('#start-jianlun-id').value.trim();
@@ -44,7 +54,7 @@ starterForm.addEventListener('submit', (event) => {
   document.querySelector('#paper-dir-name').textContent = `html_output/${paperName}/<拼音><修改日期>（导入脚本自动生成，例如 html_output/${paperName}/${pinyin}0903）`;
   document.querySelector('#branch-command').textContent = `git switch main\ngit pull origin main\ngit switch -c ${branch}`;
   document.querySelector('#skill-command').textContent = `$paper-skill 请阅读并分析《${title}》（${url}），制作成完整的中文交互式论文教程。`;
-  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}" --participant "${name}" --pinyin "${pinyin}" --github "${githubUser}"${jianlunArg}`;
+  document.querySelector('#import-command').textContent = `npm run import -- <你的网页项目目录> ${paperName} --title "${title}" --paper-url "${url}"${arxivArg} --participant "${name}" --pinyin "${pinyin}" --github "${githubUser}"${jianlunArg}`;
   document.querySelector('#build-paper-command').textContent = `npm run build:paper -- ${paperName}`;
   starterResult.hidden = false;
   starterResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -106,6 +116,8 @@ function paintActive() {
 function applySuggestion(paper) {
   titleField.value = paper.title;
   urlField.value = paper.paperUrl;
+  arxivIdField.value = '';
+  arxivIdField.setCustomValidity('');
   paperNameField.value = paper.paperName;
   hideSuggestions();
   starterResult.hidden = true;

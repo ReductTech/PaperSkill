@@ -4,7 +4,7 @@ PR 合并进 `main` 后，新增的 `Sync PaperSkill database` 工作流读取�
 
 ## 当前自动跳过策略（2026-10-30）
 
-只有能从 `paperUrl` 或明确的覆盖配置取得有效 `arxiv_id` 的版本，才进入自动评分和新建版本入库队列。只有 DOI、博客链接等无明确 arXiv ID 的版本记录为 `skipped`，保留网页发布，不打分、不发送创建请求，不因此使工作流失败。以后补齐 arXiv 链接即可重新进入队列。不会根据标题猜测标识，也不会删除已经存在的数据库记录。
+只有解析到有效 arXiv ID 的版本才进入自动评分和新建版本入库队列。优先读取本版 `paper.json` 的可选字段 `arxivId`，缺失时兼容既有覆盖配置，再尝试解析 `paperUrl`。已填写的显式 ID 与已有 arXiv 覆盖冲突时，须核对后再提交。只有 DOI、博客链接等且无明确 arXiv ID 的版本记录为 `skipped`，仍可发布网页。以后可保留原链接，补齐已核实的 `arxivId` 后重新进入队列。
 
 对方业务 `code=404` 确认未创建的论文也作为 `skipped/paper_not_found` 单独记录，继续处理其他版本。缺少被跳过的祖先时暂缓提交该后续版本。格式错误、待核对请求、鉴权、网络或 GitHub 状态保存错误仍作为真实错误报告，不能把此类故障标成成功。
 
@@ -59,7 +59,7 @@ PR 合并进 `main` 后，新增的 `Sync PaperSkill database` 工作流读取�
 | `user_display_name` | `participants[0].name` |
 | `user_github_name` | `participants[0].github`，去掉开头的 `@` |
 | `page_path` | `papers/<paperName>/<version>/`，相对路径 |
-| `arxiv_id` | 从 arXiv `paperUrl` 或明确覆盖配置解析；仅有 DOI 则跳过 |
+| `arxiv_id` | 优先使用 `paper.json` 的 `arxivId`，兼容既有覆盖，也可从 arXiv `paperUrl` 解析；仅有 DOI 则跳过 |
 | `ancestors` | 将 `github/version` 转换为 `user_github_name/version_name`，`JSON.stringify` 后作为单个表单值 |
 | `tags` | `topics` 用英文逗号连接 |
 | `uuid` | 默认不发送；只有明确的覆盖配置或确认后的可选映射才发送 |
