@@ -30,6 +30,8 @@ jobs:
         run: node .github/scripts/validate-paper-format.js "$BASE_SHA" "$GITHUB_SHA"
       - name: Validate repository structure
         run: npm run validate
+      - name: Test publication reconciliation
+        run: node --test .github/scripts/publication/tests/*.test.js
       - name: Test database synchronization
         run: npm run test:paperskill-sync
       - name: Test deployment manifest
@@ -41,4 +43,4 @@ jobs:
         run: npm run validate:pr
       - name: Build changed tutorials
         if: github.event_name == 'pull_request'
-        run: npm run build:changed
+        run: node .github/scripts/publication/build-changed.js
